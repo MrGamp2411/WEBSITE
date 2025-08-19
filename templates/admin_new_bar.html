@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Create New Bar</h1>
+<form method="get" action="/admin/bars/new" class="admin-form">
+  <div>
+    <label for="name">Name</label><br>
+    <input type="text" id="name" name="name" required>
+  </div>
+  <div>
+    <label for="address">Address</label><br>
+    <input type="text" id="address" name="address" required>
+  </div>
+  <div>
+    <label for="latitude">Latitude</label><br>
+    <input type="number" id="latitude" name="latitude" step="0.0001" required>
+  </div>
+  <div>
+    <label for="longitude">Longitude</label><br>
+    <input type="number" id="longitude" name="longitude" step="0.0001" required>
+  </div>
+  <button type="submit">Create Bar</button>
+</form>
+{% endblock %}

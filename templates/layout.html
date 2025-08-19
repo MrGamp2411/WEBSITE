@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SiplyGo Prototype</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    header { background: #ff7f50; color: white; padding: 1rem; }
+    nav a { margin-right: 1rem; color: white; text-decoration: none; }
+    .container { padding: 1rem; }
+    .bars { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .bar-card { border: 1px solid #ccc; padding: 1rem; width: 200px; }
+    .product { border-bottom: 1px solid #eee; padding: 0.5rem 0; }
+    .cart-item { border-bottom: 1px solid #eee; padding: 0.5rem 0; }
+    .admin-form { max-width: 400px; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/cart">Cart</a>
+      <a href="/admin/bars/new">Add Bar</a>
+    </nav>
+  </header>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

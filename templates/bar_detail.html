@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>{{ bar.name }}</h1>
+<p>{{ bar.address }}</p>
+<div class="categories">
+  {% for category, products in products_by_category.items() %}
+    <h2>{{ category.name }}</h2>
+    <p>{{ category.description }}</p>
+    {% for product in products %}
+      <div class="product">
+        <strong>{{ product.name }}</strong> - CHF {{ "%.2f"|format(product.price) }}<br>
+        <em>{{ product.description }}</em>
+        <form method="get" action="/bars/{{ bar.id }}/add_to_cart">
+          <input type="hidden" name="product_id" value="{{ product.id }}">
+          <button type="submit">Add to Cart</button>
+        </form>
+      </div>
+    {% endfor %}
+  {% endfor %}
+</div>
+{% endblock %}

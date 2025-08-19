@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Available Bars</h1>
+<div class="bars">
+  {% for bar in bars %}
+    <div class="bar-card">
+      <h2>{{ bar.name }}</h2>
+      <p>{{ bar.address }}</p>
+      <a href="/bars/{{ bar.id }}">View Menu</a>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
