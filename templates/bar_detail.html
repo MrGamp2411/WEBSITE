@@ -8,7 +8,7 @@
     <p>{{ category.description }}</p>
     {% for product in products %}
       <div class="product">
-        <strong>{{ product.name }}</strong> - CHF {{ "%.2f"|format(product.price) }}<br>
+               <strong>{{ product.name }}</strong> – CHF {{ product.price }}<br>
         <em>{{ product.description }}</em>
         <form method="get" action="/bars/{{ bar.id }}/add_to_cart">
           <input type="hidden" name="product_id" value="{{ product.id }}">
