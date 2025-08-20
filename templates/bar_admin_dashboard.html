@@ -1,12 +1,24 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="mb-4">Bar Admin Dashboard</h1>
+<h1>Bar Admin Dashboard</h1>
+<div class="dashboard-info">
+  <div class="card">
+    <h2>{{ user.username }}</h2>
+    <p>{{ user.email }}</p>
+    <p>{{ user.prefix }} {{ user.phone }}</p>
+  </div>
+</div>
 {% if bar %}
-<p>Managing {{ bar.name }}</p>
-<a class="btn btn-primary" href="/admin/bars/edit/{{ bar.id }}">Edit Bar</a>
-<a class="btn btn-secondary" href="/admin/bars/{{ bar.id }}/add_user">Add Staff</a>
-<a class="btn btn-success" href="/bar/{{ bar.id }}/categories/new">Add Category</a>
+<div class="dashboard-actions">
+  <div class="card">
+    <h3>{{ bar.name }}</h3>
+    <a class="btn btn--primary" href="/admin/bars/edit/{{ bar.id }}">Edit Bar</a>
+    <a class="btn" href="/admin/bars/{{ bar.id }}/add_user">Add Staff</a>
+    <a class="btn" href="/bar/{{ bar.id }}/categories/new">Add Category</a>
+  </div>
+</div>
 {% else %}
 <p>No bar assigned.</p>
 {% endif %}
 {% endblock %}
+

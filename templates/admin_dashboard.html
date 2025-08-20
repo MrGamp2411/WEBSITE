@@ -1,33 +1,29 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="mb-4">Admin Dashboard</h1>
-<div class="row">
-  <div class="col-md-4 mb-3">
-    <div class="card h-100">
-      <div class="card-body text-center">
-        <h5 class="card-title">Bars</h5>
-        <p class="card-text">Create and manage bars.</p>
-        <a class="btn btn-primary" href="/admin/bars">Manage Bars</a>
-      </div>
-    </div>
+<h1>Admin Dashboard</h1>
+<div class="dashboard-info">
+  <div class="card">
+    <h2>{{ user.username }}</h2>
+    <p>{{ user.email }}</p>
+    <p>{{ user.prefix }} {{ user.phone }}</p>
   </div>
-  <div class="col-md-4 mb-3">
-    <div class="card h-100">
-      <div class="card-body text-center">
-        <h5 class="card-title">Users</h5>
-        <p class="card-text">Manage platform users.</p>
-        <a class="btn btn-primary" href="/admin/users">Manage Users</a>
-      </div>
-    </div>
+</div>
+<div class="dashboard-actions">
+  <div class="card">
+    <h3>Bars</h3>
+    <p>Create and manage bars.</p>
+    <a class="btn btn--primary" href="/admin/bars">Manage Bars</a>
   </div>
-  <div class="col-md-4 mb-3">
-    <div class="card h-100">
-      <div class="card-body text-center">
-        <h5 class="card-title">Profile</h5>
-        <p class="card-text">View your admin profile.</p>
-        <a class="btn btn-primary" href="/admin/profile">View Profile</a>
-      </div>
-    </div>
+  <div class="card">
+    <h3>Users</h3>
+    <p>Manage platform users.</p>
+    <a class="btn btn--primary" href="/admin/users">Manage Users</a>
+  </div>
+  <div class="card">
+    <h3>Profile</h3>
+    <p>View your admin profile.</p>
+    <a class="btn btn--primary" href="/admin/profile">View Profile</a>
   </div>
 </div>
 {% endblock %}
+

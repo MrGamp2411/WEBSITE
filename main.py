@@ -246,6 +246,8 @@ def seed_super_admin():
         username="andreastojov",
         password="Andrea24",
         email="andreastojov@gmail.com",
+        phone="5551234",
+        prefix="+41",
         role="super_admin",
     )
     users[admin.id] = admin
@@ -267,6 +269,8 @@ def seed_bar_staff():
         username="baradmin",
         password="baradmin",
         email="baradmin@example.com",
+        phone="5555678",
+        prefix="+41",
         role="bar_admin",
         bar_id=bar_id,
     )
@@ -281,6 +285,8 @@ def seed_bar_staff():
         username="bartender",
         password="bartender",
         email="bartender@example.com",
+        phone="5559012",
+        prefix="+41",
         role="bartender",
         bar_id=bar_id,
     )

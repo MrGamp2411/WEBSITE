@@ -1,16 +1,17 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="mb-4">Login</h1>
-{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-<form method="get" action="/login" class="mx-auto" style="max-width:320px;">
-  <div class="mb-3">
-    <label class="form-label">Email</label>
-    <input class="form-control" type="email" name="email">
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Password</label>
-    <input class="form-control" type="password" name="password">
-  </div>
-  <button class="btn btn-primary" type="submit">Login</button>
-</form>
+<div class="auth-card">
+  <h1>Login</h1>
+  {% if error %}<p class="alert">{{ error }}</p>{% endif %}
+  <form method="get" action="/login">
+    <label>Email
+      <input type="email" name="email" required>
+    </label>
+    <label>Password
+      <input type="password" name="password" required>
+    </label>
+    <button class="btn btn--primary" type="submit">Login</button>
+  </form>
+</div>
 {% endblock %}
+

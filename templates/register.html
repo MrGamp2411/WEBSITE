@@ -1,32 +1,30 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="mb-4">Register</h1>
-{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-<form method="get" action="/register" class="mx-auto" style="max-width:320px;">
-  <div class="mb-3">
-    <label class="form-label">Username</label>
-    <input class="form-control" type="text" name="username">
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Email</label>
-    <input class="form-control" type="email" name="email">
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Password</label>
-    <input class="form-control" type="password" name="password">
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Phone Prefix</label>
-    <select class="form-control" name="prefix">
-      <option value="+41">+41 (Switzerland)</option>
-      <option value="+1">+1 (USA)</option>
-      <option value="+44">+44 (UK)</option>
-    </select>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Phone Number</label>
-    <input class="form-control" type="text" name="phone">
-  </div>
-  <button class="btn btn-primary" type="submit">Register</button>
-</form>
+<div class="auth-card">
+  <h1>Register</h1>
+  {% if error %}<p class="alert">{{ error }}</p>{% endif %}
+  <form method="get" action="/register">
+    <label>Username
+      <input type="text" name="username" required>
+    </label>
+    <label>Email
+      <input type="email" name="email" required>
+    </label>
+    <label>Password
+      <input type="password" name="password" required>
+    </label>
+    <label>Phone Prefix
+      <select name="prefix">
+        <option value="+41">+41 (Switzerland)</option>
+        <option value="+1">+1 (USA)</option>
+        <option value="+44">+44 (UK)</option>
+      </select>
+    </label>
+    <label>Phone Number
+      <input type="text" name="phone">
+    </label>
+    <button class="btn btn--primary" type="submit">Register</button>
+  </form>
+</div>
 {% endblock %}
+

@@ -1,9 +1,21 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="mb-4">Bartender Dashboard</h1>
+<h1>Bartender Dashboard</h1>
+<div class="dashboard-info">
+  <div class="card">
+    <h2>{{ user.username }}</h2>
+    <p>{{ user.email }}</p>
+    <p>{{ user.prefix }} {{ user.phone }}</p>
+  </div>
+</div>
 {% if bar %}
-<p>Working at {{ bar.name }}</p>
+<div class="dashboard-actions">
+  <div class="card">
+    <h3>Working at {{ bar.name }}</h3>
+  </div>
+</div>
 {% else %}
 <p>No bar assigned.</p>
 {% endif %}
 {% endblock %}
+
