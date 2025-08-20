@@ -26,23 +26,27 @@
   function initAutocomplete() {
     const input = document.getElementById('placeSearch');
     if (!input) return;
-    autocomplete = new google.maps.places.Autocomplete(input, {types:['establishment']});
+    autocomplete = new google.maps.places.Autocomplete(input, { types: ['establishment'] });
     autocomplete.addListener('place_changed', () => {
       const place = autocomplete.getPlace();
       if (!place.geometry) return;
       document.getElementById('name').value = place.name || '';
-      document.getElementById('address').value = place.formatted_address || '';
-      document.getElementById('latitude').value = place.geometry.location.lat().toFixed(6);
-      document.getElementById('longitude').value = place.geometry.location.lng().toFixed(6);
-      let city = '', state = '';
+      // Parse address components so street, city and state are populated separately
+      let street = '', city = '', state = '';
       if (place.address_components) {
         for (const comp of place.address_components) {
-          if (comp.types.includes('locality')) city = comp.long_name;
-          if (comp.types.includes('administrative_area_level_1')) state = comp.short_name;
+          const types = comp.types;
+          if (types.includes('street_number')) street = comp.long_name + (street ? ' ' + street : '');
+          if (types.includes('route')) street = street ? street + ' ' + comp.long_name : comp.long_name;
+          if (types.includes('locality')) city = comp.long_name;
+          if (types.includes('administrative_area_level_1')) state = comp.short_name;
         }
       }
+      document.getElementById('address').value = street || place.formatted_address || '';
       document.getElementById('city').value = city;
       document.getElementById('state').value = state;
+      document.getElementById('latitude').value = place.geometry.location.lat().toFixed(6);
+      document.getElementById('longitude').value = place.geometry.location.lng().toFixed(6);
     });
   }
 </script>
