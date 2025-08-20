@@ -1,15 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="mb-4">Add Category for {{ bar.name }}</h1>
-<form method="get">
-  <div class="mb-3">
-    <label class="form-label">Name</label>
-    <input class="form-control" name="name">
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Description</label>
-    <input class="form-control" name="description">
-  </div>
-  <button type="submit" class="btn btn-primary">Create</button>
+<h1>Add Category for {{ bar.name }}</h1>
+<form class="form" method="get">
+  <label for="name">Name
+    <input id="name" name="name">
+  </label>
+  <label for="description">Description
+    <input id="description" name="description">
+  </label>
+  <button class="btn btn--primary" type="submit">Create</button>
 </form>
 {% endblock %}

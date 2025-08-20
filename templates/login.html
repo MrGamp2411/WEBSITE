@@ -4,11 +4,11 @@
   <h1>Login</h1>
   {% if error %}<p class="alert">{{ error }}</p>{% endif %}
   <form method="get" action="/login">
-    <label>Email
-      <input type="email" name="email" required>
+    <label for="email">Email
+      <input id="email" type="email" name="email" required autocomplete="email">
     </label>
-    <label>Password
-      <input type="password" name="password" required>
+    <label for="password">Password
+      <input id="password" type="password" name="password" required autocomplete="current-password">
     </label>
     <button class="btn btn--primary" type="submit">Login</button>
   </form>
