@@ -1,9 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>Create New Bar</h1>
+ codex/fix-commit-conflicts-and-add-google-api-key-xxx1h4
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<div id="map" style="height:400px;"></div>
+
 <label for="placeSearch">Search Google Maps
   <input id="placeSearch" type="text" placeholder="Type bar name">
 </label>
+ main
 <form class="form" method="get" action="/admin/bars/new">
   <label for="name">Name
     <input id="name" type="text" name="name" required>
@@ -21,6 +26,26 @@
   <input id="longitude" type="hidden" name="longitude" required>
   <button class="btn btn--primary" type="submit">Create Bar</button>
 </form>
+ codex/fix-commit-conflicts-and-add-google-api-key-xxx1h4
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const initialLat = 45.4642;
+  const initialLng = 9.1900;
+  const map = L.map('map').setView([initialLat, initialLng], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+  const marker = L.marker([initialLat, initialLng], {draggable:true}).addTo(map);
+  function updateInputs(e) {
+    const pos = e.target.getLatLng();
+    document.getElementById('latitude').value = pos.lat.toFixed(6);
+    document.getElementById('longitude').value = pos.lng.toFixed(6);
+  }
+  marker.on('dragend', updateInputs);
+  updateInputs({target: marker});
+</script>
+
 <script>
   let autocomplete;
   function initAutocomplete() {
@@ -62,5 +87,6 @@
 {% if GOOGLE_MAPS_API_KEY %}
 <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initAutocomplete"></script>
 {% endif %}
+ main
 {% endblock %}
 

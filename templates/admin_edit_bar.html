@@ -1,9 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>Edit Bar</h1>
+codex/fix-commit-conflicts-and-add-google-api-key-xxx1h4
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<div id="map" style="height:400px;"></div>
+
 <label for="placeSearch">Search Google Maps
   <input id="placeSearch" type="text" placeholder="Type bar name">
 </label>
+ main
 <form class="form" method="get">
   <label for="name">Name
     <input id="name" name="name" value="{{ bar.name }}">
@@ -21,7 +26,22 @@
   <input id="longitude" name="longitude" type="hidden" value="{{ bar.longitude }}">
   <button class="btn btn--primary" type="submit">Save</button>
 </form>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+ codex/fix-commit-conflicts-and-add-google-api-key-xxx1h4
+  const initialLat = {{ bar.latitude }};
+  const initialLng = {{ bar.longitude }};
+  const map = L.map('map').setView([initialLat, initialLng], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+  const marker = L.marker([initialLat, initialLng], {draggable:true}).addTo(map);
+  function updateInputs(e) {
+    const pos = e.target.getLatLng();
+    document.getElementById('latitude').value = pos.lat.toFixed(6);
+    document.getElementById('longitude').value = pos.lng.toFixed(6);
+
   let autocomplete;
   function initAutocomplete() {
     const input = document.getElementById('placeSearch');
@@ -56,15 +76,10 @@
       document.getElementById('latitude').value = place.geometry.location.lat().toFixed(6);
       document.getElementById('longitude').value = place.geometry.location.lng().toFixed(6);
     });
+ main
   }
-  window.initAutocomplete = initAutocomplete;
+  marker.on('dragend', updateInputs);
+  updateInputs({target: marker});
 </script>
-{% if GOOGLE_MAPS_API_KEY %}
-<script
-    async
-    defer
-    src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initAutocomplete">
-</script>
-{% endif %}
 {% endblock %}
 

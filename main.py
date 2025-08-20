@@ -33,7 +33,6 @@ Limitations:
 
 from typing import Dict, List, Optional
 
-import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -355,6 +354,8 @@ def render_template(template_name: str, **context) -> HTMLResponse:
         if last_bar_id is not None:
             context.setdefault("last_bar", bars.get(last_bar_id))
 
+codex/fix-commit-conflicts-and-add-google-api-key-xxx1h4
+
     # Ensure Google Maps API key is available to templates. Allow an
     # environment variable to override the default key.
     default_api_key = "AIzaSyCFwtfzGRqUke-OclxMoXfZJFjNE2um23k"
@@ -362,6 +363,7 @@ def render_template(template_name: str, **context) -> HTMLResponse:
         "GOOGLE_MAPS_API_KEY", os.getenv("GOOGLE_MAPS_API_KEY", default_api_key)
     )
 
+ main
     template = templates_env.get_template(template_name)
     return HTMLResponse(template.render(**context))
 
