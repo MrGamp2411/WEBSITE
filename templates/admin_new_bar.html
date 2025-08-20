@@ -57,10 +57,14 @@
   window.initAutocomplete = initAutocomplete;
   </script>
   {% if GOOGLE_MAPS_API_KEY %}
+ codex/fix-google-maps-search-functionality-nlxvne
   <script
       async
       defer
       src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initAutocomplete">
   </script>
+
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initAutocomplete"></script>
+ main
   {% endif %}
 {% endblock %}
