@@ -1,0 +1,8 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hero {
+  background: linear-gradient(120deg, #00b4d8, #90e0ef);
+  color: #fff;
+}
