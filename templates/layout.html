@@ -21,14 +21,15 @@
         <a class="btn" href="/register">Register</a>
         {% endif %}
       </div>
-      <div class="nav-right">
-        <a class="cart" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
-          <span class="badge">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
-        </a>
-        <button id="menuToggle" class="hamburger" aria-label="Menu" aria-expanded="false">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
+        <div class="nav-right">
+          <a class="cart" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
+            <span class="badge">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
+          </a>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌙</button>
+          <button id="menuToggle" class="hamburger" aria-label="Menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
     </nav>
     <div id="mobileMenu" class="menu" hidden>
       <a href="#bars">Browse Bars</a>
