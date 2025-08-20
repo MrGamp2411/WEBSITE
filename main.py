@@ -235,7 +235,17 @@ def get_cart_for_user(user: User) -> Cart:
 def render_template(template_name: str, **context) -> HTMLResponse:
     request: Optional[Request] = context.get("request")
     if request is not None:
-        context.setdefault("user", get_current_user(request))
+        user = get_current_user(request)
+        context.setdefault("user", user)
+        if user:
+            cart = get_cart_for_user(user)
+            context.setdefault(
+                "cart_count",
+                sum(item.quantity for item in cart.items.values()),
+            )
+        last_bar_id = request.session.get("last_bar_id")
+        if last_bar_id is not None:
+            context.setdefault("last_bar", bars.get(last_bar_id))
     template = templates_env.get_template(template_name)
     return HTMLResponse(template.render(**context))
 
@@ -260,6 +270,7 @@ async def bar_detail(request: Request, bar_id: int):
     bar = bars.get(bar_id)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
+    request.session["last_bar_id"] = bar.id
     # group products by category
     products_by_category: Dict[Category, List[Product]] = {}
     for prod in bar.products.values():

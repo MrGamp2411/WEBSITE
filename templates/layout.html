@@ -4,27 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SiplyGo Prototype</title>
+  <link rel="icon" href="/static/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/lumen/bootstrap.min.css" rel="stylesheet" integrity="sha384-m0nEIiDhcE7UZ5EONosFVJeFt3PcTJS3BM4tiTqcKoy0eZZ+j9RnBbTK1Z4qVaki" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link href="/static/style.css" rel="stylesheet">
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">SiplyGo</a>
+      <a class="navbar-brand d-flex align-items-center" href="/">
+        <img src="/static/logo.svg" alt="SiplyGo" height="30" class="me-2"> SiplyGo
+      </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/"><i class="bi bi-house"></i></a></li>
           {% if user %}
-            <li class="nav-item"><a class="nav-link" href="/cart">Cart</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="/cart">
+                <i class="bi bi-cart"></i>
+                {% if cart_count %}<span class="badge bg-light text-dark ms-1">{{ cart_count }}</span>{% endif %}
+              </a>
+            </li>
             {% if user.is_super_admin %}
-              <li class="nav-item"><a class="nav-link" href="/admin/dashboard">Dashboard</a></li>
+              <li class="nav-item"><a class="nav-link" href="/admin/dashboard"><i class="bi bi-speedometer2"></i></a></li>
             {% endif %}
           {% endif %}
         </ul>
-        <div class="d-flex">
+        <div class="d-flex align-items-center">
+          <button class="btn btn-outline-light me-2" id="themeToggle" type="button"><i class="bi bi-moon"></i></button>
           {% if user %}
             <span class="navbar-text me-2">Welcome, {{ user.username }}</span>
             <a class="btn btn-outline-light" href="/logout">Logout</a>
@@ -39,6 +52,18 @@
   <div class="container">
       {% block content %}{% endblock %}
   </div>
+  <footer class="bg-light text-center mt-5 py-4">
+    <div class="container">
+      <img src="/static/logo.svg" alt="SiplyGo" height="30" class="mb-2"><br>
+      <a href="#">About</a> · <a href="#">Contact</a> · <a href="#">Terms</a> · <a href="#">Privacy</a>
+      <div class="mt-2">
+        <a href="#" class="me-2"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="me-2"><i class="bi bi-instagram"></i></a>
+        <a href="#"><i class="bi bi-twitter"></i></a>
+      </div>
+    </div>
+  </footer>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeo6lq35t1kP7FpC18mHGtDk9N3DYGzGNIcPB7VYwQ5y5Fdm" crossorigin="anonymous"></script>
+  <script src="/static/script.js"></script>
   </body>
 </html>
