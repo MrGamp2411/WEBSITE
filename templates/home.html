@@ -1,49 +1,43 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<section class="hero-banner text-center text-white d-flex align-items-center mb-5">
-  <div class="container">
-    <h1 class="display-5 fw-bold">Order drinks instantly, right from your table.</h1>
-    <p class="lead">Skip the wait. Discover nearby bars and order with one tap.</p>
-    <a href="#bars" class="btn btn--primary btn-lg">Browse Bars</a>
+<section class="hero">
+  <div class="hero__content container">
+    <h1>Order drinks instantly, right from your table.</h1>
+    <p>Skip the wait. Discover nearby bars and order with one tap.</p>
+    <div class="hero__cta">
+      <a class="btn btn--primary" href="#bars">Browse Bars</a>
+      <a class="btn" href="#how">How it works</a>
+    </div>
   </div>
 </section>
 
-<div id="offersCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="https://source.unsplash.com/random/1200x300?cocktail" class="d-block w-100" alt="Offer 1">
-      <div class="carousel-caption d-none d-md-block">
-        <h5>2x1 Happy Hour</h5>
-      </div>
-    </div>
-    <div class="carousel-item">
-      <img src="https://source.unsplash.com/random/1200x300?bar" class="d-block w-100" alt="Offer 2">
-      <div class="carousel-caption d-none d-md-block">
-        <h5>Live Music Tonight</h5>
-      </div>
-    </div>
-  </div>
-</div>
+<section aria-labelledby="promotions">
+  <h2 id="promotions" class="visually-hidden">Current promotions</h2>
+  <ul class="chips" aria-live="polite">
+    <li><span class="chip">2x1 Happy Hour</span></li>
+    <li><span class="chip">Live Music Tonight</span></li>
+  </ul>
+</section>
 
 {% if user %}
-  <h2 class="mb-3">Hi {{ user.username }} 👋, ready for your next drink?</h2>
+<section>
+  <h2>Hi {{ user.username }} 👋, ready for your next drink?</h2>
+</section>
 {% endif %}
 
 {% if last_bar %}
-<section class="mb-5">
+<section>
   <h2>Your last visited bar</h2>
   <ul class="bars">
-    <li class="bar-card" data-name="{{ last_bar.name|lower }}" data-address="{{ last_bar.address|lower }}">
-      <article class="card">
-        <figure class="card__media">
-          <img src="https://source.unsplash.com/random/400x250?bar,{{ last_bar.id }}" alt="{{ last_bar.name }}">
-        </figure>
+    <li data-name="{{ last_bar.name|lower }}" data-address="{{ last_bar.address|lower }}">
+      <article class="card" itemscope itemtype="https://schema.org/BarOrPub">
+        <img class="card__media" src="https://source.unsplash.com/random/400x250?bar,{{ last_bar.id }}" alt="{{ last_bar.name }}" itemprop="image" loading="lazy" decoding="async">
         <div class="card__body">
-          <h3 class="card__title">{{ last_bar.name }}</h3>
-          <address>{{ last_bar.address }}</address>
-          <div class="rating" aria-label="Rated 4.7 out of 5">★ 4.7</div>
-          <ul class="chips"><li>Cocktails</li><li>Sports</li><li>Live Music</li></ul>
+          <h3 class="card__title" itemprop="name">{{ last_bar.name }}</h3>
+          <address itemprop="address">{{ last_bar.address }}</address>
+          <p class="rating" aria-label="Rated 4.7 out of 5">★ 4.7</p>
+          <ul class="chips"><li><span class="chip">Cocktails</span></li><li><span class="chip">Sports</span></li><li><span class="chip">Live Music</span></li></ul>
           <a class="btn btn--primary" href="/bars/{{ last_bar.id }}">View Menu</a>
         </div>
       </article>
@@ -52,47 +46,45 @@
 </section>
 {% endif %}
 
-<div class="mb-4">
-  <input type="text" id="barSearch" class="form-control" placeholder="Search bars...">
-</div>
+<section>
+  <div class="search"><input type="text" id="barSearch" placeholder="Search bars..."></div>
+  <h2 id="bars">Available Bars</h2>
+  <ul class="bars" id="barList">
+    {% for bar in bars %}
+    <li data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}">
+      <article class="card" itemscope itemtype="https://schema.org/BarOrPub">
+        <img class="card__media" src="https://source.unsplash.com/random/400x250?bar,{{ bar.id }}" alt="{{ bar.name }}" itemprop="image" loading="lazy" decoding="async">
+        <div class="card__body">
+          <h3 class="card__title" itemprop="name">{{ bar.name }}</h3>
+          <address itemprop="address">{{ bar.address }}</address>
+          <p class="rating" aria-label="Rated 4.7 out of 5">★ 4.7</p>
+          <ul class="chips"><li><span class="chip">Cocktails</span></li><li><span class="chip">Sports</span></li><li><span class="chip">Live Music</span></li></ul>
+          <a class="btn btn--primary" href="/bars/{{ bar.id }}">View Menu</a>
+        </div>
+      </article>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
 
-<h2 id="bars" class="mb-4">Available Bars</h2>
-<ul class="bars" id="barList">
-  {% for bar in bars %}
-  <li class="bar-card" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}">
-    <article class="card">
-      <figure class="card__media">
-        <img src="https://source.unsplash.com/random/400x250?bar,{{ bar.id }}" alt="{{ bar.name }}">
-      </figure>
-      <div class="card__body">
-        <h3 class="card__title">{{ bar.name }}</h3>
-        <address>{{ bar.address }}</address>
-        <div class="rating" aria-label="Rated 4.7 out of 5">★ 4.7</div>
-        <ul class="chips"><li>Cocktails</li><li>Sports</li><li>Live Music</li></ul>
-        <a class="btn btn--primary" href="/bars/{{ bar.id }}">View Menu</a>
-      </div>
-    </article>
-  </li>
-  {% endfor %}
-</ul>
-
-<div class="mt-5">
-  <h3>Rewards & Loyalty</h3>
+<section id="how">
+  <h2>How it works</h2>
   <p>Earn points with every order and unlock exclusive offers.</p>
-</div>
+</section>
 
-<div class="mt-5">
-  <h3>What people are saying</h3>
+<section>
+  <h2>What people are saying</h2>
   <blockquote class="blockquote">
-    <p class="mb-0">“Amazing service! Ordering from the table changed our night.”</p>
+    <p>“Amazing service! Ordering from the table changed our night.”</p>
     <footer class="blockquote-footer">Happy Customer</footer>
   </blockquote>
-</div>
+</section>
 
-<div class="mt-5">
-  <h3>Find us on the map</h3>
-  <iframe class="w-100" height="300" frameborder="0" style="border:0"
+<section>
+  <h2>Find us on the map</h2>
+  <iframe width="100%" height="300" frameborder="0" style="border:0"
     src="https://www.openstreetmap.org/export/embed.html?bbox=8.6000,46.5200,8.6200,46.5350&layer=mapnik" allowfullscreen></iframe>
-</div>
+</section>
 
 {% endblock %}
+
