@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>Create New Bar</h1>
+<label for="placeSearch">Search Google Maps
+  <input id="placeSearch" type="text" placeholder="Type bar name">
+</label>
 <form class="form" method="get" action="/admin/bars/new">
-  <label for="placeSearch">Search Google Maps
-    <input id="placeSearch" type="text" placeholder="Type bar name">
-  </label>
   <label for="name">Name
     <input id="name" type="text" name="name" required>
   </label>
