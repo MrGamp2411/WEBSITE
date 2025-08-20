@@ -1,89 +1,86 @@
-:root {
-  --primary: #ff5722;
-  --secondary: #673ab7;
-  --accent: #ffc107;
+:root{
+  --color-primary:#0ea5e9;
+  --color-bg:#0b0b0c;
+  --color-surface:#111216;
+  --color-text:#e7e7ea;
+  --color-muted:#a4a7ae;
+  --radius:16px;
+  --font-sans:"Inter", ui-sans-serif, system-ui;
+  --step-0: clamp(14px, 1.2vw, 16px);
+  --step-3: clamp(28px, 4vw, 40px);
 }
-
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #f8f9fa;
-  transition: background-color 0.3s, color 0.3s;
+body{
+  background:var(--color-bg);
+  color:var(--color-text);
+  font-family:var(--font-sans);
+  transition:background-color .3s,color .3s;
 }
-
-a {
-  color: var(--primary);
+.container{
+  max-width:1200px;
+  margin-inline:auto;
+  padding-inline:clamp(16px,4vw,32px);
 }
-
-a:hover {
-  color: #e64a19;
+.skip-to-content{
+  position:absolute;
+  top:-40px;
+  left:0;
+  background:var(--color-primary);
+  color:#fff;
+  padding:.5rem 1rem;
+  z-index:100;
+  transition:top .2s;
 }
-
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 1020;
+.skip-to-content:focus{top:0;}
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:50;
+  backdrop-filter:saturate(180%) blur(10px);
+  background:color-mix(in srgb,var(--color-bg) 85%,transparent);
+  border-bottom:1px solid #1f232b;
 }
-
-.bg-primary {
-  background-color: var(--primary) !important;
+.hero-banner{
+  background:url('https://images.unsplash.com/photo-1528181304800-259b0884851d?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+  min-height:60vh;
+  display:flex;
+  align-items:center;
 }
-
-.navbar-dark .navbar-nav .nav-link,
-.navbar-dark .navbar-brand {
-  color: #fff;
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  padding:.75rem 1rem;
+  border-radius:var(--radius);
+  border:1px solid transparent;
+  transition:.2s;
+  text-decoration:none;
 }
-
-.hero-banner {
-  background: url('https://images.unsplash.com/photo-1528181304800-259b0884851d?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
-  min-height: 60vh;
+.btn--primary{background:var(--color-primary);color:#fff;}
+.btn--primary:hover{filter:brightness(1.05);transform:translateY(-1px);}
+.btn:focus-visible{outline:3px solid color-mix(in srgb,var(--color-primary),white 30%);outline-offset:2px;}
+.bars{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:24px;
+  list-style:none;
+  padding:0;
 }
-
-.card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.card{
+  background:var(--color-surface);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:0 6px 24px rgb(0 0 0 / .25);
+  transition:.25s;
 }
-
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
-}
-
-.bar-card {
-  animation: fadeIn 0.6s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: none; }
-}
-
-.btn-primary {
-  background-color: var(--primary);
-  border-color: var(--primary);
-}
-
-.btn-primary:hover {
-  background-color: #e64a19;
-  border-color: #e64a19;
-}
-
-.badge {
-  margin-right: 0.25rem;
-}
-
-.dark-mode {
-  background-color: #121212;
-  color: #f8f9fa;
-}
-
-.dark-mode a {
-  color: var(--accent);
-}
-
-.dark-mode .navbar {
-  background-color: #222 !important;
-}
-
-.dark-mode .card {
-  background-color: #1e1e1e;
-  color: #f8f9fa;
-}
+.card:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgb(0 0 0 / .35);}
+.card__media{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;}
+.card__body{padding:1rem;display:flex;flex-direction:column;gap:.5rem;}
+.card__title{font-size:1.125rem;margin:0;}
+.rating{color:var(--color-primary);}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:.5rem 0 1rem;padding:0;list-style:none;}
+.chips li{font-size:.8rem;padding:.25rem .5rem;border-radius:999px;background:#1c1f26;color:#cbd5e1;}
+.bar-card{animation:fadeIn .6s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.dark-mode{background-color:#121212;color:#f8f9fa;}
+.dark-mode .card{background-color:#1e1e1e;color:#f8f9fa;}
+.dark-mode a{color:var(--color-muted);}
