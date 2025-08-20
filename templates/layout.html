@@ -16,9 +16,6 @@
     <a class="logo" href="/">SiplyGo</a>
     <nav aria-label="Primary" class="navbar">
       <div class="nav-left">
-        <button id="menuToggle" class="hamburger" aria-label="Menu" aria-expanded="false">
-          <span></span><span></span><span></span>
-        </button>
         {% if not user %}
         <a class="btn" href="/login">Login</a>
         <a class="btn" href="/register">Register</a>
@@ -28,6 +25,9 @@
         <a class="cart" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
           <span class="badge">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
         </a>
+        <button id="menuToggle" class="hamburger" aria-label="Menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
     <div id="mobileMenu" class="menu" hidden>

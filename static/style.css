@@ -1,6 +1,6 @@
 :root{
   --brand:#0ea5e9; --brand-600:#0284c7;
-  --bg:#0b0c0f; --surface:#111318; --text:#e7e9ef; --muted:#a6adbb;
+  --bg:#ffffff; --surface:#f3f4f6; --text:#111827; --muted:#6b7280;
   --radius:16px; --shadow:0 10px 30px rgb(0 0 0/.35);
   --space-1:8px; --space-2:12px; --space-3:20px; --space-4:28px;
   --font-sans:"Inter", ui-sans-serif, system-ui;
@@ -20,6 +20,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);}
 .navbar a{color:var(--text);text-decoration:none;}
 
 .nav-left,.nav-right{display:flex;align-items:center;gap:var(--space-2);}
+.nav-right{gap:var(--space-3);}
 
 .hamburger{display:flex;flex-direction:column;gap:4px;background:none;border:0;padding:var(--space-1);cursor:pointer;}
 .hamburger span{width:24px;height:2px;background:var(--text);}
@@ -51,7 +52,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);}
 .card__title{font-size:1.125rem;margin:0;}
 
 .chips{display:flex;gap:var(--space-1);flex-wrap:wrap;margin:var(--space-1) 0;padding:0;list-style:none;}
-.chip{display:inline-block;background:#1c1f26;color:#cbd5e1;font-size:.8rem;padding:.25rem .5rem;border-radius:999px;}
+.chip{display:inline-block;background:#e5e7eb;color:#374151;font-size:.8rem;padding:.25rem .5rem;border-radius:999px;}
 
 .bars{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-3);list-style:none;padding:0;}
 
