@@ -444,7 +444,6 @@ async def admin_profile(request: Request):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template("admin_profile.html", request=request)
 
-
 @app.get("/admin/users", response_class=HTMLResponse)
 async def admin_users_view(request: Request):
     user = get_current_user(request)
