@@ -49,8 +49,9 @@
       document.getElementById('longitude').value = place.geometry.location.lng().toFixed(6);
     });
   }
-    </script>
-    {% if GOOGLE_MAPS_API_KEY %}
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initAutocomplete"></script>
-    {% endif %}
-  {% endblock %}
+  window.initAutocomplete = initAutocomplete;
+  </script>
+  {% if GOOGLE_MAPS_API_KEY %}
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initAutocomplete"></script>
+  {% endif %}
+{% endblock %}
