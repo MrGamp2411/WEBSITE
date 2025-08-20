@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1 class="mb-4">Bartender Dashboard</h1>
+{% if bar %}
+<p>Working at {{ bar.name }}</p>
+{% else %}
+<p>No bar assigned.</p>
+{% endif %}
+{% endblock %}

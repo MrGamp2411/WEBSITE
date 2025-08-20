@@ -3,13 +3,15 @@
 <h1 class="mb-4">Manage Users</h1>
 <table class="table">
   <thead>
-    <tr><th>Username</th><th>Role</th></tr>
+    <tr><th>Username</th><th>Role</th><th>Bar</th><th></th></tr>
   </thead>
   <tbody>
     {% for u in users %}
     <tr>
       <td>{{ u.username }}</td>
-      <td>{% if u.is_super_admin %}Super Admin{% else %}User{% endif %}</td>
+      <td>{{ u.role }}</td>
+      <td>{% if u.bar_id %}{{ bars[u.bar_id].name }}{% else %}-{% endif %}</td>
+      <td><a href="/admin/users/edit/{{ u.id }}">Edit</a></td>
     </tr>
     {% endfor %}
   </tbody>
