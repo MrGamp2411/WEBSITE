@@ -2,4 +2,7 @@ services:
   - type: web
     name: website
     env: python
-
+codex/create-requirements.txt-and-update-build-command-6eu1w4
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+main

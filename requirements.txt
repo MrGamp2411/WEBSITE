@@ -2,3 +2,6 @@ fastapi
 uvicorn
 jinja2
 itsdangerous
+codex/create-requirements.txt-and-update-build-command-6eu1w4
+starlette
+main
