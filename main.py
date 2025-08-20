@@ -426,7 +426,6 @@ async def new_bar(request: Request):
     bar = Bar(id=next_bar_id, name=name, address=address, latitude=lat, longitude=lon)
     next_bar_id += 1
     bars[bar.id] = bar
-    return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get("/admin/dashboard", response_class=HTMLResponse)
@@ -444,9 +443,3 @@ async def admin_profile(request: Request):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template("admin_profile.html", request=request)
 
-@app.get("/admin/users", response_class=HTMLResponse)
-async def admin_users_view(request: Request):
-    user = get_current_user(request)
-    if not user or not user.is_super_admin:
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    return render_template("admin_users.html", request=request, users=users.values())
