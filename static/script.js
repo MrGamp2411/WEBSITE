@@ -13,15 +13,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const toggle = document.getElementById('themeToggle');
   if (toggle) {
-    toggle.addEventListener('click', function() {
-      document.body.classList.toggle('dark-mode');
-      const mode = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+    const applyTheme = (mode) => {
+      document.body.classList.toggle('dark-mode', mode === 'dark');
+      toggle.textContent = mode === 'dark' ? '☀️' : '🌙';
+      toggle.setAttribute('aria-label', mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    };
+    toggle.addEventListener('click', () => {
+      const mode = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+      applyTheme(mode);
       localStorage.setItem('theme', mode);
     });
-    const stored = localStorage.getItem('theme');
-    if (stored === 'dark') {
-      document.body.classList.add('dark-mode');
-    }
+    const stored = localStorage.getItem('theme') || 'light';
+    applyTheme(stored);
   }
 
   const menuToggle = document.getElementById('menuToggle');
