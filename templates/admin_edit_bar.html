@@ -8,6 +8,12 @@
   <label for="address">Address
     <input id="address" name="address" value="{{ bar.address }}">
   </label>
+  <label for="city">City
+    <input id="city" name="city" value="{{ bar.city }}">
+  </label>
+  <label for="state">State
+    <input id="state" name="state" value="{{ bar.state }}">
+  </label>
   <label for="latitude">Latitude
     <input id="latitude" name="latitude" value="{{ bar.latitude }}">
   </label>
@@ -16,4 +22,30 @@
   </label>
   <button class="btn btn--primary" type="submit">Save</button>
 </form>
+<div id="map" style="height:300px;margin-top:1rem;"></div>
+<script>
+let map, marker;
+function initMap() {
+  const latField = document.getElementById('latitude');
+  const lngField = document.getElementById('longitude');
+  const lat = parseFloat(latField.value) || 0;
+  const lng = parseFloat(lngField.value) || 0;
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: {lat, lng},
+    zoom: 15,
+  });
+  marker = new google.maps.Marker({position: {lat, lng}, map: map, draggable: true});
+  marker.addListener('dragend', () => {
+    const pos = marker.getPosition();
+    latField.value = pos.lat().toFixed(6);
+    lngField.value = pos.lng().toFixed(6);
+  });
+  map.addListener('click', (e) => {
+    marker.setPosition(e.latLng);
+    latField.value = e.latLng.lat().toFixed(6);
+    lngField.value = e.latLng.lng().toFixed(6);
+  });
+}
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
 {% endblock %}
