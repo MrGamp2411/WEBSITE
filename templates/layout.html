@@ -20,7 +20,14 @@
   <header>
     <nav>
       <a href="/">Home</a>
+      {% if user %}
       <a href="/cart">Cart</a>
+      <span>Welcome, {{ user.username }}</span>
+      <a href="/logout">Logout</a>
+      {% else %}
+      <a href="/login">Login</a>
+      <a href="/register">Register</a>
+      {% endif %}
       <a href="/admin/bars/new">Add Bar</a>
     </nav>
   </header>

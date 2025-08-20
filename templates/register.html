@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Register</h1>
+{% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+<form method="get" action="/register">
+  <label>Username: <input type="text" name="username"></label><br>
+  <label>Password: <input type="password" name="password"></label><br>
+  <button type="submit">Register</button>
+</form>
+{% endblock %}

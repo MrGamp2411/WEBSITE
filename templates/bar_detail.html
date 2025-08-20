@@ -10,10 +10,14 @@
       <div class="product">
                <strong>{{ product.name }}</strong> – CHF {{ product.price }}<br>
         <em>{{ product.description }}</em>
+        {% if user %}
         <form method="get" action="/bars/{{ bar.id }}/add_to_cart">
           <input type="hidden" name="product_id" value="{{ product.id }}">
           <button type="submit">Add to Cart</button>
         </form>
+        {% else %}
+        <p><a href="/login">Login</a> to order</p>
+        {% endif %}
       </div>
     {% endfor %}
   {% endfor %}
