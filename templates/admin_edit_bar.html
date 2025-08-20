@@ -31,10 +31,14 @@
         e.preventDefault();
       }
     });
+ codex/fix-google-maps-search-functionality-2j5anw
     autocomplete = new google.maps.places.Autocomplete(input, {
       types: ['establishment'],
       fields: ['address_components', 'geometry', 'name']
     });
+
+    autocomplete = new google.maps.places.Autocomplete(input, { types: ['establishment'] });
+ main
     autocomplete.addListener('place_changed', () => {
       const place = autocomplete.getPlace();
       if (!place.geometry) return;
