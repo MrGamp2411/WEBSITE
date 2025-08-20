@@ -27,7 +27,10 @@
 </form>
 <div id="map" style="height:300px;margin-top:1rem;"></div>
 <script>
+ codex/add-geolocation-feature-for-bars-jxn1gb
 let map, marker, autocomplete;
+let map, marker;
+  main
 function initMap() {
   const latField = document.getElementById('latitude');
   const lngField = document.getElementById('longitude');
@@ -48,6 +51,7 @@ function initMap() {
     latField.value = e.latLng.lat().toFixed(6);
     lngField.value = e.latLng.lng().toFixed(6);
   });
+ codex/add-geolocation-feature-for-bars-jxn1gb
   const input = document.getElementById('placeSearch');
   autocomplete = new google.maps.places.Autocomplete(input, {types:['establishment']});
   autocomplete.addListener('place_changed', () => {
@@ -72,4 +76,8 @@ function initMap() {
 }
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initMap"></script>
+}
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
+main
 {% endblock %}
