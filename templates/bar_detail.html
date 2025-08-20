@@ -1,25 +1,30 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>{{ bar.name }}</h1>
-<p>{{ bar.address }}</p>
-<div class="categories">
-  {% for category, products in products_by_category.items() %}
-    <h2>{{ category.name }}</h2>
-    <p>{{ category.description }}</p>
+<h1 class="mb-3">{{ bar.name }}</h1>
+<p class="mb-4">{{ bar.address }}</p>
+{% for category, products in products_by_category.items() %}
+  <h2 class="mt-4">{{ category.name }}</h2>
+  <p>{{ category.description }}</p>
+  <div class="row">
     {% for product in products %}
-      <div class="product">
-               <strong>{{ product.name }}</strong> – CHF {{ product.price }}<br>
-        <em>{{ product.description }}</em>
-        {% if user %}
-        <form method="get" action="/bars/{{ bar.id }}/add_to_cart">
-          <input type="hidden" name="product_id" value="{{ product.id }}">
-          <button type="submit">Add to Cart</button>
-        </form>
-        {% else %}
-        <p><a href="/login">Login</a> to order</p>
-        {% endif %}
+    <div class="col-md-4 mb-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">{{ product.name }}</h5>
+          <p class="card-text">{{ product.description }}</p>
+          <p class="fw-bold">CHF {{ product.price }}</p>
+          {% if user %}
+          <form method="get" action="/bars/{{ bar.id }}/add_to_cart">
+            <input type="hidden" name="product_id" value="{{ product.id }}">
+            <button class="btn btn-primary" type="submit">Add to Cart</button>
+          </form>
+          {% else %}
+          <a class="btn btn-secondary" href="/login">Login to order</a>
+          {% endif %}
+        </div>
       </div>
+    </div>
     {% endfor %}
-  {% endfor %}
-</div>
+  </div>
+{% endfor %}
 {% endblock %}

@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1 class="mb-4">Manage Users</h1>
+<table class="table">
+  <thead>
+    <tr><th>Username</th><th>Role</th></tr>
+  </thead>
+  <tbody>
+    {% for u in users %}
+    <tr>
+      <td>{{ u.username }}</td>
+      <td>{% if u.is_super_admin %}Super Admin{% else %}User{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
