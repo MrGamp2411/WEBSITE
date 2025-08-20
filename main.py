@@ -34,11 +34,15 @@ Limitations:
 from typing import Dict, List, Optional
 
 import os
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from starlette.middleware.sessions import SessionMiddleware
+
+# Load environment variables from a .env file if present
+load_dotenv()
 
 # -----------------------------------------------------------------------------
 # Data models (in-memory for demonstration purposes)
