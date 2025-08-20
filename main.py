@@ -191,7 +191,6 @@ templates_env = Environment(
     loader=FileSystemLoader("templates"),
     autoescape=select_autoescape(["html", "xml"]),
 )
-templates_env.globals["GOOGLE_MAPS_API_KEY"] = os.getenv("GOOGLE_MAPS_API_KEY", "")
 
 # -----------------------------------------------------------------------------
 # In-memory store with sample data
@@ -355,6 +354,8 @@ def render_template(template_name: str, **context) -> HTMLResponse:
         last_bar_id = request.session.get("last_bar_id")
         if last_bar_id is not None:
             context.setdefault("last_bar", bars.get(last_bar_id))
+    # Ensure Google Maps API key is available in all templates
+    context.setdefault("GOOGLE_MAPS_API_KEY", os.getenv("GOOGLE_MAPS_API_KEY", ""))
     template = templates_env.get_template(template_name)
     return HTMLResponse(template.render(**context))
 
