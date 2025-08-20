@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="mb-4">Manage Bars</h1>
+<h1>Manage Bars</h1>
 <div class="dashboard-info">
   <div class="card">
     <h2>{{ user.username }}</h2>
@@ -8,7 +8,7 @@
     <p>{{ user.prefix }} {{ user.phone }}</p>
   </div>
 </div>
-<a class="btn btn-success mb-3" href="/admin/bars/new">Add Bar</a>
+<a class="btn btn--success" href="/admin/bars/new">Add Bar</a>
 <table class="table">
   <thead>
     <tr><th>Name</th><th>Address</th><th>Actions</th></tr>

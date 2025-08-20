@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="text-center">
-  <h1 class="mb-3">Order Placed</h1>
+  <h1>Order Placed</h1>
   <p>Your order has been placed successfully!</p>
   <p>Total paid: CHF {{ "%.2f"|format(total) }}</p>
   <p>Thank you for ordering with SiplyGo.</p>
-  <a class="btn btn-primary" href="/">Return to home</a>
+  <a class="btn btn--primary" href="/">Return to home</a>
 </div>
 {% endblock %}

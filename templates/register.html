@@ -4,24 +4,24 @@
   <h1>Register</h1>
   {% if error %}<p class="alert">{{ error }}</p>{% endif %}
   <form method="get" action="/register">
-    <label>Username
-      <input type="text" name="username" required>
+    <label for="username">Username
+      <input id="username" type="text" name="username" required autocomplete="username">
     </label>
-    <label>Email
-      <input type="email" name="email" required>
+    <label for="email">Email
+      <input id="email" type="email" name="email" required autocomplete="email">
     </label>
-    <label>Password
-      <input type="password" name="password" required>
+    <label for="password">Password
+      <input id="password" type="password" name="password" required autocomplete="new-password">
     </label>
-    <label>Phone Prefix
-      <select name="prefix">
+    <label for="prefix">Phone Prefix
+      <select id="prefix" name="prefix">
         <option value="+41">+41 (Switzerland)</option>
         <option value="+1">+1 (USA)</option>
         <option value="+44">+44 (UK)</option>
       </select>
     </label>
-    <label>Phone Number
-      <input type="text" name="phone">
+    <label for="phone">Phone Number
+      <input id="phone" type="text" name="phone" autocomplete="tel">
     </label>
     <button class="btn btn--primary" type="submit">Register</button>
   </form>

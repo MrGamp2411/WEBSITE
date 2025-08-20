@@ -1,52 +1,50 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="mb-4">Your Cart</h1>
+<h1>Your Cart</h1>
 {% if cart.items %}
 <table class="table">
   <thead>
-    <tr><th>Item</th><th style="width:120px;">Quantity</th><th>Price</th><th>Total</th><th>Actions</th></tr>
+    <tr><th>Item</th><th>Quantity</th><th>Price</th><th>Total</th><th>Actions</th></tr>
   </thead>
   <tbody>
     {% for item in cart.items.values() %}
     <tr>
       <td>{{ item.product.name }}</td>
       <td>
-        <form class="d-flex" method="get" action="/cart/update">
+        <form class="form form--inline" method="get" action="/cart/update">
           <input type="hidden" name="product_id" value="{{ item.product.id }}">
-          <input class="form-control me-2" type="number" name="quantity" min="0" value="{{ item.quantity }}">
-          <button class="btn btn-sm btn-primary" type="submit">Update</button>
+          <input type="number" name="quantity" min="0" value="{{ item.quantity }}">
+          <button class="btn btn--small btn--primary" type="submit">Update</button>
         </form>
       </td>
       <td>CHF {{ "%.2f"|format(item.product.price) }}</td>
       <td>CHF {{ "%.2f"|format(item.total) }}</td>
       <td>
-        <form method="get" action="/cart/update">
+        <form method="get" action="/cart/update" class="form form--inline">
           <input type="hidden" name="product_id" value="{{ item.product.id }}">
           <input type="hidden" name="quantity" value="0">
-          <button class="btn btn-sm btn-danger" type="submit">Remove</button>
+          <button class="btn btn--small btn--danger" type="submit">Remove</button>
         </form>
       </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
-<p class="fw-bold">Total: CHF {{ "%.2f"|format(cart.total_price()) }}</p>
-<h2 class="mt-4">Select Table</h2>
-<form class="row g-3 align-items-center" method="get" action="/cart/select_table">
-  <div class="col-auto">
-    <select class="form-select" name="table_id">
+<p><strong>Total: CHF {{ "%.2f"|format(cart.total_price()) }}</strong></p>
+<h2>Select Table</h2>
+<form class="form" method="get" action="/cart/select_table">
+  <label for="table_id">Table
+    <select id="table_id" name="table_id">
       {% for table in bar.tables.values() %}
         <option value="{{ table.id }}" {% if cart.table_id == table.id %}selected{% endif %}>{{ table.name }}</option>
       {% endfor %}
     </select>
-  </div>
-  <div class="col-auto">
-    <button class="btn btn-secondary" type="submit">Confirm</button>
-  </div>
+  </label>
+  <button class="btn" type="submit">Confirm</button>
 </form>
-<h2 class="mt-4">Checkout</h2>
+<h2>Checkout</h2>
 <form method="get" action="/cart/checkout">
-  <button class="btn btn-success" type="submit">Place Order</button>
+  <button class="btn btn--success" type="submit">Place Order</button>
 </form>
 {% else %}
 <p>Your cart is empty.</p>

@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="mb-4">Profile</h1>
+<h1>Profile</h1>
 <div class="card">
-  <div class="card-body">
-    <p class="mb-0"><strong>Username:</strong> {{ user.username }}</p>
-    <p class="mb-0"><strong>Email:</strong> {{ user.email }}</p>
-    <p class="mb-0"><strong>Phone:</strong> {{ user.prefix }} {{ user.phone }}</p>
+  <div class="card__body">
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Phone:</strong> {{ user.prefix }} {{ user.phone }}</p>
   </div>
 </div>
 {% endblock %}

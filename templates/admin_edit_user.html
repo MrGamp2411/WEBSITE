@@ -1,34 +1,30 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="mb-4">Edit User {{ user.username }}</h1>
+<h1>Edit User {{ user.username }}</h1>
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-<form method="get">
-  <div class="mb-3">
-    <label class="form-label">Username</label>
-    <input class="form-control" name="username" value="{{ user.username }}">
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Password</label>
-    <input class="form-control" name="password" value="{{ user.password }}">
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Role</label>
-    <select class="form-control" name="role">
+<form class="form" method="get">
+  <label for="username">Username
+    <input id="username" name="username" value="{{ user.username }}">
+  </label>
+  <label for="password">Password
+    <input id="password" name="password" value="{{ user.password }}">
+  </label>
+  <label for="role">Role
+    <select id="role" name="role">
       <option value="super_admin" {% if user.role=='super_admin' %}selected{% endif %}>Super Admin</option>
       <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>Bar Admin</option>
       <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>Bartender</option>
       <option value="customer" {% if user.role=='customer' %}selected{% endif %}>Customer</option>
     </select>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">Bar</label>
-    <select class="form-control" name="bar_id">
+  </label>
+  <label for="bar_id">Bar
+    <select id="bar_id" name="bar_id">
       <option value="" {% if not user.bar_id %}selected{% endif %}>None</option>
       {% for b in bars %}
       <option value="{{ b.id }}" {% if user.bar_id==b.id %}selected{% endif %}>{{ b.name }}</option>
       {% endfor %}
     </select>
-  </div>
-  <button type="submit" class="btn btn-primary">Save</button>
+  </label>
+  <button class="btn btn--primary" type="submit">Save</button>
 </form>
 {% endblock %}

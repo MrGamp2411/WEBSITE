@@ -1,30 +1,32 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="mb-3">{{ bar.name }}</h1>
-<p class="mb-4">{{ bar.address }}</p>
+<h1>{{ bar.name }}</h1>
+<p>{{ bar.address }}</p>
 {% for category, products in products_by_category.items() %}
-  <h2 class="mt-4">{{ category.name }}</h2>
-  <p>{{ category.description }}</p>
-  <div class="row">
-    {% for product in products %}
-    <div class="col-md-4 mb-3">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title">{{ product.name }}</h5>
-          <p class="card-text">{{ product.description }}</p>
-          <p class="fw-bold">CHF {{ product.price }}</p>
-          {% if user %}
-          <form method="get" action="/bars/{{ bar.id }}/add_to_cart">
-            <input type="hidden" name="product_id" value="{{ product.id }}">
-            <button class="btn btn-primary" type="submit">Add to Cart</button>
-          </form>
-          {% else %}
-          <a class="btn btn-secondary" href="/login">Login to order</a>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
+  <section class="category">
+    <h2>{{ category.name }}</h2>
+    <p>{{ category.description }}</p>
+    <ul class="products">
+      {% for product in products %}
+      <li>
+        <article class="card">
+          <div class="card__body">
+            <h3 class="card__title">{{ product.name }}</h3>
+            <p>{{ product.description }}</p>
+            <p><strong>CHF {{ product.price }}</strong></p>
+            {% if user %}
+            <form class="form form--inline" method="get" action="/bars/{{ bar.id }}/add_to_cart">
+              <input type="hidden" name="product_id" value="{{ product.id }}">
+              <button class="btn btn--primary btn--small" type="submit">Add to Cart</button>
+            </form>
+            {% else %}
+            <a class="btn" href="/login">Login to order</a>
+            {% endif %}
+          </div>
+        </article>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
 {% endfor %}
 {% endblock %}
