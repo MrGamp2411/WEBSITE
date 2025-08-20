@@ -78,15 +78,32 @@ class Bar:
         # Users assigned to this bar
         self.bar_admin_ids: List[int] = []
         self.bartender_ids: List[int] = []
+        # Bartenders that still need to confirm the assignment
+        self.pending_bartender_ids: List[int] = []
 
 
 class User:
-    def __init__(self, id: int, username: str, password: str, role: str = "customer", bar_id: Optional[int] = None):
+    def __init__(
+        self,
+        id: int,
+        username: str,
+        password: str,
+        email: str = "",
+        phone: str = "",
+        prefix: str = "",
+        role: str = "customer",
+        bar_id: Optional[int] = None,
+        pending_bar_id: Optional[int] = None,
+    ):
         self.id = id
         self.username = username
         self.password = password
+        self.email = email
+        self.phone = phone
+        self.prefix = prefix
         self.role = role
         self.bar_id = bar_id
+        self.pending_bar_id = pending_bar_id
 
     @property
     def is_super_admin(self) -> bool:
@@ -172,6 +189,7 @@ next_table_id = 1
 # User storage
 users: Dict[int, User] = {}
 users_by_username: Dict[str, User] = {}
+users_by_email: Dict[str, User] = {}
 next_user_id = 1
 
 # Cart storage per user
@@ -223,9 +241,16 @@ seed_data()
 def seed_super_admin():
     """Create the default super admin account."""
     global next_user_id
-    admin = User(id=next_user_id, username="Andrea", password="Andrea", role="super_admin")
+    admin = User(
+        id=next_user_id,
+        username="andreastojov",
+        password="Andrea24",
+        email="andreastojov@gmail.com",
+        role="super_admin",
+    )
     users[admin.id] = admin
     users_by_username[admin.username] = admin
+    users_by_email[admin.email] = admin
     next_user_id += 1
 
 
@@ -237,15 +262,31 @@ def seed_bar_staff():
     bar_id = next(iter(bars))
     bar = bars[bar_id]
     # Bar admin
-    admin_user = User(id=next_user_id, username="baradmin", password="baradmin", role="bar_admin", bar_id=bar_id)
+    admin_user = User(
+        id=next_user_id,
+        username="baradmin",
+        password="baradmin",
+        email="baradmin@example.com",
+        role="bar_admin",
+        bar_id=bar_id,
+    )
     users[admin_user.id] = admin_user
     users_by_username[admin_user.username] = admin_user
+    users_by_email[admin_user.email] = admin_user
     bar.bar_admin_ids.append(admin_user.id)
     next_user_id += 1
     # Bartender
-    bartender_user = User(id=next_user_id, username="bartender", password="bartender", role="bartender", bar_id=bar_id)
+    bartender_user = User(
+        id=next_user_id,
+        username="bartender",
+        password="bartender",
+        email="bartender@example.com",
+        role="bartender",
+        bar_id=bar_id,
+    )
     users[bartender_user.id] = bartender_user
     users_by_username[bartender_user.username] = bartender_user
+    users_by_email[bartender_user.email] = bartender_user
     bar.bartender_ids.append(bartender_user.id)
     next_user_id += 1
 
@@ -411,24 +452,37 @@ async def checkout(request: Request):
 async def register(request: Request):
     username = request.query_params.get("username")
     password = request.query_params.get("password")
-    if username and password:
+    email = request.query_params.get("email")
+    phone = request.query_params.get("phone")
+    prefix = request.query_params.get("prefix")
+    if all([username, password, email, phone, prefix]):
         if username in users_by_username:
             return render_template("register.html", request=request, error="Username already taken")
+        if email in users_by_email:
+            return render_template("register.html", request=request, error="Email already taken")
         global next_user_id
-        user = User(id=next_user_id, username=username, password=password)
+        user = User(
+            id=next_user_id,
+            username=username,
+            password=password,
+            email=email,
+            phone=phone,
+            prefix=prefix,
+        )
         next_user_id += 1
         users[user.id] = user
         users_by_username[user.username] = user
+        users_by_email[user.email] = user
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     return render_template("register.html", request=request)
 
 
 @app.get("/login", response_class=HTMLResponse)
 async def login(request: Request):
-    username = request.query_params.get("username")
+    email = request.query_params.get("email")
     password = request.query_params.get("password")
-    if username and password:
-        user = users_by_username.get(username)
+    if email and password:
+        user = users_by_email.get(email)
         if not user or user.password != password:
             return render_template("login.html", request=request, error="Invalid credentials")
         request.session["user_id"] = user.id
@@ -529,25 +583,114 @@ async def add_user_to_bar(request: Request, bar_id: int):
         raise HTTPException(status_code=404, detail="Bar not found")
     if not user or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    global next_user_id
     username = request.query_params.get("username")
     password = request.query_params.get("password")
+    email = request.query_params.get("email")
     role = request.query_params.get("role")
-    if username and password and role:
+    if username and role:
         if role not in ("bar_admin", "bartender"):
             raise HTTPException(status_code=400, detail="Invalid role")
-        if username in users_by_username:
-            return render_template("admin_add_user_to_bar.html", request=request, bar=bar, error="Username already taken")
-        global next_user_id
-        new_user = User(id=next_user_id, username=username, password=password, role=role, bar_id=bar_id)
-        next_user_id += 1
-        users[new_user.id] = new_user
-        users_by_username[new_user.username] = new_user
+        existing = users_by_username.get(username)
         if role == "bar_admin":
+            if existing:
+                return render_template(
+                    "admin_add_user_to_bar.html",
+                    request=request,
+                    bar=bar,
+                    error="Username already taken",
+                )
+            if not password or not email:
+                return render_template(
+                    "admin_add_user_to_bar.html",
+                    request=request,
+                    bar=bar,
+                    error="Email and password required",
+                )
+            if email in users_by_email:
+                return render_template(
+                    "admin_add_user_to_bar.html",
+                    request=request,
+                    bar=bar,
+                    error="Email already taken",
+                )
+            new_user = User(
+                id=next_user_id,
+                username=username,
+                password=password,
+                email=email,
+                role="bar_admin",
+                bar_id=bar_id,
+            )
+            next_user_id += 1
+            users[new_user.id] = new_user
+            users_by_username[new_user.username] = new_user
+            users_by_email[new_user.email] = new_user
             bar.bar_admin_ids.append(new_user.id)
-        else:
-            bar.bartender_ids.append(new_user.id)
-        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+            return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+        else:  # bartender
+            if existing:
+                existing.pending_bar_id = bar_id
+                bar.pending_bartender_ids.append(existing.id)
+                return render_template(
+                    "admin_add_user_to_bar.html",
+                    request=request,
+                    bar=bar,
+                    message="Invitation sent",
+                )
+            if not password or not email:
+                return render_template(
+                    "admin_add_user_to_bar.html",
+                    request=request,
+                    bar=bar,
+                    error="Email and password required",
+                )
+            if email in users_by_email:
+                return render_template(
+                    "admin_add_user_to_bar.html",
+                    request=request,
+                    bar=bar,
+                    error="Email already taken",
+                )
+            new_user = User(
+                id=next_user_id,
+                username=username,
+                password=password,
+                email=email,
+                role="bartender_pending",
+                pending_bar_id=bar_id,
+            )
+            next_user_id += 1
+            users[new_user.id] = new_user
+            users_by_username[new_user.username] = new_user
+            users_by_email[new_user.email] = new_user
+            bar.pending_bartender_ids.append(new_user.id)
+            return render_template(
+                "admin_add_user_to_bar.html",
+                request=request,
+                bar=bar,
+                message="Invitation sent",
+            )
     return render_template("admin_add_user_to_bar.html", request=request, bar=bar)
+
+
+@app.get("/confirm_bartender", response_class=HTMLResponse)
+async def confirm_bartender(request: Request):
+    user = get_current_user(request)
+    try:
+        bar_id = int(request.query_params.get("bar_id", 0))
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid bar")
+    bar = bars.get(bar_id)
+    if not user or not bar or user.pending_bar_id != bar_id:
+        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    user.role = "bartender"
+    user.bar_id = bar_id
+    user.pending_bar_id = None
+    bar.bartender_ids.append(user.id)
+    if user.id in bar.pending_bartender_ids:
+        bar.pending_bartender_ids.remove(user.id)
+    return render_template("bartender_confirm.html", request=request, bar=bar)
 
 
 @app.get("/admin/dashboard", response_class=HTMLResponse)
