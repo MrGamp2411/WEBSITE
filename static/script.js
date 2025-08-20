@@ -1,14 +1,45 @@
 document.addEventListener('DOMContentLoaded', function() {
   const searchInput = document.getElementById('barSearch');
-  if (searchInput) {
+  const barList = document.getElementById('barList');
+  if (searchInput && barList) {
     searchInput.addEventListener('keyup', function() {
       const term = this.value.toLowerCase();
-      document.querySelectorAll('.bar-card').forEach(card => {
-        const name = card.dataset.name;
-        const address = card.dataset.address;
-        card.style.display = (name.includes(term) || address.includes(term)) ? '' : 'none';
+      barList.querySelectorAll('li').forEach(item => {
+        const {name, address, city = '', state = ''} = item.dataset;
+        item.style.display = (name.includes(term) || address.includes(term) || city.includes(term) || state.includes(term)) ? '' : 'none';
       });
     });
+  }
+
+  if (barList && navigator.geolocation) {
+    const nearestBarEl = document.getElementById('nearestBar');
+    navigator.geolocation.getCurrentPosition(pos => {
+      const {latitude: uLat, longitude: uLon} = pos.coords;
+      const items = Array.from(barList.querySelectorAll('li'));
+      items.forEach(item => {
+        const bLat = parseFloat(item.dataset.latitude);
+        const bLon = parseFloat(item.dataset.longitude);
+        const dist = haversine(uLat, uLon, bLat, bLon);
+        item.dataset.distance = dist;
+      });
+      items.sort((a, b) => a.dataset.distance - b.dataset.distance);
+      items.forEach(item => barList.appendChild(item));
+      if (nearestBarEl && items.length) {
+        const nearest = items[0];
+        const name = nearest.querySelector('.card__title').textContent;
+        nearestBarEl.textContent = `Nearest bar: ${name} (${Number(nearest.dataset.distance).toFixed(1)} km)`;
+      }
+    });
+  }
+
+  function haversine(lat1, lon1, lat2, lon2) {
+    const toRad = deg => deg * Math.PI / 180;
+    const R = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
   }
 
   const toggle = document.getElementById('themeToggle');

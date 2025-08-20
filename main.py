@@ -33,6 +33,7 @@ Limitations:
 
 from typing import Dict, List, Optional
 
+import os
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -66,10 +67,21 @@ class Table:
 
 
 class Bar:
-    def __init__(self, id: int, name: str, address: str, latitude: float, longitude: float):
+    def __init__(
+        self,
+        id: int,
+        name: str,
+        address: str,
+        city: str,
+        state: str,
+        latitude: float,
+        longitude: float,
+    ):
         self.id = id
         self.name = name
         self.address = address
+        self.city = city
+        self.state = state
         self.latitude = latitude
         self.longitude = longitude
         self.categories: Dict[int, Category] = {}
@@ -175,6 +187,7 @@ templates_env = Environment(
     loader=FileSystemLoader("templates"),
     autoescape=select_autoescape(["html", "xml"]),
 )
+templates_env.globals["GOOGLE_MAPS_API_KEY"] = os.getenv("GOOGLE_MAPS_API_KEY", "")
 
 # -----------------------------------------------------------------------------
 # In-memory store with sample data
@@ -200,8 +213,15 @@ def seed_data():
     """Populate the store with a demo bar, categories, products and tables."""
     global next_bar_id, next_category_id, next_product_id, next_table_id
 
-    bar = Bar(id=next_bar_id, name="Bar Sport", address="Via Principale 1, 6780 Airolo",
-              latitude=46.5269, longitude=8.6086)
+    bar = Bar(
+        id=next_bar_id,
+        name="Bar Sport",
+        address="Via Principale 1",
+        city="Airolo",
+        state="Ticino",
+        latitude=46.5269,
+        longitude=8.6086,
+    )
     next_bar_id += 1
 
     # Categories
@@ -536,9 +556,11 @@ async def new_bar(request: Request):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     name = request.query_params.get("name")
     address = request.query_params.get("address")
+    city = request.query_params.get("city")
+    state = request.query_params.get("state")
     latitude = request.query_params.get("latitude")
     longitude = request.query_params.get("longitude")
-    if not all([name, address, latitude, longitude]):
+    if not all([name, address, city, state, latitude, longitude]):
         # Show empty form when required parameters are missing
         return render_template("admin_new_bar.html", request=request)
     try:
@@ -547,7 +569,15 @@ async def new_bar(request: Request):
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid coordinates")
     global next_bar_id
-    bar = Bar(id=next_bar_id, name=name, address=address, latitude=lat, longitude=lon)
+    bar = Bar(
+        id=next_bar_id,
+        name=name,
+        address=address,
+        city=city,
+        state=state,
+        latitude=lat,
+        longitude=lon,
+    )
     next_bar_id += 1
     bars[bar.id] = bar
     return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
@@ -563,9 +593,11 @@ async def edit_bar(request: Request, bar_id: int):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     name = request.query_params.get("name")
     address = request.query_params.get("address")
+    city = request.query_params.get("city")
+    state = request.query_params.get("state")
     latitude = request.query_params.get("latitude")
     longitude = request.query_params.get("longitude")
-    if all([name, address, latitude, longitude]):
+    if all([name, address, city, state, latitude, longitude]):
         try:
             lat = float(latitude)
             lon = float(longitude)
@@ -573,6 +605,8 @@ async def edit_bar(request: Request, bar_id: int):
             raise HTTPException(status_code=400, detail="Invalid coordinates")
         bar.name = name
         bar.address = address
+        bar.city = city
+        bar.state = state
         bar.latitude = lat
         bar.longitude = lon
         if user.is_super_admin:

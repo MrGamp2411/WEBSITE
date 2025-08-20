@@ -2,11 +2,20 @@
 {% block content %}
 <h1>Edit Bar</h1>
 <form class="form" method="get">
+  <label for="placeSearch">Search Google Maps
+    <input id="placeSearch" type="text" placeholder="Type bar name">
+  </label>
   <label for="name">Name
     <input id="name" name="name" value="{{ bar.name }}">
   </label>
   <label for="address">Address
     <input id="address" name="address" value="{{ bar.address }}">
+  </label>
+  <label for="city">City
+    <input id="city" name="city" value="{{ bar.city }}">
+  </label>
+  <label for="state">State
+    <input id="state" name="state" value="{{ bar.state }}">
   </label>
   <label for="latitude">Latitude
     <input id="latitude" name="latitude" value="{{ bar.latitude }}">
@@ -16,4 +25,51 @@
   </label>
   <button class="btn btn--primary" type="submit">Save</button>
 </form>
+<div id="map" style="height:300px;margin-top:1rem;"></div>
+<script>
+let map, marker, autocomplete;
+function initMap() {
+  const latField = document.getElementById('latitude');
+  const lngField = document.getElementById('longitude');
+  const lat = parseFloat(latField.value) || 0;
+  const lng = parseFloat(lngField.value) || 0;
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: {lat, lng},
+    zoom: 15,
+  });
+  marker = new google.maps.Marker({position: {lat, lng}, map: map, draggable: true});
+  marker.addListener('dragend', () => {
+    const pos = marker.getPosition();
+    latField.value = pos.lat().toFixed(6);
+    lngField.value = pos.lng().toFixed(6);
+  });
+  map.addListener('click', (e) => {
+    marker.setPosition(e.latLng);
+    latField.value = e.latLng.lat().toFixed(6);
+    lngField.value = e.latLng.lng().toFixed(6);
+  });
+  const input = document.getElementById('placeSearch');
+  autocomplete = new google.maps.places.Autocomplete(input, {types:['establishment']});
+  autocomplete.addListener('place_changed', () => {
+    const place = autocomplete.getPlace();
+    if (!place.geometry) return;
+    map.setCenter(place.geometry.location);
+    marker.setPosition(place.geometry.location);
+    latField.value = place.geometry.location.lat().toFixed(6);
+    lngField.value = place.geometry.location.lng().toFixed(6);
+    document.getElementById('name').value = place.name || '';
+    document.getElementById('address').value = place.formatted_address || '';
+    let city = '', state = '';
+    if (place.address_components) {
+      for (const comp of place.address_components) {
+        if (comp.types.includes('locality')) city = comp.long_name;
+        if (comp.types.includes('administrative_area_level_1')) state = comp.short_name;
+      }
+    }
+    document.getElementById('city').value = city;
+    document.getElementById('state').value = state;
+  });
+}
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initMap"></script>
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>{{ bar.name }}</h1>
-<p>{{ bar.address }}</p>
+<p>{{ bar.address }}, {{ bar.city }}, {{ bar.state }}</p>
 {% for category, products in products_by_category.items() %}
   <section class="category">
     <h2>{{ category.name }}</h2>
