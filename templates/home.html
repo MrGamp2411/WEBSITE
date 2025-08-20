@@ -1,13 +1,17 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Available Bars</h1>
-<div class="bars">
+<h1 class="mb-4">Available Bars</h1>
+<div class="row">
   {% for bar in bars %}
-    <div class="bar-card">
-      <h2>{{ bar.name }}</h2>
-      <p>{{ bar.address }}</p>
-      <a href="/bars/{{ bar.id }}">View Menu</a>
+  <div class="col-md-4 mb-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">{{ bar.name }}</h5>
+        <p class="card-text">{{ bar.address }}</p>
+        <a class="btn btn-primary" href="/bars/{{ bar.id }}">View Menu</a>
+      </div>
     </div>
+  </div>
   {% endfor %}
 </div>
 {% endblock %}
