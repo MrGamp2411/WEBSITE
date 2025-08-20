@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>Edit Bar</h1>
+<label for="placeSearch">Search Google Maps
+  <input id="placeSearch" type="text" placeholder="Type bar name">
+</label>
 <form class="form" method="get">
-  <label for="placeSearch">Search Google Maps
-    <input id="placeSearch" type="text" placeholder="Type bar name">
-  </label>
   <label for="name">Name
     <input id="name" name="name" value="{{ bar.name }}">
   </label>
@@ -31,14 +31,10 @@
         e.preventDefault();
       }
     });
- codex/fix-google-maps-search-functionality-2j5anw
     autocomplete = new google.maps.places.Autocomplete(input, {
       types: ['establishment'],
       fields: ['address_components', 'geometry', 'name']
     });
-
-    autocomplete = new google.maps.places.Autocomplete(input, { types: ['establishment'] });
- main
     autocomplete.addListener('place_changed', () => {
       const place = autocomplete.getPlace();
       if (!place.geometry) return;
