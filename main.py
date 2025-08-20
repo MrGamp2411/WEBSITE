@@ -33,6 +33,7 @@ Limitations:
 
 from typing import Dict, List, Optional
 
+import os
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -186,6 +187,7 @@ templates_env = Environment(
     loader=FileSystemLoader("templates"),
     autoescape=select_autoescape(["html", "xml"]),
 )
+templates_env.globals["GOOGLE_MAPS_API_KEY"] = os.getenv("GOOGLE_MAPS_API_KEY", "")
 
 # -----------------------------------------------------------------------------
 # In-memory store with sample data

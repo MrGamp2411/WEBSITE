@@ -2,6 +2,9 @@
 {% block content %}
 <h1>Create New Bar</h1>
 <form class="form" method="get" action="/admin/bars/new">
+  <label for="placeSearch">Search Google Maps
+    <input id="placeSearch" type="text" placeholder="Type bar name">
+  </label>
   <label for="name">Name
     <input id="name" type="text" name="name" required>
   </label>
@@ -20,6 +23,32 @@
   <label for="longitude">Longitude
     <input id="longitude" type="number" step="0.0001" name="longitude" required>
   </label>
-  <button class="btn btn--primary" type="submit">Create Bar</button>
-</form>
+    <button class="btn btn--primary" type="submit">Create Bar</button>
+  </form>
+  <script>
+  let autocomplete;
+  function initAutocomplete() {
+    const input = document.getElementById('placeSearch');
+    if (!input) return;
+    autocomplete = new google.maps.places.Autocomplete(input, {types:['establishment']});
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (!place.geometry) return;
+      document.getElementById('name').value = place.name || '';
+      document.getElementById('address').value = place.formatted_address || '';
+      document.getElementById('latitude').value = place.geometry.location.lat().toFixed(6);
+      document.getElementById('longitude').value = place.geometry.location.lng().toFixed(6);
+      let city = '', state = '';
+      if (place.address_components) {
+        for (const comp of place.address_components) {
+          if (comp.types.includes('locality')) city = comp.long_name;
+          if (comp.types.includes('administrative_area_level_1')) state = comp.short_name;
+        }
+      }
+      document.getElementById('city').value = city;
+      document.getElementById('state').value = state;
+    });
+  }
+  </script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initAutocomplete"></script>
 {% endblock %}
