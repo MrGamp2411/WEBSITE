@@ -2,5 +2,6 @@ services:
   - type: web
     name: website
     env: python
-    buildCommand: pip install -r requirements.txt
+    # Include itsdangerous to avoid missing module errors during deployment
+    buildCommand: pip install fastapi uvicorn jinja2 itsdangerous
     startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
