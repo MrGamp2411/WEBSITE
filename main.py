@@ -78,10 +78,11 @@ class Bar:
 
 
 class User:
-    def __init__(self, id: int, username: str, password: str):
+    def __init__(self, id: int, username: str, password: str, is_super_admin: bool = False):
         self.id = id
         self.username = username
         self.password = password
+        self.is_super_admin = is_super_admin
 
 
 class CartItem:
@@ -201,6 +202,18 @@ def seed_data():
 
 
 seed_data()
+
+
+def seed_super_admin():
+    """Create the default super admin account."""
+    global next_user_id
+    admin = User(id=next_user_id, username="Andrea", password="Andrea", is_super_admin=True)
+    users[admin.id] = admin
+    users_by_username[admin.username] = admin
+    next_user_id += 1
+
+
+seed_super_admin()
 
 
 # -----------------------------------------------------------------------------
@@ -385,6 +398,9 @@ async def logout(request: Request):
 @app.get("/admin/bars/new", response_class=HTMLResponse)
 async def new_bar(request: Request):
     """Display the creation form and handle adding a new bar."""
+    user = get_current_user(request)
+    if not user or not user.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     name = request.query_params.get("name")
     address = request.query_params.get("address")
     latitude = request.query_params.get("latitude")
@@ -402,3 +418,19 @@ async def new_bar(request: Request):
     next_bar_id += 1
     bars[bar.id] = bar
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.get("/admin/dashboard", response_class=HTMLResponse)
+async def admin_dashboard(request: Request):
+    user = get_current_user(request)
+    if not user or not user.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template("admin_dashboard.html", request=request)
+
+
+@app.get("/admin/profile", response_class=HTMLResponse)
+async def admin_profile(request: Request):
+    user = get_current_user(request)
+    if not user or not user.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template("admin_profile.html", request=request)
