@@ -11,13 +11,15 @@
 <a class="btn btn--success" href="/admin/bars/new">Add Bar</a>
 <table class="table">
   <thead>
-    <tr><th>Name</th><th>Address</th><th>Actions</th></tr>
+    <tr><th>Name</th><th>Address</th><th>City</th><th>State</th><th>Actions</th></tr>
   </thead>
   <tbody>
     {% for bar in bars %}
     <tr>
       <td>{{ bar.name }}</td>
       <td>{{ bar.address }}</td>
+      <td>{{ bar.city }}</td>
+      <td>{{ bar.state }}</td>
       <td>
         <a href="/admin/bars/edit/{{ bar.id }}">Edit</a> |
         <a href="/admin/bars/{{ bar.id }}/add_user">Add User</a>
