@@ -31,7 +31,13 @@
         e.preventDefault();
       }
     });
-    autocomplete = new google.maps.places.Autocomplete(input, { types: ['establishment'] });
+ codex/fix-google-maps-search-functionality-2j5anw
+    autocomplete = new google.maps.places.Autocomplete(input, {
+      types: ['establishment'],
+      fields: ['address_components', 'geometry', 'name']
+    });
+
+    autocomplete = new google.maps.places.Autocomplete(input, { types: ['establishment'] }); main
     autocomplete.addListener('place_changed', () => {
       const place = autocomplete.getPlace();
       if (!place.geometry) return;
@@ -57,14 +63,20 @@
   window.initAutocomplete = initAutocomplete;
   </script>
   {% if GOOGLE_MAPS_API_KEY %}
+ codex/fix-google-maps-search-functionality-2j5anw
+
  codex/fix-google-maps-search-functionality-nlxvne
+ main
   <script
       async
       defer
       src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initAutocomplete">
   </script>
+ codex/fix-google-maps-search-functionality-2j5anw
+
 
   <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initAutocomplete"></script>
+ main
  main
   {% endif %}
 {% endblock %}
