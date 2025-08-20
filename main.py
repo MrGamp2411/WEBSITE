@@ -380,33 +380,25 @@ async def logout(request: Request):
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 
-# Admin endpoints to add a new bar (simplified)
+# Admin endpoint to add a new bar (simplified)
 
 @app.get("/admin/bars/new", response_class=HTMLResponse)
-async def new_bar_form(request: Request):
-    return render_template("admin_new_bar.html", request=request)
-
-
-@app.get("/admin/bars/new")
-async def create_new_bar(request: Request):
-    """Endpoint to create a new bar using query parameters."""
-    # Only handle create when query parameters present
+async def new_bar(request: Request):
+    """Display the creation form and handle adding a new bar."""
     name = request.query_params.get("name")
     address = request.query_params.get("address")
     latitude = request.query_params.get("latitude")
     longitude = request.query_params.get("longitude")
     if not all([name, address, latitude, longitude]):
-        # If not all fields provided, show form (GET request) -- handled by new_bar_form
-        return await new_bar_form(request)
+        # Show empty form when required parameters are missing
+        return render_template("admin_new_bar.html", request=request)
     try:
         lat = float(latitude)
         lon = float(longitude)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid coordinates")
     global next_bar_id
-    bar = Bar(id=next_bar_id, name=name, address=address,
-              latitude=lat, longitude=lon)
+    bar = Bar(id=next_bar_id, name=name, address=address, latitude=lat, longitude=lon)
     next_bar_id += 1
     bars[bar.id] = bar
-    # Redirect to home
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
