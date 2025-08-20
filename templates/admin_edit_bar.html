@@ -26,6 +26,11 @@
   function initAutocomplete() {
     const input = document.getElementById('placeSearch');
     if (!input) return;
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+      }
+    });
     autocomplete = new google.maps.places.Autocomplete(input, { types: ['establishment'] });
     autocomplete.addListener('place_changed', () => {
       const place = autocomplete.getPlace();
@@ -52,7 +57,11 @@
   window.initAutocomplete = initAutocomplete;
 </script>
 {% if GOOGLE_MAPS_API_KEY %}
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initAutocomplete"></script>
+<script
+    async
+    defer
+    src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initAutocomplete">
+</script>
 {% endif %}
 {% endblock %}
 
