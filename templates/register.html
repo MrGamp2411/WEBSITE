@@ -1,10 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Register</h1>
-{% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
-<form method="get" action="/register">
-  <label>Username: <input type="text" name="username"></label><br>
-  <label>Password: <input type="password" name="password"></label><br>
-  <button type="submit">Register</button>
+<h1 class="mb-4">Register</h1>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+<form method="get" action="/register" class="mx-auto" style="max-width:320px;">
+  <div class="mb-3">
+    <label class="form-label">Username</label>
+    <input class="form-control" type="text" name="username">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Password</label>
+    <input class="form-control" type="password" name="password">
+  </div>
+  <button class="btn btn-primary" type="submit">Register</button>
 </form>
 {% endblock %}
