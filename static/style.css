@@ -19,6 +19,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);}
 .navbar{display:flex;align-items:center;gap:var(--space-3);justify-content:space-between;width:100%;}
 .navbar a{color:var(--text);text-decoration:none;}
 
+.nav-left,.nav-right{display:flex;align-items:center;gap:var(--space-2);}
+
+.hamburger{display:flex;flex-direction:column;gap:4px;background:none;border:0;padding:var(--space-1);cursor:pointer;}
+.hamburger span{width:24px;height:2px;background:var(--text);}
+
+.menu{position:absolute;top:100%;right:var(--space-3);background:var(--surface);border-radius:var(--radius);padding:var(--space-3);box-shadow:var(--shadow);display:none;flex-direction:column;gap:var(--space-2);}
+.menu a{color:var(--text);text-decoration:none;}
+.menu.open{display:flex;}
+
 .logo{font-weight:600;color:var(--text);text-decoration:none;font-size:1.25rem;}
 .cart{position:relative;display:inline-flex;align-items:center;text-decoration:none;color:var(--text);}
 .cart .badge{position:absolute;top:-6px;right:-10px;}

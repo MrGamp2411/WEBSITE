@@ -23,4 +23,15 @@ document.addEventListener('DOMContentLoaded', function() {
       document.body.classList.add('dark-mode');
     }
   }
+
+  const menuToggle = document.getElementById('menuToggle');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (menuToggle && mobileMenu) {
+    menuToggle.addEventListener('click', () => {
+      const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+      menuToggle.setAttribute('aria-expanded', String(!expanded));
+      mobileMenu.hidden = expanded;
+      mobileMenu.classList.toggle('open', !expanded);
+    });
+  }
 });
