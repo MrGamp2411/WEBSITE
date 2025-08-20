@@ -1,14 +1,23 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1 class="mb-4">Manage Users</h1>
+<div class="dashboard-info">
+  <div class="card">
+    <h2>{{ user.username }}</h2>
+    <p>{{ user.email }}</p>
+    <p>{{ user.prefix }} {{ user.phone }}</p>
+  </div>
+</div>
 <table class="table">
   <thead>
-    <tr><th>Username</th><th>Role</th><th>Bar</th><th></th></tr>
+    <tr><th>Username</th><th>Email</th><th>Phone</th><th>Role</th><th>Bar</th><th></th></tr>
   </thead>
   <tbody>
     {% for u in users %}
     <tr>
       <td>{{ u.username }}</td>
+      <td>{{ u.email }}</td>
+      <td>{{ u.prefix }} {{ u.phone }}</td>
       <td>{{ u.role }}</td>
       <td>{% if u.bar_id %}{{ bars[u.bar_id].name }}{% else %}-{% endif %}</td>
       <td><a href="/admin/users/edit/{{ u.id }}">Edit</a></td>
