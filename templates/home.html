@@ -1,6 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1 class="mb-4">Available Bars</h1>
+<div class="p-5 mb-4 hero rounded-3">
+  <div class="container-fluid py-5">
+    <h1 class="display-5 fw-bold">Find your next drink</h1>
+    <p class="col-md-8 fs-4">Browse nearby bars and order directly from your table.</p>
+  </div>
+</div>
+
+<h2 class="mb-4">Available Bars</h2>
 <div class="row">
   {% for bar in bars %}
   <div class="col-md-4 mb-3">
