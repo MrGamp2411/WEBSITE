@@ -75,14 +75,30 @@ class Bar:
         self.categories: Dict[int, Category] = {}
         self.products: Dict[int, Product] = {}
         self.tables: Dict[int, Table] = {}
+        # Users assigned to this bar
+        self.bar_admin_ids: List[int] = []
+        self.bartender_ids: List[int] = []
 
 
 class User:
-    def __init__(self, id: int, username: str, password: str, is_super_admin: bool = False):
+    def __init__(self, id: int, username: str, password: str, role: str = "customer", bar_id: Optional[int] = None):
         self.id = id
         self.username = username
         self.password = password
-        self.is_super_admin = is_super_admin
+        self.role = role
+        self.bar_id = bar_id
+
+    @property
+    def is_super_admin(self) -> bool:
+        return self.role == "super_admin"
+
+    @property
+    def is_bar_admin(self) -> bool:
+        return self.role == "bar_admin"
+
+    @property
+    def is_bartender(self) -> bool:
+        return self.role == "bartender"
 
 
 class CartItem:
@@ -207,13 +223,35 @@ seed_data()
 def seed_super_admin():
     """Create the default super admin account."""
     global next_user_id
-    admin = User(id=next_user_id, username="Andrea", password="Andrea", is_super_admin=True)
+    admin = User(id=next_user_id, username="Andrea", password="Andrea", role="super_admin")
     users[admin.id] = admin
     users_by_username[admin.username] = admin
     next_user_id += 1
 
 
+def seed_bar_staff():
+    """Create demo bar admin and bartender for the first bar."""
+    global next_user_id
+    if not bars:
+        return
+    bar_id = next(iter(bars))
+    bar = bars[bar_id]
+    # Bar admin
+    admin_user = User(id=next_user_id, username="baradmin", password="baradmin", role="bar_admin", bar_id=bar_id)
+    users[admin_user.id] = admin_user
+    users_by_username[admin_user.username] = admin_user
+    bar.bar_admin_ids.append(admin_user.id)
+    next_user_id += 1
+    # Bartender
+    bartender_user = User(id=next_user_id, username="bartender", password="bartender", role="bartender", bar_id=bar_id)
+    users[bartender_user.id] = bartender_user
+    users_by_username[bartender_user.username] = bartender_user
+    bar.bartender_ids.append(bartender_user.id)
+    next_user_id += 1
+
+
 seed_super_admin()
+seed_bar_staff()
 
 
 # -----------------------------------------------------------------------------
@@ -394,7 +432,7 @@ async def login(request: Request):
         if not user or user.password != password:
             return render_template("login.html", request=request, error="Invalid credentials")
         request.session["user_id"] = user.id
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     return render_template("login.html", request=request)
 
 
@@ -403,6 +441,21 @@ async def logout(request: Request):
     request.session.clear()
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard(request: Request):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    if user.is_super_admin:
+        return render_template("admin_dashboard.html", request=request)
+    if user.is_bar_admin:
+        bar = bars.get(user.bar_id)
+        return render_template("bar_admin_dashboard.html", request=request, bar=bar)
+    if user.is_bartender:
+        bar = bars.get(user.bar_id)
+        return render_template("bartender_dashboard.html", request=request, bar=bar)
+    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 
 # Admin management endpoints
@@ -440,6 +493,63 @@ async def new_bar(request: Request):
     return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
 
 
+@app.get("/admin/bars/edit/{bar_id}", response_class=HTMLResponse)
+async def edit_bar(request: Request, bar_id: int):
+    user = get_current_user(request)
+    bar = bars.get(bar_id)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    if not user or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    name = request.query_params.get("name")
+    address = request.query_params.get("address")
+    latitude = request.query_params.get("latitude")
+    longitude = request.query_params.get("longitude")
+    if all([name, address, latitude, longitude]):
+        try:
+            lat = float(latitude)
+            lon = float(longitude)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid coordinates")
+        bar.name = name
+        bar.address = address
+        bar.latitude = lat
+        bar.longitude = lon
+        if user.is_super_admin:
+            return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template("admin_edit_bar.html", request=request, bar=bar)
+
+
+@app.get("/admin/bars/{bar_id}/add_user", response_class=HTMLResponse)
+async def add_user_to_bar(request: Request, bar_id: int):
+    user = get_current_user(request)
+    bar = bars.get(bar_id)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    if not user or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    username = request.query_params.get("username")
+    password = request.query_params.get("password")
+    role = request.query_params.get("role")
+    if username and password and role:
+        if role not in ("bar_admin", "bartender"):
+            raise HTTPException(status_code=400, detail="Invalid role")
+        if username in users_by_username:
+            return render_template("admin_add_user_to_bar.html", request=request, bar=bar, error="Username already taken")
+        global next_user_id
+        new_user = User(id=next_user_id, username=username, password=password, role=role, bar_id=bar_id)
+        next_user_id += 1
+        users[new_user.id] = new_user
+        users_by_username[new_user.username] = new_user
+        if role == "bar_admin":
+            bar.bar_admin_ids.append(new_user.id)
+        else:
+            bar.bartender_ids.append(new_user.id)
+        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template("admin_add_user_to_bar.html", request=request, bar=bar)
+
+
 @app.get("/admin/dashboard", response_class=HTMLResponse)
 async def admin_dashboard(request: Request):
     user = get_current_user(request)
@@ -461,4 +571,50 @@ async def admin_users_view(request: Request):
     user = get_current_user(request)
     if not user or not user.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    return render_template("admin_users.html", request=request, users=users.values())
+    return render_template("admin_users.html", request=request, users=users.values(), bars=bars)
+
+
+@app.get("/admin/users/edit/{user_id}", response_class=HTMLResponse)
+async def edit_user(request: Request, user_id: int):
+    current = get_current_user(request)
+    if not current or not current.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    user = users.get(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    username = request.query_params.get("username")
+    password = request.query_params.get("password")
+    role = request.query_params.get("role")
+    bar_id = request.query_params.get("bar_id")
+    if username and password and role is not None:
+        if username != user.username and username in users_by_username:
+            return render_template("admin_edit_user.html", request=request, user=user, bars=bars.values(), error="Username already taken")
+        # Update username mapping
+        if username != user.username:
+            del users_by_username[user.username]
+            user.username = username
+            users_by_username[user.username] = user
+        user.password = password
+        user.role = role
+        user.bar_id = int(bar_id) if bar_id else None
+        return RedirectResponse(url="/admin/users", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template("admin_edit_user.html", request=request, user=user, bars=bars.values())
+
+
+@app.get("/bar/{bar_id}/categories/new", response_class=HTMLResponse)
+async def bar_new_category(request: Request, bar_id: int):
+    user = get_current_user(request)
+    bar = bars.get(bar_id)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    if not user or not (user.is_super_admin or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    name = request.query_params.get("name")
+    description = request.query_params.get("description")
+    if name and description:
+        global next_category_id
+        category = Category(id=next_category_id, name=name, description=description)
+        next_category_id += 1
+        bar.categories[category.id] = category
+        return RedirectResponse(url=f"/bars/{bar_id}", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template("bar_new_category.html", request=request, bar=bar)

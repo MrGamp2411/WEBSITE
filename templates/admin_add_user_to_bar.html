@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1 class="mb-4">Add User to {{ bar.name }}</h1>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+<form method="get">
+  <div class="mb-3">
+    <label class="form-label">Username</label>
+    <input class="form-control" name="username">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Password</label>
+    <input class="form-control" name="password" type="password">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Role</label>
+    <select class="form-control" name="role">
+      <option value="bar_admin">Bar Admin</option>
+      <option value="bartender">Bartender</option>
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">Create</button>
+</form>
+{% endblock %}
