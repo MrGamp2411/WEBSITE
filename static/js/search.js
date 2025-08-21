@@ -63,10 +63,10 @@ async function normalizeBars(bars, userLoc) {
 function applyFilters(bars, state) {
   return bars
     .filter(b => state.q ? b._searchKey.includes(SG.normalize.normText(state.q)) : true)
-    .filter(b => state.max_km == null ? true : (b.distance_km == null ? false : b.distance_km <= Number(state.max_km)))
-    .filter(b => state.min_rating == null ? true : (b.rating == null ? false : b.rating >= Number(state.min_rating)))
-    .filter(b => !state.categories?.length ? true : (b.categories || []).some(c => state.categories.includes(c)))
-    .filter(b => state.open_now ? !!b.is_open : true);
+    .filter(b => state.active.max_km ? (b.distance_km == null ? false : b.distance_km <= Number(state.max_km)) : true)
+    .filter(b => state.active.min_rating ? (b.rating == null ? false : b.rating >= Number(state.min_rating)) : true)
+    .filter(b => state.active.categories ? (b.categories || []).some(c => state.categories.includes(c)) : true)
+    .filter(b => state.active.open_now ? !!b.is_open : true);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -74,100 +74,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   const filterBtn = document.getElementById('filterBtn');
   const filterOverlay = document.getElementById('filterOverlay');
   const filterForm = document.getElementById('filterForm');
-  const filterSearch = document.getElementById('filterSearch');
   const distanceInput = document.getElementById('filterDistance');
   const ratingInput = document.getElementById('filterRating');
   const distanceVal = document.getElementById('filterDistanceVal');
   const ratingVal = document.getElementById('filterRatingVal');
-  const openCheckbox = document.getElementById('filterOpen');
   const categoryChips = document.getElementById('filterCategoryChips');
+  const categoryVal = document.getElementById('filterCategoryVal');
+  const openCheckbox = document.getElementById('filterOpen');
+  const openVal = document.getElementById('filterOpenVal');
   const applyBtn = filterOverlay?.querySelector('.apply');
   const resetBtn = filterOverlay?.querySelector('.reset');
   const clearBtn = document.getElementById('clearFilters');
   const filterCount = document.getElementById('filterCount');
 
-  const defaults = { q: '', max_km: null, min_rating: null, categories: [], open_now: false };
-  let state = { ...defaults };
-  let appliedState = { ...defaults };
-
-  function readFromURL() {
-    const p = new URLSearchParams(location.search);
-    const s = { ...defaults };
-    if (p.get('q')) s.q = p.get('q');
-    if (p.get('max_km')) s.max_km = parseFloat(p.get('max_km'));
-    if (p.get('min_rating')) s.min_rating = parseFloat(p.get('min_rating'));
-    if (p.get('cat')) s.categories = p.get('cat').split(',').filter(Boolean);
-    if (p.get('open_now') === '1') s.open_now = true;
-    return s;
-  }
-
-  function writeToURL(s) {
-    const p = new URLSearchParams();
-    if (s.q) p.set('q', s.q);
-    if (s.max_km != null) p.set('max_km', s.max_km);
-    if (s.min_rating != null) p.set('min_rating', s.min_rating);
-    if (s.categories.length) p.set('cat', s.categories.join(','));
-    if (s.open_now) p.set('open_now', '1');
-    const newUrl = `${location.pathname}?${p.toString()}`;
-    history.replaceState(null, '', newUrl);
-  }
-
-  function readFromStorage() {
-    const s = { ...defaults };
-    const q = localStorage.getItem('sg.searchQuery');
-    if (q) s.q = q;
-    const prefix = 'sg.filters.';
-    const mk = localStorage.getItem(prefix + 'max_km');
-    if (mk) s.max_km = parseFloat(mk);
-    const mr = localStorage.getItem(prefix + 'min_rating');
-    if (mr) s.min_rating = parseFloat(mr);
-    const cats = localStorage.getItem(prefix + 'categories');
-    if (cats) s.categories = cats.split(',').filter(Boolean);
-    const on = localStorage.getItem(prefix + 'open_now');
-    if (on) s.open_now = on === '1';
-    return s;
-  }
-
-  function writeToStorage(s) {
-    localStorage.setItem('sg.searchQuery', s.q || '');
-    const prefix = 'sg.filters.';
-    s.max_km != null ? localStorage.setItem(prefix + 'max_km', s.max_km) : localStorage.removeItem(prefix + 'max_km');
-    s.min_rating != null ? localStorage.setItem(prefix + 'min_rating', s.min_rating) : localStorage.removeItem(prefix + 'min_rating');
-    s.categories.length ? localStorage.setItem(prefix + 'categories', s.categories.join(',')) : localStorage.removeItem(prefix + 'categories');
-    localStorage.setItem(prefix + 'open_now', s.open_now ? '1' : '0');
-  }
-
-  function applyStateToControls(s) {
-    if (searchInput) searchInput.value = s.q;
-    if (filterSearch) filterSearch.value = s.q;
-    if (distanceInput) {
-      if (!distanceInput.disabled) {
-        distanceInput.value = s.max_km ?? distanceInput.defaultValue;
-        distanceVal.textContent = `${distanceInput.value} km`;
-      } else {
-        distanceVal.textContent = '';
-      }
-    }
-    if (ratingInput) {
-      if (!ratingInput.disabled) {
-        ratingInput.value = s.min_rating ?? ratingInput.defaultValue;
-        ratingVal.textContent = `≥ ${ratingInput.value}`;
-      } else {
-        ratingVal.textContent = '';
-      }
-    }
-    if (categoryChips) {
-      const chips = categoryChips.querySelectorAll('.chip');
-      chips.forEach(chip => {
-        const val = chip.dataset.value;
-        if (!val && !s.categories.length) chip.classList.add('active');
-        else if (s.categories.includes(val)) chip.classList.add('active');
-        else chip.classList.remove('active');
-      });
-    }
-    if (openCheckbox) openCheckbox.checked = s.open_now;
-    checkChanges();
-  }
+  const defaults = {
+    q: '',
+    max_km: null,
+    min_rating: null,
+    categories: [],
+    open_now: false,
+    active: { max_km: false, min_rating: false, categories: false, open_now: false }
+  };
+  let state = JSON.parse(JSON.stringify(defaults));
+  let appliedState = JSON.parse(JSON.stringify(defaults));
 
   const cardEls = Array.from(document.querySelectorAll('.bar-card'));
   const rawBars = cardEls.map(el => ({
@@ -183,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     categories: (el.dataset.categories || '').split(',').filter(Boolean),
     is_open: el.dataset.open === 'true'
   }));
-  const report = validateBars(rawBars);
+  validateBars(rawBars);
   let userLoc = null;
   let bars = await normalizeBars(rawBars, userLoc);
 
@@ -241,6 +170,161 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (empty) empty.style.display = filtered.length ? 'none' : '';
   }
 
+  function writeToURL(s) {
+    const p = new URLSearchParams();
+    if (s.q) p.set('q', s.q);
+    if (s.active.max_km) p.set('max_km', s.max_km);
+    if (s.active.min_rating) p.set('min_rating', s.min_rating);
+    if (s.active.categories) p.set('cat', s.categories.join(','));
+    if (s.active.open_now && s.open_now) p.set('open_now', '1');
+    const newUrl = `${location.pathname}?${p.toString()}`;
+    history.replaceState(null, '', newUrl);
+  }
+
+  function writeToStorage(s) {
+    localStorage.setItem('sg.searchQuery', s.q || '');
+    const prefix = 'sg.filters.';
+    if (s.active.max_km) {
+      localStorage.setItem(prefix + 'max_km', s.max_km);
+      localStorage.setItem(prefix + 'active.max_km', '1');
+    } else {
+      localStorage.removeItem(prefix + 'max_km');
+      localStorage.removeItem(prefix + 'active.max_km');
+    }
+    if (s.active.min_rating) {
+      localStorage.setItem(prefix + 'min_rating', s.min_rating);
+      localStorage.setItem(prefix + 'active.min_rating', '1');
+    } else {
+      localStorage.removeItem(prefix + 'min_rating');
+      localStorage.removeItem(prefix + 'active.min_rating');
+    }
+    if (s.active.categories) {
+      localStorage.setItem(prefix + 'categories', s.categories.join(','));
+      localStorage.setItem(prefix + 'active.categories', '1');
+    } else {
+      localStorage.removeItem(prefix + 'categories');
+      localStorage.removeItem(prefix + 'active.categories');
+    }
+    if (s.active.open_now && s.open_now) {
+      localStorage.setItem(prefix + 'open_now', '1');
+      localStorage.setItem(prefix + 'active.open_now', '1');
+    } else {
+      localStorage.removeItem(prefix + 'open_now');
+      localStorage.removeItem(prefix + 'active.open_now');
+    }
+  }
+
+  function readFromURL() {
+    const p = new URLSearchParams(location.search);
+    const s = JSON.parse(JSON.stringify(defaults));
+    if (p.get('q')) s.q = p.get('q');
+    if (p.get('max_km')) { s.max_km = parseFloat(p.get('max_km')); s.active.max_km = true; }
+    if (p.get('min_rating')) { s.min_rating = parseFloat(p.get('min_rating')); s.active.min_rating = true; }
+    if (p.get('cat')) { s.categories = p.get('cat').split(',').filter(Boolean); s.active.categories = true; }
+    if (p.get('open_now') === '1') { s.open_now = true; s.active.open_now = true; }
+    return s;
+  }
+
+  function readFromStorage() {
+    const s = JSON.parse(JSON.stringify(defaults));
+    const q = localStorage.getItem('sg.searchQuery');
+    if (q) s.q = q;
+    const prefix = 'sg.filters.';
+    if (localStorage.getItem(prefix + 'active.max_km') === '1') {
+      const mk = localStorage.getItem(prefix + 'max_km');
+      if (mk) { s.max_km = parseFloat(mk); s.active.max_km = true; }
+    }
+    if (localStorage.getItem(prefix + 'active.min_rating') === '1') {
+      const mr = localStorage.getItem(prefix + 'min_rating');
+      if (mr) { s.min_rating = parseFloat(mr); s.active.min_rating = true; }
+    }
+    if (localStorage.getItem(prefix + 'active.categories') === '1') {
+      const cats = localStorage.getItem(prefix + 'categories');
+      if (cats) { s.categories = cats.split(',').filter(Boolean); s.active.categories = true; }
+    }
+    if (localStorage.getItem(prefix + 'active.open_now') === '1') {
+      s.open_now = true; s.active.open_now = true;
+    }
+    return s;
+  }
+
+  function updateControls() {
+    if (searchInput) searchInput.value = state.q;
+    if (distanceInput) {
+      const group = distanceInput.closest('.group');
+      if (state.active.max_km && state.max_km != null && !distanceInput.disabled) {
+        distanceInput.value = state.max_km;
+        distanceVal.textContent = `${state.max_km} km`;
+        distanceVal.hidden = false;
+        group.classList.remove('inactive');
+      } else {
+        distanceInput.value = distanceInput.defaultValue;
+        distanceVal.textContent = '';
+        distanceVal.hidden = true;
+        group.classList.add('inactive');
+      }
+    }
+    if (ratingInput) {
+      const group = ratingInput.closest('.group');
+      if (state.active.min_rating && state.min_rating != null && !ratingInput.disabled) {
+        ratingInput.value = state.min_rating;
+        ratingVal.textContent = `≥ ${state.min_rating.toFixed(1)}`;
+        ratingVal.hidden = false;
+        group.classList.remove('inactive');
+      } else {
+        ratingInput.value = ratingInput.defaultValue;
+        ratingVal.textContent = '';
+        ratingVal.hidden = true;
+        group.classList.add('inactive');
+      }
+    }
+    if (categoryChips) {
+      const group = categoryChips.closest('.group');
+      const chips = categoryChips.querySelectorAll('.chip');
+      chips.forEach(chip => {
+        const val = chip.dataset.value;
+        chip.classList.toggle('active', state.active.categories && state.categories.includes(val));
+      });
+      if (state.active.categories) {
+        let text = '';
+        if (state.categories.length === 1) {
+          const chipEl = categoryChips.querySelector(`.chip[data-value="${state.categories[0]}"]`);
+          text = chipEl ? chipEl.textContent.trim() : state.categories[0];
+        } else if (state.categories.length > 1) {
+          const chipEl = categoryChips.querySelector(`.chip[data-value="${state.categories[0]}"]`);
+          const label = chipEl ? chipEl.textContent.trim() : state.categories[0];
+          text = `${label} +${state.categories.length - 1}`;
+        }
+        categoryVal.textContent = text;
+        categoryVal.hidden = false;
+        group.classList.remove('inactive');
+      } else {
+        categoryVal.textContent = '';
+        categoryVal.hidden = true;
+        group.classList.add('inactive');
+      }
+    }
+    if (openCheckbox) {
+      const group = openCheckbox.closest('.group');
+      openCheckbox.checked = state.open_now;
+      openVal.textContent = state.open_now ? 'Sì' : 'No';
+      openVal.hidden = !state.active.open_now;
+      group.classList.toggle('inactive', !state.active.open_now);
+    }
+    applyBtn && (applyBtn.disabled = Object.values(state.active).filter(Boolean).length === 0);
+  }
+
+  function updateFilterBadge(s) {
+    if (!filterCount) return;
+    const n = Object.values(s.active).filter(Boolean).length;
+    if (n > 0) {
+      filterCount.textContent = n;
+      filterCount.hidden = false;
+    } else {
+      filterCount.hidden = true;
+    }
+  }
+
   function applyState(s) {
     writeToURL(s);
     writeToStorage(s);
@@ -250,7 +334,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function openFilters() {
-    applyStateToControls(state);
+    state = JSON.parse(JSON.stringify(appliedState));
+    updateControls();
     filterOverlay.hidden = false;
     requestAnimationFrame(() => filterOverlay.classList.add('show'));
     document.body.style.overflow = 'hidden';
@@ -277,101 +362,86 @@ document.addEventListener('DOMContentLoaded', async () => {
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
 
-  function currentFromControls() {
-    return {
-      q: (filterSearch ? filterSearch.value : searchInput.value).trim().toLowerCase(),
-      max_km: distanceInput && !distanceInput.disabled ? parseInt(distanceInput.value, 10) : null,
-      min_rating: ratingInput && !ratingInput.disabled ? parseFloat(ratingInput.value) : null,
-      categories: Array.from(categoryChips.querySelectorAll('.chip.active')).map(c => c.dataset.value).filter(Boolean),
-      open_now: openCheckbox.checked
-    };
-  }
-
-  function checkChanges() {
-    if (!applyBtn) return;
-    const curr = currentFromControls();
-    applyBtn.disabled = JSON.stringify(curr) === JSON.stringify(appliedState);
-  }
-
-  function debounce(fn, delay = 300) {
-    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), delay); };
-  }
+  const debounce = (fn, delay = 300) => { let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), delay); }; };
 
   const syncSearch = debounce(val => {
-    state.q = val.toLowerCase();
-    appliedState.q = state.q;
-    if (filterSearch && filterSearch !== document.activeElement) filterSearch.value = val;
-    if (searchInput && searchInput !== document.activeElement) searchInput.value = val;
-    applyState(state);
+    state.q = val;
+    appliedState.q = val;
+    applyState(appliedState);
   }, 300);
 
   searchInput?.addEventListener('input', e => syncSearch(e.target.value));
-  filterSearch?.addEventListener('input', e => syncSearch(e.target.value));
 
-  distanceInput?.addEventListener('input', () => { distanceVal.textContent = `${distanceInput.value} km`; checkChanges(); });
-  ratingInput?.addEventListener('input', () => { ratingVal.textContent = `≥ ${ratingInput.value}`; checkChanges(); });
-  openCheckbox?.addEventListener('input', checkChanges);
+  distanceInput?.addEventListener('input', e => {
+    state.max_km = +e.target.value;
+    if (!state.active.max_km) state.active.max_km = true;
+    updateControls();
+  });
+
+  ratingInput?.addEventListener('input', e => {
+    state.min_rating = +e.target.value;
+    if (!state.active.min_rating) state.active.min_rating = true;
+    updateControls();
+  });
+
+  openCheckbox?.addEventListener('change', e => {
+    state.open_now = e.target.checked;
+    state.active.open_now = e.target.checked;
+    updateControls();
+  });
 
   categoryChips?.addEventListener('click', e => {
     const chip = e.target.closest('.chip');
     if (!chip) return;
-    if (chip.dataset.value === '') {
-      categoryChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
+    const val = chip.dataset.value;
+    if (!val) {
+      state.categories = [];
+      state.active.categories = false;
     } else {
-      chip.classList.toggle('active');
-      categoryChips.querySelector('[data-value=""]')?.classList.remove('active');
-      if (!categoryChips.querySelector('.chip.active')) categoryChips.querySelector('[data-value=""]')?.classList.add('active');
+      if (!state.active.categories) {
+        state.active.categories = true;
+        state.categories = [val];
+      } else {
+        if (state.categories.includes(val)) {
+          state.categories = state.categories.filter(c => c !== val);
+          if (state.categories.length === 0) state.active.categories = false;
+        } else {
+          state.categories.push(val);
+        }
+      }
     }
-    checkChanges();
+    updateControls();
   });
 
   filterForm?.addEventListener('submit', e => {
     e.preventDefault();
-    state = currentFromControls();
-    appliedState = { ...state };
-    applyState(state);
+    appliedState = JSON.parse(JSON.stringify(state));
+    applyState(appliedState);
     closeFilters();
   });
 
   resetBtn?.addEventListener('click', () => {
-    state = { ...defaults };
-    appliedState = { ...defaults };
-    applyStateToControls(state);
-    applyState(state);
+    state = JSON.parse(JSON.stringify(defaults));
+    appliedState = JSON.parse(JSON.stringify(defaults));
+    updateControls();
+    applyState(appliedState);
   });
 
   clearBtn?.addEventListener('click', () => {
-    state = { ...defaults };
-    appliedState = { ...defaults };
-    applyStateToControls(state);
-    applyState(state);
+    state = JSON.parse(JSON.stringify(defaults));
+    appliedState = JSON.parse(JSON.stringify(defaults));
+    updateControls();
+    applyState(appliedState);
   });
-
-  function countActiveFilters(s) {
-    let c = 0;
-    if (s.max_km != null) c++;
-    if (s.min_rating != null) c++;
-    if (s.categories.length) c++;
-    if (s.open_now) c++;
-    return c;
-  }
-
-  function updateFilterBadge(s) {
-    if (!filterCount) return;
-    const n = countActiveFilters(s);
-    filterCount.textContent = n;
-    filterCount.hidden = n === 0;
-  }
 
   // Initial state
   state = readFromURL();
-  const hasURLParams = Array.from(new URLSearchParams(location.search).keys()).length > 0;
-  if (!hasURLParams) {
-    const stored = readFromStorage();
-    state = { ...state, ...stored };
+  const hasParams = Array.from(new URLSearchParams(location.search).keys()).length > 0;
+  if (!hasParams) {
+    state = readFromStorage();
   }
-  appliedState = { ...state };
-  applyStateToControls(state);
-  applyState(state);
+  appliedState = JSON.parse(JSON.stringify(state));
+  updateControls();
+  applyState(appliedState);
 });
+
