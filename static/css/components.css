@@ -251,6 +251,11 @@ body.dark-mode{
 .filter-sheet{background:var(--bg);width:100%;max-height:85vh;border-radius:16px 16px 0 0;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.2);transform:translateY(100%);transition:transform .3s ease;overflow-y:auto;}
 .filter-overlay.show .filter-sheet{transform:translateY(0);}
 .grabber{width:48px;height:5px;border-radius:8px;background:var(--muted);margin:0 auto 16px;}
+.filter-sheet .group{margin-top:16px;}
+.filter-sheet .group-head{display:flex;justify-content:space-between;align-items:center;}
+.filter-sheet .group.inactive{opacity:.55;}
+.filter-sheet .group:not(.inactive) .inactive-hint{display:none;}
+.filter-sheet .group .value-chip{margin-left:auto;}
 .sheet-footer{position:sticky;bottom:0;display:flex;gap:12px;padding-top:16px;margin-top:16px;background:var(--bg);}
 .sheet-footer .apply{flex:1;}
 @media (prefers-color-scheme: dark){

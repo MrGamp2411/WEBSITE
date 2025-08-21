@@ -57,20 +57,27 @@
     <div class="grabber" aria-hidden="true"></div>
     <h2 id="filterTitle">Filtri</h2>
     <form id="filterForm">
-      <div class="group">
-        <label for="filterSearch">Search</label>
-        <input type="search" id="filterSearch" aria-label="Cerca bar o città" inputmode="search" autocomplete="off">
+      <div class="group inactive" data-key="max_km">
+        <div class="group-head">
+          <label for="filterDistance">Max distance</label>
+          <span id="filterDistanceVal" class="chip value-chip" hidden></span>
+        </div>
+        <input type="range" id="filterDistance" name="distance" min="1" max="50" step="1" value="50">
+        <p class="help inactive-hint">Sposta lo slider per attivare</p>
       </div>
-      <div class="group">
-        <label for="filterDistance">Max distance <span id="filterDistanceVal">10 km</span></label>
-        <input type="range" id="filterDistance" name="distance" min="1" max="50" value="10">
-      </div>
-      <div class="group">
-        <label for="filterRating">Min rating <span id="filterRatingVal">≥ 0</span></label>
+      <div class="group inactive" data-key="min_rating">
+        <div class="group-head">
+          <label for="filterRating">Min rating</label>
+          <span id="filterRatingVal" class="chip value-chip" hidden></span>
+        </div>
         <input type="range" id="filterRating" name="rating" min="0" max="5" step="0.1" value="0">
+        <p class="help inactive-hint">Sposta lo slider per attivare</p>
       </div>
-      <div class="group">
-        <p>Category</p>
+      <div class="group inactive" data-key="categories">
+        <div class="group-head">
+          <p>Category</p>
+          <span id="filterCategoryVal" class="chip value-chip" hidden></span>
+        </div>
         {% set cats = namespace(names=[]) %}
         {% for bar in bars %}
           {% for c in bar.categories.values() %}
@@ -80,15 +87,20 @@
           {% endfor %}
         {% endfor %}
         <div id="filterCategoryChips" class="chips">
-          <button type="button" class="chip active" data-value="">All</button>
+          <button type="button" class="chip" data-value="">All</button>
           {% for name in cats.names %}
           <button type="button" class="chip" data-value="{{ name|lower }}">{{ name }}</button>
           {% endfor %}
         </div>
+        <p class="help inactive-hint">Seleziona per attivare</p>
       </div>
-      <div class="group">
-        <label for="filterOpen">Open now</label>
+      <div class="group inactive" data-key="open_now">
+        <div class="group-head">
+          <label for="filterOpen">Open now</label>
+          <span id="filterOpenVal" class="chip value-chip" hidden></span>
+        </div>
         <input type="checkbox" id="filterOpen" name="open">
+        <p class="help inactive-hint">Attiva per filtrare</p>
       </div>
       <div class="sheet-footer">
         <button type="button" class="btn reset">Reset</button>
