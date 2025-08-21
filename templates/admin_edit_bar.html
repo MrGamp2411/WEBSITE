@@ -17,6 +17,9 @@
   <label for="state">State
     <input id="state" name="state" value="{{ bar.state }}">
   </label>
+  <label for="description">Description
+    <textarea id="description" name="description">{{ bar.description }}</textarea>
+  </label>
   <input id="latitude" name="latitude" type="hidden" value="{{ bar.latitude }}">
   <input id="longitude" name="longitude" type="hidden" value="{{ bar.longitude }}">
   <button class="btn btn--primary" type="submit">Save</button>

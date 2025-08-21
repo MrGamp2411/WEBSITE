@@ -80,6 +80,7 @@ class Bar:
         state: str,
         latitude: float,
         longitude: float,
+        description: str = "",
     ):
         self.id = id
         self.name = name
@@ -88,6 +89,7 @@ class Bar:
         self.state = state
         self.latitude = latitude
         self.longitude = longitude
+        self.description = description
         self.categories: Dict[int, Category] = {}
         self.products: Dict[int, Product] = {}
         self.tables: Dict[int, Table] = {}
@@ -224,6 +226,7 @@ def seed_data():
         state="Ticino",
         latitude=46.5269,
         longitude=8.6086,
+        description="Cozy sports bar serving local favorites",
     )
     next_bar_id += 1
 
@@ -569,7 +572,8 @@ async def new_bar(request: Request):
     state = request.query_params.get("state")
     latitude = request.query_params.get("latitude")
     longitude = request.query_params.get("longitude")
-    if not all([name, address, city, state, latitude, longitude]):
+    description = request.query_params.get("description")
+    if not all([name, address, city, state, latitude, longitude, description]):
         # Show empty form when required parameters are missing
         return render_template("admin_new_bar.html", request=request)
     try:
@@ -586,6 +590,7 @@ async def new_bar(request: Request):
         state=state,
         latitude=lat,
         longitude=lon,
+        description=description,
     )
     next_bar_id += 1
     bars[bar.id] = bar
@@ -606,7 +611,8 @@ async def edit_bar(request: Request, bar_id: int):
     state = request.query_params.get("state")
     latitude = request.query_params.get("latitude")
     longitude = request.query_params.get("longitude")
-    if all([name, address, city, state, latitude, longitude]):
+    description = request.query_params.get("description")
+    if all([name, address, city, state, latitude, longitude, description]):
         try:
             lat = float(latitude)
             lon = float(longitude)
@@ -618,6 +624,7 @@ async def edit_bar(request: Request, bar_id: int):
         bar.state = state
         bar.latitude = lat
         bar.longitude = lon
+        bar.description = description
         if user.is_super_admin:
             return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
