@@ -11,16 +11,16 @@
     <tr>
       <td>{{ item.product.name }}</td>
       <td>
-        <form class="form form--inline" method="get" action="/cart/update">
+        <form class="form form--inline" method="post" action="/cart/update">
           <input type="hidden" name="product_id" value="{{ item.product.id }}">
-          <input type="number" name="quantity" min="0" value="{{ item.quantity }}">
+          <input type="number" name="quantity" min="0" value="{{ item.quantity }}" inputmode="numeric" enterkeyhint="done">
           <button class="btn btn--small btn--primary" type="submit">Update</button>
         </form>
       </td>
       <td>CHF {{ "%.2f"|format(item.product.price) }}</td>
       <td>CHF {{ "%.2f"|format(item.total) }}</td>
       <td>
-        <form method="get" action="/cart/update" class="form form--inline">
+        <form method="post" action="/cart/update" class="form form--inline">
           <input type="hidden" name="product_id" value="{{ item.product.id }}">
           <input type="hidden" name="quantity" value="0">
           <button class="btn btn--small btn--danger" type="submit">Remove</button>
@@ -32,7 +32,7 @@
 </table>
 <p><strong>Total: CHF {{ "%.2f"|format(cart.total_price()) }}</strong></p>
 <h2>Select Table</h2>
-<form class="form" method="get" action="/cart/checkout">
+<form class="form" method="post" action="/cart/checkout">
   <label for="table_id">Table
     <select id="table_id" name="table_id" required>
       {% for table in bar.tables.values() %}

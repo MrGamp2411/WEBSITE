@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const items = bars.map(bar => `
       <li data-bar-id="${bar.id}">
         <article class="card" itemscope itemtype="https://schema.org/BarOrPub">
-          <img class="card__media" src="https://source.unsplash.com/random/400x250?bar,${bar.id}" alt="${bar.name}" itemprop="image" loading="lazy" decoding="async">
+          <img class="card__media" src="https://source.unsplash.com/random/400x250?bar,${bar.id}" alt="${bar.name}" itemprop="image" loading="lazy" decoding="async" width="400" height="250">
           <div class="card__body">
             <h3 class="card__title" itemprop="name">${bar.name}</h3>
             <p class="card__desc">${bar.description}</p>

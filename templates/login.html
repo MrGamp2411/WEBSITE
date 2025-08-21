@@ -3,12 +3,12 @@
 <div class="auth-card">
   <h1>Login</h1>
   {% if error %}<p class="alert">{{ error }}</p>{% endif %}
-  <form method="get" action="/login">
+  <form method="post" action="/login">
     <label for="email">Email
-      <input id="email" type="email" name="email" required autocomplete="email">
+      <input id="email" type="email" name="email" required autocomplete="email" inputmode="email" enterkeyhint="next">
     </label>
     <label for="password">Password
-      <input id="password" type="password" name="password" required autocomplete="current-password">
+      <input id="password" type="password" name="password" required autocomplete="current-password" enterkeyhint="done">
     </label>
     <button class="btn btn--primary" type="submit">Login</button>
   </form>
