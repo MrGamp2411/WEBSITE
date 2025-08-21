@@ -25,6 +25,9 @@
       {% endfor %}
     </select>
   </label>
+  <label for="credit">Credit
+    <input id="credit" name="credit" type="number" step="0.01" value="{{ user.credit }}">
+  </label>
   <button class="btn btn--primary" type="submit">Save</button>
 </form>
 {% endblock %}

@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="auth-card">
+  <h1>Top Up Credit</h1>
+  {% if error %}<p class="alert">{{ error }}</p>{% endif %}
+  {% if success %}<p class="alert">Added CHF {{ "%.2f"|format(amount) }} to your credit.</p>{% endif %}
+  <form method="get" action="/topup">
+    <label for="amount">Amount
+      <input id="amount" name="amount" type="number" step="0.01" required>
+    </label>
+    <label for="card">Card Number
+      <input id="card" name="card" required>
+    </label>
+    <label for="expiry">Expiry
+      <input id="expiry" name="expiry" required>
+    </label>
+    <label for="cvc">CVC
+      <input id="cvc" name="cvc" required>
+    </label>
+    <button class="btn btn--primary" type="submit">Top Up</button>
+  </form>
+</div>
+{% endblock %}
