@@ -30,6 +30,37 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(updatePill, 1000);
   }
 
+  function toNumber(v){ if(v==null) return null; if(typeof v==='number') return Number.isFinite(v)?v:null; const m=String(v).replace(',', '.').match(/-?\d+(\.\d+)?/); return m?parseFloat(m[0]):null; }
+  function toKm(v){ if(v==null) return null; if(typeof v==='number') return v>=1000? v/1000 : v; const n=toNumber(v); return n; }
+  function renderMeta(el, data){
+    const rating = toNumber(data.rating);
+    const km = toKm(data.distance_km);
+    const rEl = el.querySelector('.bar-rating');
+    const dEl = el.querySelector('.bar-distance');
+    if(rEl){
+      if(rating!=null){
+        rEl.innerHTML = '<i class="bi bi-star-fill" aria-hidden="true"></i> <span class="rating-value">'+rating.toFixed(1)+'</span>';
+        rEl.hidden = false;
+        rEl.dataset.hasRating = 'true';
+      } else {
+        rEl.hidden = true;
+        rEl.dataset.hasRating = 'false';
+      }
+    }
+    if(dEl){
+      if(km!=null){
+        dEl.innerHTML = '<i class="bi bi-geo-alt-fill" aria-hidden="true"></i> <span class="distance-value">'+km.toFixed(1)+' km</span>';
+        dEl.hidden = false;
+        dEl.dataset.hasDistance = 'true';
+      } else {
+        dEl.hidden = true;
+        dEl.dataset.hasDistance = 'false';
+      }
+    }
+  }
+
+  barCards().forEach(card => renderMeta(card, card.dataset));
+
   function debounce(fn, delay=300){let t;return (...args)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,args),delay);};}
 
   function filterBars(term) {
@@ -53,14 +84,8 @@ document.addEventListener('DOMContentLoaded', function() {
           <img class="thumb" src="https://source.unsplash.com/random/400x250?bar,${bar.id}" alt="${bar.name}" loading="lazy" width="400" height="100">
           <h3 class="title">${bar.name}</h3>
           <div class="bar-meta">
-            <span class="bar-rating" data-has-rating="${bar.rating ? 'true' : 'false'}"${bar.rating ? '' : ' hidden'}>
-              <i class="bi bi-star-fill" aria-hidden="true"></i>
-              <span class="rating-value">${bar.rating || ''}</span>
-            </span>
-            <span class="bar-distance" data-has-distance="false" hidden>
-              <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
-              <span class="distance-value"></span>
-            </span>
+            <span class="bar-rating" data-has-rating="true" hidden></span>
+            <span class="bar-distance" data-has-distance="true" hidden></span>
           </div>
           <address>${bar.address}, ${bar.city}, ${bar.state}</address>
           <p class="desc">${bar.description}</p>
@@ -69,6 +94,9 @@ document.addEventListener('DOMContentLoaded', function() {
     `).join('');
     suggestionsBox.innerHTML = `<ul class="bars">${items}</ul>`;
     suggestionsBox.classList.add('show');
+    suggestionsBox.querySelectorAll('.bar-card').forEach((card, i) => {
+      renderMeta(card, bars[i] || {});
+    });
   }
 
   function fetchSuggestions(term) {
@@ -127,11 +155,8 @@ document.addEventListener('DOMContentLoaded', function() {
       const bLon = parseFloat(item.dataset.longitude);
       if (!isFinite(bLat) || !isFinite(bLon)) return;
       const dist = haversine(uLat, uLon, bLat, bLon);
-      item.dataset.distance = dist;
-      const distEl = item.querySelector('.distance-value');
-      if (distEl) {
-        distEl.textContent = `${dist.toFixed(1)} km`;
-      }
+      item.dataset.distance_km = dist;
+      renderMeta(item, { rating: item.dataset.rating, distance_km: dist });
     });
 
     // sorting of cards is skipped in new layout
