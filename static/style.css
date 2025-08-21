@@ -65,6 +65,7 @@ body.dark-mode{
 .bars{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-3);list-style:none;padding:0;}
 
 .rating{color:var(--brand);}
+.distance{color:var(--muted);font-size:.875rem;}
 
 .search{margin-bottom:var(--space-3);}
 
