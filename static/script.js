@@ -25,7 +25,19 @@ document.addEventListener('DOMContentLoaded', function() {
         item.dataset.distance = dist;
         const distEl = item.querySelector('.distance');
         if (distEl) {
-          distEl.textContent = `📍 ${dist.toFixed(1)} km away`;
+          const link = document.createElement('a');
+          link.textContent = `📍 ${dist.toFixed(1)} km away`;
+          link.href = '#';
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const isApple = /iPad|iPhone|Mac/i.test(navigator.platform);
+            const url = isApple
+              ? `https://maps.apple.com/?daddr=${bLat},${bLon}`
+              : `https://www.google.com/maps/dir/?api=1&destination=${bLat},${bLon}`;
+            window.open(url, '_blank');
+          });
+          distEl.innerHTML = '';
+          distEl.appendChild(link);
         }
       });
 
