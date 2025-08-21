@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const nearestBarEl = document.getElementById('nearestBar');
   const locationInput = document.getElementById('locationInput');
   const searchResults = document.getElementById('searchResults');
+  const searchOverlay = document.getElementById('searchOverlay');
+  const searchPreview = document.getElementById('searchPreview');
 
   const barItems = barList ? Array.from(barList.querySelectorAll('li')) : [];
 
@@ -44,6 +46,20 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  function updatePreview(term = '') {
+    if (!searchPreview) return;
+    let items = barItems.slice();
+    if (term) {
+      const t = term.toLowerCase();
+      items = items.filter(li => li.dataset.name.includes(t));
+    }
+    searchPreview.innerHTML = '';
+    if (items.length) {
+      const card = items[0].querySelector('.card').cloneNode(true);
+      searchPreview.appendChild(card);
+    }
+  }
+
   if (searchInput) {
     searchInput.addEventListener('focus', () => {
       searchInput.classList.add('expanded');
@@ -51,17 +67,35 @@ document.addEventListener('DOMContentLoaded', function() {
         searchResults.hidden = false;
         showSuggestions(searchInput.value);
       }
+      if (searchOverlay) {
+        searchOverlay.hidden = false;
+        updatePreview(searchInput.value);
+      }
     });
     searchInput.addEventListener('input', () => {
       if (barList) filterBars(searchInput.value);
       showSuggestions(searchInput.value);
+      updatePreview(searchInput.value);
     });
     searchInput.addEventListener('blur', () => {
       searchInput.classList.remove('expanded');
       if (searchResults) {
         setTimeout(() => searchResults.hidden = true, 100);
       }
+      if (searchOverlay) {
+        setTimeout(() => searchOverlay.hidden = true, 100);
+      }
     });
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        window.location.href = `/search?q=${encodeURIComponent(searchInput.value)}`;
+      }
+    });
+  }
+
+  if (searchOverlay) {
+    searchOverlay.addEventListener('click', () => searchInput.blur());
   }
 
   const allBarItems = document.querySelectorAll('ul.bars li');
