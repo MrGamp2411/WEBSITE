@@ -17,8 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
   if (locationSelectors.length && locationInput) {
     locationSelectors.forEach(sel => {
       sel.addEventListener('click', () => {
+        locationInput.value = '';
         locationInput.focus();
-        locationInput.select();
+        locationInput.dispatchEvent(new Event('input'));
       });
     });
   }
@@ -233,14 +234,16 @@ document.addEventListener('DOMContentLoaded', function() {
     applyTheme(stored);
   }
 
-  const menuToggle = document.getElementById('menuToggle');
+  const menuToggles = document.querySelectorAll('.js-open-menu');
   const mobileMenu = document.getElementById('mobileMenu');
-  if (menuToggle && mobileMenu) {
-    menuToggle.addEventListener('click', () => {
-      const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
-      menuToggle.setAttribute('aria-expanded', String(!expanded));
-      mobileMenu.hidden = expanded;
-      mobileMenu.classList.toggle('open', !expanded);
+  if (menuToggles.length && mobileMenu) {
+    menuToggles.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        menuToggles.forEach(t => t.setAttribute('aria-expanded', String(!expanded)));
+        mobileMenu.hidden = expanded;
+        mobileMenu.classList.toggle('open', !expanded);
+      });
     });
   }
 

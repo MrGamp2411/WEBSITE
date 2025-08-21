@@ -29,18 +29,19 @@
 <body>
   <header class="site-header" role="banner">
     <div class="app-header mobile-nav">
-      <div class="hdr-top">
-        <button class="btn-icon js-open-menu" aria-label="Open menu">☰</button>
-        <a class="hdr-logo" href="/">SiplyGo</a>
-        <div class="hdr-actions">
-          {% if user %}
-          <a class="credit-pill js-open-credit" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
-          {% endif %}
-          <a class="cart-icon js-open-cart" href="/cart" aria-label="Cart">
-            <span class="badge">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
-          </a>
+        <div class="hdr-top">
+          <button class="btn-icon js-open-menu" aria-label="Open menu" aria-controls="mobileMenu" aria-expanded="false">☰</button>
+          <a class="hdr-logo" href="/">SiplyGo</a>
+          <div class="hdr-actions">
+            {% if user %}
+            <a class="credit-pill js-open-credit" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
+            {% endif %}
+            <a class="cart-icon js-open-cart" href="/cart" aria-label="Cart">
+              <span class="cart-emoji" aria-hidden="true">🛒</span>
+              <span class="cart-count">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
+            </a>
+          </div>
         </div>
-      </div>
       <div class="hdr-sub">
         <button class="location-pill location-selector js-open-location" aria-label="Change location"><span id="locationDisplay">📍 Detecting location...</span></button>
         <button class="btn-icon js-open-search" aria-label="Search">🔎</button>
@@ -73,18 +74,19 @@
         <input type="search" id="barSearchDesktop" class="desktop-search" placeholder="Search bars..." aria-label="Search bars" inputmode="search" autocomplete="off" enterkeyhint="search">
         <div id="searchSuggestionsDesktop" class="search-suggestions"></div>
       </div>
-      <div class="nav-right">
-        {% if user %}
-        <a class="chip desktop-credit" href="/wallet">Credit: CHF {{ "%.2f"|format(user.credit) }}</a>
-        {% endif %}
-        <a class="cart cart-icon js-open-cart" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
-          <span class="badge">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
-        </a>
-        <button id="themeToggle" class="theme-toggle js-theme-toggle" aria-label="Toggle theme">🌙</button>
-        <button id="menuToggle" class="hamburger js-open-menu" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
+        <div class="nav-right">
+          {% if user %}
+          <a class="chip desktop-credit" href="/wallet">Credit: CHF {{ "%.2f"|format(user.credit) }}</a>
+          {% endif %}
+          <a class="cart cart-icon js-open-cart" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
+            <span class="cart-emoji" aria-hidden="true">🛒</span>
+            <span class="cart-count">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
+          </a>
+          <button id="themeToggle" class="theme-toggle js-theme-toggle" aria-label="Toggle theme">🌙</button>
+          <button class="hamburger js-open-menu" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
     </nav>
     <nav id="mobileMenu" class="menu" aria-label="Mobile menu" hidden role="menu">
       <a href="#bars" role="menuitem">Browse Bars</a>
@@ -113,7 +115,7 @@
       <p>SiplyGo © 2025 · <a href="#">About</a> · <a href="#">Help Center</a> · <a href="#">For Bars</a> · <a href="#">Legal</a></p>
     </div>
   </footer>
-  <script src="/static/js/app.min.js" defer></script>
+    <script src="/static/js/app.min.js" defer></script>
 </body>
 </html>
 
