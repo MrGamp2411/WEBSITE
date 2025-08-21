@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#ffffff">
+  <meta name="color-scheme" content="light dark">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -26,7 +27,7 @@
   <link href="/static/css/utilities.css" rel="stylesheet">
 </head>
 <body>
-  <header class="site-header">
+  <header class="site-header" role="banner">
     <nav aria-label="Primary" class="navbar">
       <div class="nav-left">
         <a class="logo" href="/">SiplyGo</a>
@@ -38,14 +39,14 @@
       <div class="top-controls">
         <div class="location-selector">
           <span class="location-icon">📍</span>
-          <input type="text" id="locationInput" class="location-display" value="Detecting location..." placeholder="Enter city or ZIP" aria-label="Current location" list="citySuggestions">
+          <input type="search" id="locationInput" class="location-display" value="Detecting location..." placeholder="Enter city or ZIP" aria-label="Current location" list="citySuggestions" inputmode="search" autocomplete="postal-code" enterkeyhint="search">
           <datalist id="citySuggestions">
             <option value="Lugano"></option>
             <option value="Locarno"></option>
             <option value="Zurich"></option>
           </datalist>
         </div>
-        <input type="text" id="barSearch" placeholder="Search bars..." aria-label="Search bars">
+        <input type="search" id="barSearch" placeholder="Search bars..." aria-label="Search bars" inputmode="search" autocomplete="off" enterkeyhint="search">
         <div id="searchSuggestions" class="search-suggestions"></div>
       </div>
       <div class="nav-right">
@@ -56,27 +57,27 @@
           <span class="badge">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
         </a>
         <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌙</button>
-        <button id="menuToggle" class="hamburger" aria-label="Menu" aria-expanded="false">
+        <button id="menuToggle" class="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
           <span></span><span></span><span></span>
         </button>
       </div>
     </nav>
-    <div id="mobileMenu" class="menu" hidden>
-      <a href="#bars">Browse Bars</a>
-      <a href="#how">How it works</a>
+    <nav id="mobileMenu" class="menu" aria-label="Mobile menu" hidden role="menu">
+      <a href="#bars" role="menuitem">Browse Bars</a>
+      <a href="#how" role="menuitem">How it works</a>
       {% if user and (user.is_super_admin or user.is_bar_admin or user.is_bartender) %}
-      <a href="/dashboard">Dashboard</a>
+      <a href="/dashboard" role="menuitem">Dashboard</a>
       {% endif %}
       {% if user %}
-      <a href="/wallet">Wallet</a>
-      <a href="/logout">Logout</a>
+      <a href="/wallet" role="menuitem">Wallet</a>
+      <a href="/logout" role="menuitem">Logout</a>
       {% endif %}
-    </div>
+    </nav>
   </header>
   <main id="main" class="container">
       {% block content %}{% endblock %}
   </main>
-  <footer class="site-footer">
+  <footer class="site-footer" role="contentinfo">
     <div class="container">
       <p>SiplyGo © 2025 · <a href="#">About</a> · <a href="#">Help Center</a> · <a href="#">For Bars</a> · <a href="#">Legal</a></p>
     </div>

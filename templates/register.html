@@ -3,25 +3,25 @@
 <div class="auth-card">
   <h1>Register</h1>
   {% if error %}<p class="alert">{{ error }}</p>{% endif %}
-  <form method="get" action="/register">
+  <form method="post" action="/register">
     <label for="username">Username
-      <input id="username" type="text" name="username" required autocomplete="username">
+      <input id="username" type="text" name="username" required autocomplete="username" inputmode="text" enterkeyhint="next">
     </label>
     <label for="email">Email
-      <input id="email" type="email" name="email" required autocomplete="email">
+      <input id="email" type="email" name="email" required autocomplete="email" inputmode="email" enterkeyhint="next">
     </label>
     <label for="password">Password
-      <input id="password" type="password" name="password" required autocomplete="new-password">
+      <input id="password" type="password" name="password" required autocomplete="new-password" enterkeyhint="next">
     </label>
     <label for="prefix">Phone Prefix
-      <select id="prefix" name="prefix">
+      <select id="prefix" name="prefix" autocomplete="tel-country-code">
         <option value="+41">+41 (Switzerland)</option>
         <option value="+1">+1 (USA)</option>
         <option value="+44">+44 (UK)</option>
       </select>
     </label>
     <label for="phone">Phone Number
-      <input id="phone" type="text" name="phone" autocomplete="tel">
+      <input id="phone" type="tel" name="phone" autocomplete="tel-national" inputmode="tel" enterkeyhint="done">
     </label>
     <button class="btn btn--primary" type="submit">Register</button>
   </form>
