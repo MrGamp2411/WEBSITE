@@ -37,6 +37,7 @@
           <h3 class="card__title" itemprop="name">{{ last_bar.name }}</h3>
           <address itemprop="address">{{ last_bar.address }}, {{ last_bar.city }}, {{ last_bar.state }}</address>
           <p class="rating" aria-label="Rated 4.7 out of 5">★ 4.7</p>
+          <p class="distance" aria-live="polite"></p>
           <ul class="chips"><li><span class="chip">Cocktails</span></li><li><span class="chip">Sports</span></li><li><span class="chip">Live Music</span></li></ul>
           <a class="btn btn--primary" href="/bars/{{ last_bar.id }}">View Menu</a>
         </div>
@@ -59,6 +60,7 @@
           <h3 class="card__title" itemprop="name">{{ bar.name }}</h3>
           <address itemprop="address">{{ bar.address }}, {{ bar.city }}, {{ bar.state }}</address>
           <p class="rating" aria-label="Rated 4.7 out of 5">★ 4.7</p>
+          <p class="distance" aria-live="polite"></p>
           <ul class="chips"><li><span class="chip">Cocktails</span></li><li><span class="chip">Sports</span></li><li><span class="chip">Live Music</span></li></ul>
           <a class="btn btn--primary" href="/bars/{{ bar.id }}">View Menu</a>
         </div>
