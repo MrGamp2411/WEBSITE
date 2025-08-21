@@ -1,26 +1,74 @@
 {% extends "layout.html" %}
 {% block content %}
-<section class="search">
+<div class="search-page">
+  <div class="search-stick">
+    <label class="visually-hidden" for="barSearch">Cerca un bar o una città</label>
+    <input id="barSearch" type="search" placeholder="Cerca un bar o una città…" aria-label="Cerca un bar o una città…" autocomplete="off">
+    <button id="filterBtn" class="filter-btn" aria-label="Filtri">
+      <i class="bi bi-sliders"></i>
+    </button>
+  </div>
   {% if bars %}
-  <ul class="bars" id="barList">
-    {% for bar in bars %}
-    <li data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}">
-      <article class="card" itemscope itemtype="https://schema.org/BarOrPub">
-        <img class="card__media" src="https://source.unsplash.com/random/400x250?bar,{{ bar.id }}" alt="{{ bar.name }}" itemprop="image" loading="lazy" decoding="async" width="400" height="250">
-        <div class="card__body">
-          <h3 class="card__title" itemprop="name">{{ bar.name }}</h3>
-          <p class="card__desc">{{ bar.description }}</p>
-          <address itemprop="address">{{ bar.address }}, {{ bar.city }}, {{ bar.state }}</address>
-          <p class="rating" aria-label="Rated 4.7 out of 5">★ 4.7</p>
-          <p class="distance" aria-live="polite"></p>
-          <a class="btn btn--primary" href="/bars/{{ bar.id }}">View Menu</a>
+    {% set sections = [
+      ('recent', 'Bar visitati di recente'),
+      ('nearby', 'I più vicini a te'),
+      ('top', 'I più votati'),
+      ('popular', 'Consigliati')
+    ] %}
+    {% for key, title in sections %}
+    <section class="bar-section">
+      <div class="section-head">
+        <h2>{{ title }}</h2>
+        <div class="scroller-nav">
+          <button class="scroll-btn prev" aria-label="Precedenti">‹</button>
+          <button class="scroll-btn next" aria-label="Successivi">›</button>
         </div>
-      </article>
-    </li>
+      </div>
+      <div class="cards scroller" aria-label="{{ title }}" tabindex="0">
+        {% for bar in bars %}
+        <article class="bar-card" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" itemscope itemtype="https://schema.org/BarOrPub">
+          {% if bar.image_url %}
+          <img src="{{ bar.image_url }}" alt="Foto bar" class="thumb" loading="lazy" width="400" height="100">
+          {% else %}
+          <div class="thumb placeholder" aria-hidden="true"></div>
+          {% endif %}
+          <h3 class="title">{{ bar.name }}{% if bar.rating %} <span class="rating">★ {{ bar.rating }}</span>{% endif %}</h3>
+          {% if bar.description_short or bar.description %}
+          <p class="desc">{{ bar.description_short or bar.description }}</p>
+          {% endif %}
+          <p class="meta">📍 {{ bar.distance_km or '' }} km • {{ bar.address_short or bar.address }}</p>
+          <a href="/bars/{{ bar.id }}" class="cta">View Menu</a>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
     {% endfor %}
-  </ul>
   {% else %}
-  <p>No bars found.</p>
+  <div class="empty-state">
+    <p>Nessun bar trovato.</p>
+    <a href="/search" class="cta">Cerca in un’altra città</a>
+  </div>
   {% endif %}
-</section>
+</div>
+<div id="filterOverlay" class="filter-overlay" hidden>
+  <div class="filter-modal" role="dialog" aria-modal="true" aria-labelledby="filterTitle">
+    <h2 id="filterTitle">Filtri</h2>
+    <form id="filterForm">
+      <label>Distance
+        <input type="range" id="filterDistance" min="1" max="50" value="10">
+      </label>
+      <label>Rating
+        <input type="range" id="filterRating" min="0" max="5" step="0.1" value="0">
+      </label>
+      <label>Category
+        <select id="filterCategory">
+          <option value="">All</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="filterOpen"> Open now</label>
+      <button type="button" class="btn-apply">Apply</button>
+    </form>
+  </div>
+</div>
 {% endblock %}
+
