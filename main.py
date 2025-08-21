@@ -355,12 +355,10 @@ def render_template(template_name: str, **context) -> HTMLResponse:
         if last_bar_id is not None:
             context.setdefault("last_bar", bars.get(last_bar_id))
 
-    # Ensure Google Maps API key is available to templates. Allow an
-    # environment variable to override the default key.
-    default_api_key = "AIzaSyCFwtfzGRqUke-OclxMoXfZJFjNE2um23k"
-    context.setdefault(
-        "GOOGLE_MAPS_API_KEY", os.getenv("GOOGLE_MAPS_API_KEY", default_api_key)
-    )
+    # Ensure Google Maps API key is available to templates from environment.
+    api_key = os.getenv("GOOGLE_MAPS_API_KEY")
+    if api_key:
+        context.setdefault("GOOGLE_MAPS_API_KEY", api_key)
 
     template = templates_env.get_template(template_name)
     return HTMLResponse(template.render(**context))
