@@ -1,37 +1,60 @@
-const SG = window.SG ?? (window.SG = {});
+function toNumber(v) {
+  if (v == null) return null;
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+  const m = String(v).replace(',', '.').match(/-?\d+(\.\d+)?/);
+  return m ? parseFloat(m[0]) : null;
+}
 
-SG.normalize = {
-  toNumber(v, fallback = null) {
-    if (v == null) return fallback;
-    if (typeof v === 'number' && Number.isFinite(v)) return v;
-    const m = String(v).replace(',', '.').match(/-?\d+(\.\d+)?/);
-    const n = m ? parseFloat(m[0]) : NaN;
-    return Number.isFinite(n) ? n : fallback;
-  },
-  toKm(value) {
-    if (typeof value === 'number') {
-      return value >= 1000 ? value / 1000 : value;
+function toKm(v) {
+  if (v == null) return null;
+  if (typeof v === 'number') return v >= 1000 ? v / 1000 : v;
+  const n = toNumber(v);
+  return n;
+}
+
+const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function renderMeta(el, bar) {
+  const rating = toNumber(bar.rating);
+  const km = toKm(bar.distance_km);
+  const rEl = el.querySelector('.bar-rating');
+  const dEl = el.querySelector('.bar-distance');
+  if (rEl) {
+    if (rating != null) {
+      rEl.innerHTML = '<i class="bi bi-star-fill" aria-hidden="true"></i> <span class="rating-value">' + rating.toFixed(1) + '</span>';
+      rEl.hidden = false;
+      rEl.dataset.hasRating = 'true';
+    } else {
+      rEl.hidden = true;
+      rEl.dataset.hasRating = 'false';
     }
-    return SG.normalize.toNumber(value, null);
-  },
-  haversineKm(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const toRad = d => d * Math.PI / 180;
-    const dLat = toRad(lat2 - lat1);
-    const dLon = toRad(lon2 - lon1);
-    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  },
-  normText(s) {
-    return (s || '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
   }
-};
+  if (dEl) {
+    if (km != null) {
+      dEl.innerHTML = '<i class="bi bi-geo-alt-fill" aria-hidden="true"></i> <span class="distance-value">' + km.toFixed(1) + ' km</span>';
+      dEl.hidden = false;
+      dEl.dataset.hasDistance = 'true';
+    } else {
+      dEl.hidden = true;
+      dEl.dataset.hasDistance = 'false';
+    }
+  }
+}
 
 function validateBars(bars) {
   let missingRating = 0, missingDistance = 0, missingCoords = 0;
   for (const b of bars) {
-    if (SG.normalize.toNumber(b.rating, null) == null) missingRating++;
-    const km = SG.normalize.toKm(b.distance_km);
+    if (toNumber(b.rating) == null) missingRating++;
+    const km = toKm(b.distance_km);
     if (km == null) missingDistance++;
     if (!(Number.isFinite(b.lat) && Number.isFinite(b.lng))) missingCoords++;
   }
@@ -46,23 +69,23 @@ function validateBars(bars) {
 
 async function normalizeBars(bars, userLoc) {
   return bars.map(b => {
-    const rating = SG.normalize.toNumber(b.rating, null);
-    let distance_km = SG.normalize.toKm(b.distance_km);
+    const rating = toNumber(b.rating);
+    let distance_km = toKm(b.distance_km);
     if (distance_km == null && userLoc && Number.isFinite(b.lat) && Number.isFinite(b.lng)) {
-      distance_km = SG.normalize.haversineKm(userLoc.lat, userLoc.lng, b.lat, b.lng);
+      distance_km = haversineKm(userLoc.lat, userLoc.lng, b.lat, b.lng);
     }
     return {
       ...b,
       rating,
       distance_km,
-      _searchKey: SG.normalize.normText(`${b.name} ${b.city ?? ''} ${b.address_short ?? ''}`)
+      _searchKey: norm(`${b.name} ${b.city ?? ''}`)
     };
   });
 }
 
 function applyFilters(bars, state) {
   return bars
-    .filter(b => state.q ? b._searchKey.includes(SG.normalize.normText(state.q)) : true)
+    .filter(b => state.q ? b._searchKey.includes(norm(state.q)) : true)
     .filter(b => state.active.max_km ? (b.distance_km == null ? false : b.distance_km <= Number(state.max_km)) : true)
     .filter(b => state.active.min_rating ? (b.rating == null ? false : b.rating >= Number(state.min_rating)) : true)
     .filter(b => state.active.categories ? (b.categories || []).some(c => state.categories.includes(c)) : true)
@@ -76,6 +99,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const filterForm = document.getElementById('filterForm');
   const distanceInput = document.getElementById('filterDistance');
   const ratingInput = document.getElementById('filterRating');
+  const distanceToggle = document.getElementById('filterDistanceToggle');
+  const ratingToggle = document.getElementById('filterRatingToggle');
   const distanceVal = document.getElementById('filterDistanceVal');
   const ratingVal = document.getElementById('filterRatingVal');
   const distanceAnnounce = document.getElementById('filterDistanceAnnounce');
@@ -109,8 +134,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     city: el.dataset.city,
     rating: el.dataset.rating,
     distance_km: el.dataset.distance_km,
-    lat: SG.normalize.toNumber(el.dataset.latitude, null),
-    lng: SG.normalize.toNumber(el.dataset.longitude, null),
+    lat: toNumber(el.dataset.latitude),
+    lng: toNumber(el.dataset.longitude),
     categories: (el.dataset.categories || '').split(',').filter(Boolean),
     is_open: el.dataset.open === 'true'
   }));
@@ -118,32 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let userLoc = null;
   let bars = await normalizeBars(rawBars, userLoc);
 
-  bars.forEach(b => {
-    const rEl = b.el.querySelector('.bar-rating');
-    if (rEl) {
-      if (b.rating == null) {
-        rEl.hidden = true;
-        rEl.dataset.hasRating = 'false';
-      } else {
-        rEl.hidden = false;
-        rEl.dataset.hasRating = 'true';
-        const t = rEl.querySelector('.rating-value');
-        if (t) t.textContent = b.rating.toFixed(1);
-      }
-    }
-    const dEl = b.el.querySelector('.bar-distance');
-    if (dEl) {
-      if (b.distance_km == null) {
-        dEl.hidden = true;
-        dEl.dataset.hasDistance = 'false';
-      } else {
-        dEl.hidden = false;
-        dEl.dataset.hasDistance = 'true';
-        const t = dEl.querySelector('.distance-value');
-        if (t) t.textContent = `${b.distance_km.toFixed(1)} km`;
-      }
-    }
-  });
+  bars.forEach(b => renderMeta(b.el, b));
 
   if (distanceInput && bars.every(b => b.distance_km == null)) {
     distanceInput.disabled = true;
@@ -260,13 +260,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (searchInput) searchInput.value = state.q;
     if (distanceInput) {
       const group = distanceInput.closest('.group');
+      distanceToggle && (distanceToggle.checked = state.active.max_km);
+      distanceInput.value = state.max_km ?? distanceInput.defaultValue;
       if (state.active.max_km && state.max_km != null && !distanceInput.disabled) {
-        distanceInput.value = state.max_km;
         distanceVal.textContent = `${state.max_km} km`;
         distanceVal.hidden = false;
         group.dataset.active = 'true';
       } else {
-        distanceInput.value = distanceInput.defaultValue;
         distanceVal.textContent = '';
         distanceVal.hidden = true;
         group.dataset.active = 'false';
@@ -276,13 +276,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (ratingInput) {
       const group = ratingInput.closest('.group');
+      ratingToggle && (ratingToggle.checked = state.active.min_rating);
+      ratingInput.value = state.min_rating ?? ratingInput.defaultValue;
       if (state.active.min_rating && state.min_rating != null && !ratingInput.disabled) {
-        ratingInput.value = state.min_rating;
         ratingVal.textContent = `≥ ${state.min_rating.toFixed(1)}`;
         ratingVal.hidden = false;
         group.dataset.active = 'true';
       } else {
-        ratingInput.value = ratingInput.defaultValue;
         ratingVal.textContent = '';
         ratingVal.hidden = true;
         group.dataset.active = 'false';
@@ -333,6 +333,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       filterCount.textContent = n;
       filterCount.hidden = false;
     } else {
+      filterCount.textContent = '';
       filterCount.hidden = true;
     }
   }
@@ -384,15 +385,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   searchInput?.addEventListener('input', e => syncSearch(e.target.value));
 
+  distanceToggle?.addEventListener('change', e => {
+    state.active.max_km = e.target.checked;
+    updateControls();
+  });
+
+  ratingToggle?.addEventListener('change', e => {
+    state.active.min_rating = e.target.checked;
+    updateControls();
+  });
+
   distanceInput?.addEventListener('input', e => {
     state.max_km = +e.target.value;
-    if (!state.active.max_km) state.active.max_km = true;
+    distanceInput.setAttribute('aria-valuenow', e.target.value);
+    if (distanceAnnounce) distanceAnnounce.textContent = `${e.target.value} km`;
     updateControls();
   });
 
   ratingInput?.addEventListener('input', e => {
     state.min_rating = +e.target.value;
-    if (!state.active.min_rating) state.active.min_rating = true;
+    ratingInput.setAttribute('aria-valuenow', e.target.value);
+    if (ratingAnnounce) ratingAnnounce.textContent = `${parseFloat(e.target.value).toFixed(1)}`;
     updateControls();
   });
 
