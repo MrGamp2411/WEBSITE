@@ -1,4 +1,75 @@
-document.addEventListener('DOMContentLoaded', () => {
+const SG = window.SG ?? (window.SG = {});
+
+SG.normalize = {
+  toNumber(v, fallback = null) {
+    if (v == null) return fallback;
+    if (typeof v === 'number' && Number.isFinite(v)) return v;
+    const m = String(v).replace(',', '.').match(/-?\d+(\.\d+)?/);
+    const n = m ? parseFloat(m[0]) : NaN;
+    return Number.isFinite(n) ? n : fallback;
+  },
+  toKm(value) {
+    if (typeof value === 'number') {
+      return value >= 1000 ? value / 1000 : value;
+    }
+    return SG.normalize.toNumber(value, null);
+  },
+  haversineKm(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const toRad = d => d * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  },
+  normText(s) {
+    return (s || '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  }
+};
+
+function validateBars(bars) {
+  let missingRating = 0, missingDistance = 0, missingCoords = 0;
+  for (const b of bars) {
+    if (SG.normalize.toNumber(b.rating, null) == null) missingRating++;
+    const km = SG.normalize.toKm(b.distance_km);
+    if (km == null) missingDistance++;
+    if (!(Number.isFinite(b.lat) && Number.isFinite(b.lng))) missingCoords++;
+  }
+  console.table([
+    { metric: 'total', value: bars.length },
+    { metric: 'missing rating', value: missingRating },
+    { metric: 'missing distance_km', value: missingDistance },
+    { metric: 'missing lat/lng', value: missingCoords }
+  ]);
+  return { total: bars.length, missingRating, missingDistance, missingCoords };
+}
+
+async function normalizeBars(bars, userLoc) {
+  return bars.map(b => {
+    const rating = SG.normalize.toNumber(b.rating, null);
+    let distance_km = SG.normalize.toKm(b.distance_km);
+    if (distance_km == null && userLoc && Number.isFinite(b.lat) && Number.isFinite(b.lng)) {
+      distance_km = SG.normalize.haversineKm(userLoc.lat, userLoc.lng, b.lat, b.lng);
+    }
+    return {
+      ...b,
+      rating,
+      distance_km,
+      _searchKey: SG.normalize.normText(`${b.name} ${b.city ?? ''} ${b.address_short ?? ''}`)
+    };
+  });
+}
+
+function applyFilters(bars, state) {
+  return bars
+    .filter(b => state.q ? b._searchKey.includes(SG.normalize.normText(state.q)) : true)
+    .filter(b => state.max_km == null ? true : (b.distance_km == null ? false : b.distance_km <= Number(state.max_km)))
+    .filter(b => state.min_rating == null ? true : (b.rating == null ? false : b.rating >= Number(state.min_rating)))
+    .filter(b => !state.categories?.length ? true : (b.categories || []).some(c => state.categories.includes(c)))
+    .filter(b => state.open_now ? !!b.is_open : true);
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
   const searchInput = document.getElementById('barSearch');
   const filterBtn = document.getElementById('filterBtn');
   const filterOverlay = document.getElementById('filterOverlay');
@@ -13,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const applyBtn = filterOverlay?.querySelector('.apply');
   const resetBtn = filterOverlay?.querySelector('.reset');
   const clearBtn = document.getElementById('clearFilters');
+  const filterCount = document.getElementById('filterCount');
 
   const defaults = { q: '', max_km: null, min_rating: null, categories: [], open_now: false };
   let state = { ...defaults };
@@ -69,12 +141,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchInput) searchInput.value = s.q;
     if (filterSearch) filterSearch.value = s.q;
     if (distanceInput) {
-      distanceInput.value = s.max_km ?? distanceInput.defaultValue;
-      distanceVal.textContent = `${distanceInput.value} km`;
+      if (!distanceInput.disabled) {
+        distanceInput.value = s.max_km ?? distanceInput.defaultValue;
+        distanceVal.textContent = `${distanceInput.value} km`;
+      } else {
+        distanceVal.textContent = '';
+      }
     }
     if (ratingInput) {
-      ratingInput.value = s.min_rating ?? ratingInput.defaultValue;
-      ratingVal.textContent = `≥ ${ratingInput.value}`;
+      if (!ratingInput.disabled) {
+        ratingInput.value = s.min_rating ?? ratingInput.defaultValue;
+        ratingVal.textContent = `≥ ${ratingInput.value}`;
+      } else {
+        ratingVal.textContent = '';
+      }
     }
     if (categoryChips) {
       const chips = categoryChips.querySelectorAll('.chip');
@@ -89,23 +169,65 @@ document.addEventListener('DOMContentLoaded', () => {
     checkChanges();
   }
 
-  const allCards = Array.from(document.querySelectorAll('.bar-card'));
+  const cardEls = Array.from(document.querySelectorAll('.bar-card'));
+  const rawBars = cardEls.map(el => ({
+    el,
+    id: el.getAttribute('href')?.split('/').pop(),
+    name: el.dataset.name,
+    address_short: el.dataset.address,
+    city: el.dataset.city,
+    rating: el.dataset.rating,
+    distance_km: el.dataset.distance_km,
+    lat: SG.normalize.toNumber(el.dataset.latitude, null),
+    lng: SG.normalize.toNumber(el.dataset.longitude, null),
+    categories: (el.dataset.categories || '').split(',').filter(Boolean),
+    is_open: el.dataset.open === 'true'
+  }));
+  const report = validateBars(rawBars);
+  let userLoc = null;
+  let bars = await normalizeBars(rawBars, userLoc);
 
-  function computeFilteredData(cards, s) {
-    return cards.filter(card => {
-      const name = (card.dataset.name || '').toLowerCase();
-      const city = (card.dataset.city || '').toLowerCase();
-      if (s.q && !name.includes(s.q) && !city.includes(s.q)) return false;
-      const dist = parseFloat(card.dataset.distance_km || card.dataset.distance || '');
-      if (s.max_km != null && (!isFinite(dist) || dist > s.max_km)) return false;
-      const rating = parseFloat(card.dataset.rating || '');
-      if (s.min_rating != null && (!isFinite(rating) || rating < s.min_rating)) return false;
-      const cats = (card.dataset.categories || '').split(',').filter(Boolean);
-      if (s.categories.length && !s.categories.some(c => cats.includes(c))) return false;
-      const open = card.dataset.open === 'true';
-      if (s.open_now && !open) return false;
-      return true;
-    });
+  bars.forEach(b => {
+    const rEl = b.el.querySelector('.rating');
+    if (rEl) {
+      if (b.rating == null) rEl.hidden = true;
+      else {
+        rEl.hidden = false;
+        const t = rEl.querySelector('.rating-text');
+        if (t) t.textContent = b.rating.toFixed(1);
+      }
+    }
+    const dEl = b.el.querySelector('.distance');
+    if (dEl) {
+      if (b.distance_km == null) dEl.hidden = true;
+      else {
+        dEl.hidden = false;
+        const t = dEl.querySelector('.distance-text');
+        if (t) t.textContent = `${b.distance_km.toFixed(1)} km`;
+      }
+    }
+  });
+
+  if (distanceInput && bars.every(b => b.distance_km == null)) {
+    distanceInput.disabled = true;
+    const msg = document.createElement('p');
+    msg.className = 'help';
+    msg.textContent = 'Nessuna distanza disponibile per questi risultati.';
+    distanceInput.closest('.group')?.appendChild(msg);
+  }
+  if (ratingInput && bars.every(b => b.rating == null)) {
+    ratingInput.disabled = true;
+    const msg = document.createElement('p');
+    msg.className = 'help';
+    msg.textContent = 'Nessuna valutazione disponibile per questi risultati.';
+    ratingInput.closest('.group')?.appendChild(msg);
+  }
+
+  const allCards = cardEls;
+
+  function computeFilteredData(s) {
+    const filtered = applyFilters(bars, s);
+    return filtered.map(b => b.el);
   }
 
   function renderSections(filtered) {
@@ -122,7 +244,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyState(s) {
     writeToURL(s);
     writeToStorage(s);
-    renderSections(computeFilteredData(allCards, s));
+    const filtered = computeFilteredData(s);
+    renderSections(filtered);
+    updateFilterBadge(s);
   }
 
   function openFilters() {
@@ -156,8 +280,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function currentFromControls() {
     return {
       q: (filterSearch ? filterSearch.value : searchInput.value).trim().toLowerCase(),
-      max_km: parseInt(distanceInput.value, 10),
-      min_rating: parseFloat(ratingInput.value),
+      max_km: distanceInput && !distanceInput.disabled ? parseInt(distanceInput.value, 10) : null,
+      min_rating: ratingInput && !ratingInput.disabled ? parseFloat(ratingInput.value) : null,
       categories: Array.from(categoryChips.querySelectorAll('.chip.active')).map(c => c.dataset.value).filter(Boolean),
       open_now: openCheckbox.checked
     };
@@ -223,6 +347,22 @@ document.addEventListener('DOMContentLoaded', () => {
     applyStateToControls(state);
     applyState(state);
   });
+
+  function countActiveFilters(s) {
+    let c = 0;
+    if (s.max_km != null) c++;
+    if (s.min_rating != null) c++;
+    if (s.categories.length) c++;
+    if (s.open_now) c++;
+    return c;
+  }
+
+  function updateFilterBadge(s) {
+    if (!filterCount) return;
+    const n = countActiveFilters(s);
+    filterCount.textContent = n;
+    filterCount.hidden = n === 0;
+  }
 
   // Initial state
   state = readFromURL();

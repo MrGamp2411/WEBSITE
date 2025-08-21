@@ -223,7 +223,7 @@ body.dark-mode{
 .search-page{padding-bottom:env(safe-area-inset-bottom);}
 .search-stick{position:sticky;top:0;z-index:20;display:flex;gap:12px;padding:12px env(safe-area-inset-left) 12px env(safe-area-inset-right);background:var(--bg);border-bottom:1px solid rgba(0,0,0,.06);}
 .search-stick input{flex:1;border:1px solid #d1d5db;border-radius:12px;padding:10px 12px;font-size:16px;}
-.filter-btn{border:1px solid #d1d5db;background:var(--surface);border-radius:12px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;}
+.filter-btn{position:relative;border:1px solid #d1d5db;background:var(--surface);border-radius:12px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;}
 .bar-section{margin-top:24px;}
 .section-head{display:flex;align-items:center;justify-content:space-between;padding:0 12px 8px;}
 .section-head h2{margin:0;font-size:1.125rem;}
@@ -247,6 +247,7 @@ body.dark-mode{
 .empty-state{text-align:center;padding:40px 20px;}
 .filter-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.35);backdrop-filter:blur(6px) brightness(.9);display:flex;align-items:flex-end;justify-content:center;}
 .filter-overlay[hidden]{display:none;}
+.filter-overlay .help{font-size:.875rem;color:#6b7280;margin-top:4px;}
 .filter-sheet{background:var(--bg);width:100%;max-height:85vh;border-radius:16px 16px 0 0;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,.2);transform:translateY(100%);transition:transform .3s ease;overflow-y:auto;}
 .filter-overlay.show .filter-sheet{transform:translateY(0);}
 .grabber{width:48px;height:5px;border-radius:8px;background:var(--muted);margin:0 auto 16px;}
