@@ -112,6 +112,7 @@ class User:
         role: str = "customer",
         bar_id: Optional[int] = None,
         pending_bar_id: Optional[int] = None,
+        credit: float = 0.0,
     ):
         self.id = id
         self.username = username
@@ -122,6 +123,7 @@ class User:
         self.role = role
         self.bar_id = bar_id
         self.pending_bar_id = pending_bar_id
+        self.credit = credit
 
     @property
     def is_super_admin(self) -> bool:
@@ -477,8 +479,38 @@ async def checkout(request: Request):
     if cart.table_id is None:
         raise HTTPException(status_code=400, detail="Please select a table before checking out")
     order_total = cart.total_price()
+    if user.credit < order_total:
+        raise HTTPException(status_code=400, detail="Insufficient credit")
+    user.credit -= order_total
     cart.clear()
-    return render_template("order_success.html", request=request, total=order_total)
+    return render_template("order_success.html", request=request, total=order_total, remaining=user.credit)
+
+
+# -----------------------------------------------------------------------------
+# Credit top up
+# -----------------------------------------------------------------------------
+
+
+@app.get("/topup", response_class=HTMLResponse)
+async def topup(request: Request):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    amount = request.query_params.get("amount")
+    card = request.query_params.get("card")
+    expiry = request.query_params.get("expiry")
+    cvc = request.query_params.get("cvc")
+    if amount and card and expiry and cvc:
+        try:
+            add_amount = float(amount)
+            if add_amount <= 0:
+                raise ValueError
+        except ValueError:
+            return render_template("topup.html", request=request, error="Invalid amount")
+        # In a real application, integrate with a payment gateway here
+        user.credit += add_amount
+        return render_template("topup.html", request=request, success=True, amount=add_amount)
+    return render_template("topup.html", request=request)
 
 
 # -----------------------------------------------------------------------------
@@ -785,9 +817,16 @@ async def edit_user(request: Request, user_id: int):
     password = request.query_params.get("password")
     role = request.query_params.get("role")
     bar_id = request.query_params.get("bar_id")
-    if username and password and role is not None:
+    credit = request.query_params.get("credit")
+    if username and password and role is not None and credit is not None:
         if username != user.username and username in users_by_username:
-            return render_template("admin_edit_user.html", request=request, user=user, bars=bars.values(), error="Username already taken")
+            return render_template(
+                "admin_edit_user.html",
+                request=request,
+                user=user,
+                bars=bars.values(),
+                error="Username already taken",
+            )
         # Update username mapping
         if username != user.username:
             del users_by_username[user.username]
@@ -796,6 +835,16 @@ async def edit_user(request: Request, user_id: int):
         user.password = password
         user.role = role
         user.bar_id = int(bar_id) if bar_id else None
+        try:
+            user.credit = float(credit)
+        except ValueError:
+            return render_template(
+                "admin_edit_user.html",
+                request=request,
+                user=user,
+                bars=bars.values(),
+                error="Invalid credit amount",
+            )
         return RedirectResponse(url="/admin/users", status_code=status.HTTP_303_SEE_OTHER)
     return render_template("admin_edit_user.html", request=request, user=user, bars=bars.values())
 

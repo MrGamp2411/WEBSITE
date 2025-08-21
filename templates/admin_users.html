@@ -10,7 +10,7 @@
 </div>
 <table class="table">
   <thead>
-    <tr><th>Username</th><th>Email</th><th>Phone</th><th>Role</th><th>Bar</th><th></th></tr>
+    <tr><th>Username</th><th>Email</th><th>Phone</th><th>Role</th><th>Bar</th><th>Credit</th><th></th></tr>
   </thead>
   <tbody>
     {% for u in users %}
@@ -20,6 +20,7 @@
       <td>{{ u.prefix }} {{ u.phone }}</td>
       <td>{{ u.role }}</td>
       <td>{% if u.bar_id %}{{ bars[u.bar_id].name }}{% else %}-{% endif %}</td>
+      <td>CHF {{ "%.2f"|format(u.credit) }}</td>
       <td><a href="/admin/users/edit/{{ u.id }}">Edit</a></td>
     </tr>
     {% endfor %}

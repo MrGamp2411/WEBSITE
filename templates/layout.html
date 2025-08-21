@@ -19,6 +19,9 @@
         {% if not user %}
         <a class="btn" href="/login">Login</a>
         <a class="btn" href="/register">Register</a>
+        {% else %}
+        <span class="chip">Credit: CHF {{ "%.2f"|format(user.credit) }}</span>
+        <a class="btn" href="/topup">Top Up</a>
         {% endif %}
       </div>
         <div class="nav-right">
@@ -38,6 +41,7 @@
       <a href="/dashboard">Dashboard</a>
       {% endif %}
       {% if user %}
+      <a href="/topup">Top Up</a>
       <a href="/logout">Logout</a>
       {% endif %}
     </div>
