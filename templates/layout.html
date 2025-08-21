@@ -24,6 +24,10 @@
         <a class="btn" href="/topup">Top Up</a>
         {% endif %}
       </div>
+      <div class="top-controls">
+        <span id="currentLocation" class="location-display" role="button" tabindex="0">Detecting location...</span>
+        <input type="text" id="barSearch" placeholder="Search bars...">
+      </div>
         <div class="nav-right">
           <a class="cart" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
             <span class="badge">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
@@ -46,12 +50,6 @@
       {% endif %}
     </div>
   </header>
-  <div class="top-controls container">
-    <span id="currentLocation">Detecting location...</span>
-    <input type="text" id="manualLocation" placeholder="Enter city">
-    <button id="setLocationBtn" class="btn btn--secondary btn--small">Set</button>
-    <input type="text" id="barSearch" placeholder="Search bars...">
-  </div>
   <main id="main" class="container">
       {% block content %}{% endblock %}
   </main>
