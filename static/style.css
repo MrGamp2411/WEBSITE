@@ -109,7 +109,6 @@ body.dark-mode{
   border-color:#007bff;
 }
 .location-icon{margin-right:var(--space-1);}
-.location-arrow{margin-left:var(--space-1);pointer-events:none;}
 .location-display{
   flex:1;
   border:0;
