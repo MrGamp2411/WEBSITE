@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const searchInput = document.getElementById('barSearch');
   const barList = document.getElementById('barList');
   const nearestBarEl = document.getElementById('nearestBar');
-  const locationDisplay = document.getElementById('currentLocation');
+  const locationInput = document.getElementById('locationInput');
 
   function filterBars(term) {
     if (!barList) return;
@@ -60,26 +60,26 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
       .then(res => res.json())
       .then(data => {
-        if (!locationDisplay) return;
+        if (!locationInput) return;
         if (data.address) {
           const {city, town, village, postcode} = data.address;
           const place = city || town || village;
           if (place) {
-            locationDisplay.textContent = postcode ? `${place} ${postcode}` : place;
+            locationInput.value = postcode ? `${place} ${postcode}` : place;
             return;
           }
         }
-        locationDisplay.textContent = data.display_name || `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+        locationInput.value = data.display_name || `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
       })
       .catch(() => {
-        if (locationDisplay) locationDisplay.textContent = `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+        if (locationInput) locationInput.value = `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
       });
   }
 
   function setLocation(lat, lon, label) {
     updateDistances(lat, lon);
-    if (locationDisplay) {
-      locationDisplay.textContent = label || `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+    if (locationInput) {
+      locationInput.value = label || `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
     }
     reverseGeocode(lat, lon);
   }
@@ -92,28 +92,23 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
 
-    function editLocation() {
-      const current = locationDisplay ? locationDisplay.textContent.trim() : '';
-      const city = prompt('Enter city or ZIP code:', current);
-      if (!city) return;
+    function geocodeAndSet(city) {
       fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(city)}`)
         .then(res => res.json())
         .then(data => {
           if (data && data.length) {
             const {lat, lon} = data[0];
-            setLocation(parseFloat(lat), parseFloat(lon));
-            if (searchInput) {
-              searchInput.value = city;
-              filterBars(city);
-            }
+            setLocation(parseFloat(lat), parseFloat(lon), city);
           }
         });
     }
 
-    if (locationDisplay) {
-      locationDisplay.addEventListener('click', editLocation);
-      locationDisplay.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') editLocation();
+    if (locationInput) {
+      locationInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const city = locationInput.value.trim();
+          if (city) geocodeAndSet(city);
+        }
       });
     }
   }
