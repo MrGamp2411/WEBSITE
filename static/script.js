@@ -55,8 +55,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     searchPreview.innerHTML = '';
     if (items.length) {
-      const card = items[0].querySelector('.card').cloneNode(true);
-      searchPreview.appendChild(card);
+      const list = document.createElement('ul');
+      list.classList.add('bars');
+      items.slice(0, 4).forEach(barItem => {
+        const li = document.createElement('li');
+        const card = barItem.querySelector('.card').cloneNode(true);
+        li.appendChild(card);
+        list.appendChild(li);
+      });
+      searchPreview.appendChild(list);
     }
   }
 
