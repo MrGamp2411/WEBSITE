@@ -191,7 +191,9 @@ body.dark-mode{
     .hdr-actions{display:flex;align-items:center;gap:8px;}
     .credit-pill{padding:4px 8px;border-radius:999px;background:#eef3ff;font-weight:600;white-space:nowrap;font-size:clamp(12px,3vw,14px);min-height:32px;display:inline-flex;align-items:center;}
     .cart-icon{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;text-decoration:none;color:var(--text);overflow:visible;}
-    .nav-toggle svg,.cart-icon svg{transform:scale(2);transform-origin:center;}
+    .nav-toggle svg{transform:scale(2);transform-origin:center;}
+    .cart-icon svg{transform:scale(1);transform-origin:center;}
+    .bars{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}
     .cart-badge{position:absolute;top:4px;right:4px;min-width:16px;height:16px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:11px;background:#ff2d55;color:#fff;padding:0 4px;}
     .hdr-sub{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;}
     .location-pill{flex:1;padding:10px 12px;border-radius:999px;border:1px solid #e5e7eb;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px;font-size:clamp(14px,3.8vw,16px);background:transparent;}
