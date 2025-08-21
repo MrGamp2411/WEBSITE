@@ -49,15 +49,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     const items = bars.map(bar => `
       <li data-bar-id="${bar.id}">
-        <article class="card" itemscope itemtype="https://schema.org/BarOrPub">
-          <img class="card__media" src="https://source.unsplash.com/random/400x250?bar,${bar.id}" alt="${bar.name}" itemprop="image" loading="lazy" decoding="async" width="400" height="250">
-          <div class="card__body">
-            <h3 class="card__title" itemprop="name">${bar.name}</h3>
-            <p class="card__desc">${bar.description}</p>
-            <address itemprop="address">${bar.address}, ${bar.city}, ${bar.state}</address>
-            <a class="btn btn--primary" href="/bars/${bar.id}">View Menu</a>
+        <a class="bar-card" href="/bars/${bar.id}" aria-label="Apri ${bar.name}">
+          <img class="thumb" src="https://source.unsplash.com/random/400x250?bar,${bar.id}" alt="${bar.name}" loading="lazy" width="400" height="100">
+          <h3 class="title">${bar.name}</h3>
+          <div class="meta">
+            <span class="rating"><i class="bi bi-star-fill"></i> ${bar.rating || ''}</span>
+            <span class="distance"><i class="bi bi-geo-alt-fill"></i> <span class="distance-text"></span></span>
           </div>
-        </article>
+          <address>${bar.address}, ${bar.city}, ${bar.state}</address>
+          <p class="desc">${bar.description}</p>
+        </a>
       </li>
     `).join('');
     suggestionsBox.innerHTML = `<ul class="bars">${items}</ul>`;
@@ -121,21 +122,9 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!isFinite(bLat) || !isFinite(bLon)) return;
       const dist = haversine(uLat, uLon, bLat, bLon);
       item.dataset.distance = dist;
-      const distEl = item.querySelector('.distance');
+      const distEl = item.querySelector('.distance-text');
       if (distEl) {
-        const link = document.createElement('a');
-        link.textContent = `📍 ${dist.toFixed(1)} km away`;
-        link.href = '#';
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          const isApple = /iPad|iPhone|Mac/i.test(navigator.platform);
-          const url = isApple
-            ? `https://maps.apple.com/?daddr=${bLat},${bLon}`
-            : `https://www.google.com/maps/dir/?api=1&destination=${bLat},${bLon}`;
-          window.open(url, '_blank');
-        });
-        distEl.innerHTML = '';
-        distEl.appendChild(link);
+        distEl.textContent = `${dist.toFixed(1)} km`;
       }
     });
 
@@ -324,6 +313,77 @@ document.addEventListener('DOMContentLoaded', function() {
   // Filter overlay
   const filterBtn=document.getElementById('filterBtn');
   const filterOverlay=document.getElementById('filterOverlay');
-  filterBtn?.addEventListener('click',()=>{filterOverlay.hidden=false;});
-  filterOverlay?.addEventListener('click',e=>{if(e.target===filterOverlay){filterOverlay.hidden=true;}});
+  const filterForm=document.getElementById('filterForm');
+  const applyBtn=filterOverlay?.querySelector('.apply');
+  const resetBtn=filterOverlay?.querySelector('.reset');
+  const distanceVal=document.getElementById('filterDistanceVal');
+  const ratingVal=document.getElementById('filterRatingVal');
+  const categoryChips=document.getElementById('filterCategoryChips');
+  const categoryInput=document.getElementById('filterCategory');
+  let lastFocusedFilter;
+
+  function openFilters(){
+    lastFocusedFilter=document.activeElement;
+    filterOverlay.hidden=false;
+    requestAnimationFrame(()=>filterOverlay.classList.add('show'));
+    document.body.style.overflow='hidden';
+    const first=filterOverlay.querySelector('input,button');
+    first&&first.focus();
+  }
+
+  function closeFilters(){
+    filterOverlay.classList.remove('show');
+    document.body.style.overflow='';
+    filterOverlay.hidden=true;
+    lastFocusedFilter&&lastFocusedFilter.focus();
+  }
+
+  filterBtn?.addEventListener('click',openFilters);
+  filterOverlay?.addEventListener('click',e=>{if(e.target===filterOverlay) closeFilters();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!filterOverlay.hidden) closeFilters();});
+  filterOverlay?.addEventListener('keydown',e=>{if(e.key!=='Tab') return; const focusable=filterOverlay.querySelectorAll('input,button'); if(!focusable.length) return; const first=focusable[0]; const last=focusable[focusable.length-1]; if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();} else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+
+  function checkChanges(){
+    if(!filterForm||!applyBtn) return;
+    let changed=false;
+    Array.from(filterForm.elements).forEach(el=>{
+      if(el.type==='checkbox'){if(el.checked!==el.defaultChecked) changed=true;}
+      else if(el.value!==el.defaultValue) changed=true;
+    });
+    applyBtn.disabled=!changed;
+  }
+
+  filterForm?.addEventListener('input',e=>{
+    if(e.target.id==='filterDistance') distanceVal.textContent=`${e.target.value} km`;
+    if(e.target.id==='filterRating') ratingVal.textContent=`≥ ${e.target.value}`;
+    checkChanges();
+  });
+
+  categoryChips?.addEventListener('click',e=>{
+    const chip=e.target.closest('.chip');
+    if(!chip) return;
+    categoryChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    categoryInput.value=chip.dataset.value;
+    checkChanges();
+  });
+
+  resetBtn?.addEventListener('click',()=>{
+    filterForm.reset();
+    categoryChips?.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    categoryChips?.querySelector('[data-value=""]').classList.add('active');
+    distanceVal.textContent=`${document.getElementById('filterDistance').value} km`;
+    ratingVal.textContent=`≥ ${document.getElementById('filterRating').value}`;
+    checkChanges();
+  });
+
+  document.getElementById('clearFilters')?.addEventListener('click',()=>{
+    filterForm?.reset();
+    categoryChips?.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    categoryChips?.querySelector('[data-value=""]').classList.add('active');
+    distanceVal.textContent=`${document.getElementById('filterDistance').value} km`;
+    ratingVal.textContent=`≥ ${document.getElementById('filterRating').value}`;
+    checkChanges();
+  });
+  checkChanges();
 });
