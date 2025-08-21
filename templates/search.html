@@ -34,9 +34,15 @@
           <div class="thumb placeholder" aria-hidden="true"></div>
           {% endif %}
           <h3 class="title" itemprop="name">{{ bar.name }}</h3>
-          <div class="meta">
-            <span class="rating" hidden><i class="bi bi-star-fill"></i> <span class="rating-text"></span></span>
-            <span class="distance" hidden><i class="bi bi-geo-alt-fill"></i> <span class="distance-text"></span></span>
+          <div class="bar-meta">
+            <span class="bar-rating" data-has-rating="false" hidden>
+              <i class="bi bi-star-fill" aria-hidden="true"></i>
+              <span class="rating-value"></span>
+            </span>
+            <span class="bar-distance" data-has-distance="false" hidden>
+              <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
+              <span class="distance-value"></span>
+            </span>
           </div>
           {% if bar.address_short or bar.address %}<address>{{ bar.address_short or bar.address }}</address>{% endif %}
           {% if bar.description_short or bar.description %}<p class="desc">{{ bar.description_short or bar.description }}</p>{% endif %}
@@ -57,23 +63,25 @@
     <div class="grabber" aria-hidden="true"></div>
     <h2 id="filterTitle">Filtri</h2>
     <form id="filterForm">
-      <div class="group inactive" data-key="max_km">
+      <div class="group" data-key="max_km" data-active="false">
         <div class="group-head">
           <label for="filterDistance">Max distance</label>
           <span id="filterDistanceVal" class="chip value-chip" hidden></span>
         </div>
-        <input type="range" id="filterDistance" name="distance" min="1" max="50" step="1" value="50">
+        <input type="range" id="filterDistance" name="distance" min="1" max="50" step="1" value="50" aria-label="Max distance in kilometers" aria-valuenow="50">
+        <span id="filterDistanceAnnounce" class="visually-hidden" aria-live="polite"></span>
         <p class="help inactive-hint">Sposta lo slider per attivare</p>
       </div>
-      <div class="group inactive" data-key="min_rating">
+      <div class="group" data-key="min_rating" data-active="false">
         <div class="group-head">
           <label for="filterRating">Min rating</label>
           <span id="filterRatingVal" class="chip value-chip" hidden></span>
         </div>
-        <input type="range" id="filterRating" name="rating" min="0" max="5" step="0.1" value="0">
+        <input type="range" id="filterRating" name="rating" min="0" max="5" step="0.1" value="0" aria-label="Minimum rating" aria-valuenow="0">
+        <span id="filterRatingAnnounce" class="visually-hidden" aria-live="polite"></span>
         <p class="help inactive-hint">Sposta lo slider per attivare</p>
       </div>
-      <div class="group inactive" data-key="categories">
+      <div class="group" data-key="categories" data-active="false">
         <div class="group-head">
           <p>Category</p>
           <span id="filterCategoryVal" class="chip value-chip" hidden></span>
@@ -94,7 +102,7 @@
         </div>
         <p class="help inactive-hint">Seleziona per attivare</p>
       </div>
-      <div class="group inactive" data-key="open_now">
+      <div class="group" data-key="open_now" data-active="false">
         <div class="group-head">
           <label for="filterOpen">Open now</label>
           <span id="filterOpenVal" class="chip value-chip" hidden></span>
