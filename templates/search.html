@@ -1,9 +1,8 @@
 {% extends "layout.html" %}
 {% block content %}
 <section class="search">
-  <h2>Search results for "{{ query }}"</h2>
   {% if bars %}
-  <ul class="bars">
+  <ul class="bars" id="barList">
     {% for bar in bars %}
     <li data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}">
       <article class="card" itemscope itemtype="https://schema.org/BarOrPub">
