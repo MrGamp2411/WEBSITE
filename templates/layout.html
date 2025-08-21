@@ -28,7 +28,31 @@
 </head>
 <body>
   <header class="site-header" role="banner">
-    <nav aria-label="Primary" class="navbar">
+    <div class="app-header mobile-nav">
+      <div class="hdr-top">
+        <button class="btn-icon js-open-menu" aria-label="Open menu">☰</button>
+        <a class="hdr-logo" href="/">SiplyGo</a>
+        <div class="hdr-actions">
+          {% if user %}
+          <a class="credit-pill js-open-credit" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
+          {% endif %}
+          <a class="cart-icon js-open-cart" href="/cart" aria-label="Cart">
+            <span class="badge">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
+          </a>
+        </div>
+      </div>
+      <div class="hdr-sub">
+        <button class="location-pill location-selector js-open-location" aria-label="Change location"><span id="locationDisplay">📍 Detecting location...</span></button>
+        <button class="btn-icon js-open-search" aria-label="Search">🔎</button>
+      </div>
+      <input type="search" id="locationInput" class="visually-hidden" value="Detecting location..." placeholder="Enter city or ZIP" aria-label="Current location" list="citySuggestionsMobile" autocomplete="postal-code">
+      <datalist id="citySuggestionsMobile">
+        <option value="Lugano"></option>
+        <option value="Locarno"></option>
+        <option value="Zurich"></option>
+      </datalist>
+    </div>
+    <nav aria-label="Primary" class="navbar desktop-nav">
       <div class="nav-left">
         <a class="logo" href="/">SiplyGo</a>
         {% if not user %}
@@ -37,27 +61,27 @@
         {% endif %}
       </div>
       <div class="top-controls">
-        <div class="location-selector">
+        <div class="location-selector desktop-location">
           <span class="location-icon">📍</span>
-          <input type="search" id="locationInput" class="location-display" value="Detecting location..." placeholder="Enter city or ZIP" aria-label="Current location" list="citySuggestions" inputmode="search" autocomplete="postal-code" enterkeyhint="search">
-          <datalist id="citySuggestions">
+          <input type="search" id="locationInputDesktop" class="location-display" value="Detecting location..." placeholder="Enter city or ZIP" aria-label="Current location" list="citySuggestionsDesktop" inputmode="search" autocomplete="postal-code" enterkeyhint="search">
+          <datalist id="citySuggestionsDesktop">
             <option value="Lugano"></option>
             <option value="Locarno"></option>
             <option value="Zurich"></option>
           </datalist>
         </div>
-        <input type="search" id="barSearch" placeholder="Search bars..." aria-label="Search bars" inputmode="search" autocomplete="off" enterkeyhint="search">
-        <div id="searchSuggestions" class="search-suggestions"></div>
+        <input type="search" id="barSearchDesktop" class="desktop-search" placeholder="Search bars..." aria-label="Search bars" inputmode="search" autocomplete="off" enterkeyhint="search">
+        <div id="searchSuggestionsDesktop" class="search-suggestions"></div>
       </div>
       <div class="nav-right">
         {% if user %}
-        <a class="chip" href="/wallet">Credit: CHF {{ "%.2f"|format(user.credit) }}</a>
+        <a class="chip desktop-credit" href="/wallet">Credit: CHF {{ "%.2f"|format(user.credit) }}</a>
         {% endif %}
-        <a class="cart" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
+        <a class="cart cart-icon js-open-cart" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
           <span class="badge">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
         </a>
-        <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌙</button>
-        <button id="menuToggle" class="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
+        <button id="themeToggle" class="theme-toggle js-theme-toggle" aria-label="Toggle theme">🌙</button>
+        <button id="menuToggle" class="hamburger js-open-menu" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -74,6 +98,13 @@
       {% endif %}
     </nav>
   </header>
+  <div class="search-overlay" hidden>
+    <button class="overlay-close" aria-label="Close">×</button>
+    <div class="overlay-body">
+      <input type="search" id="barSearch" placeholder="Search bars..." aria-label="Search bars" inputmode="search" autocomplete="off" enterkeyhint="search">
+      <div id="searchSuggestions" class="search-suggestions"></div>
+    </div>
+  </div>
   <main id="main" class="container">
       {% block content %}{% endblock %}
   </main>

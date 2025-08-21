@@ -6,18 +6,29 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
-  const searchInput = document.getElementById('barSearch');
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const searchInput = isMobile ? document.getElementById('barSearch') : document.getElementById('barSearchDesktop');
   const barList = document.getElementById('barList');
   const nearestBarEl = document.getElementById('nearestBar');
-  const locationInput = document.getElementById('locationInput');
-  const locationSelector = document.querySelector('.location-selector');
-  const suggestionsBox = document.getElementById('searchSuggestions');
+  const locationInput = isMobile ? document.getElementById('locationInput') : document.getElementById('locationInputDesktop');
+  const suggestionsBox = isMobile ? document.getElementById('searchSuggestions') : document.getElementById('searchSuggestionsDesktop');
+  const locationSelectors = document.querySelectorAll('.location-selector');
 
-  if (locationSelector && locationInput) {
-    locationSelector.addEventListener('click', () => {
-      locationInput.focus();
-      locationInput.select();
+  if (locationSelectors.length && locationInput) {
+    locationSelectors.forEach(sel => {
+      sel.addEventListener('click', () => {
+        locationInput.focus();
+        locationInput.select();
+      });
     });
+  }
+
+  const locationPill = document.querySelector('.location-pill');
+  if (locationPill && locationInput) {
+    const updatePill = () => { locationPill.textContent = `📍 ${locationInput.value}`; };
+    updatePill();
+    ['input','change'].forEach(evt => locationInput.addEventListener(evt, updatePill));
+    setTimeout(updatePill, 1000);
   }
 
   function filterBars(term) {
@@ -232,4 +243,15 @@ document.addEventListener('DOMContentLoaded', function() {
       mobileMenu.classList.toggle('open', !expanded);
     });
   }
+
+  document.querySelector('.js-open-search')?.addEventListener('click', () => {
+    const ov = document.querySelector('.search-overlay');
+    ov?.classList.add('open');
+    ov?.removeAttribute('hidden');
+  });
+  document.querySelector('.overlay-close')?.addEventListener('click', () => {
+    const ov = document.querySelector('.search-overlay');
+    ov?.classList.remove('open');
+    ov?.setAttribute('hidden','');
+  });
 });
