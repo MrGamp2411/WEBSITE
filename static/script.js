@@ -3,6 +3,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const barList = document.getElementById('barList');
   const nearestBarEl = document.getElementById('nearestBar');
   const locationInput = document.getElementById('locationInput');
+  const searchResults = document.getElementById('searchResults');
+
+  const barItems = barList ? Array.from(barList.querySelectorAll('li')) : [];
 
   function filterBars(term) {
     if (!barList) return;
@@ -13,8 +16,52 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  if (searchInput && barList) {
-    searchInput.addEventListener('keyup', () => filterBars(searchInput.value));
+  function showSuggestions(term = '') {
+    if (!searchResults) return;
+    let items = barItems.slice();
+    items.sort((a, b) => (parseFloat(a.dataset.distance) || Infinity) - (parseFloat(b.dataset.distance) || Infinity));
+    if (term) {
+      const t = term.toLowerCase();
+      items = items.filter(li => li.dataset.name.includes(t));
+    }
+    searchResults.innerHTML = '';
+    if (!items.length) {
+      const li = document.createElement('li');
+      li.textContent = 'No bars found';
+      li.classList.add('no-results');
+      searchResults.appendChild(li);
+      return;
+    }
+    items.slice(0, 5).forEach(item => {
+      const li = document.createElement('li');
+      const name = item.querySelector('.card__title').textContent;
+      const href = item.querySelector('a.btn').getAttribute('href');
+      const a = document.createElement('a');
+      a.textContent = name;
+      a.href = href;
+      li.appendChild(a);
+      searchResults.appendChild(li);
+    });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('focus', () => {
+      searchInput.classList.add('expanded');
+      if (searchResults) {
+        searchResults.hidden = false;
+        showSuggestions(searchInput.value);
+      }
+    });
+    searchInput.addEventListener('input', () => {
+      if (barList) filterBars(searchInput.value);
+      showSuggestions(searchInput.value);
+    });
+    searchInput.addEventListener('blur', () => {
+      searchInput.classList.remove('expanded');
+      if (searchResults) {
+        setTimeout(() => searchResults.hidden = true, 100);
+      }
+    });
   }
 
   const allBarItems = document.querySelectorAll('ul.bars li');
