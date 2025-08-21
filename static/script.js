@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const barList = document.getElementById('barList');
   const nearestBarEl = document.getElementById('nearestBar');
   const locationInput = document.getElementById('locationInput');
-  // Elements used solely for search suggestions have been removed
+  const suggestionsBox = document.getElementById('searchSuggestions');
 
   function filterBars(term) {
     if (!barList) return;
@@ -14,7 +14,42 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Suggestion dropdown and preview overlay have been removed
+  function renderSuggestions(bars) {
+    if (!suggestionsBox) return;
+    if (!bars.length) {
+      suggestionsBox.innerHTML = '';
+      suggestionsBox.classList.remove('show');
+      return;
+    }
+    const items = bars.map(bar => `
+      <li>
+        <article class="card" itemscope itemtype="https://schema.org/BarOrPub">
+          <img class="card__media" src="https://source.unsplash.com/random/400x250?bar,${bar.id}" alt="${bar.name}" itemprop="image" loading="lazy" decoding="async">
+          <div class="card__body">
+            <h3 class="card__title" itemprop="name">${bar.name}</h3>
+            <p class="card__desc">${bar.description}</p>
+            <address itemprop="address">${bar.address}, ${bar.city}, ${bar.state}</address>
+            <a class="btn btn--primary" href="/bars/${bar.id}">View Menu</a>
+          </div>
+        </article>
+      </li>
+    `).join('');
+    suggestionsBox.innerHTML = `<ul class="bars">${items}</ul>`;
+    suggestionsBox.classList.add('show');
+  }
+
+  function fetchSuggestions(term) {
+    if (!suggestionsBox) return;
+    const q = term.trim();
+    if (!q) {
+      suggestionsBox.innerHTML = '';
+      suggestionsBox.classList.remove('show');
+      return;
+    }
+    fetch(`/api/search?q=${encodeURIComponent(q)}`)
+      .then(res => res.json())
+      .then(data => renderSuggestions(data.bars.slice(0,5)));
+  }
 
   if (searchInput) {
     searchInput.addEventListener('focus', () => {
@@ -22,11 +57,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     searchInput.addEventListener('input', () => {
       if (barList) filterBars(searchInput.value);
+      fetchSuggestions(searchInput.value);
     });
     searchInput.addEventListener('blur', () => {
-      if (searchInput.value.trim() === '') {
-        searchInput.classList.remove('expanded');
-      }
+      setTimeout(() => {
+        if (searchInput.value.trim() === '') {
+          searchInput.classList.remove('expanded');
+        }
+        if (suggestionsBox) suggestionsBox.classList.remove('show');
+      }, 100);
     });
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {

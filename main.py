@@ -394,6 +394,24 @@ async def search_bars(request: Request, q: str = ""):
     return render_template("search.html", request=request, bars=results, query=q)
 
 
+@app.get("/api/search")
+async def api_search(q: str = ""):
+    term = q.lower()
+    results = [
+        {
+            "id": bar.id,
+            "name": bar.name,
+            "address": bar.address,
+            "city": bar.city,
+            "state": bar.state,
+            "description": bar.description,
+        }
+        for bar in bars.values()
+        if term in bar.name.lower() or term in bar.address.lower() or term in bar.city.lower() or term in bar.state.lower()
+    ]
+    return {"bars": results}
+
+
 @app.get("/bars/{bar_id}", response_class=HTMLResponse)
 async def bar_detail(request: Request, bar_id: int):
     bar = bars.get(bar_id)
