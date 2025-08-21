@@ -93,15 +93,31 @@ body.dark-mode{
 .search-suggestions.show{display:block;}
 .search-suggestions .card{margin:var(--space-1);}
 .search-suggestions li{cursor:pointer;}
-.location-display{
+.location-selector{
+  display:flex;
+  align-items:center;
+  border:1px solid #d1d5db;
+  border-radius:var(--radius);
+  padding:0 var(--space-2);
+  min-height:44px;
+  background:#fff;
   cursor:text;
+}
+.location-selector:hover,
+.location-selector:focus-within{
+  background:#f9f9f9;
+  border-color:#007bff;
+}
+.location-icon{margin-right:var(--space-1);}
+.location-arrow{margin-left:var(--space-1);pointer-events:none;}
+.location-display{
+  flex:1;
   border:0;
   background:transparent;
   color:inherit;
+  min-width:0;
 }
-.location-display:focus{
-  outline:1px solid #d1d5db;
-}
+.location-display:focus{outline:none;}
 
 @media (prefers-reduced-motion: reduce){*{animation:none;transition:none}}
 

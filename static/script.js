@@ -3,7 +3,15 @@ document.addEventListener('DOMContentLoaded', function() {
   const barList = document.getElementById('barList');
   const nearestBarEl = document.getElementById('nearestBar');
   const locationInput = document.getElementById('locationInput');
+  const locationSelector = document.querySelector('.location-selector');
   const suggestionsBox = document.getElementById('searchSuggestions');
+
+  if (locationSelector && locationInput) {
+    locationSelector.addEventListener('click', () => {
+      locationInput.focus();
+      locationInput.select();
+    });
+  }
 
   function filterBars(term) {
     if (!barList) return;
