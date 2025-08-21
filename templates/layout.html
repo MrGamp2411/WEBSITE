@@ -4,11 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SiplyGo Prototype</title>
+  <meta name="description" content="SiplyGo helps you discover bars nearby and manage your orders effortlessly.">
+  <link rel="canonical" href="https://siplygo.example.com/">
+  <meta property="og:title" content="SiplyGo Prototype">
+  <meta property="og:description" content="Discover bars nearby and manage orders with SiplyGo.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://siplygo.example.com/">
+  <meta property="og:image" content="/static/favicon.png">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="/static/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link href="/static/style.css" rel="stylesheet">
+  <link href="/static/css/tokens.min.css" rel="stylesheet">
+  <link href="/static/css/base.min.css" rel="stylesheet">
+  <link href="/static/css/components.min.css" rel="stylesheet">
+  <link href="/static/css/utilities.min.css" rel="stylesheet">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -35,7 +46,7 @@
           </datalist>
         </div>
         <input type="text" id="barSearch" placeholder="Search bars..." aria-label="Search bars">
-        <div id="searchSuggestions" class="search-suggestions" hidden></div>
+        <div id="searchSuggestions" class="search-suggestions"></div>
       </div>
         <div class="nav-right">
           <a class="cart" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
@@ -67,7 +78,7 @@
       <p>SiplyGo © 2025 · <a href="#">About</a> · <a href="#">Help Center</a> · <a href="#">For Bars</a> · <a href="#">Legal</a></p>
     </div>
   </footer>
-  <script src="/static/script.js"></script>
+  <script src="/static/js/app.min.js" defer></script>
 </body>
 </html>
 

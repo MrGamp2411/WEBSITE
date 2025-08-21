@@ -1,0 +1,1 @@
+.text-center{text-align:center;} .alert{padding:var(--space-2);border-radius:var(--radius-lg);margin-bottom:var(--space-3);} .alert-danger{background:rgba(239,68,68,.1);color:var(--color-danger);} .alert-success{background:rgba(16,185,129,.1);color:var(--color-success);}
