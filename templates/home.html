@@ -31,7 +31,7 @@
   <h2>Your last visited bar</h2>
   <ul class="bars">
     <li>
-      <a class="bar-card" href="/bars/{{ last_bar.id }}" aria-label="Apri {{ last_bar.name }}" data-name="{{ last_bar.name|lower }}" data-address="{{ last_bar.address|lower }}" data-city="{{ last_bar.city|lower }}" data-state="{{ last_bar.state|lower }}" data-latitude="{{ last_bar.latitude }}" data-longitude="{{ last_bar.longitude }}" itemscope itemtype="https://schema.org/BarOrPub">
+      <a class="bar-card" href="/bars/{{ last_bar.id }}" aria-label="Apri {{ last_bar.name }}" data-name="{{ last_bar.name|lower }}" data-address="{{ last_bar.address|lower }}" data-city="{{ last_bar.city|lower }}" data-state="{{ last_bar.state|lower }}" data-latitude="{{ last_bar.latitude }}" data-longitude="{{ last_bar.longitude }}" data-rating="{{ last_bar.rating or '4.7' }}" data-distance_km="{{ last_bar.distance_km or '' }}" data-categories="" data-open="{{ 'true' if last_bar.open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
         <img class="thumb" src="https://source.unsplash.com/random/400x250?bar,{{ last_bar.id }}" alt="{{ last_bar.name }}" itemprop="image" loading="lazy" width="400" height="100">
         <h3 class="title" itemprop="name">{{ last_bar.name }}</h3>
         <div class="meta">
@@ -52,7 +52,7 @@
   <ul class="bars" id="barList">
     {% for bar in bars %}
     <li>
-      <a class="bar-card" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" itemscope itemtype="https://schema.org/BarOrPub">
+      <a class="bar-card" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '4.7' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="" data-open="{{ 'true' if bar.open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
         <img class="thumb" src="https://source.unsplash.com/random/400x250?bar,{{ bar.id }}" alt="{{ bar.name }}" itemprop="image" loading="lazy" width="400" height="100">
         <h3 class="title" itemprop="name">{{ bar.name }}</h3>
         <div class="meta">
