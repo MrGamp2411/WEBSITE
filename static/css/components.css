@@ -23,7 +23,7 @@ body.dark-mode{
 .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
 
 .site-header{position:sticky;top:0;z-index:50;backdrop-filter:saturate(180%) blur(10px);background:color-mix(in srgb,var(--bg) 85%,transparent);display:flex;align-items:center;justify-content:space-between;padding:var(--space-2) var(--space-3);}
-.navbar{display:flex;align-items:center;gap:var(--space-3);justify-content:space-between;width:100%;transition:box-shadow var(--dur) var(--ease),background var(--dur) var(--ease);}
+.navbar{position:sticky;top:0;inset-inline:0;display:flex;gap:var(--gap-1);justify-content:space-around;align-items:center;padding:calc(8px + env(safe-area-inset-top)) 8px 8px;background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,0,0,0.06);width:100%;transition:box-shadow var(--dur) var(--ease),background var(--dur) var(--ease);}
 .navbar a{color:var(--text);text-decoration:none;}
 .navbar.is-scrolled{box-shadow:var(--shadow);background:var(--surface);}
 
@@ -37,6 +37,9 @@ body.dark-mode{
 .menu{position:absolute;top:100%;right:var(--space-3);background:var(--surface);border-radius:var(--radius);padding:var(--space-3);box-shadow:var(--shadow);display:none;flex-direction:column;gap:var(--space-2);}
 .menu a{color:var(--text);text-decoration:none;}
 .menu.open{display:flex;}
+
+.navbtn{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border-radius:12px;text-decoration:none;}
+.navbtn:focus-visible{outline:2px solid Highlight;outline-offset:2px;}
 
 .logo{font-weight:600;color:var(--text);text-decoration:none;font-size:1.25rem;}
 .cart{position:relative;display:inline-flex;align-items:center;text-decoration:none;color:var(--text);}
