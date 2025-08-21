@@ -7,8 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   const searchInput = document.getElementById('barSearch') || document.getElementById('barSearchDesktop');
-  const barList = document.getElementById('barList');
-  const nearestBarEl = document.getElementById('nearestBar');
+  const barCards = () => document.querySelectorAll('.bar-card');
   const locationInput = document.getElementById('locationInput') || document.getElementById('locationInputDesktop');
   const suggestionsBox = document.getElementById('searchSuggestions') || document.getElementById('searchSuggestionsDesktop');
   const locationSelectors = document.querySelectorAll('.location-selector');
@@ -31,12 +30,13 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(updatePill, 1000);
   }
 
+  function debounce(fn, delay=300){let t;return (...args)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,args),delay);};}
+
   function filterBars(term) {
-    if (!barList) return;
     const t = term.toLowerCase();
-    barList.querySelectorAll('li').forEach(item => {
-      const {name, address, city = '', state = ''} = item.dataset;
-      item.style.display = (name.includes(t) || address.includes(t) || city.includes(t) || state.includes(t)) ? '' : 'none';
+    barCards().forEach(card => {
+      const {name='', address='', city='', state=''} = card.dataset;
+      card.style.display = (name.includes(t) || address.includes(t) || city.includes(t) || state.includes(t)) ? '' : 'none';
     });
   }
 
@@ -81,10 +81,11 @@ document.addEventListener('DOMContentLoaded', function() {
     searchInput.addEventListener('focus', () => {
       searchInput.classList.add('expanded');
     });
-    searchInput.addEventListener('input', () => {
-      if (barList) filterBars(searchInput.value);
+    const handleInput = debounce(() => {
+      filterBars(searchInput.value);
       fetchSuggestions(searchInput.value);
-    });
+    }, 300);
+    searchInput.addEventListener('input', handleInput);
     searchInput.addEventListener('blur', () => {
       setTimeout(() => {
         if (searchInput.value.trim() === '') {
@@ -111,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  const allBarItems = document.querySelectorAll('ul.bars li');
+  const allBarItems = barCards();
 
   function updateDistances(uLat, uLon) {
     allBarItems.forEach(item => {
@@ -138,16 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
-    if (barList) {
-      const items = Array.from(barList.querySelectorAll('li')).filter(li => li.style.display !== 'none');
-      items.sort((a, b) => parseFloat(a.dataset.distance) - parseFloat(b.dataset.distance));
-      items.forEach(item => barList.appendChild(item));
-      if (nearestBarEl && items.length) {
-        const nearest = items[0];
-        const name = nearest.querySelector('.card__title').textContent;
-        nearestBarEl.textContent = `Nearest bar: ${name} (${parseFloat(nearest.dataset.distance).toFixed(1)} km)`;
-      }
-    }
+    // sorting of cards is skipped in new layout
   }
 
   function reverseGeocode(lat, lon) {
@@ -310,4 +302,28 @@ document.addEventListener('DOMContentLoaded', function() {
     ov?.classList.remove('open');
     ov?.setAttribute('hidden','');
   });
+
+  // Carousel controls
+  function setupCarousels(){
+    document.querySelectorAll('.bar-section').forEach(section=>{
+      const scroller=section.querySelector('.scroller');
+      const prev=section.querySelector('.scroll-btn.prev');
+      const next=section.querySelector('.scroll-btn.next');
+      if(!scroller) return;
+      const getWidth=()=>{const card=scroller.querySelector('.bar-card');if(!card) return 0;const style=getComputedStyle(card);return card.offsetWidth+parseFloat(style.marginRight)+parseFloat(style.marginLeft);};
+      let w=getWidth();
+      const scrollBy=dir=>scroller.scrollBy({left:dir*w,behavior:'smooth'});
+      prev?.addEventListener('click',()=>scrollBy(-1));
+      next?.addEventListener('click',()=>scrollBy(1));
+      window.addEventListener('resize',()=>{w=getWidth();});
+      scroller.addEventListener('keydown',e=>{if(e.key==='ArrowRight'){e.preventDefault();scrollBy(1);}if(e.key==='ArrowLeft'){e.preventDefault();scrollBy(-1);}});
+    });
+  }
+  setupCarousels();
+
+  // Filter overlay
+  const filterBtn=document.getElementById('filterBtn');
+  const filterOverlay=document.getElementById('filterOverlay');
+  filterBtn?.addEventListener('click',()=>{filterOverlay.hidden=false;});
+  filterOverlay?.addEventListener('click',e=>{if(e.target===filterOverlay){filterOverlay.hidden=true;}});
 });
