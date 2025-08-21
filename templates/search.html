@@ -26,19 +26,20 @@
       </div>
       <div class="cards scroller" aria-label="{{ title }}" tabindex="0">
         {% for bar in bars %}
-        <article class="bar-card" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" itemscope itemtype="https://schema.org/BarOrPub">
+        <a class="bar-card" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" itemscope itemtype="https://schema.org/BarOrPub">
           {% if bar.image_url %}
           <img src="{{ bar.image_url }}" alt="Foto bar" class="thumb" loading="lazy" width="400" height="100">
           {% else %}
           <div class="thumb placeholder" aria-hidden="true"></div>
           {% endif %}
-          <h3 class="title">{{ bar.name }}{% if bar.rating %} <span class="rating">★ {{ bar.rating }}</span>{% endif %}</h3>
-          {% if bar.description_short or bar.description %}
-          <p class="desc">{{ bar.description_short or bar.description }}</p>
-          {% endif %}
-          <p class="meta">📍 {{ bar.distance_km or '' }} km • {{ bar.address_short or bar.address }}</p>
-          <a href="/bars/{{ bar.id }}" class="cta">View Menu</a>
-        </article>
+          <h3 class="title" itemprop="name">{{ bar.name }}</h3>
+          <div class="meta">
+            <span class="rating"><i class="bi bi-star-fill"></i> {{ bar.rating or '4.7' }}</span>
+            <span class="distance"><i class="bi bi-geo-alt-fill"></i> <span class="distance-text">{% if bar.distance_km %}{{ bar.distance_km }} km{% endif %}</span></span>
+          </div>
+          {% if bar.address_short or bar.address %}<address>{{ bar.address_short or bar.address }}</address>{% endif %}
+          {% if bar.description_short or bar.description %}<p class="desc">{{ bar.description_short or bar.description }}</p>{% endif %}
+        </a>
         {% endfor %}
       </div>
     </section>
@@ -46,27 +47,37 @@
   {% else %}
   <div class="empty-state">
     <p>Nessun bar trovato.</p>
-    <a href="/search" class="cta">Cerca in un’altra città</a>
+    <button type="button" id="clearFilters" class="btn btn--secondary">Clear filters</button>
   </div>
   {% endif %}
 </div>
 <div id="filterOverlay" class="filter-overlay" hidden>
-  <div class="filter-modal" role="dialog" aria-modal="true" aria-labelledby="filterTitle">
+  <div class="filter-sheet" role="dialog" aria-modal="true" aria-labelledby="filterTitle">
+    <div class="grabber" aria-hidden="true"></div>
     <h2 id="filterTitle">Filtri</h2>
     <form id="filterForm">
-      <label>Distance
-        <input type="range" id="filterDistance" min="1" max="50" value="10">
-      </label>
-      <label>Rating
-        <input type="range" id="filterRating" min="0" max="5" step="0.1" value="0">
-      </label>
-      <label>Category
-        <select id="filterCategory">
-          <option value="">All</option>
-        </select>
-      </label>
-      <label><input type="checkbox" id="filterOpen"> Open now</label>
-      <button type="button" class="btn-apply">Apply</button>
+      <div class="group">
+        <label for="filterDistance">Distance <span id="filterDistanceVal">10 km</span></label>
+        <input type="range" id="filterDistance" name="distance" min="1" max="50" value="10">
+      </div>
+      <div class="group">
+        <label for="filterRating">Rating <span id="filterRatingVal">≥ 0</span></label>
+        <input type="range" id="filterRating" name="rating" min="0" max="5" step="0.1" value="0">
+      </div>
+      <div class="group">
+        <p>Category</p>
+        <div id="filterCategoryChips" class="chips">
+          <button type="button" class="chip active" data-value="">All</button>
+        </div>
+        <input type="hidden" id="filterCategory" name="category" value="">
+      </div>
+      <div class="group">
+        <label for="filterOpen"><input type="checkbox" id="filterOpen" name="open"> Open now</label>
+      </div>
+      <div class="sheet-footer">
+        <button type="button" class="btn reset">Reset</button>
+        <button type="submit" class="btn btn--primary apply" disabled>Apply</button>
+      </div>
     </form>
   </div>
 </div>
