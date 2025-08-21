@@ -75,6 +75,23 @@ body.dark-mode{
 
 #barSearch{width:150px;transition:width .3s,transform .3s;}
 #barSearch.expanded{width:400px;transform:translateX(-250px);}
+
+.search-suggestions{
+  position:absolute;
+  top:100%;
+  left:0;
+  width:100%;
+  background:var(--bg);
+  border:1px solid #d1d5db;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  display:none;
+  max-height:60vh;
+  overflow:auto;
+  z-index:1000;
+}
+.search-suggestions.show{display:block;}
+.search-suggestions .card{margin:var(--space-1);}
 .location-display{
   cursor:text;
   border:0;

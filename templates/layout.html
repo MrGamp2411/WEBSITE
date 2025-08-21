@@ -26,7 +26,8 @@
       </div>
       <div class="top-controls">
         <input type="text" id="locationInput" class="location-display" value="Detecting location..." placeholder="Enter city or ZIP" aria-label="Current location">
-        <input type="text" id="barSearch" placeholder="Search bars...">
+        <input type="text" id="barSearch" placeholder="Search bars..." aria-label="Search bars">
+        <div id="searchSuggestions" class="search-suggestions" hidden></div>
       </div>
         <div class="nav-right">
           <a class="cart" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
