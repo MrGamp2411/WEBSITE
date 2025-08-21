@@ -32,18 +32,14 @@
 </table>
 <p><strong>Total: CHF {{ "%.2f"|format(cart.total_price()) }}</strong></p>
 <h2>Select Table</h2>
-<form class="form" method="get" action="/cart/select_table">
+<form class="form" method="get" action="/cart/checkout">
   <label for="table_id">Table
-    <select id="table_id" name="table_id">
+    <select id="table_id" name="table_id" required>
       {% for table in bar.tables.values() %}
         <option value="{{ table.id }}" {% if cart.table_id == table.id %}selected{% endif %}>{{ table.name }}</option>
       {% endfor %}
     </select>
   </label>
-  <button class="btn" type="submit">Confirm</button>
-</form>
-<h2>Checkout</h2>
-<form method="get" action="/cart/checkout">
   <button class="btn btn--success" type="submit">Place Order</button>
 </form>
 {% else %}

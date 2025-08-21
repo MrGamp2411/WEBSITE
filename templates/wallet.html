@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Wallet</h1>
+<p>Your current credit: CHF {{ "%.2f"|format(user.credit) }}</p>
+<a class="btn" href="/topup">Top Up</a>
+<h2>Recent Expenses</h2>
+<ul>
+  {% for tx in transactions %}
+  <li><a href="/wallet/tx/{{ loop.index0 }}">{{ tx.bar_name }} - CHF {{ "%.2f"|format(tx.total) }}</a></li>
+  {% else %}
+  <li>No transactions yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

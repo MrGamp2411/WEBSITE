@@ -124,6 +124,7 @@ class User:
         self.bar_id = bar_id
         self.pending_bar_id = pending_bar_id
         self.credit = credit
+        self.transactions: List[Transaction] = []
 
     @property
     def is_super_admin(self) -> bool:
@@ -148,10 +149,33 @@ class CartItem:
         return self.product.price * self.quantity
 
 
+class TransactionItem:
+    def __init__(self, name: str, quantity: int, price: float):
+        self.name = name
+        self.quantity = quantity
+        self.price = price
+
+    @property
+    def total(self) -> float:
+        return self.price * self.quantity
+
+
+class Transaction:
+    def __init__(self, bar_id: int, bar_name: str, items: List[CartItem], total: float):
+        self.bar_id = bar_id
+        self.bar_name = bar_name
+        self.items = [
+            TransactionItem(item.product.name, item.quantity, item.product.price)
+            for item in items
+        ]
+        self.total = total
+
+
 class Cart:
     def __init__(self):
         self.items: Dict[int, CartItem] = {}
         self.table_id: Optional[int] = None
+        self.bar_id: Optional[int] = None
 
     def add(self, product: Product):
         if product.id in self.items:
@@ -162,6 +186,8 @@ class Cart:
     def remove(self, product_id: int):
         if product_id in self.items:
             del self.items[product_id]
+        if not self.items:
+            self.bar_id = None
 
     def update_quantity(self, product_id: int, quantity: int):
         if product_id in self.items:
@@ -169,6 +195,8 @@ class Cart:
                 del self.items[product_id]
             else:
                 self.items[product_id].quantity = quantity
+        if not self.items:
+            self.bar_id = None
 
     def total_price(self) -> float:
         return sum(item.total for item in self.items.values())
@@ -176,6 +204,7 @@ class Cart:
     def clear(self):
         self.items.clear()
         self.table_id = None
+        self.bar_id = None
 
 
 # -----------------------------------------------------------------------------
@@ -447,6 +476,20 @@ async def add_to_cart(request: Request, bar_id: int):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     cart = get_cart_for_user(user)
+    if cart.bar_id and cart.bar_id != bar_id:
+        products_by_category: Dict[Category, List[Product]] = {}
+        for prod in bar.products.values():
+            category = bar.categories.get(prod.category_id)
+            products_by_category.setdefault(category, []).append(prod)
+        return render_template(
+            "bar_detail.html",
+            request=request,
+            bar=bar,
+            products_by_category=products_by_category,
+            error="Please clear your cart before ordering from another bar.",
+        )
+    if cart.bar_id is None:
+        cart.bar_id = bar_id
     cart.add(product)
     return RedirectResponse(url=f"/bars/{bar_id}", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -457,9 +500,7 @@ async def view_cart(request: Request):
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     cart = get_cart_for_user(user)
-    # For demonstration, select the first bar from data set; in a real app the cart
-    # would be associated with a specific bar when items are added.
-    current_bar: Optional[Bar] = next(iter(bars.values())) if bars else None
+    current_bar: Optional[Bar] = bars.get(cart.bar_id) if cart.bar_id else None
     return render_template(
         "cart.html",
         request=request,
@@ -504,19 +545,62 @@ async def checkout(request: Request):
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     cart = get_cart_for_user(user)
+    table_id = request.query_params.get("table_id")
+    if table_id is not None:
+        try:
+            cart.table_id = int(table_id)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid table")
     if cart.table_id is None:
         raise HTTPException(status_code=400, detail="Please select a table before checking out")
     order_total = cart.total_price()
     if user.credit < order_total:
         raise HTTPException(status_code=400, detail="Insufficient credit")
     user.credit -= order_total
+    bar = bars.get(cart.bar_id) if cart.bar_id else None
+    if bar:
+        user.transactions.append(
+            Transaction(bar.id, bar.name, list(cart.items.values()), order_total)
+        )
     cart.clear()
-    return render_template("order_success.html", request=request, total=order_total, remaining=user.credit)
+    return render_template(
+        "order_success.html",
+        request=request,
+        total=order_total,
+        remaining=user.credit,
+    )
 
 
 # -----------------------------------------------------------------------------
-# Credit top up
+# Wallet and credit management
 # -----------------------------------------------------------------------------
+
+
+@app.get("/wallet", response_class=HTMLResponse)
+async def wallet(request: Request):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template(
+        "wallet.html",
+        request=request,
+        transactions=user.transactions,
+    )
+
+
+@app.get("/wallet/tx/{tx_id}", response_class=HTMLResponse)
+async def wallet_transaction(request: Request, tx_id: int):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    if tx_id < 0 or tx_id >= len(user.transactions):
+        return RedirectResponse(url="/wallet", status_code=status.HTTP_303_SEE_OTHER)
+    tx = user.transactions[tx_id]
+    return render_template(
+        "transaction_detail.html",
+        request=request,
+        tx=tx,
+    )
 
 
 @app.get("/topup", response_class=HTMLResponse)
