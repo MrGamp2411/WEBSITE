@@ -65,12 +65,8 @@ body.dark-mode{
 .bars{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-3);list-style:none;padding:0;}
 
 .rating{color:var(--brand);}
- codex/fix-layout-of-bar-cards-on-homepage-8qjg1t
 .distance{color:var(--brand);font-size:.875rem;font-weight:600;min-height:1.25em;}
 .card__desc{color:var(--muted);font-size:.875rem;min-height:1.25em;}
-
-.distance{color:var(--muted);font-size:.875rem;}
- main
 
 .search{margin-bottom:var(--space-3);}
 
