@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Transaction Details</h1>
+<p>Bar: {{ tx.bar_name }}</p>
+<p>Total: CHF {{ "%.2f"|format(tx.total) }}</p>
+<ul>
+  {% for item in tx.items %}
+  <li>{{ item.name }} x{{ item.quantity }} - CHF {{ "%.2f"|format(item.total) }}</li>
+  {% endfor %}
+</ul>
+<a class="btn" href="/wallet">Back to Wallet</a>
+{% endblock %}

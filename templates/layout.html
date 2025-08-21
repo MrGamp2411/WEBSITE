@@ -33,9 +33,6 @@
         {% if not user %}
         <a class="btn" href="/login">Login</a>
         <a class="btn" href="/register">Register</a>
-        {% else %}
-        <span class="chip">Credit: CHF {{ "%.2f"|format(user.credit) }}</span>
-        <a class="btn" href="/topup">Top Up</a>
         {% endif %}
       </div>
       <div class="top-controls">
@@ -52,6 +49,9 @@
         <div id="searchSuggestions" class="search-suggestions"></div>
       </div>
       <div class="nav-right">
+        {% if user %}
+        <a class="chip" href="/wallet">Credit: CHF {{ "%.2f"|format(user.credit) }}</a>
+        {% endif %}
         <a class="cart" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
           <span class="badge">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
         </a>
@@ -68,7 +68,7 @@
       <a href="/dashboard">Dashboard</a>
       {% endif %}
       {% if user %}
-      <a href="/topup">Top Up</a>
+      <a href="/wallet">Wallet</a>
       <a href="/logout">Logout</a>
       {% endif %}
     </div>
