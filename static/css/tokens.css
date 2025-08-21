@@ -1,4 +1,11 @@
 :root{
+  /* Tipografia e scala fluida */
+  --step--1: clamp(0.85rem, 0.8rem + 0.2vw, 0.95rem);
+  --step-0:  clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+  --step-1:  clamp(1.125rem, 1rem + 0.8vw, 1.375rem);
+  --radius:  12px;
+  --gap-1:   clamp(8px, 1.5vw, 12px);
+  --gap-2:   clamp(12px, 2vw, 16px);
   /* colori */
   --color-bg:#0B0D12; --color-surface:#12151C; --color-text:#E9EEF5;
   --color-muted:#9AA4B2; --color-primary:#5B8CFF; --color-primary-600:#3E6EF2;
@@ -19,6 +26,5 @@
   --surface: var(--color-surface);
   --text: var(--color-text);
   --muted: var(--color-muted);
-  --radius: var(--radius-lg);
   --shadow: var(--shadow-1);
 }
