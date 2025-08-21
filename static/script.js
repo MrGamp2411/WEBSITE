@@ -3,8 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const barList = document.getElementById('barList');
   const nearestBarEl = document.getElementById('nearestBar');
   const locationDisplay = document.getElementById('currentLocation');
-  const manualLocation = document.getElementById('manualLocation');
-  const setLocationBtn = document.getElementById('setLocationBtn');
 
   function filterBars(term) {
     if (!barList) return;
@@ -63,11 +61,15 @@ document.addEventListener('DOMContentLoaded', function() {
       .then(res => res.json())
       .then(data => {
         if (!locationDisplay) return;
-        if (data.address && data.address.city) {
-          locationDisplay.textContent = `${data.address.city}, ${data.address.country}`;
-        } else {
-          locationDisplay.textContent = data.display_name || `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+        if (data.address) {
+          const {city, town, village, postcode} = data.address;
+          const place = city || town || village;
+          if (place) {
+            locationDisplay.textContent = postcode ? `${place} ${postcode}` : place;
+            return;
+          }
         }
+        locationDisplay.textContent = data.display_name || `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
       })
       .catch(() => {
         if (locationDisplay) locationDisplay.textContent = `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
@@ -90,22 +92,28 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
 
-    if (setLocationBtn && manualLocation) {
-      setLocationBtn.addEventListener('click', () => {
-        const city = manualLocation.value.trim();
-        if (!city) return;
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(city)}`)
-          .then(res => res.json())
-          .then(data => {
-            if (data && data.length) {
-              const {lat, lon, display_name} = data[0];
-              setLocation(parseFloat(lat), parseFloat(lon), display_name);
-              if (searchInput) {
-                searchInput.value = city;
-                filterBars(city);
-              }
+    function editLocation() {
+      const current = locationDisplay ? locationDisplay.textContent.trim() : '';
+      const city = prompt('Enter city or ZIP code:', current);
+      if (!city) return;
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(city)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.length) {
+            const {lat, lon} = data[0];
+            setLocation(parseFloat(lat), parseFloat(lon));
+            if (searchInput) {
+              searchInput.value = city;
+              filterBars(city);
             }
-          });
+          }
+        });
+    }
+
+    if (locationDisplay) {
+      locationDisplay.addEventListener('click', editLocation);
+      locationDisplay.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') editLocation();
       });
     }
   }
