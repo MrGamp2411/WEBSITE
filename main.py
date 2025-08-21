@@ -384,6 +384,16 @@ async def home(request: Request):
     return render_template("home.html", request=request, bars=bars.values())
 
 
+@app.get("/search", response_class=HTMLResponse)
+async def search_bars(request: Request, q: str = ""):
+    term = q.lower()
+    results = [
+        bar for bar in bars.values()
+        if term in bar.name.lower() or term in bar.address.lower() or term in bar.city.lower() or term in bar.state.lower()
+    ]
+    return render_template("search.html", request=request, bars=results, query=q)
+
+
 @app.get("/bars/{bar_id}", response_class=HTMLResponse)
 async def bar_detail(request: Request, bar_id: int):
     bar = bars.get(bar_id)
