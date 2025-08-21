@@ -3,11 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const barList = document.getElementById('barList');
   const nearestBarEl = document.getElementById('nearestBar');
   const locationInput = document.getElementById('locationInput');
-  const searchResults = document.getElementById('searchResults');
-  const searchOverlay = document.getElementById('searchOverlay');
-  const searchPreview = document.getElementById('searchPreview');
-
-  const barItems = barList ? Array.from(barList.querySelectorAll('li')) : [];
+  // Elements used solely for search suggestions have been removed
 
   function filterBars(term) {
     if (!barList) return;
@@ -18,95 +14,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  function showSuggestions(term = '') {
-    if (!searchResults) return;
-    let items = barItems.slice();
-    items.sort((a, b) => (parseFloat(a.dataset.distance) || Infinity) - (parseFloat(b.dataset.distance) || Infinity));
-    if (term) {
-      const t = term.toLowerCase();
-      items = items.filter(li => li.dataset.name.includes(t));
-    }
-    searchResults.innerHTML = '';
-    if (!items.length) {
-      const li = document.createElement('li');
-      li.textContent = 'No bars found';
-      li.classList.add('no-results');
-      searchResults.appendChild(li);
-      return;
-    }
-    items.slice(0, 5).forEach(item => {
-      const li = document.createElement('li');
-      const name = item.querySelector('.card__title').textContent;
-      const href = item.querySelector('a.btn').getAttribute('href');
-      const a = document.createElement('a');
-      a.textContent = name;
-      a.href = href;
-      li.appendChild(a);
-      searchResults.appendChild(li);
-    });
-  }
-
-  function updatePreview(term = '') {
-    if (!searchPreview) return;
-    let items = barItems.slice();
-    if (term) {
-      const t = term.toLowerCase();
-      items = items.filter(li => li.dataset.name.includes(t));
-    }
-    searchPreview.innerHTML = '';
-    if (items.length) {
-      const list = document.createElement('ul');
-      list.classList.add('bars');
-      items.slice(0, 4).forEach(barItem => {
-        const li = document.createElement('li');
-        const card = barItem.querySelector('.card').cloneNode(true);
-        li.appendChild(card);
-        list.appendChild(li);
-      });
-      searchPreview.appendChild(list);
-    }
-  }
+  // Suggestion dropdown and preview overlay have been removed
 
   if (searchInput) {
     searchInput.addEventListener('focus', () => {
       searchInput.classList.add('expanded');
-      if (searchResults) {
-        searchResults.hidden = false;
-        showSuggestions(searchInput.value);
-      }
-      if (searchOverlay) {
-        searchOverlay.hidden = false;
-        updatePreview(searchInput.value);
-      }
     });
     searchInput.addEventListener('input', () => {
       if (barList) filterBars(searchInput.value);
-      showSuggestions(searchInput.value);
-      updatePreview(searchInput.value);
     });
     searchInput.addEventListener('blur', () => {
       if (searchInput.value.trim() === '') {
         searchInput.classList.remove('expanded');
-        if (searchResults) {
-          setTimeout(() => searchResults.hidden = true, 100);
-        }
-        if (searchOverlay) {
-          setTimeout(() => searchOverlay.hidden = true, 100);
-        }
       }
     });
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
         window.location.href = `/search?q=${encodeURIComponent(searchInput.value)}`;
-      }
-    });
-  }
-
-  if (searchOverlay) {
-    searchOverlay.addEventListener('click', () => {
-      if (searchInput.value.trim() === '') {
-        searchInput.blur();
       }
     });
   }
