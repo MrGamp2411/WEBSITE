@@ -25,7 +25,11 @@ document.addEventListener('DOMContentLoaded', function() {
         item.dataset.distance = dist;
         const distEl = item.querySelector('.distance');
         if (distEl) {
+ codex/fix-layout-of-bar-cards-on-homepage-8qjg1t
           distEl.textContent = `📍 ${dist.toFixed(1)} km away`;
+
+          distEl.textContent = `${dist.toFixed(1)} km away`;
+ main
         }
       });
 
