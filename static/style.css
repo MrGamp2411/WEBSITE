@@ -115,8 +115,16 @@ body.dark-mode{
   background:transparent;
   color:inherit;
   min-width:0;
+  appearance:none;
+  -webkit-appearance:none;
 }
 .location-display:focus{outline:none;}
+
+.location-display::-webkit-calendar-picker-indicator,
+.location-display::-webkit-list-button,
+.location-display::-ms-expand{
+  display:none;
+}
 
 @media (prefers-reduced-motion: reduce){*{animation:none;transition:none}}
 
