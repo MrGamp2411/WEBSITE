@@ -6,12 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  const searchInput = isMobile ? document.getElementById('barSearch') : document.getElementById('barSearchDesktop');
+  const searchInput = document.getElementById('barSearch') || document.getElementById('barSearchDesktop');
   const barList = document.getElementById('barList');
   const nearestBarEl = document.getElementById('nearestBar');
-  const locationInput = isMobile ? document.getElementById('locationInput') : document.getElementById('locationInputDesktop');
-  const suggestionsBox = isMobile ? document.getElementById('searchSuggestions') : document.getElementById('searchSuggestionsDesktop');
+  const locationInput = document.getElementById('locationInput') || document.getElementById('locationInputDesktop');
+  const suggestionsBox = document.getElementById('searchSuggestions') || document.getElementById('searchSuggestionsDesktop');
   const locationSelectors = document.querySelectorAll('.location-selector');
 
   if (locationSelectors.length && locationInput) {
