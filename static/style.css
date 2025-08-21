@@ -76,7 +76,7 @@ body.dark-mode{
 #barSearch{width:150px;transition:width .3s,transform .3s;}
 #barSearch.expanded{width:400px;transform:translateX(-250px);}
 
-.search-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000;}
+.search-overlay{position:fixed;inset:0;background:transparent;display:flex;align-items:flex-start;justify-content:center;padding-top:80px;z-index:40;}
 .search-overlay[hidden]{display:none;}
 .search-overlay .card{max-width:320px;}
 
