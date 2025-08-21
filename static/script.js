@@ -11,23 +11,33 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  if (barList && navigator.geolocation) {
+  const allBarItems = document.querySelectorAll('ul.bars li');
+  if (allBarItems.length && navigator.geolocation) {
     const nearestBarEl = document.getElementById('nearestBar');
     navigator.geolocation.getCurrentPosition(pos => {
       const {latitude: uLat, longitude: uLon} = pos.coords;
-      const items = Array.from(barList.querySelectorAll('li'));
-      items.forEach(item => {
+
+      allBarItems.forEach(item => {
         const bLat = parseFloat(item.dataset.latitude);
         const bLon = parseFloat(item.dataset.longitude);
+        if (!isFinite(bLat) || !isFinite(bLon)) return;
         const dist = haversine(uLat, uLon, bLat, bLon);
         item.dataset.distance = dist;
+        const distEl = item.querySelector('.distance');
+        if (distEl) {
+          distEl.textContent = `📍 ${dist.toFixed(1)} km away`;
+        }
       });
-      items.sort((a, b) => a.dataset.distance - b.dataset.distance);
-      items.forEach(item => barList.appendChild(item));
-      if (nearestBarEl && items.length) {
-        const nearest = items[0];
-        const name = nearest.querySelector('.card__title').textContent;
-        nearestBarEl.textContent = `Nearest bar: ${name} (${Number(nearest.dataset.distance).toFixed(1)} km)`;
+
+      if (barList) {
+        const items = Array.from(barList.querySelectorAll('li'));
+        items.sort((a, b) => parseFloat(a.dataset.distance) - parseFloat(b.dataset.distance));
+        items.forEach(item => barList.appendChild(item));
+        if (nearestBarEl && items.length) {
+          const nearest = items[0];
+          const name = nearest.querySelector('.card__title').textContent;
+          nearestBarEl.textContent = `Nearest bar: ${name} (${parseFloat(nearest.dataset.distance).toFixed(1)} km)`;
+        }
       }
     });
   }
