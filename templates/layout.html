@@ -46,6 +46,12 @@
       {% endif %}
     </div>
   </header>
+  <div class="top-controls container">
+    <span id="currentLocation">Detecting location...</span>
+    <input type="text" id="manualLocation" placeholder="Enter city">
+    <button id="setLocationBtn" class="btn btn--secondary btn--small">Set</button>
+    <input type="text" id="barSearch" placeholder="Search bars...">
+  </div>
   <main id="main" class="container">
       {% block content %}{% endblock %}
   </main>
