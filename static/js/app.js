@@ -52,9 +52,15 @@ document.addEventListener('DOMContentLoaded', function() {
         <a class="bar-card" href="/bars/${bar.id}" aria-label="Apri ${bar.name}">
           <img class="thumb" src="https://source.unsplash.com/random/400x250?bar,${bar.id}" alt="${bar.name}" loading="lazy" width="400" height="100">
           <h3 class="title">${bar.name}</h3>
-          <div class="meta">
-            <span class="rating"><i class="bi bi-star-fill"></i> ${bar.rating || ''}</span>
-            <span class="distance"><i class="bi bi-geo-alt-fill"></i> <span class="distance-text"></span></span>
+          <div class="bar-meta">
+            <span class="bar-rating" data-has-rating="${bar.rating ? 'true' : 'false'}"${bar.rating ? '' : ' hidden'}>
+              <i class="bi bi-star-fill" aria-hidden="true"></i>
+              <span class="rating-value">${bar.rating || ''}</span>
+            </span>
+            <span class="bar-distance" data-has-distance="false" hidden>
+              <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
+              <span class="distance-value"></span>
+            </span>
           </div>
           <address>${bar.address}, ${bar.city}, ${bar.state}</address>
           <p class="desc">${bar.description}</p>
@@ -122,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!isFinite(bLat) || !isFinite(bLon)) return;
       const dist = haversine(uLat, uLon, bLat, bLon);
       item.dataset.distance = dist;
-      const distEl = item.querySelector('.distance-text');
+      const distEl = item.querySelector('.distance-value');
       if (distEl) {
         distEl.textContent = `${dist.toFixed(1)} km`;
       }

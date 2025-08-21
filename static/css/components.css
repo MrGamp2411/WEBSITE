@@ -233,9 +233,11 @@ body.dark-mode{
 .bar-card{flex:0 0 auto;width:clamp(220px,45vw,320px);border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.08);padding:12px;background:var(--surface);scroll-snap-align:start;display:flex;flex-direction:column;gap:12px;text-decoration:none;color:inherit;cursor:pointer;}
 .bar-card .thumb{width:100%;height:100px;object-fit:cover;border-radius:10px;background:#f1f1f1;}
 .bar-card .title{font-size:16px;font-weight:700;margin:0;}
-.bar-card .meta{display:flex;align-items:center;gap:8px;}
-.bar-card .meta .rating{font-size:14px;font-weight:600;display:flex;align-items:center;gap:2px;}
-.bar-card .meta .distance{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:2px;}
+.bar-card .bar-meta{display:flex;align-items:center;gap:8px;}
+.bar-card .bar-meta .bar-rating{font-size:14px;font-weight:600;display:flex;align-items:center;gap:2px;}
+.bar-card .bar-meta .bar-distance{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:2px;}
+.bar-card .bar-meta .bar-rating[data-has-rating="false"],
+.bar-card .bar-meta .bar-distance[data-has-distance="false"]{display:none;}
 .bar-card address{font-style:normal;font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0;}
 .bar-card .desc{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0;}
 .bar-card:focus-visible{outline:2px solid var(--brand);outline-offset:2px;}
@@ -253,14 +255,14 @@ body.dark-mode{
 .grabber{width:48px;height:5px;border-radius:8px;background:var(--muted);margin:0 auto 16px;}
 .filter-sheet .group{margin-top:16px;}
 .filter-sheet .group-head{display:flex;justify-content:space-between;align-items:center;}
-.filter-sheet .group.inactive{opacity:.55;}
-.filter-sheet .group:not(.inactive) .inactive-hint{display:none;}
+.filter-sheet .group[data-active="false"]{opacity:.55;}
+.filter-sheet .group[data-active="true"] .inactive-hint{display:none;}
 .filter-sheet .group .value-chip{margin-left:auto;}
 .sheet-footer{position:sticky;bottom:0;display:flex;gap:12px;padding-top:16px;margin-top:16px;background:var(--bg);}
 .sheet-footer .apply{flex:1;}
 @media (prefers-color-scheme: dark){
   .bar-card{background:#1e293b;}
-  .bar-card .meta .distance,
+  .bar-card .bar-meta .bar-distance,
   .bar-card address,
   .bar-card .desc{color:#94a3b8;}
   .scroll-btn{background:#1e293b;color:#f8fafc;}

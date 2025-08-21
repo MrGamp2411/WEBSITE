@@ -78,6 +78,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const ratingInput = document.getElementById('filterRating');
   const distanceVal = document.getElementById('filterDistanceVal');
   const ratingVal = document.getElementById('filterRatingVal');
+  const distanceAnnounce = document.getElementById('filterDistanceAnnounce');
+  const ratingAnnounce = document.getElementById('filterRatingAnnounce');
   const categoryChips = document.getElementById('filterCategoryChips');
   const categoryVal = document.getElementById('filterCategoryVal');
   const openCheckbox = document.getElementById('filterOpen');
@@ -117,21 +119,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   let bars = await normalizeBars(rawBars, userLoc);
 
   bars.forEach(b => {
-    const rEl = b.el.querySelector('.rating');
+    const rEl = b.el.querySelector('.bar-rating');
     if (rEl) {
-      if (b.rating == null) rEl.hidden = true;
-      else {
+      if (b.rating == null) {
+        rEl.hidden = true;
+        rEl.dataset.hasRating = 'false';
+      } else {
         rEl.hidden = false;
-        const t = rEl.querySelector('.rating-text');
+        rEl.dataset.hasRating = 'true';
+        const t = rEl.querySelector('.rating-value');
         if (t) t.textContent = b.rating.toFixed(1);
       }
     }
-    const dEl = b.el.querySelector('.distance');
+    const dEl = b.el.querySelector('.bar-distance');
     if (dEl) {
-      if (b.distance_km == null) dEl.hidden = true;
-      else {
+      if (b.distance_km == null) {
+        dEl.hidden = true;
+        dEl.dataset.hasDistance = 'false';
+      } else {
         dEl.hidden = false;
-        const t = dEl.querySelector('.distance-text');
+        dEl.dataset.hasDistance = 'true';
+        const t = dEl.querySelector('.distance-value');
         if (t) t.textContent = `${b.distance_km.toFixed(1)} km`;
       }
     }
@@ -256,13 +264,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         distanceInput.value = state.max_km;
         distanceVal.textContent = `${state.max_km} km`;
         distanceVal.hidden = false;
-        group.classList.remove('inactive');
+        group.dataset.active = 'true';
       } else {
         distanceInput.value = distanceInput.defaultValue;
         distanceVal.textContent = '';
         distanceVal.hidden = true;
-        group.classList.add('inactive');
+        group.dataset.active = 'false';
       }
+      distanceInput.setAttribute('aria-valuenow', distanceInput.value);
+      if (distanceAnnounce) distanceAnnounce.textContent = state.active.max_km ? `${state.max_km} km` : '';
     }
     if (ratingInput) {
       const group = ratingInput.closest('.group');
@@ -270,13 +280,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         ratingInput.value = state.min_rating;
         ratingVal.textContent = `≥ ${state.min_rating.toFixed(1)}`;
         ratingVal.hidden = false;
-        group.classList.remove('inactive');
+        group.dataset.active = 'true';
       } else {
         ratingInput.value = ratingInput.defaultValue;
         ratingVal.textContent = '';
         ratingVal.hidden = true;
-        group.classList.add('inactive');
+        group.dataset.active = 'false';
       }
+      ratingInput.setAttribute('aria-valuenow', ratingInput.value);
+      if (ratingAnnounce) ratingAnnounce.textContent = state.active.min_rating ? `${state.min_rating.toFixed(1)}` : '';
     }
     if (categoryChips) {
       const group = categoryChips.closest('.group');
@@ -297,11 +309,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         categoryVal.textContent = text;
         categoryVal.hidden = false;
-        group.classList.remove('inactive');
+        group.dataset.active = 'true';
       } else {
         categoryVal.textContent = '';
         categoryVal.hidden = true;
-        group.classList.add('inactive');
+        group.dataset.active = 'false';
       }
     }
     if (openCheckbox) {
@@ -309,7 +321,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       openCheckbox.checked = state.open_now;
       openVal.textContent = state.open_now ? 'Sì' : 'No';
       openVal.hidden = !state.active.open_now;
-      group.classList.toggle('inactive', !state.active.open_now);
+      group.dataset.active = state.active.open_now ? 'true' : 'false';
     }
     applyBtn && (applyBtn.disabled = Object.values(state.active).filter(Boolean).length === 0);
   }
@@ -412,6 +424,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     updateControls();
   });
+
+  function rangeKeyHandler(e) {
+    const input = e.target;
+    const step = Number(input.step) || 1;
+    const min = Number(input.min) || 0;
+    const max = Number(input.max) || 100;
+    let val = Number(input.value);
+    switch(e.key){
+      case 'ArrowUp':
+      case 'ArrowRight':
+        val = Math.min(val + step, max); break;
+      case 'ArrowDown':
+      case 'ArrowLeft':
+        val = Math.max(val - step, min); break;
+      case 'PageUp':
+        val = Math.min(val + step*5, max); break;
+      case 'PageDown':
+        val = Math.max(val - step*5, min); break;
+      case 'Home':
+        val = min; break;
+      case 'End':
+        val = max; break;
+      default:
+        return;
+    }
+    e.preventDefault();
+    input.value = val;
+    input.dispatchEvent(new Event('input', {bubbles:true}));
+  }
+
+  distanceInput?.addEventListener('keydown', rangeKeyHandler);
+  ratingInput?.addEventListener('keydown', rangeKeyHandler);
 
   filterForm?.addEventListener('submit', e => {
     e.preventDefault();
