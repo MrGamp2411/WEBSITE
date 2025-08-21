@@ -85,12 +85,14 @@ document.addEventListener('DOMContentLoaded', function() {
       updatePreview(searchInput.value);
     });
     searchInput.addEventListener('blur', () => {
-      searchInput.classList.remove('expanded');
-      if (searchResults) {
-        setTimeout(() => searchResults.hidden = true, 100);
-      }
-      if (searchOverlay) {
-        setTimeout(() => searchOverlay.hidden = true, 100);
+      if (searchInput.value.trim() === '') {
+        searchInput.classList.remove('expanded');
+        if (searchResults) {
+          setTimeout(() => searchResults.hidden = true, 100);
+        }
+        if (searchOverlay) {
+          setTimeout(() => searchOverlay.hidden = true, 100);
+        }
       }
     });
     searchInput.addEventListener('keydown', (e) => {
@@ -102,7 +104,11 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   if (searchOverlay) {
-    searchOverlay.addEventListener('click', () => searchInput.blur());
+    searchOverlay.addEventListener('click', () => {
+      if (searchInput.value.trim() === '') {
+        searchInput.blur();
+      }
+    });
   }
 
   const allBarItems = document.querySelectorAll('ul.bars li');
