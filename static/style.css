@@ -92,6 +92,7 @@ body.dark-mode{
 }
 .search-suggestions.show{display:block;}
 .search-suggestions .card{margin:var(--space-1);}
+.search-suggestions li{cursor:pointer;}
 .location-display{
   cursor:text;
   border:0;

@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
     const items = bars.map(bar => `
-      <li>
+      <li data-bar-id="${bar.id}">
         <article class="card" itemscope itemtype="https://schema.org/BarOrPub">
           <img class="card__media" src="https://source.unsplash.com/random/400x250?bar,${bar.id}" alt="${bar.name}" itemprop="image" loading="lazy" decoding="async">
           <div class="card__body">
@@ -71,6 +71,16 @@ document.addEventListener('DOMContentLoaded', function() {
       if (e.key === 'Enter') {
         e.preventDefault();
         window.location.href = `/search?q=${encodeURIComponent(searchInput.value)}`;
+      }
+    });
+  }
+
+  if (suggestionsBox) {
+    suggestionsBox.addEventListener('click', (e) => {
+      const li = e.target.closest('li[data-bar-id]');
+      if (li) {
+        const id = li.getAttribute('data-bar-id');
+        window.location.href = `/bars/${id}`;
       }
     });
   }
