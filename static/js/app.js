@@ -236,16 +236,70 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const menuToggles = document.querySelectorAll('.js-open-menu');
   const mobileMenu = document.getElementById('mobileMenu');
-  if (menuToggles.length && mobileMenu) {
-    menuToggles.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const expanded = btn.getAttribute('aria-expanded') === 'true';
-        menuToggles.forEach(t => t.setAttribute('aria-expanded', String(!expanded)));
-        mobileMenu.hidden = expanded;
-        mobileMenu.classList.toggle('open', !expanded);
-      });
+  const backdrop = document.querySelector('.menu-backdrop');
+  let activeToggle;
+  let lastFocused;
+
+  function openMenu(btn) {
+    activeToggle = btn;
+    lastFocused = document.activeElement;
+    activeToggle.setAttribute('aria-expanded', 'true');
+    mobileMenu.hidden = false;
+    backdrop.hidden = false;
+    requestAnimationFrame(() => {
+      mobileMenu.classList.add('open');
+      backdrop.classList.add('show');
     });
+    document.body.style.overflow = 'hidden';
+    const firstItem = mobileMenu.querySelector('[role="menuitem"]');
+    firstItem && firstItem.focus();
   }
+
+  function closeMenu() {
+    activeToggle && activeToggle.setAttribute('aria-expanded', 'false');
+    mobileMenu.classList.remove('open');
+    backdrop.classList.remove('show');
+    document.body.style.overflow = '';
+    mobileMenu.hidden = true;
+    backdrop.hidden = true;
+    lastFocused && lastFocused.focus();
+  }
+
+  menuToggles.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      expanded ? closeMenu() : openMenu(btn);
+    });
+  });
+
+  backdrop?.addEventListener('click', closeMenu);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !mobileMenu.hidden) {
+      closeMenu();
+    }
+  });
+
+  mobileMenu?.addEventListener('click', (e) => {
+    if (e.target.closest('[role="menuitem"]')) {
+      closeMenu();
+    }
+  });
+
+  mobileMenu?.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const items = mobileMenu.querySelectorAll('[role="menuitem"]');
+    if (!items.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
 
   document.querySelector('.js-open-search')?.addEventListener('click', () => {
     const ov = document.querySelector('.search-overlay');
