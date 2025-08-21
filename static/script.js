@@ -1,57 +1,117 @@
 document.addEventListener('DOMContentLoaded', function() {
   const searchInput = document.getElementById('barSearch');
   const barList = document.getElementById('barList');
-  if (searchInput && barList) {
-    searchInput.addEventListener('keyup', function() {
-      const term = this.value.toLowerCase();
-      barList.querySelectorAll('li').forEach(item => {
-        const {name, address, city = '', state = ''} = item.dataset;
-        item.style.display = (name.includes(term) || address.includes(term) || city.includes(term) || state.includes(term)) ? '' : 'none';
-      });
+  const nearestBarEl = document.getElementById('nearestBar');
+  const locationDisplay = document.getElementById('currentLocation');
+
+  function filterBars(term) {
+    if (!barList) return;
+    const t = term.toLowerCase();
+    barList.querySelectorAll('li').forEach(item => {
+      const {name, address, city = '', state = ''} = item.dataset;
+      item.style.display = (name.includes(t) || address.includes(t) || city.includes(t) || state.includes(t)) ? '' : 'none';
     });
   }
 
+  if (searchInput && barList) {
+    searchInput.addEventListener('keyup', () => filterBars(searchInput.value));
+  }
+
   const allBarItems = document.querySelectorAll('ul.bars li');
-  if (allBarItems.length && navigator.geolocation) {
-    const nearestBarEl = document.getElementById('nearestBar');
-    navigator.geolocation.getCurrentPosition(pos => {
-      const {latitude: uLat, longitude: uLon} = pos.coords;
 
-      allBarItems.forEach(item => {
-        const bLat = parseFloat(item.dataset.latitude);
-        const bLon = parseFloat(item.dataset.longitude);
-        if (!isFinite(bLat) || !isFinite(bLon)) return;
-        const dist = haversine(uLat, uLon, bLat, bLon);
-        item.dataset.distance = dist;
-        const distEl = item.querySelector('.distance');
-        if (distEl) {
-          const link = document.createElement('a');
-          link.textContent = `📍 ${dist.toFixed(1)} km away`;
-          link.href = '#';
-          link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const isApple = /iPad|iPhone|Mac/i.test(navigator.platform);
-            const url = isApple
-              ? `https://maps.apple.com/?daddr=${bLat},${bLon}`
-              : `https://www.google.com/maps/dir/?api=1&destination=${bLat},${bLon}`;
-            window.open(url, '_blank');
-          });
-          distEl.innerHTML = '';
-          distEl.appendChild(link);
-        }
-      });
-
-      if (barList) {
-        const items = Array.from(barList.querySelectorAll('li'));
-        items.sort((a, b) => parseFloat(a.dataset.distance) - parseFloat(b.dataset.distance));
-        items.forEach(item => barList.appendChild(item));
-        if (nearestBarEl && items.length) {
-          const nearest = items[0];
-          const name = nearest.querySelector('.card__title').textContent;
-          nearestBarEl.textContent = `Nearest bar: ${name} (${parseFloat(nearest.dataset.distance).toFixed(1)} km)`;
-        }
+  function updateDistances(uLat, uLon) {
+    allBarItems.forEach(item => {
+      const bLat = parseFloat(item.dataset.latitude);
+      const bLon = parseFloat(item.dataset.longitude);
+      if (!isFinite(bLat) || !isFinite(bLon)) return;
+      const dist = haversine(uLat, uLon, bLat, bLon);
+      item.dataset.distance = dist;
+      const distEl = item.querySelector('.distance');
+      if (distEl) {
+        const link = document.createElement('a');
+        link.textContent = `📍 ${dist.toFixed(1)} km away`;
+        link.href = '#';
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const isApple = /iPad|iPhone|Mac/i.test(navigator.platform);
+          const url = isApple
+            ? `https://maps.apple.com/?daddr=${bLat},${bLon}`
+            : `https://www.google.com/maps/dir/?api=1&destination=${bLat},${bLon}`;
+          window.open(url, '_blank');
+        });
+        distEl.innerHTML = '';
+        distEl.appendChild(link);
       }
     });
+
+    if (barList) {
+      const items = Array.from(barList.querySelectorAll('li')).filter(li => li.style.display !== 'none');
+      items.sort((a, b) => parseFloat(a.dataset.distance) - parseFloat(b.dataset.distance));
+      items.forEach(item => barList.appendChild(item));
+      if (nearestBarEl && items.length) {
+        const nearest = items[0];
+        const name = nearest.querySelector('.card__title').textContent;
+        nearestBarEl.textContent = `Nearest bar: ${name} (${parseFloat(nearest.dataset.distance).toFixed(1)} km)`;
+      }
+    }
+  }
+
+  function reverseGeocode(lat, lon) {
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!locationDisplay) return;
+        if (data.address) {
+          const city = data.address.city || data.address.town || data.address.village;
+          const postal = data.address.postcode;
+          if (city) {
+            locationDisplay.textContent = postal ? `${city}, ${postal}` : city;
+            return;
+          }
+        }
+        locationDisplay.textContent = data.display_name || `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+      })
+      .catch(() => {
+        if (locationDisplay) locationDisplay.textContent = `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+      });
+  }
+
+  function setLocation(lat, lon, label) {
+    updateDistances(lat, lon);
+    if (locationDisplay) {
+      locationDisplay.textContent = label || `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
+    }
+    reverseGeocode(lat, lon);
+  }
+
+  if (allBarItems.length) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const {latitude, longitude} = pos.coords;
+        setLocation(latitude, longitude);
+      });
+    }
+
+    if (locationDisplay) {
+      locationDisplay.addEventListener('click', () => {
+        const city = prompt('Enter city', locationDisplay.textContent);
+        if (!city) return;
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(city)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.length) {
+              const {lat, lon, address} = data[0];
+              const labelCity = address?.city || address?.town || address?.village || city;
+              const labelPost = address?.postcode ? `, ${address.postcode}` : '';
+              setLocation(parseFloat(lat), parseFloat(lon), `${labelCity}${labelPost}`);
+              if (searchInput) {
+                searchInput.value = city;
+                filterBars(city);
+              }
+            }
+          });
+      });
+    }
   }
 
   function haversine(lat1, lon1, lat2, lon2) {

@@ -23,6 +23,8 @@
         <span class="chip">Credit: CHF {{ "%.2f"|format(user.credit) }}</span>
         <a class="btn" href="/topup">Top Up</a>
         {% endif %}
+        <span id="currentLocation" class="location-display">Detecting location...</span>
+        <input type="text" id="barSearch" placeholder="Search bars...">
       </div>
         <div class="nav-right">
           <a class="cart" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
