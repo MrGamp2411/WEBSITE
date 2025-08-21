@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
+  const nav = document.querySelector('.navbar');
+  if (nav) {
+    const onScroll = () => nav.classList.toggle('is-scrolled', window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
   const searchInput = document.getElementById('barSearch');
   const barList = document.getElementById('barList');
   const nearestBarEl = document.getElementById('nearestBar');
