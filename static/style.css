@@ -72,7 +72,15 @@ body.dark-mode{
 
 .top-controls{display:flex;align-items:center;gap:var(--space-2);}
 .top-controls input{padding:var(--space-1);}
-.location-display{cursor:pointer;}
+.location-display{
+  cursor:text;
+  border:0;
+  background:transparent;
+  color:inherit;
+}
+.location-display:focus{
+  outline:1px solid #d1d5db;
+}
 
 @media (prefers-reduced-motion: reduce){*{animation:none;transition:none}}
 
