@@ -387,11 +387,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   distanceToggle?.addEventListener('change', e => {
     state.active.max_km = e.target.checked;
+    state.max_km = e.target.checked ? +distanceInput.value : null;
     updateControls();
   });
 
   ratingToggle?.addEventListener('change', e => {
     state.active.min_rating = e.target.checked;
+    state.min_rating = e.target.checked ? +ratingInput.value : null;
     updateControls();
   });
 
