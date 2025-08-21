@@ -6,6 +6,7 @@
     <input id="barSearch" type="search" placeholder="Cerca un bar o una città…" aria-label="Cerca bar o città" inputmode="search" autocomplete="off">
     <button id="filterBtn" class="filter-btn" aria-label="Filtri">
       <i class="bi bi-sliders"></i>
+      <span id="filterCount" class="cart-badge" hidden></span>
     </button>
   </div>
   {% if bars %}
@@ -34,8 +35,8 @@
           {% endif %}
           <h3 class="title" itemprop="name">{{ bar.name }}</h3>
           <div class="meta">
-            <span class="rating"><i class="bi bi-star-fill"></i> {{ bar.rating or '4.7' }}</span>
-            <span class="distance"><i class="bi bi-geo-alt-fill"></i> <span class="distance-text">{% if bar.distance_km %}{{ bar.distance_km }} km{% endif %}</span></span>
+            <span class="rating" hidden><i class="bi bi-star-fill"></i> <span class="rating-text"></span></span>
+            <span class="distance" hidden><i class="bi bi-geo-alt-fill"></i> <span class="distance-text"></span></span>
           </div>
           {% if bar.address_short or bar.address %}<address>{{ bar.address_short or bar.address }}</address>{% endif %}
           {% if bar.description_short or bar.description %}<p class="desc">{{ bar.description_short or bar.description }}</p>{% endif %}
