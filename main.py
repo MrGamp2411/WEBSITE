@@ -1067,28 +1067,96 @@ async def admin_profile(request: Request):
 
 
 @app.get("/admin/users", response_class=HTMLResponse)
-async def admin_users_view(request: Request):
+async def admin_users_view(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request)
     if not user or not user.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    return render_template("admin_users.html", request=request, users=users.values(), bars=bars)
+    # Synchronise in-memory users with the database so the list is always
+    # up to date even after a restart.
+    db_users = db.query(User).all()
+    role_map = {
+        RoleEnum.SUPERADMIN: "super_admin",
+        RoleEnum.BARADMIN: "bar_admin",
+        RoleEnum.BARTENDER: "bartender",
+        RoleEnum.CUSTOMER: "customer",
+    }
+    for db_user in db_users:
+        existing = users.get(db_user.id)
+        if existing:
+            existing.username = db_user.username
+            existing.email = db_user.email
+            existing.phone = db_user.phone or ""
+            existing.prefix = db_user.prefix or ""
+            existing.role = role_map.get(db_user.role, "customer")
+        else:
+            demo = DemoUser(
+                id=db_user.id,
+                username=db_user.username,
+                password="",
+                email=db_user.email,
+                phone=db_user.phone or "",
+                prefix=db_user.prefix or "",
+                role=role_map.get(db_user.role, "customer"),
+            )
+            users[demo.id] = demo
+            users_by_username[demo.username] = demo
+            users_by_email[demo.email] = demo
+    return render_template(
+        "admin_users.html",
+        request=request,
+        user=user,
+        users=users.values(),
+        bars=bars,
+    )
 
 
 @app.get("/admin/users/edit/{user_id}", response_class=HTMLResponse)
-async def edit_user(request: Request, user_id: int):
+async def edit_user(request: Request, user_id: int, db: Session = Depends(get_db)):
     current = get_current_user(request)
     if not current or not current.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     user = users.get(user_id)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        db_user = db.query(User).filter(User.id == user_id).first()
+        if not db_user:
+            raise HTTPException(status_code=404, detail="User not found")
+        role_map = {
+            RoleEnum.SUPERADMIN: "super_admin",
+            RoleEnum.BARADMIN: "bar_admin",
+            RoleEnum.BARTENDER: "bartender",
+            RoleEnum.CUSTOMER: "customer",
+        }
+        user = DemoUser(
+            id=db_user.id,
+            username=db_user.username,
+            password="",
+            email=db_user.email,
+            phone=db_user.phone or "",
+            prefix=db_user.prefix or "",
+            role=role_map.get(db_user.role, "customer"),
+        )
+        users[user.id] = user
+        users_by_username[user.username] = user
+        users_by_email[user.email] = user
     username = request.query_params.get("username")
     password = request.query_params.get("password")
+    email = request.query_params.get("email")
+    prefix = request.query_params.get("prefix")
+    phone = request.query_params.get("phone")
     role = request.query_params.get("role")
     bar_id = request.query_params.get("bar_id")
     credit = request.query_params.get("credit")
-    if username and password and role is not None and credit is not None:
-        if username != user.username and username in users_by_username:
+    if (
+        username
+        and password
+        and email is not None
+        and role is not None
+        and credit is not None
+    ):
+        if username != user.username and (
+            username in users_by_username
+            or db.query(User).filter(User.username == username).first()
+        ):
             return render_template(
                 "admin_edit_user.html",
                 request=request,
@@ -1096,12 +1164,32 @@ async def edit_user(request: Request, user_id: int):
                 bars=bars.values(),
                 error="Username already taken",
             )
+        if email != user.email and (
+            email in users_by_email
+            or db.query(User).filter(User.email == email).first()
+        ):
+            return render_template(
+                "admin_edit_user.html",
+                request=request,
+                user=user,
+                bars=bars.values(),
+                error="Email already taken",
+            )
         # Update username mapping
         if username != user.username:
             del users_by_username[user.username]
             user.username = username
             users_by_username[user.username] = user
+        # Update email mapping
+        if email != user.email:
+            del users_by_email[user.email]
+            user.email = email
+            users_by_email[user.email] = user
+        else:
+            user.email = email
         user.password = password
+        user.prefix = prefix or ""
+        user.phone = phone or ""
         user.role = role
         user.bar_id = int(bar_id) if bar_id else None
         try:
@@ -1114,8 +1202,26 @@ async def edit_user(request: Request, user_id: int):
                 bars=bars.values(),
                 error="Invalid credit amount",
             )
+        db_user = db.query(User).filter(User.id == user_id).first()
+        if not db_user:
+            raise HTTPException(status_code=404, detail="User not found")
+        db_user.username = username
+        db_user.email = email
+        db_user.prefix = prefix or None
+        db_user.phone = phone or None
+        db_user.password_hash = hashlib.sha256(password.encode("utf-8")).hexdigest()
+        role_enum_map = {
+            "super_admin": RoleEnum.SUPERADMIN,
+            "bar_admin": RoleEnum.BARADMIN,
+            "bartender": RoleEnum.BARTENDER,
+            "customer": RoleEnum.CUSTOMER,
+        }
+        db_user.role = role_enum_map.get(role, RoleEnum.CUSTOMER)
+        db.commit()
         return RedirectResponse(url="/admin/users", status_code=status.HTTP_303_SEE_OTHER)
-    return render_template("admin_edit_user.html", request=request, user=user, bars=bars.values())
+    return render_template(
+        "admin_edit_user.html", request=request, user=user, bars=bars.values()
+    )
 
 
 @app.get("/bar/{bar_id}/categories/new", response_class=HTMLResponse)

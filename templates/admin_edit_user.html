@@ -9,6 +9,15 @@
   <label for="password">Password
     <input id="password" name="password" value="{{ user.password }}">
   </label>
+  <label for="email">Email
+    <input id="email" name="email" value="{{ user.email }}">
+  </label>
+  <label for="prefix">Prefix
+    <input id="prefix" name="prefix" value="{{ user.prefix }}">
+  </label>
+  <label for="phone">Phone
+    <input id="phone" name="phone" value="{{ user.phone }}">
+  </label>
   <label for="role">Role
     <select id="role" name="role">
       <option value="super_admin" {% if user.role=='super_admin' %}selected{% endif %}>Super Admin</option>
