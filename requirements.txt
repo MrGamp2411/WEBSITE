@@ -5,3 +5,6 @@ itsdangerous
 starlette
 python-dotenv
 python-multipart
+sqlalchemy
+alembic
+psycopg2-binary
