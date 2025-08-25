@@ -5,7 +5,15 @@ from sqlalchemy.pool import StaticPool
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL environment variable is required")
+    user = os.getenv("POSTGRES_USER")
+    password = os.getenv("POSTGRES_PASSWORD")
+    db = os.getenv("POSTGRES_DB")
+    host = os.getenv("POSTGRES_HOST", "postgres")
+    port = os.getenv("POSTGRES_PORT", "5432")
+    if user and password and db:
+        DATABASE_URL = f"postgresql://{user}:{password}@{host}:{port}/{db}"
+    else:
+        raise RuntimeError("DATABASE_URL environment variable is required")
 
 # Use a StaticPool for in-memory SQLite so connections share the same DB.
 if DATABASE_URL.startswith("sqlite"):
