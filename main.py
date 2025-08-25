@@ -631,12 +631,20 @@ async def topup(request: Request):
 
 
 @app.get("/register", response_class=HTMLResponse)
+async def register_form(request: Request):
+    """Display the registration form."""
+    return render_template("register.html", request=request)
+
+
+@app.post("/register", response_class=HTMLResponse)
 async def register(request: Request):
-    username = request.query_params.get("username")
-    password = request.query_params.get("password")
-    email = request.query_params.get("email")
-    phone = request.query_params.get("phone")
-    prefix = request.query_params.get("prefix")
+    """Handle user registration submissions."""
+    form = await request.form()
+    username = form.get("username")
+    password = form.get("password")
+    email = form.get("email")
+    phone = form.get("phone")
+    prefix = form.get("prefix")
     if all([username, password, email, phone, prefix]):
         if username in users_by_username:
             return render_template("register.html", request=request, error="Username already taken")
@@ -656,20 +664,28 @@ async def register(request: Request):
         users_by_username[user.username] = user
         users_by_email[user.email] = user
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
-    return render_template("register.html", request=request)
+    return render_template("register.html", request=request, error="All fields are required")
 
 
 @app.get("/login", response_class=HTMLResponse)
+async def login_form(request: Request):
+    """Display the login form."""
+    return render_template("login.html", request=request)
+
+
+@app.post("/login", response_class=HTMLResponse)
 async def login(request: Request):
-    email = request.query_params.get("email")
-    password = request.query_params.get("password")
+    """Handle login submissions."""
+    form = await request.form()
+    email = form.get("email")
+    password = form.get("password")
     if email and password:
         user = users_by_email.get(email)
         if not user or user.password != password:
             return render_template("login.html", request=request, error="Invalid credentials")
         request.session["user_id"] = user.id
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
-    return render_template("login.html", request=request)
+    return render_template("login.html", request=request, error="Email and password required")
 
 
 @app.get("/logout")
