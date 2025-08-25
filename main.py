@@ -41,6 +41,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -263,10 +264,21 @@ def seed_super_admin():
     finally:
         db.close()
 
+
+def ensure_prefix_column():
+    """Add the `prefix` column to users table if it's missing."""
+    inspector = inspect(engine)
+    columns = [col["name"] for col in inspector.get_columns("users")]
+    if "prefix" not in columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN prefix VARCHAR(10)"))
+
+
 @app.on_event("startup")
 def on_startup():
     """Initialise database tables on startup."""
     Base.metadata.create_all(bind=engine)
+    ensure_prefix_column()
     seed_super_admin()
 
 
