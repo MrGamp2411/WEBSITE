@@ -41,6 +41,8 @@ from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from starlette.middleware.sessions import SessionMiddleware
 
+from database import Base, engine
+
 # Load environment variables from a .env file if present
 load_dotenv()
 
@@ -218,6 +220,11 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Enable server-side sessions for authentication
 app.add_middleware(SessionMiddleware, secret_key="dev-secret")
+
+
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=engine)
 
 # Jinja2 environment for rendering HTML templates
 templates_env = Environment(
