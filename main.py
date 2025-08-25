@@ -35,13 +35,16 @@ import os
 from typing import Dict, List, Optional
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 
-from database import Base, engine
+from database import Base, SessionLocal, engine, get_db
+from models import Bar as BarModel
+from pydantic import BaseModel
 
 # Load environment variables from a .env file if present
 load_dotenv()
@@ -225,6 +228,15 @@ app.add_middleware(SessionMiddleware, secret_key="dev-secret")
 @app.on_event("startup")
 def on_startup():
     Base.metadata.create_all(bind=engine)
+    # Create a sample bar if none exist so the API returns data immediately
+    db = SessionLocal()
+    try:
+        if not db.query(BarModel).first():
+            sample = BarModel(name="Sample Bar", slug="sample-bar")
+            db.add(sample)
+            db.commit()
+    finally:
+        db.close()
 
 # Jinja2 environment for rendering HTML templates
 templates_env = Environment(
@@ -446,6 +458,43 @@ async def api_search(q: str = ""):
         if term in bar.name.lower() or term in bar.address.lower() or term in bar.city.lower() or term in bar.state.lower()
     ]
     return {"bars": results}
+
+
+# -----------------------------------------------------------------------------
+# Simple database-backed Bar API
+# -----------------------------------------------------------------------------
+
+
+class BarCreate(BaseModel):
+    name: str
+    slug: str
+    address: Optional[str] = None
+
+
+class BarRead(BaseModel):
+    id: int
+    name: str
+    slug: str
+    address: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
+
+@app.get("/api/bars", response_model=List[BarRead])
+def list_bars(db: Session = Depends(get_db)):
+    """Return all bars stored in the database."""
+    return db.query(BarModel).all()
+
+
+@app.post("/api/bars", response_model=BarRead, status_code=status.HTTP_201_CREATED)
+def create_bar(data: BarCreate, db: Session = Depends(get_db)):
+    """Create a new bar in the database."""
+    bar = BarModel(**data.dict())
+    db.add(bar)
+    db.commit()
+    db.refresh(bar)
+    return bar
 
 
 @app.get("/bars/{bar_id}", response_class=HTMLResponse)
