@@ -49,13 +49,14 @@ from database import Base, SessionLocal, engine, get_db
 from models import (
     Bar as BarModel,
     MenuItem,
+    MenuVariant,
     Order,
     OrderItem,
     Payout,
     User,
     RoleEnum,
     UserBarRole,
-    Category,
+    Category as CategoryModel,
 )
 from pydantic import BaseModel
 from decimal import Decimal
@@ -1073,9 +1074,22 @@ async def delete_bar(request: Request, bar_id: int, db: Session = Depends(get_db
     bar = db.get(BarModel, bar_id)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
-    db.query(MenuItem).filter(MenuItem.bar_id == bar_id).delete()
-    db.query(Category).filter(Category.bar_id == bar_id).delete()
-    db.query(UserBarRole).filter(UserBarRole.bar_id == bar_id).delete()
+    # Remove dependent records to satisfy foreign key constraints
+    menu_item_ids = [m.id for m in db.query(MenuItem.id).filter(MenuItem.bar_id == bar_id)]
+    if menu_item_ids:
+        db.query(MenuVariant).filter(MenuVariant.menu_item_id.in_(menu_item_ids)).delete(synchronize_session=False)
+    db.query(MenuItem).filter(MenuItem.bar_id == bar_id).delete(synchronize_session=False)
+
+    db.query(CategoryModel).filter(CategoryModel.bar_id == bar_id).delete(synchronize_session=False)
+    db.query(UserBarRole).filter(UserBarRole.bar_id == bar_id).delete(synchronize_session=False)
+
+    order_ids = [o.id for o in db.query(Order.id).filter(Order.bar_id == bar_id)]
+    if order_ids:
+        db.query(OrderItem).filter(OrderItem.order_id.in_(order_ids)).delete(synchronize_session=False)
+    db.query(Order).filter(Order.bar_id == bar_id).delete(synchronize_session=False)
+
+    db.query(Payout).filter(Payout.bar_id == bar_id).delete(synchronize_session=False)
+
     db.delete(bar)
     db.commit()
     bars.pop(bar_id, None)
