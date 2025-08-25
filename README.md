@@ -19,3 +19,14 @@ instance automatically.
 - Tables are created on startup if they do not yet exist.
 
 This is a starting point for adding persistent storage and role-based features.
+
+## API
+
+The application exposes minimal database-backed endpoints to illustrate
+integration:
+
+- `GET /api/bars` – list bars stored in the PostgreSQL database.
+- `POST /api/bars` – create a new bar by providing `name` and `slug`.
+
+A sample bar is automatically created on startup if the database is empty so the
+listing endpoint immediately returns data.
