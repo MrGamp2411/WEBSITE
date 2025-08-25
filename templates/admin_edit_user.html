@@ -2,12 +2,12 @@
 {% block content %}
 <h1>Edit User {{ user.username }}</h1>
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-<form class="form" method="get">
+<form class="form" method="post">
   <label for="username">Username
     <input id="username" name="username" value="{{ user.username }}">
   </label>
   <label for="password">Password
-    <input id="password" name="password" value="{{ user.password }}">
+    <input id="password" name="password" type="password" placeholder="Leave blank to keep current">
   </label>
   <label for="email">Email
     <input id="email" name="email" value="{{ user.email }}">
