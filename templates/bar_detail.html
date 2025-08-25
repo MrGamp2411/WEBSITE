@@ -5,10 +5,16 @@
 {% if error %}
 <p class="error">{{ error }}</p>
 {% endif %}
-{% for category, products in products_by_category.items() %}
+{% for category, products in products_by_category %}
   <section class="category">
     <h2>{{ category.name }}</h2>
     <p>{{ category.description }}</p>
+    {% if category.photo_url %}
+    <img src="{{ category.photo_url }}" alt="{{ category.name }} photo" style="max-width:200px;"/>
+    {% endif %}
+    {% if user and (user.is_super_admin or (user.bar_id == bar.id and (user.is_bar_admin or user.is_bartender))) %}
+    <a class="btn btn--small" href="/bar/{{ bar.id }}/categories/{{ category.id }}/edit">Edit Category</a>
+    {% endif %}
     <ul class="products">
       {% for product in products %}
       <li>

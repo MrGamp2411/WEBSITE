@@ -36,7 +36,7 @@ import hashlib
 from typing import Dict, List, Optional
 from datetime import datetime
 
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi import Depends, FastAPI, HTTPException, Request, status, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -46,6 +46,7 @@ from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 
 from database import Base, SessionLocal, engine, get_db
+from uuid import uuid4
 from models import (
     Bar as BarModel,
     MenuItem,
@@ -73,19 +74,37 @@ from audit import log_action
 # -----------------------------------------------------------------------------
 
 class Category:
-    def __init__(self, id: int, name: str, description: str):
+    def __init__(
+        self,
+        id: int,
+        name: str,
+        description: str,
+        display_order: int = 0,
+        photo_url: Optional[str] = None,
+    ):
         self.id = id
         self.name = name
         self.description = description
+        self.display_order = display_order
+        self.photo_url = photo_url
 
 
 class Product:
-    def __init__(self, id: int, category_id: int, name: str, price: float, description: str):
+    def __init__(
+        self,
+        id: int,
+        category_id: int,
+        name: str,
+        price: float,
+        description: str,
+        photo_url: Optional[str] = None,
+    ):
         self.id = id
         self.category_id = category_id
         self.name = name
         self.price = price
         self.description = description
+        self.photo_url = photo_url
 
 
 class Table:
@@ -634,14 +653,15 @@ async def bar_detail(request: Request, bar_id: int):
     products_by_category: Dict[Category, List[Product]] = {}
     for prod in bar.products.values():
         category = bar.categories.get(prod.category_id)
-        if category not in products_by_category:
-            products_by_category[category] = []
-        products_by_category[category].append(prod)
+        products_by_category.setdefault(category, []).append(prod)
+    sorted_products = sorted(
+        products_by_category.items(), key=lambda kv: kv[0].display_order
+    )
     return render_template(
         "bar_detail.html",
         request=request,
         bar=bar,
-        products_by_category=products_by_category,
+        products_by_category=sorted_products,
     )
 
 
@@ -959,7 +979,17 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
     latitude = form.get("latitude")
     longitude = form.get("longitude")
     description = form.get("description")
-    photo_url = form.get("photo_url")
+    photo_file = form.get("photo")
+    photo_url = None
+    if isinstance(photo_file, UploadFile) and photo_file.filename:
+        uploads_dir = os.path.join("static", "uploads")
+        os.makedirs(uploads_dir, exist_ok=True)
+        _, ext = os.path.splitext(photo_file.filename)
+        filename = f"{uuid4().hex}{ext}"
+        file_path = os.path.join(uploads_dir, filename)
+        with open(file_path, "wb") as f:
+            f.write(await photo_file.read())
+        photo_url = f"/static/uploads/{filename}"
     if not all([name, address, city, state, latitude, longitude, description]):
         return render_template("admin_new_bar.html", request=request, error="All fields are required")
     try:
@@ -1034,7 +1064,17 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
     latitude = form.get("latitude")
     longitude = form.get("longitude")
     description = form.get("description")
-    photo_url = form.get("photo_url")
+    photo_file = form.get("photo")
+    photo_url = bar.photo_url
+    if isinstance(photo_file, UploadFile) and photo_file.filename:
+        uploads_dir = os.path.join("static", "uploads")
+        os.makedirs(uploads_dir, exist_ok=True)
+        _, ext = os.path.splitext(photo_file.filename)
+        filename = f"{uuid4().hex}{ext}"
+        file_path = os.path.join(uploads_dir, filename)
+        with open(file_path, "wb") as f:
+            f.write(await photo_file.read())
+        photo_url = f"/static/uploads/{filename}"
     if all([name, address, city, state, latitude, longitude, description]):
         try:
             lat = float(latitude)
@@ -1405,19 +1445,128 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
 
 
 @app.get("/bar/{bar_id}/categories/new", response_class=HTMLResponse)
+async def bar_new_category_form(request: Request, bar_id: int):
+    user = get_current_user(request)
+    bar = bars.get(bar_id)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    if not user or not (
+        user.is_super_admin
+        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template("bar_new_category.html", request=request, bar=bar)
+
+
+@app.post("/bar/{bar_id}/categories/new")
 async def bar_new_category(request: Request, bar_id: int):
     user = get_current_user(request)
     bar = bars.get(bar_id)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
-    if not user or not (user.is_super_admin or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))):
+    if not user or not (
+        user.is_super_admin
+        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+    ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    name = request.query_params.get("name")
-    description = request.query_params.get("description")
-    if name and description:
-        global next_category_id
-        category = Category(id=next_category_id, name=name, description=description)
-        next_category_id += 1
-        bar.categories[category.id] = category
-        return RedirectResponse(url=f"/bars/{bar_id}", status_code=status.HTTP_303_SEE_OTHER)
-    return render_template("bar_new_category.html", request=request, bar=bar)
+    form = await request.form()
+    name = form.get("name")
+    description = form.get("description")
+    display_order = form.get("display_order") or 0
+    photo_file = form.get("photo")
+    photo_url = None
+    if isinstance(photo_file, UploadFile) and photo_file.filename:
+        uploads_dir = os.path.join("static", "uploads")
+        os.makedirs(uploads_dir, exist_ok=True)
+        _, ext = os.path.splitext(photo_file.filename)
+        filename = f"{uuid4().hex}{ext}"
+        file_path = os.path.join(uploads_dir, filename)
+        with open(file_path, "wb") as f:
+            f.write(await photo_file.read())
+        photo_url = f"/static/uploads/{filename}"
+    if not name or not description:
+        return render_template(
+            "bar_new_category.html",
+            request=request,
+            bar=bar,
+            error="Name and description are required",
+        )
+    try:
+        order_val = int(display_order)
+    except ValueError:
+        order_val = 0
+    global next_category_id
+    category = Category(
+        id=next_category_id,
+        name=name,
+        description=description,
+        display_order=order_val,
+        photo_url=photo_url,
+    )
+    next_category_id += 1
+    bar.categories[category.id] = category
+    return RedirectResponse(url=f"/bars/{bar_id}", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.get(
+    "/bar/{bar_id}/categories/{category_id}/edit", response_class=HTMLResponse
+)
+async def bar_edit_category_form(
+    request: Request, bar_id: int, category_id: int
+):
+    user = get_current_user(request)
+    bar = bars.get(bar_id)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    if not user or not (
+        user.is_super_admin
+        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template(
+        "bar_edit_category.html", request=request, bar=bar, category=category
+    )
+
+
+@app.post("/bar/{bar_id}/categories/{category_id}/edit")
+async def bar_edit_category(
+    request: Request, bar_id: int, category_id: int
+):
+    user = get_current_user(request)
+    bar = bars.get(bar_id)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    if not user or not (
+        user.is_super_admin
+        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    name = form.get("name")
+    description = form.get("description")
+    display_order = form.get("display_order") or category.display_order
+    photo_file = form.get("photo")
+    if name:
+        category.name = name
+    if description:
+        category.description = description
+    try:
+        category.display_order = int(display_order)
+    except ValueError:
+        pass
+    if isinstance(photo_file, UploadFile) and photo_file.filename:
+        uploads_dir = os.path.join("static", "uploads")
+        os.makedirs(uploads_dir, exist_ok=True)
+        _, ext = os.path.splitext(photo_file.filename)
+        filename = f"{uuid4().hex}{ext}"
+        file_path = os.path.join(uploads_dir, filename)
+        with open(file_path, "wb") as f:
+            f.write(await photo_file.read())
+        category.photo_url = f"/static/uploads/{filename}"
+    return RedirectResponse(url=f"/bars/{bar_id}", status_code=status.HTTP_303_SEE_OTHER)
