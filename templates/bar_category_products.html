@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Products in {{ category.name }} for {{ bar.name }}</h1>
+
+<div class="toolbar" style="margin-bottom:1rem;">
+  <a class="btn btn--primary" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products/new">Add Product</a>
+</div>
+
+{% if products %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Price (CHF)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for product in products %}
+    <tr>
+      <td>{{ product.name }}</td>
+      <td>{{ product.description }}</td>
+      <td>{{ "%.2f"|format(product.price) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No products in this category.</p>
+{% endif %}
+
+{% endblock %}
+

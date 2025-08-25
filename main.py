@@ -352,8 +352,6 @@ templates_env = Environment(
 # -----------------------------------------------------------------------------
 
 bars: Dict[int, Bar] = {}
-next_category_id = 1
-next_product_id = 1
 next_table_id = 1
 
 # User storage
@@ -394,7 +392,7 @@ def load_bars_from_db() -> None:
     try:
         bars.clear()
         for b in db.query(BarModel).all():
-            bars[b.id] = Bar(
+            bar = Bar(
                 id=b.id,
                 name=b.name,
                 address=b.address or "",
@@ -405,8 +403,78 @@ def load_bars_from_db() -> None:
                 description=b.description or "",
                 photo_url=b.photo_url,
             )
+            # Load categories for the bar
+            for c in b.categories:
+                bar.categories[c.id] = Category(
+                    id=c.id,
+                    name=c.name,
+                    description=c.description or "",
+                    display_order=c.sort_order,
+                    photo_url=c.photo_url,
+                )
+            # Load products for the bar
+            for item in b.menu_items:
+                bar.products[item.id] = Product(
+                    id=item.id,
+                    category_id=item.category_id,
+                    name=item.name,
+                    price=float(item.price_chf),
+                    description=item.description or "",
+                    photo_url=item.photo,
+                )
+            bars[b.id] = bar
     finally:
         db.close()
+
+
+def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
+    """Reload a single bar with its categories and products from the database."""
+    b = db.get(BarModel, bar_id)
+    if not b:
+        return None
+    bar = bars.get(bar_id)
+    if not bar:
+        bar = Bar(
+            id=b.id,
+            name=b.name,
+            address=b.address or "",
+            city=b.city or "",
+            state=b.state or "",
+            latitude=float(b.latitude) if b.latitude is not None else 0.0,
+            longitude=float(b.longitude) if b.longitude is not None else 0.0,
+            description=b.description or "",
+            photo_url=b.photo_url,
+        )
+        bars[bar_id] = bar
+    else:
+        bar.name = b.name
+        bar.address = b.address or ""
+        bar.city = b.city or ""
+        bar.state = b.state or ""
+        bar.latitude = float(b.latitude) if b.latitude is not None else 0.0
+        bar.longitude = float(b.longitude) if b.longitude is not None else 0.0
+        bar.description = b.description or ""
+        bar.photo_url = b.photo_url
+        bar.categories.clear()
+        bar.products.clear()
+    for c in b.categories:
+        bar.categories[c.id] = Category(
+            id=c.id,
+            name=c.name,
+            description=c.description or "",
+            display_order=c.sort_order,
+            photo_url=c.photo_url,
+        )
+    for item in b.menu_items:
+        bar.products[item.id] = Product(
+            id=item.id,
+            category_id=item.category_id,
+            name=item.name,
+            price=float(item.price_chf),
+            description=item.description or "",
+            photo_url=item.photo,
+        )
+    return bar
 
 
 def render_template(template_name: str, **context) -> HTMLResponse:
@@ -1444,10 +1512,34 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     return RedirectResponse(url="/admin/users", status_code=status.HTTP_303_SEE_OTHER)
 
 
-@app.get("/bar/{bar_id}/categories/new", response_class=HTMLResponse)
-async def bar_new_category_form(request: Request, bar_id: int):
+@app.get("/bar/{bar_id}/categories", response_class=HTMLResponse)
+async def bar_manage_categories(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
     user = get_current_user(request)
-    bar = bars.get(bar_id)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    if not user or not (
+        user.is_super_admin
+        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    categories = sorted(bar.categories.values(), key=lambda c: c.display_order)
+    return render_template(
+        "bar_manage_categories.html",
+        request=request,
+        bar=bar,
+        categories=categories,
+    )
+
+
+@app.get("/bar/{bar_id}/categories/new", response_class=HTMLResponse)
+async def bar_new_category_form(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     if not user or not (
@@ -1459,9 +1551,11 @@ async def bar_new_category_form(request: Request, bar_id: int):
 
 
 @app.post("/bar/{bar_id}/categories/new")
-async def bar_new_category(request: Request, bar_id: int):
+async def bar_new_category(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
     user = get_current_user(request)
-    bar = bars.get(bar_id)
+    bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     if not user or not (
@@ -1495,27 +1589,199 @@ async def bar_new_category(request: Request, bar_id: int):
         order_val = int(display_order)
     except ValueError:
         order_val = 0
-    global next_category_id
+    db_category = CategoryModel(
+        bar_id=bar_id,
+        name=name,
+        description=description,
+        photo_url=photo_url,
+        sort_order=order_val,
+    )
+    db.add(db_category)
+    db.commit()
+    db.refresh(db_category)
     category = Category(
-        id=next_category_id,
+        id=db_category.id,
         name=name,
         description=description,
         display_order=order_val,
         photo_url=photo_url,
     )
-    next_category_id += 1
     bar.categories[category.id] = category
-    return RedirectResponse(url=f"/bars/{bar_id}", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(
+        url=f"/bar/{bar_id}/categories", status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@app.post("/bar/{bar_id}/categories/{category_id}/delete")
+async def bar_delete_category(
+    request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    if not user or not (
+        user.is_super_admin
+        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    db.query(MenuItem).filter(MenuItem.category_id == category_id).delete(
+        synchronize_session=False
+    )
+    db.query(CategoryModel).filter(CategoryModel.id == category_id).delete(
+        synchronize_session=False
+    )
+    db.commit()
+    bar.categories.pop(category_id, None)
+    bar.products = {
+        pid: p for pid, p in bar.products.items() if p.category_id != category_id
+    }
+    return RedirectResponse(
+        url=f"/bar/{bar_id}/categories", status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@app.get(
+    "/bar/{bar_id}/categories/{category_id}/products", response_class=HTMLResponse
+)
+async def bar_category_products(
+    request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    if not user or not (
+        user.is_super_admin
+        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    products = [
+        p for p in bar.products.values() if p.category_id == category_id
+    ]
+    return render_template(
+        "bar_category_products.html",
+        request=request,
+        bar=bar,
+        category=category,
+        products=products,
+    )
+
+
+@app.get(
+    "/bar/{bar_id}/categories/{category_id}/products/new",
+    response_class=HTMLResponse,
+)
+async def bar_new_product_form(
+    request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    if not user or not (
+        user.is_super_admin
+        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template(
+        "bar_new_product.html", request=request, bar=bar, category=category
+    )
+
+
+@app.post("/bar/{bar_id}/categories/{category_id}/products/new")
+async def bar_new_product(
+    request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    if not user or not (
+        user.is_super_admin
+        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    name = form.get("name")
+    price = form.get("price")
+    description = form.get("description")
+    photo_file = form.get("photo")
+    photo_url = None
+    if isinstance(photo_file, UploadFile) and photo_file.filename:
+        uploads_dir = os.path.join("static", "uploads")
+        os.makedirs(uploads_dir, exist_ok=True)
+        _, ext = os.path.splitext(photo_file.filename)
+        filename = f"{uuid4().hex}{ext}"
+        file_path = os.path.join(uploads_dir, filename)
+        with open(file_path, "wb") as f:
+            f.write(await photo_file.read())
+        photo_url = f"/static/uploads/{filename}"
+    if not name or not description or not price:
+        return render_template(
+            "bar_new_product.html",
+            request=request,
+            bar=bar,
+            category=category,
+            error="All fields are required",
+        )
+    try:
+        price_val = float(price)
+        price_decimal = Decimal(price)
+    except ValueError:
+        return render_template(
+            "bar_new_product.html",
+            request=request,
+            bar=bar,
+            category=category,
+            error="Invalid price",
+        )
+    db_item = MenuItem(
+        bar_id=bar_id,
+        category_id=category_id,
+        name=name,
+        description=description,
+        price_chf=price_decimal,
+        photo=photo_url,
+    )
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    product = Product(
+        id=db_item.id,
+        category_id=category_id,
+        name=name,
+        price=price_val,
+        description=description,
+        photo_url=photo_url,
+    )
+    bar.products[product.id] = product
+    return RedirectResponse(
+        url=f"/bar/{bar_id}/categories/{category_id}/products",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
 
 
 @app.get(
     "/bar/{bar_id}/categories/{category_id}/edit", response_class=HTMLResponse
 )
 async def bar_edit_category_form(
-    request: Request, bar_id: int, category_id: int
+    request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
-    bar = bars.get(bar_id)
+    bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     category = bar.categories.get(category_id)
@@ -1533,10 +1799,10 @@ async def bar_edit_category_form(
 
 @app.post("/bar/{bar_id}/categories/{category_id}/edit")
 async def bar_edit_category(
-    request: Request, bar_id: int, category_id: int
+    request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
-    bar = bars.get(bar_id)
+    bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     category = bar.categories.get(category_id)
@@ -1552,12 +1818,20 @@ async def bar_edit_category(
     description = form.get("description")
     display_order = form.get("display_order") or category.display_order
     photo_file = form.get("photo")
+    db_category = db.get(CategoryModel, category_id)
     if name:
         category.name = name
+        if db_category:
+            db_category.name = name
     if description:
         category.description = description
+        if db_category:
+            db_category.description = description
     try:
-        category.display_order = int(display_order)
+        order_val = int(display_order)
+        category.display_order = order_val
+        if db_category:
+            db_category.sort_order = order_val
     except ValueError:
         pass
     if isinstance(photo_file, UploadFile) and photo_file.filename:
@@ -1569,4 +1843,10 @@ async def bar_edit_category(
         with open(file_path, "wb") as f:
             f.write(await photo_file.read())
         category.photo_url = f"/static/uploads/{filename}"
-    return RedirectResponse(url=f"/bars/{bar_id}", status_code=status.HTTP_303_SEE_OTHER)
+        if db_category:
+            db_category.photo_url = category.photo_url
+    if db_category:
+        db.commit()
+    return RedirectResponse(
+        url=f"/bar/{bar_id}/categories", status_code=status.HTTP_303_SEE_OTHER
+    )
