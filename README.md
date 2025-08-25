@@ -29,6 +29,9 @@ integration:
 - `POST /api/bars` – create a new bar by providing `name` and `slug`.
 - `POST /api/orders` – create an order and automatically compute VAT,
   the 5% platform fee and the payout due to the bar.
+- `POST /api/payouts/run` – aggregate completed orders for a bar within a
+  date range and create a payout entry. Each invocation is recorded in the
+  `audit_logs` table for traceability.
 
 A sample bar is automatically created on startup if the database is empty so the
 listing endpoint immediately returns data.
