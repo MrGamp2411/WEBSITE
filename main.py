@@ -43,8 +43,14 @@ from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 
 from database import Base, SessionLocal, engine, get_db
-from models import Bar as BarModel
+from models import Bar as BarModel, MenuItem, Order, OrderItem
 from pydantic import BaseModel
+from decimal import Decimal
+from finance import (
+    calculate_platform_fee,
+    calculate_payout,
+    calculate_vat_from_gross,
+)
 
 # Load environment variables from a .env file if present
 load_dotenv()
@@ -481,6 +487,28 @@ class BarRead(BaseModel):
         orm_mode = True
 
 
+class OrderItemInput(BaseModel):
+    menu_item_id: int
+    qty: int = 1
+
+
+class OrderCreate(BaseModel):
+    bar_id: int
+    items: List[OrderItemInput]
+
+
+class OrderRead(BaseModel):
+    id: int
+    subtotal: float
+    vat_total: float
+    fee_platform_5pct: float
+    payout_due_to_bar: float
+    status: str
+
+    class Config:
+        orm_mode = True
+
+
 @app.get("/api/bars", response_model=List[BarRead])
 def list_bars(db: Session = Depends(get_db)):
     """Return all bars stored in the database."""
@@ -495,6 +523,55 @@ def create_bar(data: BarCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(bar)
     return bar
+
+
+@app.post("/api/orders", response_model=OrderRead, status_code=status.HTTP_201_CREATED)
+def create_order(order: OrderCreate, db: Session = Depends(get_db)):
+    """Create an order and compute platform fee and payout."""
+    bar = db.get(BarModel, order.bar_id)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+
+    subtotal = Decimal("0.00")
+    vat_total = Decimal("0.00")
+    order_items: List[OrderItem] = []
+
+    for item in order.items:
+        menu_item = db.get(MenuItem, item.menu_item_id)
+        if not menu_item:
+            raise HTTPException(status_code=404, detail="Menu item not found")
+        price = Decimal(menu_item.price_chf)
+        line_total = price * item.qty
+        line_vat = calculate_vat_from_gross(price, Decimal(menu_item.vat_rate)) * item.qty
+        vat_total += line_vat
+        subtotal += line_total - line_vat
+        order_items.append(
+            OrderItem(
+                menu_item_id=menu_item.id,
+                qty=item.qty,
+                unit_price=price,
+                line_vat=line_vat,
+                line_total=line_total,
+            )
+        )
+
+    fee = calculate_platform_fee(subtotal)
+    total_gross = subtotal + vat_total
+    payout = calculate_payout(total_gross, fee)
+
+    db_order = Order(
+        bar_id=order.bar_id,
+        subtotal=subtotal,
+        vat_total=vat_total,
+        fee_platform_5pct=fee,
+        payout_due_to_bar=payout,
+        status="completed",
+        items=order_items,
+    )
+    db.add(db_order)
+    db.commit()
+    db.refresh(db_order)
+    return db_order
 
 
 @app.get("/bars/{bar_id}", response_class=HTMLResponse)

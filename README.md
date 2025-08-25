@@ -27,6 +27,8 @@ integration:
 
 - `GET /api/bars` – list bars stored in the PostgreSQL database.
 - `POST /api/bars` – create a new bar by providing `name` and `slug`.
+- `POST /api/orders` – create an order and automatically compute VAT,
+  the 5% platform fee and the payout due to the bar.
 
 A sample bar is automatically created on startup if the database is empty so the
 listing endpoint immediately returns data.
