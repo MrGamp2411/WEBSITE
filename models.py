@@ -80,6 +80,8 @@ class Category(Base):
     id = Column(Integer, primary_key=True)
     bar_id = Column(Integer, ForeignKey("bars.id"), nullable=False)
     name = Column(String(100), nullable=False)
+    description = Column(Text)
+    photo_url = Column(String(255))
     sort_order = Column(Integer, default=0)
     active = Column(Boolean, default=True)
 

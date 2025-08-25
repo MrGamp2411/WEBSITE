@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Manage Categories for {{ bar.name }}</h1>
+
+<div class="toolbar" style="margin-bottom:1rem;">
+  <a class="btn btn--primary" href="/bar/{{ bar.id }}/categories/new">Add Category</a>
+</div>
+
+{% if categories %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for category in categories %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ category.name }}</td>
+      <td>{{ category.description }}</td>
+      <td>
+        <a class="btn" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products">Products</a>
+        <a class="btn" href="/bar/{{ bar.id }}/categories/{{ category.id }}/edit">Edit</a>
+        <form method="post" action="/bar/{{ bar.id }}/categories/{{ category.id }}/delete" style="display:inline">
+          <button class="btn" type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No categories yet.</p>
+{% endif %}
+
+{% endblock %}
+
