@@ -33,6 +33,7 @@ Limitations:
 
 import os
 from typing import Dict, List, Optional
+from datetime import datetime
 
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, status
@@ -43,7 +44,7 @@ from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 
 from database import Base, SessionLocal, engine, get_db
-from models import Bar as BarModel, MenuItem, Order, OrderItem
+from models import Bar as BarModel, MenuItem, Order, OrderItem, Payout
 from pydantic import BaseModel
 from decimal import Decimal
 from finance import (
@@ -51,6 +52,8 @@ from finance import (
     calculate_payout,
     calculate_vat_from_gross,
 )
+from payouts import schedule_payout
+from audit import log_action
 
 # Load environment variables from a .env file if present
 load_dotenv()
@@ -509,6 +512,25 @@ class OrderRead(BaseModel):
         orm_mode = True
 
 
+class PayoutRunInput(BaseModel):
+    bar_id: int
+    period_start: datetime
+    period_end: datetime
+    actor_user_id: Optional[int] = None
+
+
+class PayoutRead(BaseModel):
+    id: int
+    bar_id: int
+    amount_chf: float
+    period_start: datetime
+    period_end: datetime
+    status: str
+
+    class Config:
+        orm_mode = True
+
+
 @app.get("/api/bars", response_model=List[BarRead])
 def list_bars(db: Session = Depends(get_db)):
     """Return all bars stored in the database."""
@@ -572,6 +594,28 @@ def create_order(order: OrderCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_order)
     return db_order
+
+
+@app.post("/api/payouts/run", response_model=PayoutRead, status_code=status.HTTP_201_CREATED)
+def run_payout(data: PayoutRunInput, db: Session = Depends(get_db)):
+    """Aggregate completed orders for a bar within a date range and create a payout."""
+    try:
+        payout = schedule_payout(db, data.bar_id, data.period_start, data.period_end)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    log_action(
+        db,
+        actor_user_id=data.actor_user_id,
+        action="payout_run",
+        entity_type="payout",
+        entity_id=payout.id,
+        payload={
+            "bar_id": data.bar_id,
+            "period_start": data.period_start.isoformat(),
+            "period_end": data.period_end.isoformat(),
+        },
+    )
+    return payout
 
 
 @app.get("/bars/{bar_id}", response_class=HTMLResponse)

@@ -1,0 +1,35 @@
+from datetime import datetime
+import json
+from typing import Optional, Dict, Any
+
+from sqlalchemy.orm import Session
+
+from models import AuditLog
+
+
+def log_action(
+    db: Session,
+    *,
+    actor_user_id: Optional[int],
+    action: str,
+    entity_type: str,
+    entity_id: Optional[int] = None,
+    payload: Optional[Dict[str, Any]] = None,
+    ip: Optional[str] = None,
+    user_agent: Optional[str] = None,
+) -> AuditLog:
+    """Persist an audit log entry to the database."""
+    log = AuditLog(
+        actor_user_id=actor_user_id,
+        action=action,
+        entity_type=entity_type,
+        entity_id=entity_id,
+        payload_json=json.dumps(payload) if payload else None,
+        ip=ip,
+        user_agent=user_agent,
+        created_at=datetime.utcnow(),
+    )
+    db.add(log)
+    db.commit()
+    db.refresh(log)
+    return log
