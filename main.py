@@ -94,6 +94,7 @@ class Bar:
         latitude: float,
         longitude: float,
         description: str = "",
+        photo_url: Optional[str] = None,
     ):
         self.id = id
         self.name = name
@@ -103,6 +104,7 @@ class Bar:
         self.latitude = latitude
         self.longitude = longitude
         self.description = description
+        self.photo_url = photo_url
         self.categories: Dict[int, Category] = {}
         self.products: Dict[int, Product] = {}
         self.tables: Dict[int, Table] = {}
@@ -280,6 +282,7 @@ def on_startup():
     Base.metadata.create_all(bind=engine)
     ensure_prefix_column()
     seed_super_admin()
+    load_bars_from_db()
 
 
 @app.get("/healthz")
@@ -302,7 +305,6 @@ templates_env = Environment(
 # -----------------------------------------------------------------------------
 
 bars: Dict[int, Bar] = {}
-next_bar_id = 1
 next_category_id = 1
 next_product_id = 1
 next_table_id = 1
@@ -332,6 +334,32 @@ def get_current_user(request: Request) -> Optional[DemoUser]:
 
 def get_cart_for_user(user: DemoUser) -> Cart:
     return user_carts.setdefault(user.id, Cart())
+
+
+def slugify(value: str) -> str:
+    """Convert a string to a simple slug."""
+    return value.lower().replace(" ", "-")
+
+
+def load_bars_from_db() -> None:
+    """Populate in-memory bars dict from the database."""
+    db = SessionLocal()
+    try:
+        bars.clear()
+        for b in db.query(BarModel).all():
+            bars[b.id] = Bar(
+                id=b.id,
+                name=b.name,
+                address=b.address or "",
+                city=b.city or "",
+                state=b.state or "",
+                latitude=float(b.latitude) if b.latitude is not None else 0.0,
+                longitude=float(b.longitude) if b.longitude is not None else 0.0,
+                description=b.description or "",
+                photo_url=b.photo_url,
+            )
+    finally:
+        db.close()
 
 
 def render_template(template_name: str, **context) -> HTMLResponse:
@@ -368,17 +396,23 @@ def render_template(template_name: str, **context) -> HTMLResponse:
 
 
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
+async def home(request: Request, db: Session = Depends(get_db)):
     """Home page listing available bars."""
-    return render_template("home.html", request=request, bars=bars.values())
+    db_bars = db.query(BarModel).all()
+    return render_template("home.html", request=request, bars=db_bars)
 
 
 @app.get("/search", response_class=HTMLResponse)
-async def search_bars(request: Request, q: str = ""):
+async def search_bars(request: Request, q: str = "", db: Session = Depends(get_db)):
     term = q.lower()
+    db_bars = db.query(BarModel).all()
     results = [
-        bar for bar in bars.values()
-        if term in bar.name.lower() or term in bar.address.lower() or term in bar.city.lower() or term in bar.state.lower()
+        bar
+        for bar in db_bars
+        if term in (bar.name or "").lower()
+        or term in (bar.address or "").lower()
+        or term in (bar.city or "").lower()
+        or term in (bar.state or "").lower()
     ]
     return render_template("search.html", request=request, bars=results, query=q)
 
@@ -410,6 +444,12 @@ class BarCreate(BaseModel):
     name: str
     slug: str
     address: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    description: Optional[str] = None
+    photo_url: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 
 class BarRead(BaseModel):
@@ -417,6 +457,12 @@ class BarRead(BaseModel):
     name: str
     slug: str
     address: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    description: Optional[str] = None
+    photo_url: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
     class Config:
         orm_mode = True
@@ -854,37 +900,61 @@ async def dashboard(request: Request):
 # Admin management endpoints
 
 @app.get("/admin/bars", response_class=HTMLResponse)
-async def admin_bars_view(request: Request):
+async def admin_bars_view(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request)
     if not user or not user.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    return render_template("admin_bars.html", request=request, bars=bars.values())
+    db_bars = db.query(BarModel).all()
+    return render_template("admin_bars.html", request=request, bars=db_bars)
 
 
 @app.get("/admin/bars/new", response_class=HTMLResponse)
-async def new_bar(request: Request):
-    """Display the creation form and handle adding a new bar."""
+async def new_bar_form(request: Request):
+    """Display the creation form for a new bar."""
     user = get_current_user(request)
     if not user or not user.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    name = request.query_params.get("name")
-    address = request.query_params.get("address")
-    city = request.query_params.get("city")
-    state = request.query_params.get("state")
-    latitude = request.query_params.get("latitude")
-    longitude = request.query_params.get("longitude")
-    description = request.query_params.get("description")
+    return render_template("admin_new_bar.html", request=request)
+
+
+@app.post("/admin/bars/new")
+async def create_bar_post(request: Request, db: Session = Depends(get_db)):
+    """Create a new bar from submitted form data."""
+    user = get_current_user(request)
+    if not user or not user.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    name = form.get("name")
+    address = form.get("address")
+    city = form.get("city")
+    state = form.get("state")
+    latitude = form.get("latitude")
+    longitude = form.get("longitude")
+    description = form.get("description")
+    photo_url = form.get("photo_url")
     if not all([name, address, city, state, latitude, longitude, description]):
-        # Show empty form when required parameters are missing
-        return render_template("admin_new_bar.html", request=request)
+        return render_template("admin_new_bar.html", request=request, error="All fields are required")
     try:
         lat = float(latitude)
         lon = float(longitude)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid coordinates")
-    global next_bar_id
-    bar = Bar(
-        id=next_bar_id,
+    db_bar = BarModel(
+        name=name,
+        slug=slugify(name),
+        address=address,
+        city=city,
+        state=state,
+        latitude=lat,
+        longitude=lon,
+        description=description,
+        photo_url=photo_url,
+    )
+    db.add(db_bar)
+    db.commit()
+    db.refresh(db_bar)
+    bars[db_bar.id] = Bar(
+        id=db_bar.id,
         name=name,
         address=address,
         city=city,
@@ -892,27 +962,51 @@ async def new_bar(request: Request):
         latitude=lat,
         longitude=lon,
         description=description,
+        photo_url=photo_url,
     )
-    next_bar_id += 1
-    bars[bar.id] = bar
     return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get("/admin/bars/edit/{bar_id}", response_class=HTMLResponse)
-async def edit_bar(request: Request, bar_id: int):
+async def edit_bar_options(request: Request, bar_id: int, db: Session = Depends(get_db)):
+    """Display links to different bar management pages."""
     user = get_current_user(request)
-    bar = bars.get(bar_id)
+    bar = db.get(BarModel, bar_id)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     if not user or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    name = request.query_params.get("name")
-    address = request.query_params.get("address")
-    city = request.query_params.get("city")
-    state = request.query_params.get("state")
-    latitude = request.query_params.get("latitude")
-    longitude = request.query_params.get("longitude")
-    description = request.query_params.get("description")
+    return render_template("admin_edit_bar_options.html", request=request, bar=bar)
+
+
+@app.get("/admin/bars/edit/{bar_id}/info", response_class=HTMLResponse)
+async def edit_bar_form(request: Request, bar_id: int, db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    bar = db.get(BarModel, bar_id)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    if not user or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template("admin_edit_bar.html", request=request, bar=bar)
+
+
+@app.post("/admin/bars/edit/{bar_id}/info")
+async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    bar = db.get(BarModel, bar_id)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    if not user or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    name = form.get("name")
+    address = form.get("address")
+    city = form.get("city")
+    state = form.get("state")
+    latitude = form.get("latitude")
+    longitude = form.get("longitude")
+    description = form.get("description")
+    photo_url = form.get("photo_url")
     if all([name, address, city, state, latitude, longitude, description]):
         try:
             lat = float(latitude)
@@ -926,6 +1020,18 @@ async def edit_bar(request: Request, bar_id: int):
         bar.latitude = lat
         bar.longitude = lon
         bar.description = description
+        bar.photo_url = photo_url
+        db.commit()
+        mem_bar = bars.get(bar_id)
+        if mem_bar:
+            mem_bar.name = name
+            mem_bar.address = address
+            mem_bar.city = city
+            mem_bar.state = state
+            mem_bar.latitude = lat
+            mem_bar.longitude = lon
+            mem_bar.description = description
+            mem_bar.photo_url = photo_url
         if user.is_super_admin:
             return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)

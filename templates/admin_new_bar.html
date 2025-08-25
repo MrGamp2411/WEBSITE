@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <div id="map" style="height:400px;"></div>
 
-<form class="form" method="get" action="/admin/bars/new">
+<form class="form" method="post" action="/admin/bars/new">
   <label for="name">Name
     <input id="name" type="text" name="name" required>
   </label>
@@ -19,6 +19,9 @@
   </label>
   <label for="description">Description
     <textarea id="description" name="description" required></textarea>
+  </label>
+  <label for="photo_url">Photo URL
+    <input id="photo_url" type="text" name="photo_url">
   </label>
   <input id="latitude" type="hidden" name="latitude" required>
   <input id="longitude" type="hidden" name="longitude" required>
