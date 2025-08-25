@@ -35,3 +35,13 @@ integration:
 
 A sample bar is automatically created on startup if the database is empty so the
 listing endpoint immediately returns data.
+
+## Environment Variables
+
+- `API_BASE_URL` – base URL for API requests (defaults to `http://localhost:8000`).
+- `ADMIN_EMAIL` – email for the SuperAdmin account.
+- `ADMIN_PASSWORD` – password for the SuperAdmin account.
+
+On startup the application ensures a SuperAdmin user exists using these
+credentials. If the user is missing, it is created with the provided values. For
+local development the defaults `admin@example.com` / `ChangeMe!123` are used.
