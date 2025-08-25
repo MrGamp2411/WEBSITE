@@ -276,11 +276,28 @@ def ensure_prefix_column():
             conn.execute(text("ALTER TABLE users ADD COLUMN prefix VARCHAR(10)"))
 
 
+def ensure_bar_columns() -> None:
+    """Ensure recently added columns exist on the bars table."""
+    inspector = inspect(engine)
+    columns = {col["name"] for col in inspector.get_columns("bars")}
+    required = {
+        "city": "VARCHAR(100)",
+        "state": "VARCHAR(100)",
+        "description": "TEXT",
+    }
+    missing = {name: ddl for name, ddl in required.items() if name not in columns}
+    if missing:
+        with engine.begin() as conn:
+            for name, ddl in missing.items():
+                conn.execute(text(f"ALTER TABLE bars ADD COLUMN IF NOT EXISTS {name} {ddl}"))
+
+
 @app.on_event("startup")
 def on_startup():
     """Initialise database tables on startup."""
     Base.metadata.create_all(bind=engine)
     ensure_prefix_column()
+    ensure_bar_columns()
     seed_super_admin()
     load_bars_from_db()
 
