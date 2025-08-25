@@ -112,7 +112,7 @@ class Bar:
         self.pending_bartender_ids: List[int] = []
 
 
-class User:
+class DemoUser:
     def __init__(
         self,
         id: int,
@@ -296,9 +296,9 @@ next_product_id = 1
 next_table_id = 1
 
 # User storage
-users: Dict[int, User] = {}
-users_by_username: Dict[str, User] = {}
-users_by_email: Dict[str, User] = {}
+users: Dict[int, DemoUser] = {}
+users_by_username: Dict[str, DemoUser] = {}
+users_by_email: Dict[str, DemoUser] = {}
 next_user_id = 1
 
 # Cart storage per user
@@ -311,14 +311,14 @@ user_carts: Dict[int, Cart] = {}
 # -----------------------------------------------------------------------------
 
 
-def get_current_user(request: Request) -> Optional[User]:
+def get_current_user(request: Request) -> Optional[DemoUser]:
     user_id = request.session.get("user_id")
     if user_id is None:
         return None
     return users.get(user_id)
 
 
-def get_cart_for_user(user: User) -> Cart:
+def get_cart_for_user(user: DemoUser) -> Cart:
     return user_carts.setdefault(user.id, Cart())
 
 
@@ -748,7 +748,7 @@ async def register(request: Request):
         if email in users_by_email:
             return render_template("register.html", request=request, error="Email already taken")
         global next_user_id
-        user = User(
+        user = DemoUser(
             id=next_user_id,
             username=username,
             password=password,
@@ -927,7 +927,7 @@ async def add_user_to_bar(request: Request, bar_id: int):
                     bar=bar,
                     error="Email already taken",
                 )
-            new_user = User(
+            new_user = DemoUser(
                 id=next_user_id,
                 username=username,
                 password=password,
@@ -965,7 +965,7 @@ async def add_user_to_bar(request: Request, bar_id: int):
                     bar=bar,
                     error="Email already taken",
                 )
-            new_user = User(
+            new_user = DemoUser(
                 id=next_user_id,
                 username=username,
                 password=password,
