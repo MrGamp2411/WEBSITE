@@ -5,17 +5,15 @@ using SQLAlchemy and a Docker Compose setup with PostgreSQL.
 
 ## Running with Docker Compose
 
-1. Copy `.env.example` to `.env` and set the values for `DATABASE_URL` and, if
-   using the bundled Postgres service, `POSTGRES_USER`, `POSTGRES_PASSWORD`, and
-   `POSTGRES_DB`.
+1. Ensure the environment variables `DATABASE_URL`, `POSTGRES_USER`,
+   `POSTGRES_PASSWORD`, and `POSTGRES_DB` are set.
 2. Start the containers:
 
 ```
 docker compose up --build
 ```
 
-Docker Compose automatically reads variables from `.env`. The app will then be
-available at http://localhost:8000.
+The app will then be available at http://localhost:8000.
 
 ## Database
 
@@ -41,14 +39,17 @@ integration:
   healthy.
 
 ## Environment Variables
-Copy `.env.example` to `.env` for local development or define these variables in
-your hosting provider's settings (for example, on Render). The application
-requires a database connection string provided via environment variables.
+
+The application reads its configuration from environment variables:
 
 - `DATABASE_URL` – SQLAlchemy connection URL. Example:
   `postgresql://USER:PASSWORD@HOST:5432/DBNAME`.
+- `ADMIN_EMAIL` – email for the SuperAdmin account (defaults to
+  `admin@example.com`).
+- `ADMIN_PASSWORD` – password for the SuperAdmin account (defaults to
+  `ChangeMe!123`).
 
-When running via Docker Compose, the bundled Postgres service also honours:
+When running via Docker Compose with the bundled Postgres service, also set:
 
 - `POSTGRES_USER` – database user name.
 - `POSTGRES_PASSWORD` – database user password.
@@ -57,7 +58,7 @@ When running via Docker Compose, the bundled Postgres service also honours:
 These three variables must match the credentials used in `DATABASE_URL` when
 connecting to the internal Postgres instance. When deploying to an external
 provider, only `DATABASE_URL` needs to be set to the provider's connection
-string; no `.env` file is required.
+string.
 
 Optional variables:
 
