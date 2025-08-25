@@ -56,7 +56,7 @@ from models import (
     User,
     RoleEnum,
     UserBarRole,
-    Category,
+    Category as CategoryModel,
 )
 from pydantic import BaseModel
 from decimal import Decimal
@@ -1080,7 +1080,7 @@ async def delete_bar(request: Request, bar_id: int, db: Session = Depends(get_db
         db.query(MenuVariant).filter(MenuVariant.menu_item_id.in_(menu_item_ids)).delete(synchronize_session=False)
     db.query(MenuItem).filter(MenuItem.bar_id == bar_id).delete(synchronize_session=False)
 
-    db.query(Category).filter(Category.bar_id == bar_id).delete(synchronize_session=False)
+    db.query(CategoryModel).filter(CategoryModel.bar_id == bar_id).delete(synchronize_session=False)
     db.query(UserBarRole).filter(UserBarRole.bar_id == bar_id).delete(synchronize_session=False)
 
     order_ids = [o.id for o in db.query(Order.id).filter(Order.bar_id == bar_id)]
