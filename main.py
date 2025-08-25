@@ -4,7 +4,7 @@ Simplified prototype of the SiplyGo platform using FastAPI and Jinja2 templates.
 This application is not production‑ready but demonstrates the core building blocks
 required to implement a premium bar ordering platform.  It includes:
 
-* A home page that lists bars near the user (using a static data set for now).
+* A home page that lists bars added through the admin interface.
 * A bar detail page where customers can browse drink categories and add items to
   their cart.
 * A session‑based cart implementation allowing quantity adjustments and order
@@ -246,41 +246,10 @@ app.add_middleware(
 # Enable server-side sessions for authentication
 app.add_middleware(SessionMiddleware, secret_key="dev-secret")
 
-
-def seed_super_admin():
-    """Ensure a SuperAdmin user exists based on environment variables."""
-    admin_email = os.getenv("ADMIN_EMAIL", "admin@example.com")
-    admin_password = os.getenv("ADMIN_PASSWORD", "ChangeMe!123")
-    db = SessionLocal()
-    try:
-        existing = db.query(User).filter(User.email == admin_email).first()
-        if not existing:
-            password_hash = hashlib.sha256(admin_password.encode("utf-8")).hexdigest()
-            user = User(
-                username=admin_email,
-                email=admin_email,
-                password_hash=password_hash,
-                role=RoleEnum.SUPERADMIN,
-            )
-            db.add(user)
-            db.commit()
-    finally:
-        db.close()
-
-
 @app.on_event("startup")
 def on_startup():
+    """Initialise database tables on startup."""
     Base.metadata.create_all(bind=engine)
-    # Create a sample bar if none exist so the API returns data immediately
-    db = SessionLocal()
-    try:
-        if not db.query(BarModel).first():
-            sample = BarModel(name="Sample Bar", slug="sample-bar")
-            db.add(sample)
-            db.commit()
-    finally:
-        db.close()
-    seed_super_admin()
 
 
 @app.get("/healthz")
@@ -317,118 +286,6 @@ next_user_id = 1
 # Cart storage per user
 user_carts: Dict[int, Cart] = {}
 
-
-def seed_data():
-    """Populate the store with a demo bar, categories, products and tables."""
-    global next_bar_id, next_category_id, next_product_id, next_table_id
-
-    bar = Bar(
-        id=next_bar_id,
-        name="Bar Sport",
-        address="Via Principale 1",
-        city="Airolo",
-        state="Ticino",
-        latitude=46.5269,
-        longitude=8.6086,
-        description="Cozy sports bar serving local favorites",
-    )
-    next_bar_id += 1
-
-    # Categories
-    cat_coffee = Category(id=next_category_id, name="Coffee", description="Espresso, cappuccino and more")
-    next_category_id += 1
-    cat_cocktails = Category(id=next_category_id, name="Cocktails", description="Classic and signature cocktails")
-    next_category_id += 1
-    bar.categories[cat_coffee.id] = cat_coffee
-    bar.categories[cat_cocktails.id] = cat_cocktails
-
-    # Products
-    prod_espresso = Product(id=next_product_id, category_id=cat_coffee.id, name="Espresso", price=2.5,
-                            description="Rich Italian espresso")
-    next_product_id += 1
-    prod_cappuccino = Product(id=next_product_id, category_id=cat_coffee.id, name="Cappuccino", price=3.0,
-                              description="Creamy cappuccino with milk foam")
-    next_product_id += 1
-    prod_mojito = Product(id=next_product_id, category_id=cat_cocktails.id, name="Mojito", price=8.0,
-                          description="Rum, mint, lime and soda")
-    next_product_id += 1
-    bar.products[prod_espresso.id] = prod_espresso
-    bar.products[prod_cappuccino.id] = prod_cappuccino
-    bar.products[prod_mojito.id] = prod_mojito
-
-    # Tables
-    for table_number in range(1, 6):
-        table = Table(id=next_table_id, name=f"Table {table_number}")
-        next_table_id += 1
-        bar.tables[table.id] = table
-
-    bars[bar.id] = bar
-
-
-seed_data()
-
-
-def seed_super_admin():
-    """Create the default super admin account."""
-    global next_user_id
-    admin = User(
-        id=next_user_id,
-        username="andreastojov",
-        password="Andrea24",
-        email="andreastojov@gmail.com",
-        phone="5551234",
-        prefix="+41",
-        role="super_admin",
-    )
-    users[admin.id] = admin
-    users_by_username[admin.username] = admin
-    users_by_email[admin.email] = admin
-    next_user_id += 1
-
-
-def seed_bar_staff():
-    """Create demo bar admin and bartender for the first bar."""
-    global next_user_id
-    if not bars:
-        return
-    bar_id = next(iter(bars))
-    bar = bars[bar_id]
-    # Bar admin
-    admin_user = User(
-        id=next_user_id,
-        username="baradmin",
-        password="baradmin",
-        email="baradmin@example.com",
-        phone="5555678",
-        prefix="+41",
-        role="bar_admin",
-        bar_id=bar_id,
-    )
-    users[admin_user.id] = admin_user
-    users_by_username[admin_user.username] = admin_user
-    users_by_email[admin_user.email] = admin_user
-    bar.bar_admin_ids.append(admin_user.id)
-    next_user_id += 1
-    # Bartender
-    bartender_user = User(
-        id=next_user_id,
-        username="bartender",
-        password="bartender",
-        email="bartender@example.com",
-        phone="5559012",
-        prefix="+41",
-        role="bartender",
-        bar_id=bar_id,
-    )
-    users[bartender_user.id] = bartender_user
-    users_by_username[bartender_user.username] = bartender_user
-    users_by_email[bartender_user.email] = bartender_user
-    bar.bartender_ids.append(bartender_user.id)
-    next_user_id += 1
-
-
-seed_super_admin()
-seed_bar_staff()
 
 
 # -----------------------------------------------------------------------------

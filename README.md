@@ -5,12 +5,17 @@ using SQLAlchemy and a Docker Compose setup with PostgreSQL.
 
 ## Running with Docker Compose
 
+1. Copy `.env.example` to `.env` and set the values for `DATABASE_URL` and, if
+   using the bundled Postgres service, `POSTGRES_USER`, `POSTGRES_PASSWORD`, and
+   `POSTGRES_DB`.
+2. Start the containers:
+
 ```
 docker compose up --build
 ```
 
-The app will be available at http://localhost:8000 and connects to a PostgreSQL
-instance automatically.
+Docker Compose automatically reads variables from `.env`. The app will then be
+available at http://localhost:8000.
 
 ## Database
 
@@ -35,17 +40,27 @@ integration:
 - `GET /healthz` – returns `{"status": "ok"}` when the database connection is
   healthy.
 
-A sample bar is automatically created on startup if the database is empty so the
-listing endpoint immediately returns data.
-
 ## Environment Variables
+Copy `.env.example` to `.env` for local development or define these variables in
+your hosting provider's settings (for example, on Render). The application
+requires a database connection string provided via environment variables.
 
-- `API_BASE_URL` – base URL for API requests (defaults to `http://localhost:8000`).
-- `ADMIN_EMAIL` – email for the SuperAdmin account.
-- `ADMIN_PASSWORD` – password for the SuperAdmin account.
+- `DATABASE_URL` – SQLAlchemy connection URL. Example:
+  `postgresql://USER:PASSWORD@HOST:5432/DBNAME`.
+
+When running via Docker Compose, the bundled Postgres service also honours:
+
+- `POSTGRES_USER` – database user name.
+- `POSTGRES_PASSWORD` – database user password.
+- `POSTGRES_DB` – database name.
+
+These three variables must match the credentials used in `DATABASE_URL` when
+connecting to the internal Postgres instance. When deploying to an external
+provider, only `DATABASE_URL` needs to be set to the provider's connection
+string; no `.env` file is required.
+
+Optional variables:
+
 - `FRONTEND_ORIGINS` – comma-separated list of allowed frontend URLs for CORS
   (defaults to `http://localhost:5173`).
-
-On startup the application ensures a SuperAdmin user exists using these
-credentials. If the user is missing, it is created with the provided values. For
-local development the defaults `admin@example.com` / `ChangeMe!123` are used.
+- `GOOGLE_MAPS_API_KEY` – required if map widgets are used.
