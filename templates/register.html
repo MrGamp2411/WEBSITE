@@ -14,14 +14,14 @@
       <input id="password" type="password" name="password" required autocomplete="new-password" enterkeyhint="next">
     </label>
     <label for="prefix">Phone Prefix
-      <select id="prefix" name="prefix" autocomplete="tel-country-code">
+      <select id="prefix" name="prefix" required autocomplete="tel-country-code">
         <option value="+41">+41 (Switzerland)</option>
         <option value="+1">+1 (USA)</option>
         <option value="+44">+44 (UK)</option>
       </select>
     </label>
     <label for="phone">Phone Number
-      <input id="phone" type="tel" name="phone" autocomplete="tel-national" inputmode="tel" enterkeyhint="done">
+      <input id="phone" type="tel" name="phone" required autocomplete="tel-national" inputmode="tel" enterkeyhint="done">
     </label>
     <button class="btn btn--primary" type="submit">Register</button>
   </form>

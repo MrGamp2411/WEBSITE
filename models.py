@@ -33,6 +33,7 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     role = Column(Enum(RoleEnum), default=RoleEnum.CUSTOMER, nullable=False)
     phone = Column(String(30))
+    prefix = Column(String(10))
     twofa_secret = Column(String(32))
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)

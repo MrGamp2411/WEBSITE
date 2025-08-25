@@ -734,7 +734,7 @@ async def register_form(request: Request):
 
 
 @app.post("/register", response_class=HTMLResponse)
-async def register(request: Request):
+async def register(request: Request, db: Session = Depends(get_db)):
     """Handle user registration submissions."""
     form = await request.form()
     username = form.get("username")
@@ -743,20 +743,29 @@ async def register(request: Request):
     phone = form.get("phone")
     prefix = form.get("prefix")
     if all([username, password, email, phone, prefix]):
-        if username in users_by_username:
+        if username in users_by_username or db.query(User).filter(User.username == username).first():
             return render_template("register.html", request=request, error="Username already taken")
-        if email in users_by_email:
+        if email in users_by_email or db.query(User).filter(User.email == email).first():
             return render_template("register.html", request=request, error="Email already taken")
-        global next_user_id
+        password_hash = hashlib.sha256(password.encode("utf-8")).hexdigest()
+        db_user = User(
+            username=username,
+            email=email,
+            password_hash=password_hash,
+            phone=phone,
+            prefix=prefix,
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
         user = DemoUser(
-            id=next_user_id,
+            id=db_user.id,
             username=username,
             password=password,
             email=email,
             phone=phone,
             prefix=prefix,
         )
-        next_user_id += 1
         users[user.id] = user
         users_by_username[user.username] = user
         users_by_email[user.email] = user
@@ -794,6 +803,8 @@ async def login(request: Request, db: Session = Depends(get_db)):
                         username=db_user.username,
                         password=password,
                         email=db_user.email,
+                        phone=db_user.phone or "",
+                        prefix=db_user.prefix or "",
                         role=role_map.get(db_user.role, "customer"),
                     )
                     users[user.id] = user
