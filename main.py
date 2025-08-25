@@ -46,7 +46,17 @@ from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 
 from database import Base, SessionLocal, engine, get_db
-from models import Bar as BarModel, MenuItem, Order, OrderItem, Payout, User, RoleEnum
+from models import (
+    Bar as BarModel,
+    MenuItem,
+    Order,
+    OrderItem,
+    Payout,
+    User,
+    RoleEnum,
+    UserBarRole,
+    Category,
+)
 from pydantic import BaseModel
 from decimal import Decimal
 from finance import (
@@ -1053,6 +1063,23 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
             return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     return render_template("admin_edit_bar.html", request=request, bar=bar)
+
+
+@app.post("/admin/bars/{bar_id}/delete")
+async def delete_bar(request: Request, bar_id: int, db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    if not user or not user.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    bar = db.get(BarModel, bar_id)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    db.query(MenuItem).filter(MenuItem.bar_id == bar_id).delete()
+    db.query(Category).filter(Category.bar_id == bar_id).delete()
+    db.query(UserBarRole).filter(UserBarRole.bar_id == bar_id).delete()
+    db.delete(bar)
+    db.commit()
+    bars.pop(bar_id, None)
+    return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get("/admin/bars/{bar_id}/add_user", response_class=HTMLResponse)

@@ -22,7 +22,8 @@
       <td>{{ bar.state }}</td>
       <td>
         <a href="/admin/bars/edit/{{ bar.id }}">Edit</a> |
-        <a href="/admin/bars/{{ bar.id }}/add_user">Add User</a>
+        <a href="#" onclick="if(confirm('Are you sure you want to delete this bar?')){document.getElementById('delete-bar-{{ bar.id }}').submit();} return false;">Delete</a>
+        <form id="delete-bar-{{ bar.id }}" method="post" action="/admin/bars/{{ bar.id }}/delete" style="display:none;"></form>
       </td>
     </tr>
     {% endfor %}
