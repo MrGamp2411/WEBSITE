@@ -2,41 +2,41 @@
 {% block content %}
 <h1>Edit User {{ user.username }}</h1>
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-<form class="form" method="get">
-  <label for="username">Username
-    <input id="username" name="username" value="{{ user.username }}">
-  </label>
-  <label for="password">Password
-    <input id="password" name="password" value="{{ user.password }}">
-  </label>
-  <label for="email">Email
-    <input id="email" name="email" value="{{ user.email }}">
-  </label>
-  <label for="prefix">Prefix
-    <input id="prefix" name="prefix" value="{{ user.prefix }}">
-  </label>
-  <label for="phone">Phone
-    <input id="phone" name="phone" value="{{ user.phone }}">
-  </label>
-  <label for="role">Role
-    <select id="role" name="role">
-      <option value="super_admin" {% if user.role=='super_admin' %}selected{% endif %}>Super Admin</option>
-      <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>Bar Admin</option>
-      <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>Bartender</option>
-      <option value="customer" {% if user.role=='customer' %}selected{% endif %}>Customer</option>
-    </select>
-  </label>
-  <label for="bar_id">Bar
-    <select id="bar_id" name="bar_id">
-      <option value="" {% if not user.bar_id %}selected{% endif %}>None</option>
-      {% for b in bars %}
-      <option value="{{ b.id }}" {% if user.bar_id==b.id %}selected{% endif %}>{{ b.name }}</option>
-      {% endfor %}
-    </select>
-  </label>
-  <label for="credit">Credit
-    <input id="credit" name="credit" type="number" step="0.01" value="{{ user.credit }}">
-  </label>
+<form class="form" method="post" action="/admin/users/edit/{{ user.id }}">
+  <label for="username">Username</label>
+  <input id="username" name="username" type="text" value="{{ user.username }}" required>
+
+  <label for="password">Password</label>
+  <input id="password" name="password" type="password" placeholder="Leave blank to keep current">
+
+  <label for="email">Email</label>
+  <input id="email" name="email" type="email" value="{{ user.email }}" required>
+
+  <label for="prefix">Prefix</label>
+  <input id="prefix" name="prefix" type="text" value="{{ user.prefix }}">
+
+  <label for="phone">Phone</label>
+  <input id="phone" name="phone" type="tel" value="{{ user.phone }}">
+
+  <label for="role">Role</label>
+  <select id="role" name="role">
+    <option value="super_admin" {% if user.role=='super_admin' %}selected{% endif %}>Super Admin</option>
+    <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>Bar Admin</option>
+    <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>Bartender</option>
+    <option value="customer" {% if user.role=='customer' %}selected{% endif %}>Customer</option>
+  </select>
+
+  <label for="bar_id">Bar</label>
+  <select id="bar_id" name="bar_id">
+    <option value="" {% if not user.bar_id %}selected{% endif %}>None</option>
+    {% for b in bars %}
+    <option value="{{ b.id }}" {% if user.bar_id==b.id %}selected{% endif %}>{{ b.name }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="credit">Credit</label>
+  <input id="credit" name="credit" type="number" step="0.01" value="{{ user.credit }}" required>
+
   <button class="btn btn--primary" type="submit">Save</button>
 </form>
 {% endblock %}
