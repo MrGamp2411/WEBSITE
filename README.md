@@ -32,6 +32,8 @@ integration:
 - `POST /api/payouts/run` – aggregate completed orders for a bar within a
   date range and create a payout entry. Each invocation is recorded in the
   `audit_logs` table for traceability.
+- `GET /healthz` – returns `{"status": "ok"}` when the database connection is
+  healthy.
 
 A sample bar is automatically created on startup if the database is empty so the
 listing endpoint immediately returns data.
@@ -41,6 +43,8 @@ listing endpoint immediately returns data.
 - `API_BASE_URL` – base URL for API requests (defaults to `http://localhost:8000`).
 - `ADMIN_EMAIL` – email for the SuperAdmin account.
 - `ADMIN_PASSWORD` – password for the SuperAdmin account.
+- `FRONTEND_ORIGINS` – comma-separated list of allowed frontend URLs for CORS
+  (defaults to `http://localhost:5173`).
 
 On startup the application ensures a SuperAdmin user exists using these
 credentials. If the user is missing, it is created with the provided values. For

@@ -40,6 +40,7 @@ from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
@@ -231,6 +232,17 @@ app = FastAPI()
 # Mount a static files directory for CSS/JS/image assets if needed
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# Allow cross-origin requests from configured frontends
+origins_env = os.getenv("FRONTEND_ORIGINS", "http://localhost:5173")
+origins = [o.strip() for o in origins_env.split(",") if o.strip()]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Enable server-side sessions for authentication
 app.add_middleware(SessionMiddleware, secret_key="dev-secret")
 
@@ -269,6 +281,16 @@ def on_startup():
     finally:
         db.close()
     seed_super_admin()
+
+
+@app.get("/healthz")
+def healthz(db: Session = Depends(get_db)):
+    """Simple health check returning DB status."""
+    try:
+        db.execute("SELECT 1")
+        return {"status": "ok"}
+    except Exception:
+        raise HTTPException(status_code=500, detail="DB unavailable")
 
 # Jinja2 environment for rendering HTML templates
 templates_env = Environment(
