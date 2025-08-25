@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Edit Category for {{ bar.name }}</h1>
+<form class="form" method="post" enctype="multipart/form-data">
+  <label for="name">Name
+    <input id="name" name="name" value="{{ category.name }}" required>
+  </label>
+  <label for="description">Description
+    <input id="description" name="description" value="{{ category.description }}" required>
+  </label>
+  <label for="display_order">Display Order
+    <input id="display_order" type="number" name="display_order" value="{{ category.display_order }}">
+  </label>
+  {% if category.photo_url %}
+  <img src="{{ category.photo_url }}" alt="{{ category.name }} photo" style="max-width:200px;"/>
+  {% endif %}
+  <label for="photo">Photo
+    <input id="photo" type="file" name="photo">
+  </label>
+  <button class="btn btn--primary" type="submit">Save</button>
+</form>
+{% endblock %}

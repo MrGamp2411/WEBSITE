@@ -1,12 +1,19 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>Add Category for {{ bar.name }}</h1>
-<form class="form" method="get">
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<form class="form" method="post" enctype="multipart/form-data">
   <label for="name">Name
-    <input id="name" name="name">
+    <input id="name" name="name" required>
   </label>
   <label for="description">Description
-    <input id="description" name="description">
+    <input id="description" name="description" required>
+  </label>
+  <label for="display_order">Display Order
+    <input id="display_order" type="number" name="display_order" value="0">
+  </label>
+  <label for="photo">Photo
+    <input id="photo" type="file" name="photo">
   </label>
   <button class="btn btn--primary" type="submit">Create</button>
 </form>
