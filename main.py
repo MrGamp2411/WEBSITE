@@ -36,7 +36,6 @@ import hashlib
 from typing import Dict, List, Optional
 from datetime import datetime
 
-from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -56,9 +55,6 @@ from finance import (
 )
 from payouts import schedule_payout
 from audit import log_action
-
-# Load environment variables from a .env file if present
-load_dotenv()
 
 # -----------------------------------------------------------------------------
 # Data models (in-memory for demonstration purposes)
@@ -246,10 +242,32 @@ app.add_middleware(
 # Enable server-side sessions for authentication
 app.add_middleware(SessionMiddleware, secret_key="dev-secret")
 
+
+def seed_super_admin():
+    """Ensure a SuperAdmin user exists based on environment variables."""
+    admin_email = os.getenv("ADMIN_EMAIL", "admin@example.com")
+    admin_password = os.getenv("ADMIN_PASSWORD", "ChangeMe!123")
+    db = SessionLocal()
+    try:
+        existing = db.query(User).filter(User.email == admin_email).first()
+        if not existing:
+            password_hash = hashlib.sha256(admin_password.encode("utf-8")).hexdigest()
+            user = User(
+                username=admin_email,
+                email=admin_email,
+                password_hash=password_hash,
+                role=RoleEnum.SUPERADMIN,
+            )
+            db.add(user)
+            db.commit()
+    finally:
+        db.close()
+
 @app.on_event("startup")
 def on_startup():
     """Initialise database tables on startup."""
     Base.metadata.create_all(bind=engine)
+    seed_super_admin()
 
 
 @app.get("/healthz")
