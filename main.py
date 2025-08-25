@@ -771,13 +771,34 @@ async def login_form(request: Request):
 
 
 @app.post("/login", response_class=HTMLResponse)
-async def login(request: Request):
+async def login(request: Request, db: Session = Depends(get_db)):
     """Handle login submissions."""
     form = await request.form()
     email = form.get("email")
     password = form.get("password")
     if email and password:
         user = users_by_email.get(email)
+        if not user:
+            db_user = db.query(User).filter(User.email == email).first()
+            if db_user:
+                expected = hashlib.sha256(password.encode("utf-8")).hexdigest()
+                if db_user.password_hash == expected:
+                    role_map = {
+                        RoleEnum.SUPERADMIN: "super_admin",
+                        RoleEnum.BARADMIN: "bar_admin",
+                        RoleEnum.BARTENDER: "bartender",
+                        RoleEnum.CUSTOMER: "customer",
+                    }
+                    user = DemoUser(
+                        id=db_user.id,
+                        username=db_user.username,
+                        password=password,
+                        email=db_user.email,
+                        role=role_map.get(db_user.role, "customer"),
+                    )
+                    users[user.id] = user
+                    users_by_email[user.email] = user
+                    users_by_username[user.username] = user
         if not user or user.password != password:
             return render_template("login.html", request=request, error="Invalid credentials")
         request.session["user_id"] = user.id
