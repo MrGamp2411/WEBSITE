@@ -28,7 +28,7 @@
       </div>
       <div class="cards scroller" aria-label="{{ title }}" tabindex="0">
         {% for bar in bars %}
-        <a class="bar-card" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.categories.values() | map(attribute='name') | map('lower') | join(',') if bar.categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
+        <a class="bar-card" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.categories | map(attribute='name') | map('lower') | join(',') if bar.categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
         {% if bar.photo_url %}
           <div class="thumb-wrapper">
           <img src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" class="thumb" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
@@ -98,7 +98,7 @@
         </div>
         {% set cats = namespace(names=[]) %}
         {% for bar in bars %}
-          {% for c in bar.categories.values() %}
+          {% for c in bar.categories %}
             {% if c.name not in cats.names %}
               {% set cats.names = cats.names + [c.name] %}
             {% endif %}
