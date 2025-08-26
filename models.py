@@ -60,6 +60,7 @@ class Bar(Base):
     zone = Column(String(50))
     rating = Column(Float, default=0.0)
     is_open_now = Column(Boolean, default=False)
+    manual_closed = Column(Boolean, default=False)
     promo_label = Column(String(100))
     tags = Column(Text)
 
