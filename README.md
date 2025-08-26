@@ -82,3 +82,21 @@ placeholder fallback. Spacing and grid breakpoints follow an
 
 Design tokens such as colors, radii and typography live in
 `static/css/tokens.css`.
+
+## New Bar fields
+
+Bars now support additional optional metadata:
+
+- `rating` – float 0–5 displayed with a star icon.
+- `is_open_now` – flag shown as an "OPEN NOW" badge.
+- `price_level` – integer 1–4.
+- `promo_label` – short badge text like "2×1 Happy Hour".
+- `tags` – comma separated list of chips.
+- `short_description` – 120–160 character summary.
+- `avg_prep_time_min` – average preparation time in minutes.
+- `cover_image_url` – https image shown on cards.
+- `gallery_urls` – comma separated additional images.
+
+These fields are editable in **Admin → BarEdit Info**. Image URLs must be
+absolute HTTPS links; when no cover image is provided a generic placeholder is
+used.

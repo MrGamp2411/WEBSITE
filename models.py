@@ -11,6 +11,7 @@ from sqlalchemy import (
     Numeric,
     String,
     Text,
+    Float,
 )
 from sqlalchemy.orm import relationship
 
@@ -57,6 +58,15 @@ class Bar(Base):
     opening_hours = Column(Text)
     active = Column(Boolean, default=True)
     zone = Column(String(50))
+    rating = Column(Float, default=0.0)
+    is_open_now = Column(Boolean, default=False)
+    price_level = Column(Integer, default=1)
+    promo_label = Column(String(100))
+    tags = Column(Text)
+    short_description = Column(String(160))
+    avg_prep_time_min = Column(Integer)
+    cover_image_url = Column(String(255))
+    gallery_urls = Column(Text)
 
     categories = relationship("Category", back_populates="bar")
     menu_items = relationship("MenuItem", back_populates="bar")
