@@ -7,8 +7,9 @@
   --gap-1:   clamp(8px, 1.5vw, 12px);
   --gap-2:   clamp(12px, 2vw, 16px);
   /* colori */
-  --color-bg:#0B0D12; --color-surface:#12151C; --color-text:#E9EEF5;
-  --color-muted:#9AA4B2; --color-primary:#5B8CFF; --color-primary-600:#3E6EF2;
+  --color-bg:#FFFFFF; --color-surface:#F5F7FA; --color-text:#0B0D12;
+  --color-muted:#374151; --color-primary:#7A5CE0; --color-primary-600:#5B3E96; --color-primary-700:#50327E;
+  --color-tint-50:#F3F0FF; --color-focus:#B9A7FF;
   --color-success:#10B981; --color-warning:#F59E0B; --color-danger:#EF4444;
   /* tipografia */
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";

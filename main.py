@@ -33,6 +33,7 @@ Limitations:
 
 import os
 import hashlib
+import json
 from typing import Dict, List, Optional
 from datetime import datetime
 
@@ -128,6 +129,15 @@ class Bar:
         longitude: float,
         description: str = "",
         photo_url: Optional[str] = None,
+        rating: float = 0.0,
+        is_open_now: bool = False,
+        price_level: Optional[int] = None,
+        promo_label: Optional[str] = None,
+        tags: Optional[List[str]] = None,
+        short_description: str = "",
+        avg_prep_time_min: Optional[int] = None,
+        cover_image_url: Optional[str] = None,
+        gallery_urls: Optional[List[str]] = None,
     ):
         self.id = id
         self.name = name
@@ -138,6 +148,15 @@ class Bar:
         self.longitude = longitude
         self.description = description
         self.photo_url = photo_url
+        self.rating = rating
+        self.is_open_now = is_open_now
+        self.price_level = price_level
+        self.promo_label = promo_label
+        self.tags = tags or []
+        self.short_description = short_description
+        self.avg_prep_time_min = avg_prep_time_min
+        self.cover_image_url = cover_image_url
+        self.gallery_urls = gallery_urls or []
         self.categories: Dict[int, Category] = {}
         self.products: Dict[int, Product] = {}
         self.tables: Dict[int, Table] = {}
@@ -317,6 +336,15 @@ def ensure_bar_columns() -> None:
         "city": "VARCHAR(100)",
         "state": "VARCHAR(100)",
         "description": "TEXT",
+        "rating": "FLOAT",
+        "is_open_now": "BOOLEAN",
+        "price_level": "INTEGER",
+        "promo_label": "VARCHAR(100)",
+        "tags": "TEXT",
+        "short_description": "VARCHAR(160)",
+        "avg_prep_time_min": "INTEGER",
+        "cover_image_url": "VARCHAR(255)",
+        "gallery_urls": "TEXT",
     }
     missing = {name: ddl for name, ddl in required.items() if name not in columns}
     if missing:
@@ -429,6 +457,15 @@ def load_bars_from_db() -> None:
                 longitude=float(b.longitude) if b.longitude is not None else 0.0,
                 description=b.description or "",
                 photo_url=b.photo_url,
+                rating=b.rating or 0.0,
+                is_open_now=b.is_open_now or False,
+                price_level=b.price_level,
+                promo_label=b.promo_label,
+                tags=json.loads(b.tags) if b.tags else [],
+                short_description=b.short_description or "",
+                avg_prep_time_min=b.avg_prep_time_min,
+                cover_image_url=b.cover_image_url,
+                gallery_urls=json.loads(b.gallery_urls) if b.gallery_urls else [],
             )
             # Load categories for the bar
             for c in b.categories:
@@ -492,6 +529,15 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
             longitude=float(b.longitude) if b.longitude is not None else 0.0,
             description=b.description or "",
             photo_url=b.photo_url,
+            rating=b.rating or 0.0,
+            is_open_now=b.is_open_now or False,
+            price_level=b.price_level,
+            promo_label=b.promo_label,
+            tags=json.loads(b.tags) if b.tags else [],
+            short_description=b.short_description or "",
+            avg_prep_time_min=b.avg_prep_time_min,
+            cover_image_url=b.cover_image_url,
+            gallery_urls=json.loads(b.gallery_urls) if b.gallery_urls else [],
         )
         bars[bar_id] = bar
     else:
@@ -503,6 +549,15 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
         bar.longitude = float(b.longitude) if b.longitude is not None else 0.0
         bar.description = b.description or ""
         bar.photo_url = b.photo_url
+        bar.rating = b.rating or 0.0
+        bar.is_open_now = b.is_open_now or False
+        bar.price_level = b.price_level
+        bar.promo_label = b.promo_label
+        bar.tags = json.loads(b.tags) if b.tags else []
+        bar.short_description = b.short_description or ""
+        bar.avg_prep_time_min = b.avg_prep_time_min
+        bar.cover_image_url = b.cover_image_url
+        bar.gallery_urls = json.loads(b.gallery_urls) if b.gallery_urls else []
         bar.categories.clear()
         bar.products.clear()
     for c in b.categories:
@@ -595,6 +650,7 @@ async def home(request: Request, db: Session = Depends(get_db)):
     db_bars = db.query(BarModel).all()
     for bar in db_bars:
         bar.photo_url = make_absolute_url(bar.photo_url, request)
+        bar.cover_image_url = make_absolute_url(bar.cover_image_url, request)
     return render_template("home.html", request=request, bars=db_bars)
 
 
@@ -604,6 +660,7 @@ async def search_bars(request: Request, q: str = "", db: Session = Depends(get_d
     db_bars = db.query(BarModel).all()
     for bar in db_bars:
         bar.photo_url = make_absolute_url(bar.photo_url, request)
+        bar.cover_image_url = make_absolute_url(bar.cover_image_url, request)
     results = [
         bar
         for bar in db_bars
@@ -649,6 +706,15 @@ class BarCreate(BaseModel):
     photo_url: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
+    rating: Optional[float] = 0.0
+    is_open_now: Optional[bool] = False
+    price_level: Optional[int] = None
+    promo_label: Optional[str] = None
+    tags: Optional[str] = None
+    short_description: Optional[str] = None
+    avg_prep_time_min: Optional[int] = None
+    cover_image_url: Optional[str] = None
+    gallery_urls: Optional[str] = None
 
 
 class BarRead(BaseModel):
@@ -662,6 +728,15 @@ class BarRead(BaseModel):
     photo_url: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
+    rating: float = 0.0
+    is_open_now: bool = False
+    price_level: Optional[int] = None
+    promo_label: Optional[str] = None
+    tags: Optional[str] = None
+    short_description: Optional[str] = None
+    avg_prep_time_min: Optional[int] = None
+    cover_image_url: Optional[str] = None
+    gallery_urls: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -1133,6 +1208,17 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
     latitude = form.get("latitude")
     longitude = form.get("longitude")
     description = form.get("description")
+    short_description = form.get("short_description")
+    cover_image_url = form.get("cover_image_url")
+    gallery_urls = form.get("gallery_urls")
+    rating = form.get("rating")
+    is_open_now = form.get("is_open_now") == "on"
+    price_level = form.get("price_level")
+    promo_label = form.get("promo_label")
+    tags = form.get("tags")
+    avg_prep_time_min = form.get("avg_prep_time_min")
+    tags_json = json.dumps([t.strip() for t in tags.split(",") if t.strip()]) if tags else None
+    gallery_json = json.dumps([u.strip() for u in gallery_urls.split(",") if u.strip()]) if gallery_urls else None
     photo_file = form.get("photo")
     photo_url = None
     if isinstance(photo_file, UploadFile) and photo_file.filename:
@@ -1243,6 +1329,15 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
         bar.longitude = lon
         bar.description = description
         bar.photo_url = photo_url
+        bar.short_description = short_description
+        bar.cover_image_url = cover_image_url
+        bar.gallery_urls = gallery_json
+        bar.rating = float(rating) if rating else 0.0
+        bar.is_open_now = is_open_now
+        bar.price_level = int(price_level) if price_level else None
+        bar.promo_label = promo_label
+        bar.tags = tags_json
+        bar.avg_prep_time_min = int(avg_prep_time_min) if avg_prep_time_min else None
         db.commit()
         mem_bar = bars.get(bar_id)
         if mem_bar:
@@ -1254,6 +1349,15 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
             mem_bar.longitude = lon
             mem_bar.description = description
             mem_bar.photo_url = photo_url
+            mem_bar.short_description = short_description or ""
+            mem_bar.cover_image_url = cover_image_url
+            mem_bar.gallery_urls = [u.strip() for u in gallery_urls.split(",") if u.strip()] if gallery_urls else []
+            mem_bar.rating = float(rating) if rating else 0.0
+            mem_bar.is_open_now = is_open_now
+            mem_bar.price_level = int(price_level) if price_level else None
+            mem_bar.promo_label = promo_label
+            mem_bar.tags = [t.strip() for t in tags.split(",") if t.strip()] if tags else []
+            mem_bar.avg_prep_time_min = int(avg_prep_time_min) if avg_prep_time_min else None
         if user.is_super_admin:
             return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
