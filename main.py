@@ -41,7 +41,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from sqlalchemy import inspect, text, func
+from sqlalchemy import inspect, text, func, extract
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -1471,14 +1471,14 @@ async def admin_analytics(request: Request, db: Session = Depends(get_db)):
 
     peak = (
         db.query(
-            func.strftime("%H", Order.created_at).label("hour"),
+            extract('hour', Order.created_at).label("hour"),
             func.count(Order.id).label("cnt"),
         )
         .group_by("hour")
         .order_by(func.count(Order.id).desc())
         .first()
     )
-    peak_hour = peak.hour if peak else "N/A"
+    peak_hour = f"{int(peak.hour):02d}" if peak else "N/A"
 
     top_bar = (
         db.query(BarModel.name, func.count(Order.id).label("cnt"))
@@ -1528,14 +1528,14 @@ async def admin_analytics(request: Request, db: Session = Depends(get_db)):
 
     hourly = (
         db.query(
-            func.strftime("%H", Order.created_at).label("hour"),
+            extract('hour', Order.created_at).label("hour"),
             func.count(Order.id).label("cnt"),
         )
         .group_by("hour")
         .order_by("hour")
         .all()
     )
-    hourly_labels = [h.hour for h in hourly]
+    hourly_labels = [f"{int(h.hour):02d}" for h in hourly]
     hourly_orders = [h.cnt for h in hourly]
 
     top_products = (
