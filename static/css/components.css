@@ -59,6 +59,9 @@ body.dark-mode{
 .btn--primary:hover{background:var(--brand-600);transform:translateY(-1px);}
 
 .badge{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:var(--brand);color:#fff;padding:0 var(--space-1);font-size:.75rem;}
+.status{font-weight:600;}
+.status-open{color:#2563eb;}
+.status-closed{color:#dc2626;}
 
 .card{background:var(--surface);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:.25s;display:flex;flex-direction:column;}
 .card:hover{transform:translateY(-2px);}
