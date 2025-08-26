@@ -162,6 +162,26 @@ document.addEventListener('DOMContentLoaded', function() {
     items.forEach(it=>list.appendChild(it));
   }
 
+  function showNearestOpenBars(){
+    const list = document.getElementById('barList');
+    if(!list) return;
+    const items = Array.from(list.children);
+    let shown = 0;
+    let anyOpen = false;
+    items.forEach(li => {
+      const open = li.querySelector('.bar-card').dataset.open === 'true';
+      if (open && shown < 5) {
+        li.hidden = false;
+        shown++;
+        anyOpen = true;
+      } else {
+        li.hidden = true;
+      }
+    });
+    const msg = document.getElementById('noBarsMessage');
+    if (msg) msg.hidden = anyOpen;
+  }
+
   function updateDistances(uLat, uLon) {
     allBarItems.forEach(item => {
       const bLat = parseFloat(item.dataset.latitude);
@@ -172,6 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
       renderMeta(item, { rating: item.dataset.rating, distance_km: dist });
     });
     sortBarsByDistance();
+    showNearestOpenBars();
   }
 
   function reverseGeocode(lat, lon) {
@@ -211,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     sortBarsByDistance();
+    showNearestOpenBars();
 
     function geocodeAndSet(city) {
       fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(city)}`)

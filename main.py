@@ -643,13 +643,17 @@ def render_template(template_name: str, **context) -> HTMLResponse:
                 "cart_count",
                 sum(item.quantity for item in cart.items.values()),
             )
-        last_bar_id = request.session.get("last_bar_id")
-        if last_bar_id is not None:
+        recent_ids = request.session.get("recent_bar_ids", [])
+        if recent_ids:
             with SessionLocal() as db:
-                bar = db.get(BarModel, last_bar_id)
-                if bar:
-                    bar.photo_url = make_absolute_url(bar.photo_url, request)
-                    context.setdefault("last_bar", bar)
+                recent_bars = []
+                for bar_id in reversed(recent_ids):
+                    bar = db.get(BarModel, bar_id)
+                    if bar:
+                        bar.photo_url = make_absolute_url(bar.photo_url, request)
+                        bar.is_open_now = is_bar_open_now(bar)
+                        recent_bars.append(bar)
+                context.setdefault("recent_bars", recent_bars)
 
     # Ensure Google Maps API key is available to templates from environment.
     api_key = os.getenv("GOOGLE_MAPS_API_KEY")
@@ -897,7 +901,13 @@ async def bar_detail(request: Request, bar_id: int):
     bar = bars.get(bar_id)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
-    request.session["last_bar_id"] = bar.id
+    recent = request.session.get("recent_bar_ids", [])
+    if bar.id in recent:
+        recent.remove(bar.id)
+    recent.append(bar.id)
+    if len(recent) > 5:
+        recent = recent[-5:]
+    request.session["recent_bar_ids"] = recent
     # group products by category
     products_by_category: Dict[Category, List[Product]] = {}
     for prod in bar.products.values():

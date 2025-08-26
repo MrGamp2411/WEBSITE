@@ -26,48 +26,16 @@
 </section>
 {% endif %}
 
-{% if last_bar %}
+{% if recent_bars %}
 <section>
-  <h2>Your last visited bar</h2>
+  <h2>Recently visited</h2>
   <ul class="bars">
-    <li>
-      <a class="bar-card" href="/bars/{{ last_bar.id }}" aria-label="Apri {{ last_bar.name }}" data-name="{{ last_bar.name|lower }}" data-address="{{ last_bar.address|lower }}" data-city="{{ last_bar.city|lower }}" data-state="{{ last_bar.state|lower }}" data-latitude="{{ last_bar.latitude }}" data-longitude="{{ last_bar.longitude }}" data-rating="{{ last_bar.rating or '' }}" data-distance_km="{{ last_bar.distance_km or '' }}" data-categories="" data-open="{{ 'true' if last_bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
-        <div class="thumb-wrapper">
-        {% if last_bar.photo_url %}
-        <img class="thumb" src="{{ last_bar.photo_url }}" alt="{{ last_bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ last_bar.photo_url }} 400w, {{ last_bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" fetchpriority="high" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
-        {% else %}
-        <img class="thumb" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
-        {% endif %}
-        </div>
-        {% if last_bar.is_open_now %}
-        <span class="status status-open">Open now</span>
-        {% else %}
-        <span class="status status-closed">Closed now</span>
-        {% endif %}
-        {% if last_bar.promo_label %}<span class="badge badge-promo">{{ last_bar.promo_label }}</span>{% endif %}
-        <h3 class="title" itemprop="name">{{ last_bar.name }}</h3>
-        <div class="bar-meta">
-          {% if last_bar.rating %}<span class="bar-rating"><i class="bi bi-star-fill" aria-hidden="true"></i> {{ '%.1f'|format(last_bar.rating) }}</span>{% endif %}
-          <span class="bar-distance" data-has-distance="true" hidden></span>
-        </div>
-        <address>{{ last_bar.address }}, {{ last_bar.city }}, {{ last_bar.state }}</address>
-        <p class="desc">{{ last_bar.description }}</p>
-      </a>
-    </li>
-  </ul>
-</section>
-{% endif %}
-
-<section>
-  <h2 id="bars">Available Bars</h2>
-  <p id="nearestBar" aria-live="polite"></p>
-  <ul class="bars" id="barList">
-    {% for bar in bars %}
+    {% for bar in recent_bars %}
     <li>
       <a class="bar-card" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
         <div class="thumb-wrapper">
         {% if bar.photo_url %}
-        <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" {% if not last_bar and loop.first %}fetchpriority="high"{% endif %} onerror="this.src='{{ fallback_img }}';this.onerror=null;">
+        <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
         {% else %}
         <img class="thumb" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
         {% endif %}
@@ -89,6 +57,42 @@
     </li>
     {% endfor %}
   </ul>
+</section>
+{% endif %}
+
+<section>
+  <h2 id="bars">Nearby Open Bars</h2>
+  <p id="nearestBar" aria-live="polite"></p>
+  <ul class="bars" id="barList">
+    {% for bar in bars %}
+    <li>
+      <a class="bar-card" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
+        <div class="thumb-wrapper">
+        {% if bar.photo_url %}
+        <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" {% if not recent_bars and loop.first %}fetchpriority="high"{% endif %} onerror="this.src='{{ fallback_img }}';this.onerror=null;">
+        {% else %}
+        <img class="thumb" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
+        {% endif %}
+        </div>
+        {% if bar.is_open_now %}
+        <span class="status status-open">Open now</span>
+        {% else %}
+        <span class="status status-closed">Closed now</span>
+        {% endif %}
+        {% if bar.promo_label %}<span class="badge badge-promo">{{ bar.promo_label }}</span>{% endif %}
+        <h3 class="title" itemprop="name">{{ bar.name }}</h3>
+        <div class="bar-meta">
+          {% if bar.rating %}<span class="bar-rating"><i class="bi bi-star-fill" aria-hidden="true"></i> {{ '%.1f'|format(bar.rating) }}</span>{% endif %}
+          <span class="bar-distance" data-has-distance="true" hidden></span>
+        </div>
+        <address>{{ bar.address }}, {{ bar.city }}, {{ bar.state }}</address>
+        <p class="desc">{{ bar.description }}</p>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  <p id="noBarsMessage" hidden>Sorry but all bars are closed at the moment</p>
+  <a class="btn btn--primary" href="/search">Browse Bars</a>
 </section>
 
 <section id="how">
