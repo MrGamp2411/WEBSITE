@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-  const FALLBACK_IMG = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZWVlJy8+PC9zdmc+";
+  const FALLBACK_IMG = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+";
   const nav = document.querySelector('.navbar');
   if (nav) {
     const onScroll = () => nav.classList.toggle('is-scrolled', window.scrollY > 8);
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const items = bars.map(bar => `
       <li data-bar-id="${bar.id}">
         <a class="bar-card" href="/bars/${bar.id}" aria-label="Apri ${bar.name}">
-          <img class="thumb" src="${bar.image_url || FALLBACK_IMG}" alt="${bar.name}" loading="lazy" decoding="async" width="400" height="225" onerror="this.src='${FALLBACK_IMG}';this.onerror=null;">
+          <div class="thumb-wrapper"><img class="thumb" src="${bar.photo_url || FALLBACK_IMG}" alt="${bar.name} photo" loading="lazy" decoding="async" width="400" height="225" srcset="${bar.photo_url || FALLBACK_IMG} 400w, ${bar.photo_url || FALLBACK_IMG} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='${FALLBACK_IMG}';this.onerror=null;"></div>
           <h3 class="title">${bar.name}</h3>
           <div class="bar-meta">
             <span class="bar-rating" data-has-rating="true" hidden></span>
