@@ -44,6 +44,7 @@
         <h3 class="title" itemprop="name">{{ last_bar.name }}</h3>
         <div class="bar-meta">
           {% if last_bar.rating %}<span class="bar-rating"><i class="bi bi-star-fill" aria-hidden="true"></i> {{ '%.1f'|format(last_bar.rating) }}</span>{% endif %}
+          <span class="bar-distance" data-has-distance="true" hidden></span>
         </div>
         <address>{{ last_bar.address }}, {{ last_bar.city }}, {{ last_bar.state }}</address>
         <p class="desc">{{ last_bar.description }}</p>
@@ -72,6 +73,7 @@
         <h3 class="title" itemprop="name">{{ bar.name }}</h3>
         <div class="bar-meta">
           {% if bar.rating %}<span class="bar-rating"><i class="bi bi-star-fill" aria-hidden="true"></i> {{ '%.1f'|format(bar.rating) }}</span>{% endif %}
+          <span class="bar-distance" data-has-distance="true" hidden></span>
         </div>
         <address>{{ bar.address }}, {{ bar.city }}, {{ bar.state }}</address>
         <p class="desc">{{ bar.description }}</p>

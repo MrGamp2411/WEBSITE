@@ -23,6 +23,25 @@
   <label for="photo">Photo
     <input id="photo" type="file" name="photo">
   </label>
+  <label for="manual_closed">
+    <input id="manual_closed" name="manual_closed" type="checkbox"> Close bar manually
+  </label>
+  {% set days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] %}
+  <table class="opening-hours">
+    <thead>
+      <tr><th>Day</th><th>Open</th><th>Close</th></tr>
+    </thead>
+    <tbody>
+    {% for day in days %}
+      {% set idx = loop.index0 %}
+      <tr>
+        <td>{{ day }}</td>
+        <td><input type="time" name="open_{{ idx }}"></td>
+        <td><input type="time" name="close_{{ idx }}"></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
   <input id="latitude" type="hidden" name="latitude" required>
   <input id="longitude" type="hidden" name="longitude" required>
   <button class="btn btn--primary" type="submit">Create Bar</button>

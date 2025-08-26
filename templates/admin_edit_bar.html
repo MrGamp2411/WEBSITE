@@ -29,9 +29,26 @@
   <label for="rating">Rating
     <input id="rating" name="rating" type="number" min="0" max="5" step="0.1" value="{{ bar.rating or 0 }}">
   </label>
-  <label for="is_open_now">
-    <input id="is_open_now" name="is_open_now" type="checkbox" {% if bar.is_open_now %}checked{% endif %}> Open now
+  <label for="manual_closed">
+    <input id="manual_closed" name="manual_closed" type="checkbox" {% if bar.manual_closed %}checked{% endif %}> Close bar manually
   </label>
+  {% set days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] %}
+  <table class="opening-hours">
+    <thead>
+      <tr><th>Day</th><th>Open</th><th>Close</th></tr>
+    </thead>
+    <tbody>
+    {% for day in days %}
+      {% set idx = loop.index0 %}
+      {% set h = hours.get(idx|string) if hours else None %}
+      <tr>
+        <td>{{ day }}</td>
+        <td><input type="time" name="open_{{ idx }}" value="{{ h.open if h }}"></td>
+        <td><input type="time" name="close_{{ idx }}" value="{{ h.close if h }}"></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
   <label for="promo_label">Promo Label
     <input id="promo_label" name="promo_label" value="{{ bar.promo_label or '' }}">
   </label>
