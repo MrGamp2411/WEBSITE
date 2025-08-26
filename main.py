@@ -326,11 +326,16 @@ def ensure_category_columns() -> None:
     """Ensure expected columns exist on the categories table."""
     inspector = inspect(engine)
     columns = {col["name"] for col in inspector.get_columns("categories")}
-    if "description" not in columns:
+    required = {"description": "TEXT", "photo_url": "VARCHAR(255)"}
+    missing = {name: ddl for name, ddl in required.items() if name not in columns}
+    if missing:
         with engine.begin() as conn:
-            conn.execute(
-                text("ALTER TABLE categories ADD COLUMN IF NOT EXISTS description TEXT")
-            )
+            for name, ddl in missing.items():
+                conn.execute(
+                    text(
+                        f"ALTER TABLE categories ADD COLUMN IF NOT EXISTS {name} {ddl}"
+                    )
+                )
 
 
 @app.on_event("startup")
