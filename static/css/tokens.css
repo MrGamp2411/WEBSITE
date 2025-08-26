@@ -11,7 +11,7 @@
   --color-muted:#9AA4B2; --color-primary:#5B8CFF; --color-primary-600:#3E6EF2;
   --color-success:#10B981; --color-warning:#F59E0B; --color-danger:#EF4444;
   /* tipografia */
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
   --fs-100:12px; --fs-200:14px; --fs-300:16px; --fs-400:18px; --fs-500:20px; --fs-600:24px; --fs-700:32px; --fs-800:40px; --fs-900:56px;
   /* spaziatura & raggio & ombre */
   --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px; --space-6:32px; --space-7:48px;
