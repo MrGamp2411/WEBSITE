@@ -89,7 +89,7 @@ function applyFilters(bars, state) {
     .filter(b => state.active.max_km ? (b.distance_km == null ? false : b.distance_km <= Number(state.max_km)) : true)
     .filter(b => state.active.min_rating ? (b.rating == null ? false : b.rating >= Number(state.min_rating)) : true)
     .filter(b => state.active.categories ? (b.categories || []).some(c => state.categories.includes(c)) : true)
-    .filter(b => state.active.open_now ? !!b.is_open : true);
+    .filter(b => state.open_now ? !!b.is_open : true);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -119,8 +119,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     max_km: null,
     min_rating: null,
     categories: [],
-    open_now: false,
-    active: { max_km: false, min_rating: false, categories: false, open_now: false }
+    open_now: true,
+    active: { max_km: false, min_rating: false, categories: false }
   };
   let state = JSON.parse(JSON.stringify(defaults));
   let appliedState = JSON.parse(JSON.stringify(defaults));
@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (s.active.max_km) p.set('max_km', s.max_km);
     if (s.active.min_rating) p.set('min_rating', s.min_rating);
     if (s.active.categories) p.set('cat', s.categories.join(','));
-    if (s.active.open_now && s.open_now) p.set('open_now', '1');
+    if (!s.open_now) p.set('open_now', '0');
     const newUrl = `${location.pathname}?${p.toString()}`;
     history.replaceState(null, '', newUrl);
   }
@@ -213,12 +213,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       localStorage.removeItem(prefix + 'categories');
       localStorage.removeItem(prefix + 'active.categories');
     }
-    if (s.active.open_now && s.open_now) {
-      localStorage.setItem(prefix + 'open_now', '1');
-      localStorage.setItem(prefix + 'active.open_now', '1');
+    if (!s.open_now) {
+      localStorage.setItem(prefix + 'open_now', '0');
     } else {
       localStorage.removeItem(prefix + 'open_now');
-      localStorage.removeItem(prefix + 'active.open_now');
     }
   }
 
@@ -229,7 +227,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (p.get('max_km')) { s.max_km = parseFloat(p.get('max_km')); s.active.max_km = true; }
     if (p.get('min_rating')) { s.min_rating = parseFloat(p.get('min_rating')); s.active.min_rating = true; }
     if (p.get('cat')) { s.categories = p.get('cat').split(',').filter(Boolean); s.active.categories = true; }
-    if (p.get('open_now') === '1') { s.open_now = true; s.active.open_now = true; }
+    if (p.has('open_now')) { s.open_now = p.get('open_now') === '1'; }
     return s;
   }
 
@@ -250,9 +248,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const cats = localStorage.getItem(prefix + 'categories');
       if (cats) { s.categories = cats.split(',').filter(Boolean); s.active.categories = true; }
     }
-    if (localStorage.getItem(prefix + 'active.open_now') === '1') {
-      s.open_now = true; s.active.open_now = true;
-    }
+    const on = localStorage.getItem(prefix + 'open_now');
+    if (on !== null) { s.open_now = on === '1'; }
     return s;
   }
 
@@ -320,10 +317,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       const group = openCheckbox.closest('.group');
       openCheckbox.checked = state.open_now;
       openVal.textContent = state.open_now ? 'Sì' : 'No';
-      openVal.hidden = !state.active.open_now;
-      group.dataset.active = state.active.open_now ? 'true' : 'false';
+      openVal.hidden = !state.open_now;
+      group.dataset.active = state.open_now ? 'true' : 'false';
     }
-    applyBtn && (applyBtn.disabled = Object.values(state.active).filter(Boolean).length === 0);
+    const activeCount = Object.values(state.active).filter(Boolean).length;
+    const openChanged = state.open_now !== defaults.open_now;
+    applyBtn && (applyBtn.disabled = activeCount === 0 && !openChanged);
   }
 
   function updateFilterBadge(s) {
@@ -413,7 +412,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   openCheckbox?.addEventListener('change', e => {
     state.open_now = e.target.checked;
-    state.active.open_now = e.target.checked;
     updateControls();
   });
 
