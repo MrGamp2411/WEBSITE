@@ -684,13 +684,39 @@ async def home(request: Request, db: Session = Depends(get_db)):
     return render_template("home.html", request=request, bars=db_bars)
 
 
+def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Calculate distance in kilometers between two lat/lon points."""
+    from math import asin, cos, radians, sin, sqrt
+
+    dlat = radians(lat2 - lat1)
+    dlon = radians(lon2 - lon1)
+    a = sin(dlat / 2) ** 2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon / 2) ** 2
+    c = 2 * asin(sqrt(a))
+    return 6371 * c
+
+
 @app.get("/search", response_class=HTMLResponse)
-async def search_bars(request: Request, q: str = "", db: Session = Depends(get_db)):
+async def search_bars(
+    request: Request,
+    q: str = "",
+    lat: float | None = None,
+    lng: float | None = None,
+    db: Session = Depends(get_db),
+):
     term = q.lower()
     db_bars = db.query(BarModel).all()
     for bar in db_bars:
         bar.photo_url = make_absolute_url(bar.photo_url, request)
         bar.is_open_now = is_bar_open_now(bar)
+        if (
+            lat is not None
+            and lng is not None
+            and bar.latitude is not None
+            and bar.longitude is not None
+        ):
+            bar.distance_km = _haversine_km(float(lat), float(lng), float(bar.latitude), float(bar.longitude))
+        else:
+            bar.distance_km = None
     results = [
         bar
         for bar in db_bars
@@ -699,7 +725,22 @@ async def search_bars(request: Request, q: str = "", db: Session = Depends(get_d
         or term in (bar.city or "").lower()
         or term in (bar.state or "").lower()
     ]
-    return render_template("search.html", request=request, bars=results, query=q)
+
+    rated_within = [b for b in results if b.rating is not None and b.distance_km is not None and b.distance_km <= 5]
+    rated_within.sort(key=lambda b: (-b.rating, b.distance_km))
+    top_bars = rated_within[:5]
+    if len(top_bars) < 5:
+        others = [b for b in results if b not in top_bars and b.distance_km is not None]
+        others.sort(key=lambda b: b.distance_km)
+        top_bars.extend(others[: 5 - len(top_bars)])
+
+    return render_template(
+        "search.html",
+        request=request,
+        bars=results,
+        top_bars=top_bars,
+        query=q,
+    )
 
 
 @app.get("/api/search")
