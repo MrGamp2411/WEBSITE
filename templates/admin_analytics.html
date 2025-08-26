@@ -20,20 +20,42 @@
 </nav>
 <div id="overview" class="tab-content active">
   <div class="dashboard-actions">
-    <div class="card"><h3>Ordini</h3><p>{{ stats.orders }}</p></div>
-    <div class="card"><h3>GMV lordo</h3><p>CHF {{ '%.2f'|format(stats.gmv_gross) }}</p></div>
-    <div class="card"><h3>GMV netto</h3><p>CHF {{ '%.2f'|format(stats.gmv_net) }}</p></div>
-    <div class="card"><h3>AOV</h3><p>CHF {{ '%.2f'|format(stats.aov) }}</p></div>
-    <div class="card"><h3>Commissioni SiplyGo</h3><p>CHF {{ '%.2f'|format(stats.commission_amount) }} ({{ '%.1f'|format(stats.commission_pct) }}%)</p></div>
-    <div class="card"><h3>Netto al bar</h3><p>CHF {{ '%.2f'|format(stats.payout_total) }}</p></div>
-    <div class="card"><h3>Tips</h3><p>CHF {{ '%.2f'|format(stats.tips) }}</p></div>
-    <div class="card"><h3>Tasso cancellazione</h3><p>{{ '%.1f'|format(stats.cancellation_rate) }}%</p></div>
+    <div class="card" title="Numero totale di ordini effettuati nel periodo selezionato">
+      <h3>Ordini</h3><p>{{ stats.orders }}</p>
+    </div>
+    <div class="card" title="Valore complessivo degli ordini prima di tasse e commissioni">
+      <h3>GMV lordo</h3><p>CHF {{ '%.2f'|format(stats.gmv_gross) }}</p>
+    </div>
+    <div class="card" title="Valore complessivo degli ordini dopo tasse e commissioni">
+      <h3>GMV netto</h3><p>CHF {{ '%.2f'|format(stats.gmv_net) }}</p>
+    </div>
+    <div class="card" title="Valore medio per ordine (Average Order Value)">
+      <h3>AOV</h3><p>CHF {{ '%.2f'|format(stats.aov) }}</p>
+    </div>
+    <div class="card" title="Importo e percentuale delle commissioni trattenute da SiplyGo">
+      <h3>Commissioni SiplyGo</h3><p>CHF {{ '%.2f'|format(stats.commission_amount) }} ({{ '%.1f'|format(stats.commission_pct) }}%)</p>
+    </div>
+    <div class="card" title="Importo che spetta al bar dopo commissioni e tasse">
+      <h3>Netto al bar</h3><p>CHF {{ '%.2f'|format(stats.payout_total) }}</p>
+    </div>
+    <div class="card" title="Mance totali raccolte tramite la piattaforma">
+      <h3>Tips</h3><p>CHF {{ '%.2f'|format(stats.tips) }}</p>
+    </div>
+    <div class="card" title="Percentuale di ordini cancellati sul totale">
+      <h3>Tasso cancellazione</h3><p>{{ '%.1f'|format(stats.cancellation_rate) }}%</p>
+    </div>
   </div>
   <canvas id="gmvChart"></canvas>
   <div class="dashboard-actions">
-    <div class="card"><h4>Ora di picco</h4><p>{{ stats.peak_hour }}</p></div>
-    <div class="card"><h4>Categoria top</h4><p>{{ stats.top_category }}</p></div>
-    <div class="card"><h4>Bar top</h4><p>{{ stats.top_bar }}</p></div>
+    <div class="card" title="Fascia oraria con il maggior numero di ordini">
+      <h4>Ora di picco</h4><p>{{ stats.peak_hour }}</p>
+    </div>
+    <div class="card" title="Categoria di prodotti con il maggior fatturato">
+      <h4>Categoria top</h4><p>{{ stats.top_category }}</p>
+    </div>
+    <div class="card" title="Bar con il maggior volume di vendite">
+      <h4>Bar top</h4><p>{{ stats.top_bar }}</p>
+    </div>
   </div>
 </div>
 <div id="revenue" class="tab-content">
@@ -70,8 +92,12 @@
 </div>
 <div id="clients" class="tab-content">
   <div class="dashboard-actions">
-    <div class="card"><h4>Nuovi</h4><p>{{ stats.new_customers }}</p></div>
-    <div class="card"><h4>Ricorrenti</h4><p>{{ stats.returning_customers }}</p></div>
+    <div class="card" title="Clienti che hanno effettuato il primo ordine">
+      <h4>Nuovi</h4><p>{{ stats.new_customers }}</p>
+    </div>
+    <div class="card" title="Clienti che hanno effettuato più di un ordine">
+      <h4>Ricorrenti</h4><p>{{ stats.returning_customers }}</p>
+    </div>
   </div>
   <table>
     <tr><th>Cliente</th><th># ordini</th><th>Spesa</th><th>Ultimo acquisto</th></tr>
