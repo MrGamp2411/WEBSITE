@@ -26,6 +26,13 @@ The app will then be available at http://localhost:8000.
 
 This is a starting point for adding persistent storage and role-based features.
 
+## Timezone
+
+Opening hours are evaluated in the timezone specified by the
+`BAR_TIMEZONE` environment variable (or `TZ` if set). Ensure this variable
+matches your local timezone (e.g. `Europe/Rome`) so the "open now" status
+reflects your local time.
+
 ## API
 
 The application exposes minimal database-backed endpoints to illustrate
