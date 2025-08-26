@@ -18,7 +18,12 @@
       ('popular', 'Consigliati')
     ] %}
     {% for key, title in sections %}
-      {% set items = recent_bars if key == 'recent' else top_bars if key == 'top' else bars %}
+      {% set items =
+        recent_bars if key == 'recent' else
+        top_bars if key == 'top' else
+        recommended_bars if key == 'popular' else
+        bars
+      %}
       {% if items %}
       <section class="bar-section" data-section="{{ key }}">
         <div class="section-head">
