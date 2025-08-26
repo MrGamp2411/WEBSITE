@@ -322,12 +322,24 @@ def ensure_bar_columns() -> None:
                 conn.execute(text(f"ALTER TABLE bars ADD COLUMN IF NOT EXISTS {name} {ddl}"))
 
 
+def ensure_category_columns() -> None:
+    """Ensure expected columns exist on the categories table."""
+    inspector = inspect(engine)
+    columns = {col["name"] for col in inspector.get_columns("categories")}
+    if "description" not in columns:
+        with engine.begin() as conn:
+            conn.execute(
+                text("ALTER TABLE categories ADD COLUMN IF NOT EXISTS description TEXT")
+            )
+
+
 @app.on_event("startup")
 def on_startup():
     """Initialise database tables on startup."""
     Base.metadata.create_all(bind=engine)
     ensure_prefix_column()
     ensure_bar_columns()
+    ensure_category_columns()
     seed_super_admin()
     load_bars_from_db()
 
