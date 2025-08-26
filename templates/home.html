@@ -33,9 +33,8 @@
     <li>
       <a class="bar-card" href="/bars/{{ last_bar.id }}" aria-label="Apri {{ last_bar.name }}" data-name="{{ last_bar.name|lower }}" data-address="{{ last_bar.address|lower }}" data-city="{{ last_bar.city|lower }}" data-state="{{ last_bar.state|lower }}" data-latitude="{{ last_bar.latitude }}" data-longitude="{{ last_bar.longitude }}" data-rating="{{ last_bar.rating or '' }}" data-distance_km="{{ last_bar.distance_km or '' }}" data-categories="" data-open="{{ 'true' if last_bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
         <div class="thumb-wrapper">
-        {% set img = last_bar.cover_image_url or last_bar.photo_url %}
-        {% if img %}
-        <img class="thumb" src="{{ img }}" alt="{{ last_bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ img }} 400w, {{ img }} 800w" sizes="(max-width: 600px) 100vw, 400px" fetchpriority="high" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
+        {% if last_bar.photo_url %}
+        <img class="thumb" src="{{ last_bar.photo_url }}" alt="{{ last_bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ last_bar.photo_url }} 400w, {{ last_bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" fetchpriority="high" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
         {% else %}
         <img class="thumb" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
         {% endif %}
@@ -47,7 +46,7 @@
           {% if last_bar.rating %}<span class="bar-rating"><i class="bi bi-star-fill" aria-hidden="true"></i> {{ '%.1f'|format(last_bar.rating) }}</span>{% endif %}
         </div>
         <address>{{ last_bar.address }}, {{ last_bar.city }}, {{ last_bar.state }}</address>
-        <p class="desc">{{ last_bar.short_description or last_bar.description }}</p>
+        <p class="desc">{{ last_bar.description }}</p>
       </a>
     </li>
   </ul>
@@ -62,9 +61,8 @@
     <li>
       <a class="bar-card" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
         <div class="thumb-wrapper">
-        {% set img = bar.cover_image_url or bar.photo_url %}
-        {% if img %}
-        <img class="thumb" src="{{ img }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ img }} 400w, {{ img }} 800w" sizes="(max-width: 600px) 100vw, 400px" {% if not last_bar and loop.first %}fetchpriority="high"{% endif %} onerror="this.src='{{ fallback_img }}';this.onerror=null;">
+        {% if bar.photo_url %}
+        <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" {% if not last_bar and loop.first %}fetchpriority="high"{% endif %} onerror="this.src='{{ fallback_img }}';this.onerror=null;">
         {% else %}
         <img class="thumb" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
         {% endif %}
@@ -76,7 +74,7 @@
           {% if bar.rating %}<span class="bar-rating"><i class="bi bi-star-fill" aria-hidden="true"></i> {{ '%.1f'|format(bar.rating) }}</span>{% endif %}
         </div>
         <address>{{ bar.address }}, {{ bar.city }}, {{ bar.state }}</address>
-        <p class="desc">{{ bar.short_description or bar.description }}</p>
+        <p class="desc">{{ bar.description }}</p>
       </a>
     </li>
     {% endfor %}
