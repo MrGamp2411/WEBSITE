@@ -11,20 +11,22 @@ from models import Bar  # noqa: E402
 from main import app  # noqa: E402
 
 
-def setup_module(module):
+def reset_db():
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
 
-def test_top_rated_section_sorts_and_fills():
+def extract_top_section(html: str) -> str:
+    return html.split("I più votati", 1)[1].split("Consigliati", 1)[0]
+
+
+def test_top_rated_prefers_5km_radius():
+    reset_db()
     db = SessionLocal()
     bars = [
-        Bar(name="Bar D", slug="bar-d", rating=5.0, latitude=0.03, longitude=0.0),
-        Bar(name="Bar A", slug="bar-a", rating=4.9, latitude=0.0, longitude=0.0),
-        Bar(name="Bar C", slug="bar-c", rating=4.8, latitude=0.02, longitude=0.0),
-        Bar(name="Bar B", slug="bar-b", rating=4.5, latitude=0.01, longitude=0.0),
-        Bar(name="Bar F", slug="bar-f", rating=4.2, latitude=0.06, longitude=0.0),
-        Bar(name="Bar E", slug="bar-e", rating=3.5, latitude=0.5, longitude=0.0),
+        Bar(name="Near A", slug="near-a", rating=5.0, latitude=0.03, longitude=0.0),
+        Bar(name="Near B", slug="near-b", rating=4.5, latitude=0.04, longitude=0.0),
+        Bar(name="Mid", slug="mid", rating=4.9, latitude=0.08, longitude=0.0),
     ]
     db.add_all(bars)
     db.commit()
@@ -35,10 +37,82 @@ def test_top_rated_section_sorts_and_fills():
     with TestClient(app) as client:
         resp = client.get("/search?lat=0&lng=0")
         assert resp.status_code == 200
-        section = resp.text.split("I più votati", 1)[1].split("Consigliati", 1)[0]
-        expected = ["Bar D", "Bar A", "Bar C", "Bar B", "Bar F"]
+        section = extract_top_section(resp.text)
+        assert "Near A" in section
+        assert "Near B" in section
+        assert "Mid" not in section
+        assert section.index("Near A") < section.index("Near B")
+
+
+def test_top_rated_falls_back_to_10km():
+    reset_db()
+    db = SessionLocal()
+    bars = [
+        Bar(name="Mid A", slug="mid-a", rating=5.0, latitude=0.08, longitude=0.0),
+        Bar(name="Mid B", slug="mid-b", rating=4.5, latitude=0.089, longitude=0.0),
+        Bar(name="Far A", slug="far-a", rating=4.8, latitude=0.15, longitude=0.0),
+    ]
+    db.add_all(bars)
+    db.commit()
+    for b in bars:
+        db.refresh(b)
+    db.close()
+
+    with TestClient(app) as client:
+        resp = client.get("/search?lat=0&lng=0")
+        assert resp.status_code == 200
+        section = extract_top_section(resp.text)
+        assert "Mid A" in section
+        assert "Mid B" in section
+        assert "Far A" not in section
+        assert section.index("Mid A") < section.index("Mid B")
+
+
+def test_top_rated_falls_back_to_20km():
+    reset_db()
+    db = SessionLocal()
+    bars = [
+        Bar(name="Far B", slug="far-b", rating=5.0, latitude=0.17, longitude=0.0),
+        Bar(name="Far C", slug="far-c", rating=4.5, latitude=-0.16, longitude=0.0),
+        Bar(name="Too Far", slug="too-far", rating=4.9, latitude=0.25, longitude=0.0),
+    ]
+    db.add_all(bars)
+    db.commit()
+    for b in bars:
+        db.refresh(b)
+    db.close()
+
+    with TestClient(app) as client:
+        resp = client.get("/search?lat=0&lng=0")
+        assert resp.status_code == 200
+        section = extract_top_section(resp.text)
+        assert "Far B" in section
+        assert "Far C" in section
+        assert "Too Far" not in section
+        assert section.index("Far B") < section.index("Far C")
+
+
+def test_top_rated_section_without_location():
+    reset_db()
+    db = SessionLocal()
+    bars = [
+        Bar(name="Rated A", slug="rated-a", rating=5.0),
+        Bar(name="Rated B", slug="rated-b", rating=4.5),
+        Bar(name="Unrated", slug="unrated"),
+    ]
+    db.add_all(bars)
+    db.commit()
+    for b in bars:
+        db.refresh(b)
+    db.close()
+
+    with TestClient(app) as client:
+        resp = client.get("/search")
+        assert resp.status_code == 200
+        section = extract_top_section(resp.text)
+        expected = ["Rated A", "Rated B", "Unrated"]
         for name in expected:
             assert name in section
         positions = [section.index(name) for name in expected]
         assert positions == sorted(positions)
-        assert "Bar E" not in section
+
