@@ -36,6 +36,7 @@ import hashlib
 import json
 from typing import Dict, List, Optional
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from fastapi import Depends, FastAPI, HTTPException, Request, status, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -433,8 +434,14 @@ def slugify(value: str) -> str:
 
 
 def is_open_now_from_hours(hours: Dict[str, Dict[str, str]]) -> bool:
-    """Determine if a bar should be open now based on its hours dict."""
-    now = datetime.now()
+    """Determine if a bar should be open now based on its hours dict.
+
+    The current time is evaluated in the timezone specified by the
+    ``BAR_TIMEZONE`` environment variable (falling back to ``TZ`` if set).
+    If neither variable is defined the server's local timezone is used.
+    """
+    tz_name = os.getenv("BAR_TIMEZONE") or os.getenv("TZ")
+    now = datetime.now(ZoneInfo(tz_name)) if tz_name else datetime.now()
     day = str(now.weekday())
     info = hours.get(day)
     if not info:
