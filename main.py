@@ -459,6 +459,26 @@ def load_bars_from_db() -> None:
                     display_order=item.sort_order or 0,
                     photo_url=item.photo,
                 )
+            # Load user assignments
+            bar.bar_admin_ids = []
+            bar.bartender_ids = []
+            bar.pending_bartender_ids = []
+            roles = (
+                db.query(UserBarRole)
+                .filter(UserBarRole.bar_id == b.id)
+                .all()
+            )
+            for r in roles:
+                if r.role == RoleEnum.BARADMIN:
+                    bar.bar_admin_ids.append(r.user_id)
+                    if r.user_id in users:
+                        users[r.user_id].bar_id = b.id
+                        users[r.user_id].role = "bar_admin"
+                elif r.role == RoleEnum.BARTENDER:
+                    bar.bartender_ids.append(r.user_id)
+                    if r.user_id in users:
+                        users[r.user_id].bar_id = b.id
+                        users[r.user_id].role = "bartender"
             bars[b.id] = bar
     finally:
         db.close()
@@ -512,6 +532,22 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
             display_order=item.sort_order or 0,
             photo_url=item.photo,
         )
+    # Load user assignments
+    bar.bar_admin_ids = []
+    bar.bartender_ids = []
+    bar.pending_bartender_ids = []
+    roles = db.query(UserBarRole).filter(UserBarRole.bar_id == bar_id).all()
+    for r in roles:
+        if r.role == RoleEnum.BARADMIN:
+            bar.bar_admin_ids.append(r.user_id)
+            if r.user_id in users:
+                users[r.user_id].bar_id = bar_id
+                users[r.user_id].role = "bar_admin"
+        elif r.role == RoleEnum.BARTENDER:
+            bar.bartender_ids.append(r.user_id)
+            if r.user_id in users:
+                users[r.user_id].bar_id = bar_id
+                users[r.user_id].role = "bartender"
     return bar
 
 
@@ -1244,103 +1280,131 @@ async def delete_bar(request: Request, bar_id: int, db: Session = Depends(get_db
     return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
 
 
-@app.get("/admin/bars/{bar_id}/add_user", response_class=HTMLResponse)
-async def add_user_to_bar(request: Request, bar_id: int):
+@app.get("/admin/bars/{bar_id}/users", response_class=HTMLResponse)
+async def manage_bar_users(request: Request, bar_id: int, db: Session = Depends(get_db)):
     user = get_current_user(request)
-    bar = bars.get(bar_id)
-    if not bar:
-        raise HTTPException(status_code=404, detail="Bar not found")
-    if not user or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)):
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar or not user or not (
+        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    global next_user_id
-    username = request.query_params.get("username")
-    password = request.query_params.get("password")
-    email = request.query_params.get("email")
-    role = request.query_params.get("role")
-    if username and role:
-        if role not in ("bar_admin", "bartender"):
-            raise HTTPException(status_code=400, detail="Invalid role")
-        existing = users_by_username.get(username)
-        if role == "bar_admin":
-            if existing:
-                return render_template(
-                    "admin_add_user_to_bar.html",
-                    request=request,
-                    bar=bar,
-                    error="Username already taken",
+    staff = [
+        _load_demo_user(uid, db) for uid in bar.bar_admin_ids + bar.bartender_ids
+    ]
+    return render_template(
+        "admin_bar_users.html", request=request, bar=bar, staff=staff
+    )
+
+
+@app.post("/admin/bars/{bar_id}/users", response_class=HTMLResponse)
+async def manage_bar_users_post(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
+    current = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar or not current or not (
+        current.is_super_admin or (current.is_bar_admin and current.bar_id == bar_id)
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    action = form.get("action")
+    role = form.get("role")
+    role_map = {"bar_admin": RoleEnum.BARADMIN, "bartender": RoleEnum.BARTENDER}
+    error = None
+    message = None
+    if action == "existing":
+        email = form.get("email")
+        if not email or role not in role_map:
+            error = "Email and role required"
+        else:
+            db_user = db.query(User).filter(User.email == email).first()
+            if not db_user:
+                error = "User not found"
+            else:
+                db_user.role = role_map[role]
+                rel = (
+                    db.query(UserBarRole)
+                    .filter(
+                        UserBarRole.user_id == db_user.id,
+                        UserBarRole.bar_id == bar_id,
+                    )
+                    .first()
                 )
-            if not password or not email:
-                return render_template(
-                    "admin_add_user_to_bar.html",
-                    request=request,
-                    bar=bar,
-                    error="Email and password required",
-                )
-            if email in users_by_email:
-                return render_template(
-                    "admin_add_user_to_bar.html",
-                    request=request,
-                    bar=bar,
-                    error="Email already taken",
-                )
-            new_user = DemoUser(
-                id=next_user_id,
+                if not rel:
+                    rel = UserBarRole(
+                        user_id=db_user.id, bar_id=bar_id, role=role_map[role]
+                    )
+                    db.add(rel)
+                else:
+                    rel.role = role_map[role]
+                db.commit()
+                demo = _load_demo_user(db_user.id, db)
+                demo.role = role
+                demo.bar_id = bar_id
+                if role == "bar_admin":
+                    if demo.id not in bar.bar_admin_ids:
+                        bar.bar_admin_ids.append(demo.id)
+                    if demo.id in bar.bartender_ids:
+                        bar.bartender_ids.remove(demo.id)
+                else:
+                    if demo.id not in bar.bartender_ids:
+                        bar.bartender_ids.append(demo.id)
+                    if demo.id in bar.bar_admin_ids:
+                        bar.bar_admin_ids.remove(demo.id)
+                message = "User assigned"
+    elif action == "new":
+        username = form.get("username")
+        email = form.get("email")
+        password = form.get("password")
+        if not all([username, email, password]) or role not in role_map:
+            error = "All fields are required"
+        elif username in users_by_username or db.query(User).filter(User.username == username).first():
+            error = "Username already taken"
+        elif email in users_by_email or db.query(User).filter(User.email == email).first():
+            error = "Email already taken"
+        else:
+            password_hash = hashlib.sha256(password.encode("utf-8")).hexdigest()
+            db_user = User(
+                username=username,
+                email=email,
+                password_hash=password_hash,
+                role=role_map[role],
+            )
+            db.add(db_user)
+            db.commit()
+            db.refresh(db_user)
+            db_role = UserBarRole(
+                user_id=db_user.id, bar_id=bar_id, role=role_map[role]
+            )
+            db.add(db_role)
+            db.commit()
+            demo = DemoUser(
+                id=db_user.id,
                 username=username,
                 password=password,
                 email=email,
-                role="bar_admin",
+                role=role,
                 bar_id=bar_id,
             )
-            next_user_id += 1
-            users[new_user.id] = new_user
-            users_by_username[new_user.username] = new_user
-            users_by_email[new_user.email] = new_user
-            bar.bar_admin_ids.append(new_user.id)
-            return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
-        else:  # bartender
-            if existing:
-                existing.pending_bar_id = bar_id
-                bar.pending_bartender_ids.append(existing.id)
-                return render_template(
-                    "admin_add_user_to_bar.html",
-                    request=request,
-                    bar=bar,
-                    message="Invitation sent",
-                )
-            if not password or not email:
-                return render_template(
-                    "admin_add_user_to_bar.html",
-                    request=request,
-                    bar=bar,
-                    error="Email and password required",
-                )
-            if email in users_by_email:
-                return render_template(
-                    "admin_add_user_to_bar.html",
-                    request=request,
-                    bar=bar,
-                    error="Email already taken",
-                )
-            new_user = DemoUser(
-                id=next_user_id,
-                username=username,
-                password=password,
-                email=email,
-                role="bartender_pending",
-                pending_bar_id=bar_id,
-            )
-            next_user_id += 1
-            users[new_user.id] = new_user
-            users_by_username[new_user.username] = new_user
-            users_by_email[new_user.email] = new_user
-            bar.pending_bartender_ids.append(new_user.id)
-            return render_template(
-                "admin_add_user_to_bar.html",
-                request=request,
-                bar=bar,
-                message="Invitation sent",
-            )
-    return render_template("admin_add_user_to_bar.html", request=request, bar=bar)
+            users[demo.id] = demo
+            users_by_username[demo.username] = demo
+            users_by_email[demo.email] = demo
+            if role == "bar_admin":
+                bar.bar_admin_ids.append(demo.id)
+            else:
+                bar.bartender_ids.append(demo.id)
+            message = "User created"
+    staff = [
+        _load_demo_user(uid, db) for uid in bar.bar_admin_ids + bar.bartender_ids
+    ]
+    return render_template(
+        "admin_bar_users.html",
+        request=request,
+        bar=bar,
+        staff=staff,
+        error=error,
+        message=message,
+    )
 
 
 @app.get("/confirm_bartender", response_class=HTMLResponse)
@@ -1454,18 +1518,30 @@ def _load_demo_user(user_id: int, db: Session) -> DemoUser:
 @app.get("/admin/users/edit/{user_id}", response_class=HTMLResponse)
 async def edit_user(request: Request, user_id: int, db: Session = Depends(get_db)):
     current = get_current_user(request)
-    if not current or not current.is_super_admin:
+    if not current:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     user = _load_demo_user(user_id, db)
-    return render_template("admin_edit_user.html", request=request, user=user, bars=bars.values())
+    if not (
+        current.is_super_admin
+        or (current.is_bar_admin and user.bar_id == current.bar_id)
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template(
+        "admin_edit_user.html", request=request, user=user, bars=bars.values(), current=current
+    )
 
 
 @app.post("/admin/users/edit/{user_id}", response_class=HTMLResponse)
 async def update_user(request: Request, user_id: int, db: Session = Depends(get_db)):
     current = get_current_user(request)
-    if not current or not current.is_super_admin:
+    if not current:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     user = _load_demo_user(user_id, db)
+    if not (
+        current.is_super_admin
+        or (current.is_bar_admin and user.bar_id == current.bar_id)
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
     username = form.get("username")
     password = form.get("password")
@@ -1475,14 +1551,9 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     role = form.get("role")
     bar_id = form.get("bar_id")
     credit = form.get("credit")
-    if not (
-        username
-        and email is not None
-        and role is not None
-        and credit is not None
-    ):
+    if not (username and email is not None and role is not None):
         return render_template(
-            "admin_edit_user.html", request=request, user=user, bars=bars.values()
+            "admin_edit_user.html", request=request, user=user, bars=bars.values(), current=current
         )
     if username != user.username and (
         username in users_by_username
@@ -1493,6 +1564,7 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
             request=request,
             user=user,
             bars=bars.values(),
+            current=current,
             error="Username already taken",
         )
     if email != user.email and (
@@ -1504,6 +1576,7 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
             request=request,
             user=user,
             bars=bars.values(),
+            current=current,
             error="Email already taken",
         )
     if username != user.username:
@@ -1520,16 +1593,21 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         user.password = password
     user.prefix = prefix or ""
     user.phone = phone or ""
+    if not current.is_super_admin:
+        role = "bar_admin" if role == "bar_admin" else "bartender"
+        bar_id = str(current.bar_id)
+        credit = str(user.credit)
     user.role = role
     user.bar_id = int(bar_id) if bar_id else None
     try:
         user.credit = float(credit)
-    except ValueError:
+    except (TypeError, ValueError):
         return render_template(
             "admin_edit_user.html",
             request=request,
             user=user,
             bars=bars.values(),
+            current=current,
             error="Invalid credit amount",
         )
     db_user = db.query(User).filter(User.id == user_id).first()
@@ -1549,6 +1627,36 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     }
     db_user.role = role_enum_map.get(role, RoleEnum.CUSTOMER)
     db.commit()
+    # Update user-bar role association
+    existing_role = (
+        db.query(UserBarRole)
+        .filter(UserBarRole.user_id == user_id, UserBarRole.bar_id == user.bar_id)
+        .first()
+    )
+    if user.bar_id:
+        if existing_role:
+            existing_role.role = role_enum_map.get(role, RoleEnum.CUSTOMER)
+        else:
+            db.add(
+                UserBarRole(
+                    user_id=user_id, bar_id=user.bar_id, role=role_enum_map.get(role, RoleEnum.CUSTOMER)
+                )
+            )
+    elif existing_role:
+        db.delete(existing_role)
+    db.commit()
+    # Update in-memory bar assignments
+    for b in bars.values():
+        if user_id in b.bar_admin_ids:
+            b.bar_admin_ids.remove(user_id)
+        if user_id in b.bartender_ids:
+            b.bartender_ids.remove(user_id)
+    if user.bar_id:
+        target = bars.get(user.bar_id) or refresh_bar_from_db(user.bar_id, db)
+        if role == "bar_admin":
+            target.bar_admin_ids.append(user_id)
+        elif role == "bartender":
+            target.bartender_ids.append(user_id)
     return RedirectResponse(url="/admin/users", status_code=status.HTTP_303_SEE_OTHER)
 
 

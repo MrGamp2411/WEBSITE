@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Manage Users for {{ bar.name }}</h1>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+{% if message %}<div class="alert alert-success">{{ message }}</div>{% endif %}
+
+<h2>Add Existing User</h2>
+<form class="form" method="post">
+  <input type="hidden" name="action" value="existing">
+  <label for="existing_email">Email
+    <input id="existing_email" name="email" type="email" required>
+  </label>
+  <label for="existing_role">Role
+    <select id="existing_role" name="role">
+      <option value="bar_admin">Bar Admin</option>
+      <option value="bartender">Bartender</option>
+    </select>
+  </label>
+  <p>Assigning to {{ bar.name }}</p>
+  <button class="btn btn--primary" type="submit">Add</button>
+</form>
+
+<h2>Add New User</h2>
+<form class="form" method="post">
+  <input type="hidden" name="action" value="new">
+  <label for="username">Username
+    <input id="username" name="username" required>
+  </label>
+  <label for="email">Email
+    <input id="email" name="email" type="email" required>
+  </label>
+  <label for="password">Password
+    <input id="password" name="password" type="password" required>
+  </label>
+  <label for="role">Role
+    <select id="role" name="role">
+      <option value="bar_admin">Bar Admin</option>
+      <option value="bartender">Bartender</option>
+    </select>
+  </label>
+  <p>Assigning to {{ bar.name }}</p>
+  <button class="btn btn--primary" type="submit">Create</button>
+</form>
+
+<h2>Current Staff</h2>
+<table class="table">
+  <thead><tr><th>Username</th><th>Email</th><th>Role</th><th></th></tr></thead>
+  <tbody>
+    {% for u in staff %}
+    <tr>
+      <td>{{ u.username }}</td>
+      <td>{{ u.email }}</td>
+      <td>{{ u.role }}</td>
+      <td><a href="/admin/users/edit/{{ u.id }}">Edit</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

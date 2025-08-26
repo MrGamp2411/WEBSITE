@@ -19,6 +19,7 @@
   <input id="phone" name="phone" type="tel" value="{{ user.phone }}">
 
   <label for="role">Role</label>
+  {% if current.is_super_admin %}
   <select id="role" name="role">
     <option value="super_admin" {% if user.role=='super_admin' %}selected{% endif %}>Super Admin</option>
     <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>Bar Admin</option>
@@ -36,6 +37,14 @@
 
   <label for="credit">Credit</label>
   <input id="credit" name="credit" type="number" step="0.01" value="{{ user.credit }}" required>
+  {% else %}
+  <select id="role" name="role">
+    <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>Bar Admin</option>
+    <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>Bartender</option>
+  </select>
+  <input type="hidden" name="bar_id" value="{{ current.bar_id }}">
+  <input type="hidden" name="credit" value="{{ user.credit }}">
+  {% endif %}
 
   <button class="btn btn--primary" type="submit">Save</button>
 </form>
