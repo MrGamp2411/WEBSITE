@@ -34,6 +34,7 @@ Limitations:
 import os
 import hashlib
 import json
+import random
 from typing import Dict, List, Optional
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -725,6 +726,16 @@ async def search_bars(
         or term in (bar.city or "").lower()
         or term in (bar.state or "").lower()
     ]
+    # Determine a random selection of bars within 20km for the "Consigliati" section.
+    if lat is not None and lng is not None:
+        nearby_pool = [
+            b
+            for b in db_bars
+            if b.distance_km is not None and b.distance_km <= 20
+        ]
+    else:
+        nearby_pool = list(db_bars)
+    recommended_bars = random.sample(nearby_pool, min(5, len(nearby_pool)))
     if lat is not None and lng is not None:
         top_bars: List[BarModel] = []
         for radius in (5, 10, 20):
@@ -757,6 +768,7 @@ async def search_bars(
         request=request,
         bars=results,
         top_bars=top_bars,
+        recommended_bars=recommended_bars,
         query=q,
     )
 
