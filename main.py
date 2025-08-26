@@ -41,7 +41,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from sqlalchemy import inspect, text
+from sqlalchemy import inspect, text, func
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -366,16 +366,6 @@ def on_startup():
     ensure_menu_item_columns()
     seed_super_admin()
     load_bars_from_db()
-
-
-@app.get("/healthz")
-def healthz(db: Session = Depends(get_db)):
-    """Simple health check returning DB status."""
-    try:
-        db.execute("SELECT 1")
-        return {"status": "ok"}
-    except Exception:
-        raise HTTPException(status_code=500, detail="DB unavailable")
 
 # Jinja2 environment for rendering HTML templates
 templates_env = Environment(
@@ -1438,6 +1428,210 @@ async def admin_dashboard(request: Request):
     if not user or not user.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template("admin_dashboard.html", request=request)
+
+
+@app.get("/admin/analytics", response_class=HTMLResponse)
+async def admin_analytics(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    if not user or not user.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    total_orders = db.query(func.count(Order.id)).scalar() or 0
+    gmv_gross = float(
+        db.query(func.coalesce(func.sum(Order.subtotal + Order.vat_total), 0)).scalar()
+    )
+    commission_amount = float(
+        db.query(func.coalesce(func.sum(Order.fee_platform_5pct), 0)).scalar()
+    )
+    payout_total = float(
+        db.query(func.coalesce(func.sum(Order.payout_due_to_bar), 0)).scalar()
+    )
+    cancelled_orders = (
+        db.query(func.count(Order.id)).filter(Order.status == "cancelled").scalar() or 0
+    )
+    gmv_net = gmv_gross
+    aov = gmv_gross / total_orders if total_orders else 0
+    commission_pct = (commission_amount / gmv_gross * 100) if gmv_gross else 0
+    cancellation_rate = (
+        cancelled_orders / total_orders * 100 if total_orders else 0
+    )
+
+    daily = (
+        db.query(
+            func.date(Order.created_at).label("day"),
+            func.sum(Order.subtotal + Order.vat_total).label("gmv"),
+            func.count(Order.id).label("orders"),
+        )
+        .group_by("day")
+        .order_by("day")
+        .all()
+    )
+    daily_labels = [d.day.strftime("%Y-%m-%d") for d in daily]
+    daily_gmv = [float(d.gmv) for d in daily]
+    daily_orders = [d.orders for d in daily]
+
+    peak = (
+        db.query(
+            func.strftime("%H", Order.created_at).label("hour"),
+            func.count(Order.id).label("cnt"),
+        )
+        .group_by("hour")
+        .order_by(func.count(Order.id).desc())
+        .first()
+    )
+    peak_hour = peak.hour if peak else "N/A"
+
+    top_bar = (
+        db.query(BarModel.name, func.count(Order.id).label("cnt"))
+        .join(Order, BarModel.id == Order.bar_id)
+        .group_by(BarModel.id)
+        .order_by(func.count(Order.id).desc())
+        .first()
+    )
+    top_bar_name = top_bar.name if top_bar else "N/A"
+
+    top_category = (
+        db.query(CategoryModel.name, func.sum(OrderItem.qty).label("qty"))
+        .join(MenuItem, MenuItem.id == OrderItem.menu_item_id)
+        .join(CategoryModel, CategoryModel.id == MenuItem.category_id)
+        .group_by(CategoryModel.id)
+        .order_by(func.sum(OrderItem.qty).desc())
+        .first()
+    )
+    top_category_name = top_category.name if top_category else "N/A"
+
+    revenue_rows = (
+        db.query(
+            BarModel.name.label("bar"),
+            func.sum(Order.subtotal + Order.vat_total).label("gmv"),
+            func.sum(Order.vat_total).label("vat"),
+            func.sum(Order.fee_platform_5pct).label("commission"),
+            func.sum(Order.payout_due_to_bar).label("net"),
+        )
+        .join(BarModel, BarModel.id == Order.bar_id)
+        .group_by(BarModel.id)
+        .all()
+    )
+    revenue_bars = []
+    for row in revenue_rows:
+        gmv = float(row.gmv or 0)
+        commission = float(row.commission or 0)
+        revenue_bars.append(
+            {
+                "bar": row.bar,
+                "gmv": gmv,
+                "vat": float(row.vat or 0),
+                "commission": commission,
+                "net": float(row.net or 0),
+                "take_rate": (commission / gmv * 100) if gmv else 0,
+            }
+        )
+
+    hourly = (
+        db.query(
+            func.strftime("%H", Order.created_at).label("hour"),
+            func.count(Order.id).label("cnt"),
+        )
+        .group_by("hour")
+        .order_by("hour")
+        .all()
+    )
+    hourly_labels = [h.hour for h in hourly]
+    hourly_orders = [h.cnt for h in hourly]
+
+    top_products = (
+        db.query(
+            MenuItem.name.label("name"),
+            func.sum(OrderItem.qty).label("qty"),
+            func.sum(OrderItem.line_total).label("revenue"),
+        )
+        .join(OrderItem, MenuItem.id == OrderItem.menu_item_id)
+        .group_by(MenuItem.id)
+        .order_by(func.sum(OrderItem.qty).desc())
+        .limit(5)
+        .all()
+    )
+    product_rows = [
+        {
+            "name": p.name,
+            "qty": int(p.qty or 0),
+            "revenue": float(p.revenue or 0),
+        }
+        for p in top_products
+    ]
+
+    customer_rows = (
+        db.query(
+            Order.customer_id.label("cid"),
+            func.count(Order.id).label("cnt"),
+            func.sum(Order.subtotal + Order.vat_total).label("spend"),
+            func.max(Order.created_at).label("last"),
+        )
+        .filter(Order.customer_id.isnot(None))
+        .group_by(Order.customer_id)
+        .all()
+    )
+    new_customers = sum(1 for c in customer_rows if c.cnt == 1)
+    returning_customers = sum(1 for c in customer_rows if c.cnt > 1)
+    customers = [
+        {
+            "id": f"C{c.cid}",
+            "count": int(c.cnt),
+            "spend": float(c.spend or 0),
+            "last": c.last.strftime("%Y-%m-%d") if c.last else "",
+        }
+        for c in customer_rows
+    ]
+
+    payouts = [
+        {
+            "start": p.period_start.strftime("%Y-%m-%d"),
+            "end": p.period_end.strftime("%Y-%m-%d"),
+            "amount": float(p.amount_chf),
+            "status": p.status,
+        }
+        for p in db.query(Payout).all()
+    ]
+
+    refund_total = float(
+        db.query(func.coalesce(func.sum(Order.refund_amount), 0)).scalar()
+    )
+    refund_count = (
+        db.query(func.count(Order.id)).filter(Order.refund_amount > 0).scalar() or 0
+    )
+    vat_total = float(db.query(func.coalesce(func.sum(Order.vat_total), 0)).scalar())
+
+    stats = {
+        "users": db.query(User).count(),
+        "bars": db.query(BarModel).count(),
+        "orders": total_orders,
+        "gmv_gross": gmv_gross,
+        "gmv_net": gmv_net,
+        "aov": aov,
+        "commission_amount": commission_amount,
+        "commission_pct": commission_pct,
+        "payout_total": payout_total,
+        "tips": 0.0,
+        "cancellation_rate": cancellation_rate,
+        "cancelled_orders": cancelled_orders,
+        "daily_labels": daily_labels,
+        "daily_gmv": daily_gmv,
+        "daily_orders": daily_orders,
+        "peak_hour": peak_hour,
+        "top_bar": top_bar_name,
+        "top_category": top_category_name,
+        "revenue_bars": revenue_bars,
+        "hourly_labels": hourly_labels,
+        "hourly_orders": hourly_orders,
+        "top_products": product_rows,
+        "new_customers": new_customers,
+        "returning_customers": returning_customers,
+        "customers": customers,
+        "payouts": payouts,
+        "refund_total": refund_total,
+        "refund_count": refund_count,
+        "vat_total": vat_total,
+    }
+    return render_template("admin_analytics.html", request=request, stats=stats)
 
 
 @app.get("/admin/profile", response_class=HTMLResponse)
