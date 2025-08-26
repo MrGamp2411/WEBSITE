@@ -76,7 +76,7 @@ Optional variables:
 ## Frontend redesign
 
 The home page and shared layout were refreshed with a mobile‑first design.
-Images now load from the `image_url` field with lazy loading and an inline SVG
+Images now load from the `photo_url` field with lazy loading and an inline SVG
 placeholder fallback. Spacing and grid breakpoints follow an
 8px rhythm.
 

@@ -68,6 +68,7 @@ from finance import (
 )
 from payouts import schedule_payout
 from audit import log_action
+from urllib.parse import urljoin
 
 # -----------------------------------------------------------------------------
 # Data models (in-memory for demonstration purposes)
@@ -541,6 +542,16 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
     return bar
 
 
+def make_absolute_url(url: Optional[str], request: Request) -> Optional[str]:
+    if not url:
+        return None
+    if url.startswith("http://"):
+        url = "https://" + url[len("http://") :]
+    elif not url.startswith("https://"):
+        url = urljoin(str(request.base_url), url.lstrip("/"))
+    return url
+
+
 def render_template(template_name: str, **context) -> HTMLResponse:
     request: Optional[Request] = context.get("request")
     if request is not None:
@@ -554,7 +565,11 @@ def render_template(template_name: str, **context) -> HTMLResponse:
             )
         last_bar_id = request.session.get("last_bar_id")
         if last_bar_id is not None:
-            context.setdefault("last_bar", bars.get(last_bar_id))
+            with SessionLocal() as db:
+                bar = db.get(BarModel, last_bar_id)
+                if bar:
+                    bar.photo_url = make_absolute_url(bar.photo_url, request)
+                    context.setdefault("last_bar", bar)
 
     # Ensure Google Maps API key is available to templates from environment.
     api_key = os.getenv("GOOGLE_MAPS_API_KEY")
@@ -578,6 +593,8 @@ def render_template(template_name: str, **context) -> HTMLResponse:
 async def home(request: Request, db: Session = Depends(get_db)):
     """Home page listing available bars."""
     db_bars = db.query(BarModel).all()
+    for bar in db_bars:
+        bar.photo_url = make_absolute_url(bar.photo_url, request)
     return render_template("home.html", request=request, bars=db_bars)
 
 
@@ -585,6 +602,8 @@ async def home(request: Request, db: Session = Depends(get_db)):
 async def search_bars(request: Request, q: str = "", db: Session = Depends(get_db)):
     term = q.lower()
     db_bars = db.query(BarModel).all()
+    for bar in db_bars:
+        bar.photo_url = make_absolute_url(bar.photo_url, request)
     results = [
         bar
         for bar in db_bars
@@ -597,7 +616,7 @@ async def search_bars(request: Request, q: str = "", db: Session = Depends(get_d
 
 
 @app.get("/api/search")
-async def api_search(q: str = ""):
+async def api_search(q: str = "", request: Request = None):
     term = q.lower()
     results = [
         {
@@ -607,6 +626,7 @@ async def api_search(q: str = ""):
             "city": bar.city,
             "state": bar.state,
             "description": bar.description,
+            "photo_url": make_absolute_url(bar.photo_url, request) if request else bar.photo_url,
         }
         for bar in bars.values()
         if term in bar.name.lower() or term in bar.address.lower() or term in bar.city.lower() or term in bar.state.lower()
