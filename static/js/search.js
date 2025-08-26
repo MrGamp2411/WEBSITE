@@ -89,7 +89,7 @@ function applyFilters(bars, state) {
     .filter(b => state.active.max_km ? (b.distance_km == null ? false : b.distance_km <= Number(state.max_km)) : true)
     .filter(b => state.active.min_rating ? (b.rating == null ? false : b.rating >= Number(state.min_rating)) : true)
     .filter(b => state.active.categories ? (b.categories || []).some(c => state.categories.includes(c)) : true)
-    .filter(b => state.open_now ? !!b.is_open : true);
+    .filter(b => state.open_now ? (!!b.is_open || b.is_recent) : true);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -137,7 +137,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     lat: toNumber(el.dataset.latitude),
     lng: toNumber(el.dataset.longitude),
     categories: (el.dataset.categories || '').split(',').filter(Boolean),
-    is_open: el.dataset.open === 'true'
+    is_open: el.dataset.open === 'true',
+    is_recent: el.closest('[data-section="recent"]') !== null
   }));
   validateBars(rawBars);
   let userLoc = null;
