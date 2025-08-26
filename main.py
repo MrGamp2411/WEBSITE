@@ -1356,7 +1356,9 @@ async def manage_bar_users_post(
         username = form.get("username")
         email = form.get("email")
         password = form.get("password")
-        if not all([username, email, password]) or role not in role_map:
+        phone = form.get("phone")
+        prefix = form.get("prefix")
+        if not all([username, email, password, phone, prefix]) or role not in role_map:
             error = "All fields are required"
         elif username in users_by_username or db.query(User).filter(User.username == username).first():
             error = "Username already taken"
@@ -1368,6 +1370,8 @@ async def manage_bar_users_post(
                 username=username,
                 email=email,
                 password_hash=password_hash,
+                phone=phone,
+                prefix=prefix,
                 role=role_map[role],
             )
             db.add(db_user)
@@ -1383,6 +1387,8 @@ async def manage_bar_users_post(
                 username=username,
                 password=password,
                 email=email,
+                phone=phone,
+                prefix=prefix,
                 role=role,
                 bar_id=bar_id,
             )

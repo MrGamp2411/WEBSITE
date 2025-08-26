@@ -59,6 +59,8 @@ def test_add_existing_and_new_user_to_bar():
             "username": "brandnew",
             "email": "fresh@example.com",
             "password": "secret",
+            "prefix": "+41",
+            "phone": "763661800",
             "role": "bartender",
         }
         resp = client.post(f"/admin/bars/{bar.id}/users", data=form)
