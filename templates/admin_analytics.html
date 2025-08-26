@@ -1,0 +1,175 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Analytics</h1>
+<div class="dashboard-info">
+  <div class="card">
+    <h2>{{ user.username }}</h2>
+    <p>{{ user.email }}</p>
+    <p>{{ user.prefix }} {{ user.phone }}</p>
+  </div>
+</div>
+<nav class="tab-nav">
+  <a href="#" data-tab="overview" class="active">Overview</a>
+  <a href="#" data-tab="revenue">Ricavi & Commissioni</a>
+  <a href="#" data-tab="orders">Ordini & Operatività</a>
+  <a href="#" data-tab="products">Prodotti / Menu</a>
+  <a href="#" data-tab="clients">Clienti & Crediti</a>
+  <a href="#" data-tab="finance">Finance</a>
+  <a href="#" data-tab="refunds">Rimborsi</a>
+  <a href="#" data-tab="exports">Esportazioni</a>
+</nav>
+<div id="overview" class="tab-content active">
+  <div class="dashboard-actions">
+    <div class="card"><h3>Ordini</h3><p>{{ stats.orders }}</p></div>
+    <div class="card"><h3>GMV lordo</h3><p>CHF {{ '%.2f'|format(stats.gmv_gross) }}</p></div>
+    <div class="card"><h3>GMV netto</h3><p>CHF {{ '%.2f'|format(stats.gmv_net) }}</p></div>
+    <div class="card"><h3>AOV</h3><p>CHF {{ '%.2f'|format(stats.aov) }}</p></div>
+    <div class="card"><h3>Commissioni SiplyGo</h3><p>CHF {{ '%.2f'|format(stats.commission_amount) }} ({{ '%.1f'|format(stats.commission_pct) }}%)</p></div>
+    <div class="card"><h3>Netto al bar</h3><p>CHF {{ '%.2f'|format(stats.payout_total) }}</p></div>
+    <div class="card"><h3>Tips</h3><p>CHF {{ '%.2f'|format(stats.tips) }}</p></div>
+    <div class="card"><h3>Tasso cancellazione</h3><p>{{ '%.1f'|format(stats.cancellation_rate) }}%</p></div>
+  </div>
+  <canvas id="gmvChart"></canvas>
+  <div class="dashboard-actions">
+    <div class="card"><h4>Ora di picco</h4><p>{{ stats.peak_hour }}</p></div>
+    <div class="card"><h4>Categoria top</h4><p>{{ stats.top_category }}</p></div>
+    <div class="card"><h4>Bar top</h4><p>{{ stats.top_bar }}</p></div>
+  </div>
+</div>
+<div id="revenue" class="tab-content">
+  <canvas id="revenueChart"></canvas>
+  <table>
+    <tr><th>Bar</th><th>GMV</th><th>IVA</th><th>Commissione</th><th>Take rate</th><th>Netto</th></tr>
+    {% for r in stats.revenue_bars %}
+    <tr>
+      <td>{{ r.bar }}</td>
+      <td>CHF {{ '%.2f'|format(r.gmv) }}</td>
+      <td>CHF {{ '%.2f'|format(r.vat) }}</td>
+      <td>CHF {{ '%.2f'|format(r.commission) }}</td>
+      <td>{{ '%.1f'|format(r.take_rate) }}%</td>
+      <td>CHF {{ '%.2f'|format(r.net) }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+<div id="orders" class="tab-content">
+  <canvas id="ordersChart"></canvas>
+  <p>Cancellazioni totali: {{ stats.cancelled_orders }}</p>
+</div>
+<div id="products" class="tab-content">
+  <table>
+    <tr><th>Prodotto</th><th>Quantità</th><th>Ricavi</th></tr>
+    {% for p in stats.top_products %}
+    <tr>
+      <td>{{ p.name }}</td>
+      <td>{{ p.qty }}</td>
+      <td>CHF {{ '%.2f'|format(p.revenue) }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+<div id="clients" class="tab-content">
+  <div class="dashboard-actions">
+    <div class="card"><h4>Nuovi</h4><p>{{ stats.new_customers }}</p></div>
+    <div class="card"><h4>Ricorrenti</h4><p>{{ stats.returning_customers }}</p></div>
+  </div>
+  <table>
+    <tr><th>Cliente</th><th># ordini</th><th>Spesa</th><th>Ultimo acquisto</th></tr>
+    {% for c in stats.customers %}
+    <tr>
+      <td>{{ c.id }}</td>
+      <td>{{ c.count }}</td>
+      <td>CHF {{ '%.2f'|format(c.spend) }}</td>
+      <td>{{ c.last }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+<div id="finance" class="tab-content">
+  <table>
+    <tr><th>Periodo</th><th>Importo</th><th>Stato</th></tr>
+    {% for p in stats.payouts %}
+    <tr>
+      <td>{{ p.start }} – {{ p.end }}</td>
+      <td>CHF {{ '%.2f'|format(p.amount) }}</td>
+      <td>{{ p.status }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p>IVA totale: CHF {{ '%.2f'|format(stats.vat_total) }}</p>
+</div>
+<div id="refunds" class="tab-content">
+  <p>Rimborsi totali: CHF {{ '%.2f'|format(stats.refund_total) }} ({{ stats.refund_count }} ordini)</p>
+</div>
+<div id="exports" class="tab-content">
+  <p>Esportazioni CSV e report programmati saranno disponibili prossimamente.</p>
+</div>
+<style>
+.tab-nav a{margin-right:1rem;cursor:pointer;}
+.tab-nav a.active{font-weight:bold;}
+.tab-content{display:none;margin-top:1rem;}
+.tab-content.active{display:block;}
+</style>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const labels = {{ stats.daily_labels|tojson }};
+const gmv = {{ stats.daily_gmv|tojson }};
+const orders = {{ stats.daily_orders|tojson }};
+const ctx = document.getElementById('gmvChart');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: labels,
+    datasets: [
+      {label: 'GMV', data: gmv, borderColor: '#0d6efd', fill: false},
+      {label: '# Ordini', data: orders, borderColor: '#6c757d', fill: false, yAxisID: 'y1'}
+    ]
+  },
+  options: {
+    scales: {
+      y: {beginAtZero: true},
+      y1: {beginAtZero: true, position: 'right'}
+    }
+  }
+});
+
+const revData = {{ stats.revenue_bars|tojson }};
+if (revData.length) {
+  const revLabels = revData.map(r=>r.bar);
+  const revGmv = revData.map(r=>r.gmv);
+  const revComm = revData.map(r=>r.commission);
+  const revNet = revData.map(r=>r.net);
+  new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: {labels: revLabels, datasets: [
+      {label: 'GMV', data: revGmv, backgroundColor: '#0d6efd'},
+      {label: 'Commissioni', data: revComm, backgroundColor: '#dc3545'},
+      {label: 'Netto', data: revNet, backgroundColor: '#198754'}
+    ]},
+    options: {scales: {y: {beginAtZero: true}}}
+  });
+}
+
+const hourLabels = {{ stats.hourly_labels|tojson }};
+const hourOrders = {{ stats.hourly_orders|tojson }};
+new Chart(document.getElementById('ordersChart'), {
+  type: 'line',
+  data: {labels: hourLabels, datasets: [
+    {label: 'Ordini/ora', data: hourOrders, borderColor: '#0d6efd', fill: false}
+  ]},
+  options: {scales: {y: {beginAtZero: true}}}
+});
+
+document.querySelectorAll('.tab-nav a').forEach(a=>{
+  a.addEventListener('click', e=>{
+    e.preventDefault();
+    document.querySelectorAll('.tab-nav a').forEach(el=>el.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+    a.classList.add('active');
+    document.getElementById(a.dataset.tab).classList.add('active');
+  });
+});
+</script>
+{% endblock %}

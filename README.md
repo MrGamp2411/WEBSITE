@@ -38,8 +38,9 @@ integration:
 - `POST /api/payouts/run` – aggregate completed orders for a bar within a
   date range and create a payout entry. Each invocation is recorded in the
   `audit_logs` table for traceability.
-- `GET /healthz` – returns `{"status": "ok"}` when the database connection is
-  healthy.
+  - `GET /admin/analytics` – analytics dashboard with multi-tab layout
+    exposing KPIs for orders, revenue breakdowns, top products, client
+    metrics, payouts and refunds.
 
 ## Environment Variables
 
