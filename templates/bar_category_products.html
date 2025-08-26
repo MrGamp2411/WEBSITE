@@ -10,17 +10,26 @@
 <table class="table">
   <thead>
     <tr>
+      <th>Order</th>
       <th>Name</th>
       <th>Description</th>
       <th>Price (CHF)</th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
     {% for product in products %}
     <tr>
+      <td>{{ product.display_order }}</td>
       <td>{{ product.name }}</td>
       <td>{{ product.description }}</td>
       <td>{{ "%.2f"|format(product.price) }}</td>
+      <td>
+        <a class="btn" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/edit">Edit</a>
+        <form method="post" action="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/delete" style="display:inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
+          <button class="btn" type="submit">Delete</button>
+        </form>
+      </td>
     </tr>
     {% endfor %}
   </tbody>
