@@ -38,6 +38,11 @@
           <img src="{{ fallback_img }}" alt="" class="thumb" loading="lazy" width="400" height="225">
           </div>
         {% endif %}
+        {% if bar.is_open_now %}
+        <span class="status status-open">Open now</span>
+        {% else %}
+        <span class="status status-closed">Closed now</span>
+        {% endif %}
           <h3 class="title" itemprop="name">{{ bar.name }}</h3>
           <div class="bar-meta">
             <span class="bar-rating" data-has-rating="true" hidden></span>

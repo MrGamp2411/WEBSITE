@@ -39,7 +39,11 @@
         <img class="thumb" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
         {% endif %}
         </div>
-        {% if last_bar.is_open_now %}<span class="badge badge-open">OPEN NOW</span>{% endif %}
+        {% if last_bar.is_open_now %}
+        <span class="status status-open">Open now</span>
+        {% else %}
+        <span class="status status-closed">Closed now</span>
+        {% endif %}
         {% if last_bar.promo_label %}<span class="badge badge-promo">{{ last_bar.promo_label }}</span>{% endif %}
         <h3 class="title" itemprop="name">{{ last_bar.name }}</h3>
         <div class="bar-meta">
@@ -68,7 +72,11 @@
         <img class="thumb" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
         {% endif %}
         </div>
-        {% if bar.is_open_now %}<span class="badge badge-open">OPEN NOW</span>{% endif %}
+        {% if bar.is_open_now %}
+        <span class="status status-open">Open now</span>
+        {% else %}
+        <span class="status status-closed">Closed now</span>
+        {% endif %}
         {% if bar.promo_label %}<span class="badge badge-promo">{{ bar.promo_label }}</span>{% endif %}
         <h3 class="title" itemprop="name">{{ bar.name }}</h3>
         <div class="bar-meta">
