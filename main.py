@@ -652,6 +652,7 @@ def render_template(template_name: str, **context) -> HTMLResponse:
                     if bar:
                         bar.photo_url = make_absolute_url(bar.photo_url, request)
                         bar.is_open_now = is_bar_open_now(bar)
+                        _ = bar.categories  # preload categories for search filters
                         recent_bars.append(bar)
                 context.setdefault("recent_bars", recent_bars)
 

@@ -10,7 +10,7 @@
       <span id="filterCount" class="cart-badge" hidden></span>
     </button>
   </div>
-  {% if bars %}
+  {% if bars or recent_bars %}
     {% set sections = [
       ('recent', 'Bar visitati di recente'),
       ('nearby', 'I più vicini a te'),
@@ -18,42 +18,45 @@
       ('popular', 'Consigliati')
     ] %}
     {% for key, title in sections %}
-    <section class="bar-section">
-      <div class="section-head">
-        <h2>{{ title }}</h2>
-        <div class="scroller-nav">
-          <button class="scroll-btn prev" aria-label="Precedenti">‹</button>
-          <button class="scroll-btn next" aria-label="Successivi">›</button>
+      {% set items = recent_bars if key == 'recent' else bars %}
+      {% if items %}
+      <section class="bar-section">
+        <div class="section-head">
+          <h2>{{ title }}</h2>
+          <div class="scroller-nav">
+            <button class="scroll-btn prev" aria-label="Precedenti">‹</button>
+            <button class="scroll-btn next" aria-label="Successivi">›</button>
+          </div>
         </div>
-      </div>
-      <div class="cards scroller" aria-label="{{ title }}" tabindex="0">
-        {% for bar in bars %}
-        <a class="bar-card" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.categories | map(attribute='name') | map('lower') | join(',') if bar.categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
-        {% if bar.photo_url %}
-          <div class="thumb-wrapper">
-          <img src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" class="thumb" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
-          </div>
-        {% else %}
-          <div class="thumb-wrapper">
-          <img src="{{ fallback_img }}" alt="" class="thumb" loading="lazy" width="400" height="225">
-          </div>
-        {% endif %}
-        {% if bar.is_open_now %}
-        <span class="status status-open">Open now</span>
-        {% else %}
-        <span class="status status-closed">Closed now</span>
-        {% endif %}
-          <h3 class="title" itemprop="name">{{ bar.name }}</h3>
-          <div class="bar-meta">
-            <span class="bar-rating" data-has-rating="true" hidden></span>
-            <span class="bar-distance" data-has-distance="true" hidden></span>
-          </div>
-          {% if bar.address_short or bar.address %}<address>{{ bar.address_short or bar.address }}</address>{% endif %}
-          {% if bar.description_short or bar.description %}<p class="desc">{{ bar.description_short or bar.description }}</p>{% endif %}
-        </a>
-        {% endfor %}
-      </div>
-    </section>
+        <div class="cards scroller" aria-label="{{ title }}" tabindex="0">
+          {% for bar in items %}
+          <a class="bar-card" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.categories | map(attribute='name') | map('lower') | join(',') if bar.categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
+          {% if bar.photo_url %}
+            <div class="thumb-wrapper">
+            <img src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" class="thumb" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
+            </div>
+          {% else %}
+            <div class="thumb-wrapper">
+            <img src="{{ fallback_img }}" alt="" class="thumb" loading="lazy" width="400" height="225">
+            </div>
+          {% endif %}
+          {% if bar.is_open_now %}
+          <span class="status status-open">Open now</span>
+          {% else %}
+          <span class="status status-closed">Closed now</span>
+          {% endif %}
+            <h3 class="title" itemprop="name">{{ bar.name }}</h3>
+            <div class="bar-meta">
+              <span class="bar-rating" data-has-rating="true" hidden></span>
+              <span class="bar-distance" data-has-distance="true" hidden></span>
+            </div>
+            {% if bar.address_short or bar.address %}<address>{{ bar.address_short or bar.address }}</address>{% endif %}
+            {% if bar.description_short or bar.description %}<p class="desc">{{ bar.description_short or bar.description }}</p>{% endif %}
+          </a>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
     {% endfor %}
   {% else %}
   <div class="empty-state">
