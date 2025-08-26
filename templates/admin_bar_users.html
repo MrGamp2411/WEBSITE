@@ -4,43 +4,57 @@
 {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
 {% if message %}<div class="alert alert-success">{{ message }}</div>{% endif %}
 
-<h2>Add Existing User</h2>
-<form class="form" method="post">
-  <input type="hidden" name="action" value="existing">
-  <label for="existing_email">Email
-    <input id="existing_email" name="email" type="email" required>
-  </label>
-  <label for="existing_role">Role
-    <select id="existing_role" name="role">
-      <option value="bar_admin">Bar Admin</option>
-      <option value="bartender">Bartender</option>
-    </select>
-  </label>
-  <p>Assigning to {{ bar.name }}</p>
-  <button class="btn btn--primary" type="submit">Add</button>
-</form>
+<details>
+  <summary>Add Existing User</summary>
+  <form class="form" method="post">
+    <input type="hidden" name="action" value="existing">
+    <label for="existing_email">Email
+      <input id="existing_email" name="email" type="email" required>
+    </label>
+    <label for="existing_role">Role
+      <select id="existing_role" name="role">
+        <option value="bar_admin">Bar Admin</option>
+        <option value="bartender">Bartender</option>
+      </select>
+    </label>
+    <p>Assigning to {{ bar.name }}</p>
+    <button class="btn btn--primary" type="submit">Add</button>
+  </form>
+</details>
 
-<h2>Add New User</h2>
-<form class="form" method="post">
-  <input type="hidden" name="action" value="new">
-  <label for="username">Username
-    <input id="username" name="username" required>
-  </label>
-  <label for="email">Email
-    <input id="email" name="email" type="email" required>
-  </label>
-  <label for="password">Password
-    <input id="password" name="password" type="password" required>
-  </label>
-  <label for="role">Role
-    <select id="role" name="role">
-      <option value="bar_admin">Bar Admin</option>
-      <option value="bartender">Bartender</option>
-    </select>
-  </label>
-  <p>Assigning to {{ bar.name }}</p>
-  <button class="btn btn--primary" type="submit">Create</button>
-</form>
+<details>
+  <summary>Add New User</summary>
+  <form class="form" method="post">
+    <input type="hidden" name="action" value="new">
+    <label for="username">Username
+      <input id="username" name="username" required>
+    </label>
+    <label for="email">Email
+      <input id="email" name="email" type="email" required>
+    </label>
+    <label for="password">Password
+      <input id="password" name="password" type="password" required>
+    </label>
+    <label for="prefix">Phone Prefix
+      <select id="prefix" name="prefix" required autocomplete="tel-country-code">
+        <option value="+41">+41 (Switzerland)</option>
+        <option value="+1">+1 (USA)</option>
+        <option value="+44">+44 (UK)</option>
+      </select>
+    </label>
+    <label for="phone">Phone Number
+      <input id="phone" name="phone" type="tel" required autocomplete="tel-national">
+    </label>
+    <label for="role">Role
+      <select id="role" name="role">
+        <option value="bar_admin">Bar Admin</option>
+        <option value="bartender">Bartender</option>
+      </select>
+    </label>
+    <p>Assigning to {{ bar.name }}</p>
+    <button class="btn btn--primary" type="submit">Create</button>
+  </form>
+</details>
 
 <h2>Current Staff</h2>
 <table class="table">
