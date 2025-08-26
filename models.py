@@ -101,6 +101,7 @@ class MenuItem(Base):
     vat_rate = Column(Numeric(4, 2), default=0)
     sku = Column(String(50))
     photo = Column(String(255))
+    sort_order = Column(Integer, default=0)
     active = Column(Boolean, default=True)
     stock_status = Column(String(20), default="in_stock")
 

@@ -97,6 +97,7 @@ class Product:
         name: str,
         price: float,
         description: str,
+        display_order: int = 0,
         photo_url: Optional[str] = None,
     ):
         self.id = id
@@ -104,6 +105,7 @@ class Product:
         self.name = name
         self.price = price
         self.description = description
+        self.display_order = display_order
         self.photo_url = photo_url
 
 
@@ -338,6 +340,22 @@ def ensure_category_columns() -> None:
                 )
 
 
+def ensure_menu_item_columns() -> None:
+    """Ensure expected columns exist on the menu_items table."""
+    inspector = inspect(engine)
+    columns = {col["name"] for col in inspector.get_columns("menu_items")}
+    required = {"sort_order": "INTEGER"}
+    missing = {name: ddl for name, ddl in required.items() if name not in columns}
+    if missing:
+        with engine.begin() as conn:
+            for name, ddl in missing.items():
+                conn.execute(
+                    text(
+                        f"ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS {name} {ddl}"
+                    )
+                )
+
+
 @app.on_event("startup")
 def on_startup():
     """Initialise database tables on startup."""
@@ -345,6 +363,7 @@ def on_startup():
     ensure_prefix_column()
     ensure_bar_columns()
     ensure_category_columns()
+    ensure_menu_item_columns()
     seed_super_admin()
     load_bars_from_db()
 
@@ -437,6 +456,7 @@ def load_bars_from_db() -> None:
                     name=item.name,
                     price=float(item.price_chf),
                     description=item.description or "",
+                    display_order=item.sort_order or 0,
                     photo_url=item.photo,
                 )
             bars[b.id] = bar
@@ -489,6 +509,7 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
             name=item.name,
             price=float(item.price_chf),
             description=item.description or "",
+            display_order=item.sort_order or 0,
             photo_url=item.photo,
         )
     return bar
@@ -739,6 +760,8 @@ async def bar_detail(request: Request, bar_id: int):
     for prod in bar.products.values():
         category = bar.categories.get(prod.category_id)
         products_by_category.setdefault(category, []).append(prod)
+    for prods in products_by_category.values():
+        prods.sort(key=lambda p: p.display_order)
     sorted_products = sorted(
         products_by_category.items(), key=lambda kv: kv[0].display_order
     )
@@ -1679,9 +1702,10 @@ async def bar_category_products(
         or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    products = [
-        p for p in bar.products.values() if p.category_id == category_id
-    ]
+    products = sorted(
+        [p for p in bar.products.values() if p.category_id == category_id],
+        key=lambda p: p.display_order,
+    )
     return render_template(
         "bar_category_products.html",
         request=request,
@@ -1735,6 +1759,7 @@ async def bar_new_product(
     name = form.get("name")
     price = form.get("price")
     description = form.get("description")
+    display_order = form.get("display_order") or 0
     photo_file = form.get("photo")
     photo_url = None
     if isinstance(photo_file, UploadFile) and photo_file.filename:
@@ -1765,6 +1790,10 @@ async def bar_new_product(
             category=category,
             error="Invalid price",
         )
+    try:
+        order_val = int(display_order)
+    except ValueError:
+        order_val = 0
     db_item = MenuItem(
         bar_id=bar_id,
         category_id=category_id,
@@ -1772,6 +1801,7 @@ async def bar_new_product(
         description=description,
         price_chf=price_decimal,
         photo=photo_url,
+        sort_order=order_val,
     )
     db.add(db_item)
     db.commit()
@@ -1782,9 +1812,146 @@ async def bar_new_product(
         name=name,
         price=price_val,
         description=description,
+        display_order=order_val,
         photo_url=photo_url,
     )
     bar.products[product.id] = product
+    return RedirectResponse(
+        url=f"/bar/{bar_id}/categories/{category_id}/products",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@app.post(
+    "/bar/{bar_id}/categories/{category_id}/products/{product_id}/delete"
+)
+async def bar_delete_product(
+    request: Request,
+    bar_id: int,
+    category_id: int,
+    product_id: int,
+    db: Session = Depends(get_db),
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    product = bar.products.get(product_id)
+    if not product or product.category_id != category_id:
+        raise HTTPException(status_code=404, detail="Product not found")
+    if not user or not (
+        user.is_super_admin
+        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    db.query(MenuItem).filter(MenuItem.id == product_id).delete()
+    db.commit()
+    bar.products.pop(product_id, None)
+    return RedirectResponse(
+        url=f"/bar/{bar_id}/categories/{category_id}/products",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@app.get(
+    "/bar/{bar_id}/categories/{category_id}/products/{product_id}/edit",
+    response_class=HTMLResponse,
+)
+async def bar_edit_product_form(
+    request: Request,
+    bar_id: int,
+    category_id: int,
+    product_id: int,
+    db: Session = Depends(get_db),
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    product = bar.products.get(product_id)
+    if not category or not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    if not user or not (
+        user.is_super_admin
+        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template(
+        "bar_edit_product.html",
+        request=request,
+        bar=bar,
+        category=category,
+        product=product,
+    )
+
+
+@app.post("/bar/{bar_id}/categories/{category_id}/products/{product_id}/edit")
+async def bar_edit_product(
+    request: Request,
+    bar_id: int,
+    category_id: int,
+    product_id: int,
+    db: Session = Depends(get_db),
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    product = bar.products.get(product_id)
+    if not category or not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    if not user or not (
+        user.is_super_admin
+        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    name = form.get("name")
+    price = form.get("price")
+    description = form.get("description")
+    display_order = form.get("display_order") or product.display_order
+    photo_file = form.get("photo")
+    db_item = db.get(MenuItem, product_id)
+    if name:
+        product.name = name
+        if db_item:
+            db_item.name = name
+    if description:
+        product.description = description
+        if db_item:
+            db_item.description = description
+    if price:
+        try:
+            price_val = float(price)
+            price_dec = Decimal(price)
+            product.price = price_val
+            if db_item:
+                db_item.price_chf = price_dec
+        except ValueError:
+            pass
+    try:
+        order_val = int(display_order)
+        product.display_order = order_val
+        if db_item:
+            db_item.sort_order = order_val
+    except ValueError:
+        pass
+    if isinstance(photo_file, UploadFile) and photo_file.filename:
+        uploads_dir = os.path.join("static", "uploads")
+        os.makedirs(uploads_dir, exist_ok=True)
+        _, ext = os.path.splitext(photo_file.filename)
+        filename = f"{uuid4().hex}{ext}"
+        file_path = os.path.join(uploads_dir, filename)
+        with open(file_path, "wb") as f:
+            f.write(await photo_file.read())
+        product.photo_url = f"/static/uploads/{filename}"
+        if db_item:
+            db_item.photo = product.photo_url
+    if db_item:
+        db.add(db_item)
+        db.commit()
     return RedirectResponse(
         url=f"/bar/{bar_id}/categories/{category_id}/products",
         status_code=status.HTTP_303_SEE_OTHER,
