@@ -62,7 +62,7 @@ from models import (
     UserBarRole,
     Category as CategoryModel,
 )
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 from decimal import Decimal
 from finance import (
     calculate_platform_fee,
@@ -806,7 +806,7 @@ class BarCreate(BaseModel):
     address: Optional[str] = None
     city: Optional[str] = None
     state: Optional[str] = None
-    description: Optional[str] = None
+    description: Optional[constr(max_length=120)] = None
     photo_url: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
@@ -1315,6 +1315,8 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
     latitude = form.get("latitude")
     longitude = form.get("longitude")
     description = form.get("description")
+    if description:
+        description = description[:120]
     rating = form.get("rating")
     manual_closed = form.get("manual_closed") == "on"
     promo_label = form.get("promo_label")
@@ -1432,6 +1434,8 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
     latitude = form.get("latitude")
     longitude = form.get("longitude")
     description = form.get("description")
+    if description:
+        description = description[:120]
     rating = form.get("rating")
     manual_closed = form.get("manual_closed") == "on"
     promo_label = form.get("promo_label")
