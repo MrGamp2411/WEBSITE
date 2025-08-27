@@ -157,33 +157,51 @@ document.addEventListener('DOMContentLoaded', async () => {
   sortNearby();
 
   const topSection = document.querySelector('.bar-section[data-section="top"]');
+  const recommendedSection = document.querySelector('.bar-section[data-section="popular"]');
 
-  async function filterTopByDistance(pos) {
-    if (!topSection) return;
+  async function filterSectionsByDistance(pos) {
     if (pos) {
       userLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
       bars = await normalizeBars(rawBars, userLoc);
       bars.forEach(b => renderMeta(b.el, b));
       sortNearby();
     }
-    const topBars = bars.filter(b => b.el.closest('[data-section="top"]'));
-    topBars.forEach(b => {
-      if (b.distance_km == null || b.distance_km > 5) {
-        b.el.remove();
+
+    if (topSection) {
+      const topBars = bars.filter(b => b.el.closest('[data-section="top"]'));
+      topBars.forEach(b => {
+        if (b.distance_km == null || b.distance_km > 5) {
+          b.el.remove();
+        }
+      });
+      if (!topSection.querySelector('.bar-card')) {
+        const msg = document.createElement('p');
+        msg.textContent = 'Non ci sono bar nelle tue vicinanze.';
+        topSection.appendChild(msg);
       }
-    });
-    if (!topSection.querySelector('.bar-card')) {
-      const msg = document.createElement('p');
-      msg.textContent = 'Non ci sono bar nelle tue vicinanze.';
-      topSection.appendChild(msg);
     }
+
+    if (recommendedSection) {
+      const recBars = bars.filter(b => b.el.closest('[data-section="popular"]'));
+      recBars.forEach(b => {
+        if (b.distance_km == null || b.distance_km > 20) {
+          b.el.remove();
+        }
+      });
+      if (!recommendedSection.querySelector('.bar-card')) {
+        const msg = document.createElement('p');
+        msg.textContent = 'Non ci sono bar consigliati nelle tue vicinanze.';
+        recommendedSection.appendChild(msg);
+      }
+    }
+
     bars = bars.filter(b => document.body.contains(b.el));
   }
 
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(filterTopByDistance, () => filterTopByDistance());
+    navigator.geolocation.getCurrentPosition(filterSectionsByDistance, () => filterSectionsByDistance());
   } else {
-    filterTopByDistance();
+    filterSectionsByDistance();
   }
 
   if (distanceInput && bars.every(b => b.distance_km == null)) {
