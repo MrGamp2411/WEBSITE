@@ -141,15 +141,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     is_recent: el.closest('[data-section="recent"]') !== null
   }));
   validateBars(rawBars);
-  let userLoc = null;
-  let bars = await normalizeBars(rawBars, userLoc);
+    let userLoc = null;
+    let bars = await normalizeBars(rawBars, userLoc);
 
-  bars.forEach(b => renderMeta(b.el, b));
+    bars.forEach(b => renderMeta(b.el, b));
 
-  if (distanceInput && bars.every(b => b.distance_km == null)) {
-    distanceInput.disabled = true;
-    const msg = document.createElement('p');
-    msg.className = 'help';
+    const topSection = document.querySelector('.bar-section[data-section="top"]');
+
+    async function filterTopByDistance(pos) {
+      if (!topSection) return;
+      if (pos) {
+        userLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        bars = await normalizeBars(rawBars, userLoc);
+        bars.forEach(b => renderMeta(b.el, b));
+      }
+      const topBars = bars.filter(b => b.el.closest('[data-section="top"]'));
+      topBars.forEach(b => {
+        if (b.distance_km != null && b.distance_km > 5) {
+          b.el.remove();
+        }
+      });
+      if (!topSection.querySelector('.bar-card')) {
+        const msg = document.createElement('p');
+        msg.textContent = 'Non ci sono bar nelle tue vicinanze.';
+        topSection.appendChild(msg);
+      }
+      bars = bars.filter(b => document.body.contains(b.el));
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(filterTopByDistance, () => filterTopByDistance());
+    } else {
+      filterTopByDistance();
+    }
+
+    if (distanceInput && bars.every(b => b.distance_km == null)) {
+      distanceInput.disabled = true;
+      const msg = document.createElement('p');
+      msg.className = 'help';
     msg.textContent = 'Nessuna distanza disponibile per questi risultati.';
     distanceInput.closest('.group')?.appendChild(msg);
   }
