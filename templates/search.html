@@ -61,6 +61,13 @@
           {% endfor %}
         </div>
       </section>
+      {% elif key == 'top' and top_bars_message %}
+      <section class="bar-section" data-section="{{ key }}">
+        <div class="section-head">
+          <h2>{{ title }}</h2>
+        </div>
+        <p>{{ top_bars_message }}</p>
+      </section>
       {% endif %}
     {% endfor %}
   {% else %}

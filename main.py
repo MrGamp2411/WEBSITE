@@ -737,23 +737,18 @@ async def search_bars(
         nearby_pool = list(db_bars)
     recommended_bars = random.sample(nearby_pool, min(5, len(nearby_pool)))
     if lat is not None and lng is not None:
-        top_bars: List[BarModel] = []
-        for radius in (5, 10, 20):
-            rated_within = [
-                b
-                for b in results
-                if b.rating is not None
-                and b.distance_km is not None
-                and b.distance_km <= radius
-            ]
-            rated_within.sort(key=lambda b: (-b.rating, b.distance_km))
-            if rated_within:
-                top_bars = rated_within[:5]
-                break
+        rated_within = [
+            b
+            for b in results
+            if b.rating is not None
+            and b.distance_km is not None
+            and b.distance_km <= 5
+        ]
+        rated_within.sort(key=lambda b: (-b.rating, b.distance_km))
+        top_bars = rated_within[:5]
+        top_bars_message = None
         if not top_bars:
-            rated = [b for b in results if b.rating is not None]
-            rated.sort(key=lambda b: -b.rating)
-            top_bars = rated[:5]
+            top_bars_message = "Non ci sono bar nelle tue vicinanze."
     else:
         rated = [b for b in results if b.rating is not None]
         rated.sort(key=lambda b: -b.rating)
@@ -762,12 +757,14 @@ async def search_bars(
             others = [b for b in results if b not in top_bars]
             others.sort(key=lambda b: (b.name or ""))
             top_bars.extend(others[: 5 - len(top_bars)])
+        top_bars_message = None
 
     return render_template(
         "search.html",
         request=request,
         bars=results,
         top_bars=top_bars,
+        top_bars_message=top_bars_message,
         recommended_bars=recommended_bars,
         query=q,
     )
