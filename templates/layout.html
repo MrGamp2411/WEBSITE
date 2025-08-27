@@ -29,95 +29,74 @@
 </head>
 <body>
   <header class="site-header" role="banner">
-    <div class="mobile-header">
-      <button class="nav-toggle js-open-menu" aria-label="Menu" aria-controls="mobileMenu" aria-expanded="false">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-          <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
-        </svg>
-      </button>
-      <a class="hdr-logo" href="/">SiplyGo</a>
-      <div class="hdr-actions">
-        {% if user %}
-        <a class="credit-pill" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
-        {% endif %}
-        <a class="cart-icon" href="/cart" aria-label="Cart">
-          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-          </svg>
-          <span class="cart-badge" aria-live="polite">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
-        </a>
-      </div>
-    </div>
-    <nav aria-label="Primary" class="navbar desktop-nav">
-      <div class="nav-left">
-        <a class="logo" href="/">SiplyGo</a>
-        {% if not user %}
-        <a class="btn" href="/login">Login</a>
-        <a class="btn" href="/register">Register</a>
-        {% endif %}
-      </div>
-      <div class="top-controls">
-        <div class="location-selector desktop-location">
-          <span class="location-icon">📍</span>
-          <input type="search" id="locationInputDesktop" class="location-display" value="Detecting location..." placeholder="Enter city or ZIP" aria-label="Current location" list="citySuggestionsDesktop" inputmode="search" autocomplete="postal-code" enterkeyhint="search">
-          <datalist id="citySuggestionsDesktop">
-            <option value="Lugano"></option>
-            <option value="Locarno"></option>
-            <option value="Zurich"></option>
-          </datalist>
+      <div class="mobile-header">
+        <!-- Premium hamburger trigger -->
+        <button class="nav-toggle js-open-menu" aria-label="Menu" aria-controls="mobileMenu" aria-expanded="false">
+          <i class="bi bi-list" aria-hidden="true"></i>
+        </button>
+        <a class="hdr-logo" href="/">SiplyGo</a>
+        <div class="hdr-actions">
+          {% if user %}
+          <a class="credit-pill" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
+          {% endif %}
+          <a class="cart-icon" href="/cart" aria-label="Cart">
+            <i class="bi bi-cart2" aria-hidden="true"></i>
+            <span class="cart-badge" aria-live="polite">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
+          </a>
         </div>
-        <input type="search" id="barSearchDesktop" class="desktop-search" placeholder="Search bars..." aria-label="Search bars" inputmode="search" autocomplete="off" enterkeyhint="search">
-        <div id="searchSuggestionsDesktop" class="search-suggestions"></div>
       </div>
+      <nav aria-label="Primary" class="navbar desktop-nav">
+        <div class="nav-left">
+          <a class="logo" href="/">SiplyGo</a>
+        </div>
+        <!-- Search and location kept for JS but visually hidden -->
+        <div class="top-controls" hidden>
+          <div class="location-selector desktop-location">
+            <span class="location-icon">📍</span>
+            <input type="search" id="locationInputDesktop" class="location-display" value="Detecting location..." placeholder="Enter city or ZIP" aria-label="Current location" list="citySuggestionsDesktop" inputmode="search" autocomplete="postal-code" enterkeyhint="search">
+            <datalist id="citySuggestionsDesktop">
+              <option value="Lugano"></option>
+              <option value="Locarno"></option>
+              <option value="Zurich"></option>
+            </datalist>
+          </div>
+          <input type="search" id="barSearchDesktop" class="desktop-search" placeholder="Search bars..." aria-label="Search bars" inputmode="search" autocomplete="off" enterkeyhint="search">
+          <div id="searchSuggestionsDesktop" class="search-suggestions"></div>
+        </div>
         <div class="nav-right">
+          {% if not user %}
+          <a class="btn" href="/login">Login</a>
+          <a class="btn" href="/register">Register</a>
+          {% endif %}
           {% if user %}
           <a class="credit-pill desktop-credit" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
           {% endif %}
           <a class="cart-icon" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-              <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-            </svg>
+            <i class="bi bi-cart2" aria-hidden="true"></i>
             <span class="cart-badge" aria-live="polite">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
           </a>
           <button id="themeToggle" class="theme-toggle js-theme-toggle" aria-label="Toggle theme">🌙</button>
-          <button class="hamburger js-open-menu" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
-            <span></span><span></span><span></span>
+          <!-- Desktop hamburger mirrors mobile trigger -->
+          <button class="nav-toggle js-open-menu" aria-label="Menu" aria-controls="mobileMenu" aria-expanded="false">
+            <i class="bi bi-list" aria-hidden="true"></i>
           </button>
         </div>
-    </nav>
-    <nav id="mobileMenu" class="mobile-menu" aria-label="Mobile menu" hidden role="menu">
-      <a href="/search" role="menuitem">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-          <path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/>
-          <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-        </svg>
-        <span>Browse Bars</span>
-      </a>
-      {% if user and (user.is_super_admin or user.is_bar_admin or user.is_bartender) %}
-      <a href="/dashboard" role="menuitem">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-          <path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4M3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707M2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10m9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5m.754-4.246a.39.39 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.39.39 0 0 0-.029-.518z"/>
-          <path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A8 8 0 0 1 0 10m8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3"/>
-        </svg>
-        <span>Dashboard</span>
-      </a>
-      {% endif %}
-      {% if user %}
-      <a href="/wallet" role="menuitem">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-          <path d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9A1.5 1.5 0 0 1 1.432 2.5zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"/>
-        </svg>
-        <span>Wallet</span>
-      </a>
-      <a href="/logout" role="menuitem">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-          <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
-          <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
-        </svg>
-        <span>Logout</span>
-      </a>
-      {% endif %}
-    </nav>
+      </nav>
+      <nav id="mobileMenu" class="mobile-menu" aria-label="Mobile menu" hidden role="menu">
+        <button class="menu-close js-close-menu" aria-label="Close menu"><i class="bi bi-x" aria-hidden="true"></i></button>
+        <a href="/search" role="menuitem"><i class="bi bi-geo-alt" aria-hidden="true"></i><span>Browse Bars</span></a>
+        <a href="#how" role="menuitem"><i class="bi bi-stars" aria-hidden="true"></i><span>How it works</span></a>
+        {% if user and (user.is_super_admin or user.is_bar_admin or user.is_bartender) %}
+        <a href="/dashboard" role="menuitem"><i class="bi bi-speedometer2" aria-hidden="true"></i><span>Dashboard</span></a>
+        {% endif %}
+        {% if user %}
+        <a href="/wallet" role="menuitem"><i class="bi bi-wallet2" aria-hidden="true"></i><span>Wallet</span></a>
+        <a href="/logout" role="menuitem"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Logout</span></a>
+        {% else %}
+        <a href="/login" role="menuitem" class="menu-login"><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>Login</span></a>
+        <a href="/register" role="menuitem" class="menu-register"><i class="bi bi-person-plus" aria-hidden="true"></i><span>Register</span></a>
+        {% endif %}
+      </nav>
     <div class="menu-backdrop" hidden></div>
   </header>
   <div class="hdr-sub">
