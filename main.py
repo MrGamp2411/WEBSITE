@@ -749,6 +749,8 @@ async def search_bars(
         top_bars_message = None
         if not top_bars:
             top_bars_message = "Non ci sono bar nelle tue vicinanze."
+        # Sort search results by proximity when location is provided
+        results.sort(key=lambda b: (b.distance_km is None, b.distance_km))
     else:
         rated = [b for b in results if b.rating is not None]
         rated.sort(key=lambda b: -b.rating)
@@ -758,6 +760,8 @@ async def search_bars(
             others.sort(key=lambda b: (b.name or ""))
             top_bars.extend(others[: 5 - len(top_bars)])
         top_bars_message = None
+        # Default to alphabetical order when distance is unavailable
+        results.sort(key=lambda b: (b.name or "").lower())
 
     return render_template(
         "search.html",
