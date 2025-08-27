@@ -726,15 +726,17 @@ async def search_bars(
         or term in (bar.city or "").lower()
         or term in (bar.state or "").lower()
     ]
-    # Determine a random selection of bars within 20km for the "Consigliati" section.
+    # Determine a random selection of open bars within 20km for the "Consigliati" section.
     if lat is not None and lng is not None:
         nearby_pool = [
             b
             for b in db_bars
-            if b.distance_km is not None and b.distance_km <= 20
+            if b.is_open_now
+            and b.distance_km is not None
+            and b.distance_km <= 20
         ]
     else:
-        nearby_pool = list(db_bars)
+        nearby_pool = [b for b in db_bars if b.is_open_now]
     recommended_bars = random.sample(nearby_pool, min(5, len(nearby_pool)))
     if lat is not None and lng is not None:
         rated_within = [
