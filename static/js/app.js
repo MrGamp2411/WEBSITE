@@ -170,7 +170,13 @@ document.addEventListener('DOMContentLoaded', function() {
     let shown = 0;
     let anyOpen = false;
     items.forEach(li => {
-      const open = li.querySelector('.bar-card').dataset.open === 'true';
+      const card = li.querySelector('.bar-card');
+      const o = card.dataset.open;
+      if (o === undefined) {
+        li.hidden = false;
+        return;
+      }
+      const open = o === 'true';
       if (open && shown < 5) {
         li.hidden = false;
         shown++;
