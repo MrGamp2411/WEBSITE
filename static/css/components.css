@@ -305,6 +305,7 @@ body.dark-mode{
 @media (min-width:640px){.bar-card{width:45vw;}}
 @media (min-width:380px){.bars.scroller .bar-card{width:57vw;}}
 @media (min-width:640px){.bars.scroller .bar-card{width:45vw;}}
+@media (max-width:640px){.bar-card,.bars.scroller .bar-card{width:300px;max-width:300px;}}
 .scroller-nav{display:flex;gap:8px;}
 .scroll-btn{width:36px;height:36px;border:1px solid var(--sg-card-border);border-radius:50%;background:#FFF;color:var(--sg-ink-900);cursor:pointer;transition:background .2s,color .2s;display:flex;align-items:center;justify-content:center;}
 .scroll-btn:hover{background:var(--sg-purple-100);}
