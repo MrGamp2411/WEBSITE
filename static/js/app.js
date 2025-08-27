@@ -160,6 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
       return da - db;
     });
     items.forEach(it=>list.appendChild(it));
+    list.scrollLeft = 0;
   }
 
   function showNearestOpenBars(){
