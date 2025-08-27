@@ -46,28 +46,11 @@
         </div>
       </div>
       <nav aria-label="Primary" class="navbar desktop-nav">
-        <div class="nav-left">
-          <a class="logo" href="/">SiplyGo</a>
-        </div>
-        <!-- Search and location kept for JS but visually hidden -->
-        <div class="top-controls" hidden>
-          <div class="location-selector desktop-location">
-            <span class="location-icon">📍</span>
-            <input type="search" id="locationInputDesktop" class="location-display" value="Detecting location..." placeholder="Enter city or ZIP" aria-label="Current location" list="citySuggestionsDesktop" inputmode="search" autocomplete="postal-code" enterkeyhint="search">
-            <datalist id="citySuggestionsDesktop">
-              <option value="Lugano"></option>
-              <option value="Locarno"></option>
-              <option value="Zurich"></option>
-            </datalist>
-          </div>
-          <input type="search" id="barSearchDesktop" class="desktop-search" placeholder="Search bars..." aria-label="Search bars" inputmode="search" autocomplete="off" enterkeyhint="search">
-          <div id="searchSuggestionsDesktop" class="search-suggestions"></div>
-        </div>
-        <div class="nav-right">
-          {% if not user %}
-          <a class="btn" href="/login">Login</a>
-          <a class="btn" href="/register">Register</a>
-          {% endif %}
+        <button class="nav-toggle js-open-menu" aria-label="Menu" aria-controls="mobileMenu" aria-expanded="false">
+          <i class="bi bi-list" aria-hidden="true"></i>
+        </button>
+        <a class="hdr-logo" href="/">SiplyGo</a>
+        <div class="hdr-actions">
           {% if user %}
           <a class="credit-pill desktop-credit" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
           {% endif %}
@@ -75,14 +58,9 @@
             <i class="bi bi-cart2" aria-hidden="true"></i>
             <span class="cart-badge" aria-live="polite">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
           </a>
-          <button id="themeToggle" class="theme-toggle js-theme-toggle" aria-label="Toggle theme">🌙</button>
-          <!-- Desktop hamburger mirrors mobile trigger -->
-          <button class="nav-toggle js-open-menu" aria-label="Menu" aria-controls="mobileMenu" aria-expanded="false">
-            <i class="bi bi-list" aria-hidden="true"></i>
-          </button>
         </div>
       </nav>
-      <nav id="mobileMenu" class="mobile-menu" aria-label="Mobile menu" hidden role="menu">
+      <nav id="mobileMenu" class="mobile-menu" aria-label="Menu" role="dialog" aria-modal="true" hidden>
         <button class="menu-close js-close-menu" aria-label="Close menu"><i class="bi bi-x" aria-hidden="true"></i></button>
         <a href="/search" role="menuitem"><i class="bi bi-geo-alt" aria-hidden="true"></i><span>Browse Bars</span></a>
         <a href="#how" role="menuitem"><i class="bi bi-stars" aria-hidden="true"></i><span>How it works</span></a>
