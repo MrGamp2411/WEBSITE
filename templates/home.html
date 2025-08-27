@@ -27,9 +27,15 @@
 {% endif %}
 
 {% if recent_bars %}
-<section>
-  <h2>Recently visited</h2>
-  <ul class="bars">
+<section class="bar-section">
+  <div class="section-head">
+    <h2>Recently visited</h2>
+    <div class="scroller-nav">
+      <button class="scroll-btn prev" aria-label="Precedenti">‹</button>
+      <button class="scroll-btn next" aria-label="Successivi">›</button>
+    </div>
+  </div>
+  <ul class="bars scroller">
     {% for bar in recent_bars %}
     <li>
       <a class="bar-card" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
@@ -60,10 +66,16 @@
 </section>
 {% endif %}
 
-<section>
-  <h2 id="bars">Nearby Open Bars</h2>
+<section class="bar-section">
+  <div class="section-head">
+    <h2 id="bars">Nearby Open Bars</h2>
+    <div class="scroller-nav">
+      <button class="scroll-btn prev" aria-label="Precedenti">‹</button>
+      <button class="scroll-btn next" aria-label="Successivi">›</button>
+    </div>
+  </div>
   <p id="nearestBar" aria-live="polite"></p>
-  <ul class="bars" id="barList">
+  <ul class="bars scroller" id="barList">
     {% for bar in bars %}
     <li>
       <a class="bar-card" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
