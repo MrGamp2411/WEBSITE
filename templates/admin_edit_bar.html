@@ -18,7 +18,7 @@
     <input id="state" name="state" value="{{ bar.state }}">
   </label>
   <label for="description">Description
-    <textarea id="description" name="description">{{ bar.description }}</textarea>
+    <textarea id="description" name="description" maxlength="120">{{ bar.description }}</textarea>
   </label>
   {% if bar.photo_url %}
   <img src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" style="max-width:200px;"/>
