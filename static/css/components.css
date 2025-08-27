@@ -331,3 +331,48 @@ body.dark-mode{
   .scroll-btn{background:#1e293b;color:#f8fafc;}
   .filter-sheet{background:#1e293b;}
 }
+
+/* Mobile header adjustments */
+@media (max-width: 768px){
+  .site-header,
+  .site-header .mobile-header,
+  .site-header .navbar,
+  .site-header .container,
+  .site-header .header-surface,
+  .site-header .header-card{
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+
+  .site-header{
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    padding-top: max(12px, env(safe-area-inset-top));
+    z-index: 1000;
+  }
+
+  .site-header::after{
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(91,33,182,.55), rgba(91,33,182,.15));
+    pointer-events: none;
+  }
+
+  .site-header .mobile-header,
+  .site-header .navbar{
+    max-width: none !important;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
