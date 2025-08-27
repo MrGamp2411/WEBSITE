@@ -7,9 +7,12 @@
   --gap-1:   clamp(8px, 1.5vw, 12px);
   --gap-2:   clamp(12px, 2vw, 16px);
   /* colori */
-  --color-bg:#FFFFFF; --color-surface:#F5F7FA; --color-text:#0B0D12;
-  --color-muted:#374151; --color-primary:#7A5CE0; --color-primary-600:#5B3E96; --color-primary-700:#50327E;
-  --color-tint-50:#F3F0FF; --color-focus:#B9A7FF;
+  --color-bg:#FFFFFF; --color-surface:#F8F9FC; --color-text:#0E0B17;
+  --color-muted:#374151; --color-primary:#5B21B6; --color-primary-600:#6D28D9; --color-primary-700:#5B21B6;
+  --color-tint-50:#F3F0FF; --color-focus:#A78BFA;
+  --sg-purple-700:#5B21B6; --sg-purple-600:#6D28D9; --sg-purple-400:#A78BFA;
+  --sg-ink-900:#0E0B17; --sg-gray-25:#F8F9FC;
+  --sg-radius-xl:16px; --sg-shadow-md:0 6px 24px rgba(16,12,40,.08);
   --color-success:#10B981; --color-warning:#F59E0B; --color-danger:#EF4444;
   /* tipografia */
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
@@ -21,11 +24,11 @@
   --ease: cubic-bezier(.2,.8,.2,1); --dur: 220ms;
 
   /* legacy variables mapping */
-  --brand: var(--color-primary);
-  --brand-600: var(--color-primary-600);
+  --brand: var(--sg-purple-700);
+  --brand-600: var(--sg-purple-600);
   --bg: var(--color-bg);
   --surface: var(--color-surface);
-  --text: var(--color-text);
+  --text: var(--sg-ink-900);
   --muted: var(--color-muted);
-  --shadow: var(--shadow-1);
+  --shadow: var(--sg-shadow-md);
 }
