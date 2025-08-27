@@ -55,7 +55,7 @@
               <span class="bar-rating" data-has-rating="true" hidden></span>
               <span class="bar-distance" data-has-distance="true" hidden></span>
             </div>
-            {% if bar.address_short or bar.address %}<address>{{ bar.address_short or bar.address }}</address>{% endif %}
+            {% if bar.city %}<address>{{ bar.city }}{% if bar.state %}, {{ bar.state }}{% endif %}</address>{% endif %}
             {% if bar.description_short or bar.description %}<p class="desc">{{ bar.description_short or bar.description }}</p>{% endif %}
           </a>
           {% endfor %}
