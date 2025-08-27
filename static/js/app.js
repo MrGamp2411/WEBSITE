@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   const FALLBACK_IMG = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+";
-  const nav = document.querySelector('.navbar');
+  const nav = document.querySelector('.site-header');
   if (nav) {
     const onScroll = () => nav.classList.toggle('is-scrolled', window.scrollY > 8);
     onScroll();
