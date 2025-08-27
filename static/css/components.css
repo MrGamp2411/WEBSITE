@@ -67,6 +67,7 @@ body.dark-mode{
 .mobile-menu{position:fixed;top:64px;left:50%;transform:translate(-50%,-10px);width:94%;max-width:360px;background:#fff;border-radius:var(--sg-radius-xl);box-shadow:var(--sg-shadow-lg);padding:20px;display:flex;flex-direction:column;gap:8px;z-index:1001;opacity:0;transition:transform .22s var(--ease),opacity .22s var(--ease);}
 .mobile-menu[hidden]{display:none;}
 .mobile-menu.is-open{opacity:1;transform:translate(-50%,0);}
+.mobile-menu:focus,.mobile-menu:focus-within{outline:none;box-shadow:none;}
 .mobile-menu a{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:8px;text-decoration:none;color:var(--sg-ink-900);font-size:clamp(16px,4vw,18px);min-height:48px;transition:background .2s var(--ease),color .2s var(--ease),transform .2s var(--ease);}
 .mobile-menu a i{font-size:1.25rem;opacity:.9;transition:opacity .2s var(--ease),transform .2s var(--ease);}
 .mobile-menu a:hover{background:var(--sg-purple-100);color:var(--sg-purple-700);transform:translateX(2px);}
@@ -74,9 +75,12 @@ body.dark-mode{
 .mobile-menu a + a{border-top:1px solid rgba(14,11,23,.08);}
 .menu-close{align-self:flex-end;background:none;border:0;color:var(--sg-ink-900);min-width:44px;min-height:44px;font-size:1.25rem;}
 .menu-close:hover{color:var(--sg-purple-700);}
-.menu-register{border:1px solid var(--sg-purple-700);border-radius:999px;margin-top:4px;text-align:center;}
-.menu-register:hover{background:var(--sg-purple-600);color:#fff;}
-.mobile-menu a:focus-visible,.menu-close:focus-visible{outline:2px solid var(--sg-purple-600);outline-offset:2px;}
+.menu-register{border:1px solid rgba(14,11,23,.12);background:#fff;border-radius:999px;margin-top:4px;text-align:center;}
+.menu-register:hover{border-color:var(--sg-purple-700);background:var(--sg-purple-100);}
+.menu-register:focus{outline:none;box-shadow:none;}
+.menu-register:focus-visible{outline:2px solid var(--sg-purple-600);outline-offset:3px;}
+.mobile-menu a:focus,.mobile-menu button:focus{outline:none;box-shadow:none;}
+.mobile-menu a:focus-visible,.mobile-menu button:focus-visible{outline:2px solid var(--sg-purple-600);outline-offset:3px;box-shadow:none;}
 
 @media(min-width:769px){
   .mobile-menu{top:72px;right:16px;left:auto;transform:translateY(-10px);width:320px;}
