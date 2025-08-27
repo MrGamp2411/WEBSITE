@@ -13,7 +13,8 @@
     --sg-purple-700:#5B21B6; --sg-purple-600:#6D28D9; --sg-purple-500:#7C3AED; --sg-purple-400:#A78BFA; --sg-purple-300:#C4B5FD; --sg-purple-100:#EDE9FE;
     --sg-ink-900:#0E0B17; --sg-gray-25:#F8F9FC;
     --sg-bg0:#FFFFFF; --sg-t1:rgba(124,58,237,.15); --sg-t2:rgba(196,181,253,.15); --sg-t3:rgba(124,58,237,.10);
-    --sg-radius-xl:16px; --sg-shadow-md:0 6px 24px rgba(16,12,40,.08); --sg-shadow-lg:0 20px 40px rgba(16,12,40,.18);
+    --sg-surface:#FFFFFF; --sg-card-radius:16px; --sg-card-border:rgba(16,12,40,.10); --sg-focus:#6D28D9;
+    --sg-radius-xl:16px; --sg-shadow-sm:0 3px 10px rgba(16,12,40,.08), 0 1px 2px rgba(16,12,40,.04); --sg-shadow-md:0 10px 30px rgba(16,12,40,.12), 0 2px 6px rgba(16,12,40,.05); --sg-shadow-lg:0 20px 40px rgba(16,12,40,.18);
   --color-success:#10B981; --color-warning:#F59E0B; --color-danger:#EF4444;
   /* tipografia */
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";

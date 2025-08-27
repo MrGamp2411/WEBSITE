@@ -26,16 +26,17 @@
       %}
       {% if items %}
       <section class="bar-section" data-section="{{ key }}">
-        <div class="section-head">
-          <h2>{{ title }}</h2>
-          <div class="scroller-nav">
-            <button class="scroll-btn prev" aria-label="Precedenti">‹</button>
-            <button class="scroll-btn next" aria-label="Successivi">›</button>
+        <div class="section-track">
+          <div class="section-head">
+            <h2>{{ title }}</h2>
+            <div class="scroller-nav">
+              <button class="scroll-btn prev" aria-label="Precedenti">‹</button>
+              <button class="scroll-btn next" aria-label="Successivi">›</button>
+            </div>
           </div>
-        </div>
-        <div class="cards scroller" aria-label="{{ title }}" tabindex="0">
-          {% for bar in items %}
-          <a class="bar-card" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.categories | map(attribute='name') | map('lower') | join(',') if bar.categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
+          <div class="cards scroller" aria-label="{{ title }}" tabindex="0">
+            {% for bar in items %}
+            <a class="bar-card{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.categories | map(attribute='name') | map('lower') | join(',') if bar.categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
           {% if bar.photo_url %}
             <div class="thumb-wrapper">
             <img src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" class="thumb" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
@@ -57,8 +58,9 @@
             </div>
             {% if bar.city %}<address>{{ bar.city }}{% if bar.state %}, {{ bar.state }}{% endif %}</address>{% endif %}
             {% if bar.description_short or bar.description %}<p class="desc">{{ bar.description_short or bar.description }}</p>{% endif %}
-          </a>
-          {% endfor %}
+            </a>
+            {% endfor %}
+          </div>
         </div>
       </section>
       {% elif key == 'top' and top_bars_message %}
