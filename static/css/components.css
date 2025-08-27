@@ -340,7 +340,7 @@ body.dark-mode{
   .site-header .container,
   .site-header .header-surface,
   .site-header .header-card{
-    background: transparent !important;
+    background: #fff !important;
     box-shadow: none !important;
     border: none !important;
     border-radius: 0 !important;
