@@ -3,20 +3,20 @@
 html{font-family:var(--font-sans);font-size:var(--step-0);-webkit-text-size-adjust:100%;}
 html,body{background:var(--sg-bg0);}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
-      radial-gradient(900px 520px at 18% 6%, var(--sg-bg-tint-1) 0%, transparent 60%),
-      radial-gradient(1100px 640px at 78% 0%, var(--sg-bg-tint-2) 0%, transparent 65%),
-      radial-gradient(1200px 700px at 50% 105%, rgba(109,40,217,.06) 0%, transparent 70%),
+      radial-gradient(900px 520px at 18% 6%, var(--sg-tint-1) 0%, transparent 60%),
+      radial-gradient(1100px 640px at 78% 0%, var(--sg-tint-2) 0%, transparent 65%),
+      radial-gradient(1200px 700px at 50% 105%, var(--sg-tint-3) 0%, transparent 70%),
       var(--sg-bg0);}
 @media (max-width: 768px){
   body::before{
       background:
-        radial-gradient(720px 420px at 20% 4%, rgba(109,40,217,.08) 0%, transparent 58%),
-        radial-gradient(900px 520px at 80% 0%, rgba(167,139,250,.08) 0%, transparent 62%),
-        radial-gradient(1000px 560px at 50% 100%, rgba(109,40,217,.05) 0%, transparent 68%),
+        radial-gradient(720px 420px at 20% 4%, rgba(124,58,237,.08) 0%, transparent 58%),
+        radial-gradient(900px 520px at 80% 0%, rgba(196,181,253,.08) 0%, transparent 62%),
+        radial-gradient(1000px 560px at 50% 100%, rgba(124,58,237,.05) 0%, transparent 68%),
         var(--sg-bg0);
     }
 }
-body{margin:0;font-size:var(--step-0);line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;color:var(--fg,#111);transition:background var(--dur) var(--ease),color var(--dur) var(--ease);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);}
+body{margin:0;font-size:var(--step-0);line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;color:var(--fg,#111);transition:background var(--dur) var(--ease),color var(--dur) var(--ease);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);position:relative;}
 img{max-width:100%;display:block;height:auto;}
 a{color:inherit;}
 .container{max-width:72rem;margin-inline:auto;padding-inline:clamp(16px,4vw,24px);}
