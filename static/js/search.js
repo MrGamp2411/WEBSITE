@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       const topBars = bars.filter(b => b.el.closest('[data-section="top"]'));
       topBars.forEach(b => {
-        if (b.distance_km != null && b.distance_km > 5) {
+        if (b.distance_km == null || b.distance_km > 5) {
           b.el.remove();
         }
       });
