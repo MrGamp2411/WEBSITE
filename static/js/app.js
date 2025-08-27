@@ -150,36 +150,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const allBarItems = barCards();
 
-  function sortBarsByDistance(){
+  function showTopRatedBars(){
     const list = document.getElementById('barList');
     if(!list) return;
     const items = Array.from(list.children);
-    items.sort((a,b)=>{
-      const da = parseFloat(a.querySelector('.bar-card').dataset.distance_km || 'Infinity');
-      const db = parseFloat(b.querySelector('.bar-card').dataset.distance_km || 'Infinity');
-      return da - db;
-    });
-    items.forEach(it=>list.appendChild(it));
-  }
-
-  function showNearestOpenBars(){
-    const list = document.getElementById('barList');
-    if(!list) return;
-    const items = Array.from(list.children);
-    let shown = 0;
-    let anyOpen = false;
-    items.forEach(li => {
-      const open = li.querySelector('.bar-card').dataset.open === 'true';
-      if (open && shown < 5) {
-        li.hidden = false;
-        shown++;
-        anyOpen = true;
-      } else {
-        li.hidden = true;
+    const openBars = items.filter(li => li.querySelector('.bar-card').dataset.open === 'true');
+    const getDist = li => {
+      const d = parseFloat(li.querySelector('.bar-card').dataset.distance_km);
+      return isFinite(d) ? d : Infinity;
+    };
+    const getRating = li => {
+      const r = parseFloat(li.querySelector('.bar-card').dataset.rating);
+      return isFinite(r) ? r : -Infinity;
+    };
+    const withinRadius = openBars.filter(li => getDist(li) <= 5)
+      .sort((a,b) => getRating(b) - getRating(a));
+    const selected = withinRadius.slice(0,5);
+    if(selected.length < 5){
+      const remaining = openBars.filter(li => !selected.includes(li))
+        .sort((a,b) => getDist(a) - getDist(b));
+      for(const li of remaining){
+        if(selected.length >= 5) break;
+        selected.push(li);
       }
-    });
+    }
+    items.forEach(li => li.hidden = !selected.includes(li));
+    selected.forEach(li => list.appendChild(li));
     const msg = document.getElementById('noBarsMessage');
-    if (msg) msg.hidden = anyOpen;
+    if (msg) msg.hidden = selected.length > 0;
   }
 
   function updateDistances(uLat, uLon) {
@@ -191,8 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
       item.dataset.distance_km = dist;
       renderMeta(item, { rating: item.dataset.rating, distance_km: dist });
     });
-    sortBarsByDistance();
-    showNearestOpenBars();
+    showTopRatedBars();
   }
 
   function reverseGeocode(lat, lon) {
@@ -231,8 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
 
-    sortBarsByDistance();
-    showNearestOpenBars();
+    showTopRatedBars();
 
     function geocodeAndSet(city) {
       fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(city)}`)
