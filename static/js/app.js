@@ -291,8 +291,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const menuToggles = document.querySelectorAll('.js-open-menu');
   const mobileMenu = document.getElementById('mobileMenu');
   const backdrop = document.querySelector('.menu-backdrop');
+  const closeBtn = mobileMenu?.querySelector('.js-close-menu');
+  const contentEls = document.querySelectorAll('main, .hdr-sub, footer');
   let activeToggle;
   let lastFocused;
+
+  const handleKeydown = (e) => { if (e.key === 'Escape') closeMenu(); };
 
   function openMenu(btn) {
     activeToggle = btn;
@@ -301,21 +305,29 @@ document.addEventListener('DOMContentLoaded', function() {
     mobileMenu.hidden = false;
     backdrop.hidden = false;
     requestAnimationFrame(() => {
-      mobileMenu.classList.add('open');
-      backdrop.classList.add('show');
+      mobileMenu.classList.add('is-open');
+      backdrop.classList.add('is-open');
     });
     document.body.style.overflow = 'hidden';
+    contentEls.forEach(el => el.setAttribute('aria-hidden','true'));
+    document.addEventListener('keydown', handleKeydown);
+    backdrop.addEventListener('click', closeMenu);
+    closeBtn?.addEventListener('click', closeMenu);
     const firstItem = mobileMenu.querySelector('[role="menuitem"]');
     firstItem && firstItem.focus();
   }
 
   function closeMenu() {
     activeToggle && activeToggle.setAttribute('aria-expanded', 'false');
-    mobileMenu.classList.remove('open');
-    backdrop.classList.remove('show');
+    mobileMenu.classList.remove('is-open');
+    backdrop.classList.remove('is-open');
     document.body.style.overflow = '';
     mobileMenu.hidden = true;
     backdrop.hidden = true;
+    contentEls.forEach(el => el.removeAttribute('aria-hidden'));
+    document.removeEventListener('keydown', handleKeydown);
+    backdrop.removeEventListener('click', closeMenu);
+    closeBtn?.removeEventListener('click', closeMenu);
     lastFocused && lastFocused.focus();
   }
 
@@ -326,14 +338,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  backdrop?.addEventListener('click', closeMenu);
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !mobileMenu.hidden) {
-      closeMenu();
-    }
-  });
-
   mobileMenu?.addEventListener('click', (e) => {
     if (e.target.closest('[role="menuitem"]')) {
       closeMenu();
@@ -342,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   mobileMenu?.addEventListener('keydown', (e) => {
     if (e.key !== 'Tab') return;
-    const items = mobileMenu.querySelectorAll('[role="menuitem"]');
+    const items = mobileMenu.querySelectorAll('[role="menuitem"], .js-close-menu');
     if (!items.length) return;
     const first = items[0];
     const last = items[items.length - 1];
