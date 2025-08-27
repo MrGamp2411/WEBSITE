@@ -20,7 +20,7 @@ def extract_top_section(html: str) -> str:
     return html.split("I più votati", 1)[1].split("Consigliati", 1)[0]
 
 
-def test_top_rated_prefers_5km_radius():
+def test_top_rated_within_5km():
     reset_db()
     db = SessionLocal()
     bars = [
@@ -44,13 +44,12 @@ def test_top_rated_prefers_5km_radius():
         assert section.index("Near A") < section.index("Near B")
 
 
-def test_top_rated_falls_back_to_10km():
+def test_top_rated_no_nearby_message():
     reset_db()
     db = SessionLocal()
     bars = [
-        Bar(name="Mid A", slug="mid-a", rating=5.0, latitude=0.08, longitude=0.0),
-        Bar(name="Mid B", slug="mid-b", rating=4.5, latitude=0.089, longitude=0.0),
-        Bar(name="Far A", slug="far-a", rating=4.8, latitude=0.15, longitude=0.0),
+        Bar(name="Far A", slug="far-a", rating=5.0, latitude=0.15, longitude=0.0),
+        Bar(name="Far B", slug="far-b", rating=4.5, latitude=-0.16, longitude=0.0),
     ]
     db.add_all(bars)
     db.commit()
@@ -62,34 +61,9 @@ def test_top_rated_falls_back_to_10km():
         resp = client.get("/search?lat=0&lng=0")
         assert resp.status_code == 200
         section = extract_top_section(resp.text)
-        assert "Mid A" in section
-        assert "Mid B" in section
         assert "Far A" not in section
-        assert section.index("Mid A") < section.index("Mid B")
-
-
-def test_top_rated_falls_back_to_20km():
-    reset_db()
-    db = SessionLocal()
-    bars = [
-        Bar(name="Far B", slug="far-b", rating=5.0, latitude=0.17, longitude=0.0),
-        Bar(name="Far C", slug="far-c", rating=4.5, latitude=-0.16, longitude=0.0),
-        Bar(name="Too Far", slug="too-far", rating=4.9, latitude=0.25, longitude=0.0),
-    ]
-    db.add_all(bars)
-    db.commit()
-    for b in bars:
-        db.refresh(b)
-    db.close()
-
-    with TestClient(app) as client:
-        resp = client.get("/search?lat=0&lng=0")
-        assert resp.status_code == 200
-        section = extract_top_section(resp.text)
-        assert "Far B" in section
-        assert "Far C" in section
-        assert "Too Far" not in section
-        assert section.index("Far B") < section.index("Far C")
+        assert "Far B" not in section
+        assert "Non ci sono bar nelle tue vicinanze." in section
 
 
 def test_top_rated_section_without_location():
