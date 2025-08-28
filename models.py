@@ -39,6 +39,8 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    credit = Column(Numeric(10, 2), default=0)
+
     bar_roles = relationship("UserBarRole", back_populates="user")
 
 

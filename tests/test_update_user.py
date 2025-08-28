@@ -68,6 +68,7 @@ def test_update_user_details_without_password():
     assert updated.prefix == "+41"
     assert updated.phone == "763661800"
     assert updated.role == RoleEnum.BARADMIN
+    assert float(updated.credit) == 5.0
     # password should remain unchanged
     assert updated.password_hash == password_hash
     db.close()
