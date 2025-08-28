@@ -63,6 +63,7 @@ class Bar(Base):
     manual_closed = Column(Boolean, default=False)
     promo_label = Column(String(100))
     tags = Column(Text)
+    bar_categories = Column(Text)
 
     categories = relationship("Category", back_populates="bar")
     menu_items = relationship("MenuItem", back_populates="bar")

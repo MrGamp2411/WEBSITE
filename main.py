@@ -73,6 +73,40 @@ from payouts import schedule_payout
 from audit import log_action
 from urllib.parse import urljoin
 
+# Predefined categories for bars (used for filtering and admin forms)
+BAR_CATEGORIES = [
+    "Cocktail classico",
+    "Mixology&Signature",
+    "Enoteca/Vineria (Merlot)",
+    "Birreria artigianale",
+    "Pub/Irish pub",
+    "Gastropub",
+    "Sports bar",
+    "Lounge bar",
+    "Rooftop/Sky bar",
+    "Speakeasy",
+    "Live music/Jazz bar",
+    "Piano bar",
+    "Karaoke bar",
+    "Club/Discoteca bar",
+    "Aperitivo&Cicchetti",
+    "Caffetteria/Espresso bar",
+    "Pasticceria-bar",
+    "Paninoteca/Snack bar",
+    "Gelateria-bar",
+    "Bar di paese",
+    "Lakefront/Lido (lago)",
+    "Grotto ticinese",
+    "Hotel bar",
+    "Shisha/Hookah lounge",
+    "Cigar&Whisky lounge",
+    "Gin bar",
+    "Rum/Tiki bar",
+    "Tequila/Mezcalería",
+    "Biliardo&Darts pub",
+    "Afterwork/Business bar",
+]
+
 # -----------------------------------------------------------------------------
 # Data models (in-memory for demonstration purposes)
 # -----------------------------------------------------------------------------
@@ -137,6 +171,7 @@ class Bar:
         opening_hours: Optional[Dict[str, Dict[str, str]]] = None,
         promo_label: Optional[str] = None,
         tags: Optional[List[str]] = None,
+        bar_categories: Optional[List[str]] = None,
     ):
         self.id = id
         self.name = name
@@ -153,6 +188,7 @@ class Bar:
         self.opening_hours = opening_hours or {}
         self.promo_label = promo_label
         self.tags = tags or []
+        self.bar_categories = bar_categories or []
         self.categories: Dict[int, Category] = {}
         self.products: Dict[int, Product] = {}
         self.tables: Dict[int, Table] = {}
@@ -842,6 +878,7 @@ class BarCreate(BaseModel):
     manual_closed: Optional[bool] = False
     promo_label: Optional[str] = None
     tags: Optional[str] = None
+    bar_categories: Optional[str] = None
 
 
 class BarRead(BaseModel):
@@ -861,6 +898,7 @@ class BarRead(BaseModel):
     manual_closed: bool = False
     promo_label: Optional[str] = None
     tags: Optional[str] = None
+    bar_categories: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -1324,7 +1362,11 @@ async def new_bar_form(request: Request):
     user = get_current_user(request)
     if not user or not user.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    return render_template("admin_new_bar.html", request=request)
+    return render_template(
+        "admin_new_bar.html",
+        request=request,
+        bar_categories=BAR_CATEGORIES,
+    )
 
 
 @app.post("/admin/bars/new")
@@ -1348,7 +1390,6 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
     promo_label = form.get("promo_label")
     tags = form.get("tags")
     tags_json = json.dumps([t.strip() for t in tags.split(",") if t.strip()]) if tags else None
-    photo_file = form.get("photo")
     hours = {}
     for i in range(7):
         o = form.get(f"open_{i}")
@@ -1356,6 +1397,17 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
         if o and c:
             hours[str(i)] = {"open": o, "close": c}
     opening_hours = json.dumps(hours) if hours else None
+    categories = form.getlist("categories")
+    if len(categories) > 5:
+        return render_template(
+            "admin_new_bar.html",
+            request=request,
+            bar_categories=BAR_CATEGORIES,
+            selected_categories=categories,
+            error="Select up to 5 categories",
+        )
+    categories_csv = ",".join(categories) if categories else None
+    photo_file = form.get("photo")
     photo_url = None
     if isinstance(photo_file, UploadFile) and photo_file.filename:
         uploads_dir = os.path.join("static", "uploads")
@@ -1367,7 +1419,13 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
             f.write(await photo_file.read())
         photo_url = f"/static/uploads/{filename}"
     if not all([name, address, city, state, latitude, longitude, description]):
-        return render_template("admin_new_bar.html", request=request, error="All fields are required")
+        return render_template(
+            "admin_new_bar.html",
+            request=request,
+            bar_categories=BAR_CATEGORIES,
+            selected_categories=categories,
+            error="All fields are required",
+        )
     try:
         lat = float(latitude)
         lon = float(longitude)
@@ -1389,6 +1447,7 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
         manual_closed=manual_closed,
         promo_label=promo_label,
         tags=tags_json,
+        bar_categories=categories_csv,
     )
     db.add(db_bar)
     db.commit()
@@ -1409,6 +1468,7 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
         opening_hours=hours,
         promo_label=promo_label,
         tags=[t.strip() for t in tags.split(",") if t.strip()] if tags else [],
+        bar_categories=categories,
     )
     return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -1434,6 +1494,7 @@ async def edit_bar_form(request: Request, bar_id: int, db: Session = Depends(get
     if not user or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     tags_csv = ", ".join(json.loads(bar.tags)) if bar.tags else ""
+    selected_categories = bar.bar_categories.split(",") if bar.bar_categories else []
     hours = json.loads(bar.opening_hours) if bar.opening_hours else {}
     return render_template(
         "admin_edit_bar.html",
@@ -1441,6 +1502,8 @@ async def edit_bar_form(request: Request, bar_id: int, db: Session = Depends(get
         bar=bar,
         tags_csv=tags_csv,
         hours=hours,
+        bar_categories=BAR_CATEGORIES,
+        selected_categories=selected_categories,
     )
 
 
@@ -1467,8 +1530,6 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
     promo_label = form.get("promo_label")
     tags = form.get("tags")
     tags_json = json.dumps([t.strip() for t in tags.split(",") if t.strip()]) if tags else None
-    photo_file = form.get("photo")
-    photo_url = bar.photo_url
     hours = {}
     for i in range(7):
         o = form.get(f"open_{i}")
@@ -1476,6 +1537,20 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
         if o and c:
             hours[str(i)] = {"open": o, "close": c}
     opening_hours = json.dumps(hours) if hours else None
+    categories = form.getlist("categories")
+    if len(categories) > 5:
+        return render_template(
+            "admin_edit_bar.html",
+            request=request,
+            bar=bar,
+            hours=hours,
+            bar_categories=BAR_CATEGORIES,
+            selected_categories=categories,
+            error="Select up to 5 categories",
+        )
+    categories_csv = ",".join(categories) if categories else None
+    photo_file = form.get("photo")
+    photo_url = bar.photo_url
     if isinstance(photo_file, UploadFile) and photo_file.filename:
         uploads_dir = os.path.join("static", "uploads")
         os.makedirs(uploads_dir, exist_ok=True)
@@ -1505,6 +1580,7 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
         bar.is_open_now = is_open_now_from_hours(hours) and not manual_closed
         bar.promo_label = promo_label
         bar.tags = tags_json
+        bar.bar_categories = categories_csv
         db.commit()
         mem_bar = bars.get(bar_id)
         if mem_bar:
@@ -1522,11 +1598,18 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
             mem_bar.is_open_now = is_open_now_from_hours(hours) and not manual_closed
             mem_bar.promo_label = promo_label
             mem_bar.tags = [t.strip() for t in tags.split(",") if t.strip()] if tags else []
+            mem_bar.bar_categories = categories
         if user.is_super_admin:
             return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(
-        "admin_edit_bar.html", request=request, bar=bar, hours=hours
+        "admin_edit_bar.html",
+        request=request,
+        bar=bar,
+        hours=hours,
+        bar_categories=BAR_CATEGORIES,
+        selected_categories=categories,
+        error="All fields are required",
     )
 
 

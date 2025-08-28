@@ -114,6 +114,49 @@ document.addEventListener('DOMContentLoaded', async () => {
   const clearBtn = document.getElementById('clearFilters');
   const filterCount = document.getElementById('filterCount');
 
+  if (categoryChips) {
+    const allCategories = [
+      "Cocktail classico",
+      "Mixology&Signature",
+      "Enoteca/Vineria (Merlot)",
+      "Birreria artigianale",
+      "Pub/Irish pub",
+      "Gastropub",
+      "Sports bar",
+      "Lounge bar",
+      "Rooftop/Sky bar",
+      "Speakeasy",
+      "Live music/Jazz bar",
+      "Piano bar",
+      "Karaoke bar",
+      "Club/Discoteca bar",
+      "Aperitivo&Cicchetti",
+      "Caffetteria/Espresso bar",
+      "Pasticceria-bar",
+      "Paninoteca/Snack bar",
+      "Gelateria-bar",
+      "Bar di paese",
+      "Lakefront/Lido (lago)",
+      "Grotto ticinese",
+      "Hotel bar",
+      "Shisha/Hookah lounge",
+      "Cigar&Whisky lounge",
+      "Gin bar",
+      "Rum/Tiki bar",
+      "Tequila/Mezcalería",
+      "Biliardo&Darts pub",
+      "Afterwork/Business bar",
+    ];
+    allCategories.forEach(c => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'chip';
+      chip.dataset.value = norm(c);
+      chip.textContent = c;
+      categoryChips.appendChild(chip);
+    });
+  }
+
   const defaults = {
     q: '',
     max_km: null,

@@ -10,3 +10,7 @@
 - On the `/bars` page, card widths are reduced by `50px` (to `350px` desktop and `250px` mobile) via `.bars.all-bars .bar-card` overrides in `components.css`.
 - Cards on the `/bars` page are centered within their grid cells via `.bars.all-bars{justify-items:center;}`.
 - `/bars` now includes search inputs and filter controls (name, city, max distance, min rating, open/closed, categories) wired up in `static/js/view-all.js` and styled via `.bar-filters` in `components.css`.
+- Bars support a `bar_categories` field (comma-separated) with 30 predefined types (see `BAR_CATEGORIES` in `main.py`).
+- Admin forms `templates/admin_new_bar.html` and `templates/admin_edit_bar.html` offer multiselect inputs for these categories.
+- Category filter chips on `/bars` and search overlays draw from this predefined list in `static/js/view-all.js` and `static/js/search.js`.
+- Admin bar category selection is limited to five choices, enforced in both the form UI and server-side handlers.
