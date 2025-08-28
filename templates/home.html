@@ -23,12 +23,9 @@
 </section>
 
 {% if user %}
-<section class="bar-section">
-  <div class="section-track">
-    <div class="section-head">
-      <h2>Hi {{ user.username }} <i class="bi bi-hand-thumbs-up" aria-hidden="true"></i>, ready for your next drink?</h2>
-    </div>
-  </div>
+<section class="info-section">
+  <h2>Hi {{ user.username }} 👋</h2>
+  <p>Ready for your next drink?</p>
 </section>
 {% endif %}
 

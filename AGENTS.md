@@ -30,3 +30,4 @@
 - Browse bars sections in `templates/search.html` append a "View all" card linking to `/bars` (excluded for the "Recently visited bars" section); these cards use `.browse-bars-card` styling and are ignored by data logic in `static/js/search.js`.
 - All UI text is now in English. Category names are defined in `main.py` and mirrored in `static/js/search.js` and `static/js/view-all.js`.
 - Sorting in `static/js/search.js` and `static/js/app.js` inserts bars before browse/view-all cards so those cards always stay at the end of their lists.
+- Logged-in greeting on the home page uses the `.info-section` layout with a waving hand emoji and a separate paragraph.
