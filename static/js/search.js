@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let state = JSON.parse(JSON.stringify(defaults));
   let appliedState = JSON.parse(JSON.stringify(defaults));
 
-  const cardEls = Array.from(document.querySelectorAll('.bar-card'));
+  const cardEls = Array.from(document.querySelectorAll('.bar-card:not(.browse-bars-card)'));
   const rawBars = cardEls.map(el => ({
     el,
     id: el.getAttribute('href')?.split('/').pop(),
