@@ -598,6 +598,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     applyState(appliedState);
   });
 
+  function setupCarousels() {
+    document.querySelectorAll('.bar-section').forEach(section => {
+      const scroller = section.querySelector('.scroller');
+      const prev = section.querySelector('.scroll-btn.prev');
+      const next = section.querySelector('.scroll-btn.next');
+      if (!scroller) return;
+      const getWidth = () => {
+        const card = scroller.querySelector('.bar-card:not([hidden]):not([style*="display: none"])');
+        if (!card) return 0;
+        const style = getComputedStyle(card);
+        return card.offsetWidth + parseFloat(style.marginRight) + parseFloat(style.marginLeft);
+      };
+      let w = getWidth();
+      const scrollBy = dir => scroller.scrollBy({ left: dir * w, behavior: 'smooth' });
+      prev?.addEventListener('click', () => scrollBy(-1));
+      next?.addEventListener('click', () => scrollBy(1));
+      window.addEventListener('resize', () => { w = getWidth(); });
+      scroller.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight') { e.preventDefault(); scrollBy(1); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); scrollBy(-1); }
+      });
+    });
+  }
+
   // Initial state
   state = readFromURL();
   const hasParams = Array.from(new URLSearchParams(location.search).keys()).length > 0;
@@ -607,5 +631,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   appliedState = JSON.parse(JSON.stringify(state));
   updateControls();
   applyState(appliedState);
+  setupCarousels();
 });
 
