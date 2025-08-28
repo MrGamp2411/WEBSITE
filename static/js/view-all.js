@@ -78,6 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const chipsContainer = document.getElementById('categoryChips');
   const activeChips = document.getElementById('activeFilterChips');
   const filterBadge = document.getElementById('filterCount');
+  const toggleBtn = document.getElementById('toggleFilters');
+  const filterPanel = document.getElementById('barFilters');
   const distanceValue = document.getElementById('distanceValue');
   const activeCategories = new Set();
 
@@ -316,6 +318,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
+
+  toggleBtn?.addEventListener('click', () => {
+    filterPanel?.toggleAttribute('hidden');
+  });
 
   applyFilters();
 

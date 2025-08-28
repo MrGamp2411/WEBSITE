@@ -124,9 +124,9 @@ body.dark-mode{
   .chip.active{background:var(--sg-purple-700);color:#fff;}
   .nav-right .chip{min-height:44px;display:inline-flex;align-items:center;padding:0 var(--space-2);}
 
+.filter-toggle{background:none;border:0;color:var(--brand);text-decoration:underline;padding:8px;font:inherit;cursor:pointer;margin-bottom:var(--space-2);display:flex;align-items:center;gap:6px;}
+  .filter-count{background:var(--brand);color:#fff;border-radius:999px;font-size:.75rem;padding:0 6px;}
   .bar-filters{border:1px solid var(--filter-border);border-radius:var(--filter-radius);padding:var(--filter-pad);display:flex;flex-direction:column;gap:var(--filter-gap);margin-bottom:var(--space-2);}
-  .bar-filters .filter-title{display:flex;align-items:center;gap:6px;font-weight:600;}
-  .bar-filters .filter-count{background:var(--brand);color:#fff;border-radius:999px;font-size:.75rem;padding:0 6px;}
   .bar-filters .filter-grid{display:flex;flex-wrap:wrap;gap:var(--filter-gap);align-items:flex-end;}
   .bar-filters .filter-group{display:flex;flex-direction:column;gap:4px;}
   .bar-filters .input-wrap{display:flex;align-items:center;gap:4px;border:1px solid var(--filter-border);border-radius:var(--filter-radius);padding:4px 8px;background:#fff;}

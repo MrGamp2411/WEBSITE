@@ -6,11 +6,8 @@
       <div class="section-head">
         <h2>Tutti i bar</h2>
       </div>
-      <div class="bar-filters">
-        <div class="filter-title">
-          <span>Filtri</span>
-          <span class="filter-count" id="filterCount" hidden>0</span>
-        </div>
+      <button type="button" id="toggleFilters" class="filter-toggle">Filtri <span class="filter-count" id="filterCount" hidden>0</span></button>
+      <div class="bar-filters" id="barFilters" hidden>
         <div class="filter-grid">
           <div class="filter-group">
             <label for="searchName">Nome del bar</label>
