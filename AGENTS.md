@@ -13,6 +13,7 @@
 - `/bars` filter toolbar uses a grid layout with icon-labeled inputs, range slider, star rating selector, and active filter chips (markup in `templates/all_bars.html`, logic in `static/js/view-all.js`, styles in `components.css`).
 - The filter controls sit inside a responsive `.bar-filters` card that uses `auto-fit` grid columns to size itself to both screen width and filter content.
 - Filters on `/bars` are hidden by default and revealed via the `#toggleFilters` button, which also shows the active filter count.
+- The `#toggleFilters` button controls the `.bar-filters` card via `aria-controls`/`aria-expanded`, updated in `static/js/view-all.js`.
 - When the filter panel is shown, the bar list is temporarily hidden to free screen space; category chips now sit inside the `.bar-filters` card and are toggled along with it (logic in `static/js/view-all.js`).
 - Category chip group spans the full filter width via `.bar-filters .filter-group.categories` to keep chips inline until space runs out (see `templates/all_bars.html` and `static/css/components.css`).
 - Bars support a `bar_categories` field (comma-separated) with 30 predefined types (see `BAR_CATEGORIES` in `main.py`).

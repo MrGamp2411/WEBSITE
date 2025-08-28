@@ -328,6 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     list?.toggleAttribute('hidden', wasHidden);
     activeChips?.toggleAttribute('hidden', wasHidden);
+    toggleBtn?.setAttribute('aria-expanded', wasHidden ? 'true' : 'false');
     const textNode = toggleBtn.childNodes[0];
     if (textNode && textNode.nodeType === Node.TEXT_NODE) {
       textNode.textContent = wasHidden ? 'Chiudi filtri ' : 'Filtri ';
