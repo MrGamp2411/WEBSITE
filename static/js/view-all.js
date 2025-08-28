@@ -328,7 +328,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     list?.toggleAttribute('hidden', wasHidden);
     activeChips?.toggleAttribute('hidden', wasHidden);
-    chipsContainer?.toggleAttribute('hidden', wasHidden);
     const textNode = toggleBtn.childNodes[0];
     if (textNode && textNode.nodeType === Node.TEXT_NODE) {
       textNode.textContent = wasHidden ? 'Chiudi filtri ' : 'Filtri ';
