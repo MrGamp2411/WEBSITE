@@ -102,8 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const rating = toNumber(data.rating);
       if (minRating != null && (rating == null || rating < minRating)) show = false;
       const isOpen = data.open === 'true';
-      if (showOpen && !isOpen) show = false;
-      if (showClosed && isOpen) show = false;
+      if (showOpen !== showClosed) {
+        if (showOpen && !isOpen) show = false;
+        if (showClosed && isOpen) show = false;
+      }
       if (activeCategories.size > 0) {
         const barCats = (data.categories || '').split(',').map(norm);
         if (!barCats.some(c => activeCategories.has(c))) show = false;
