@@ -7,14 +7,59 @@
         <h2>Tutti i bar</h2>
       </div>
       <div class="bar-filters">
-        <input type="search" id="searchName" placeholder="Cerca per nome">
-        <input type="search" id="searchCity" placeholder="Cerca per città">
-        <input type="number" id="filterDistance" placeholder="Distanza max (km)" min="0" step="0.1">
-        <input type="number" id="filterRating" placeholder="Rating minimo" min="0" max="5" step="0.1">
-        <label><input type="checkbox" id="filterOpen"> Aperti ora</label>
-        <label><input type="checkbox" id="filterClosed"> Chiusi ora</label>
-        <div class="chips" id="categoryChips"></div>
+        <div class="filter-title">
+          <span>Filtri</span>
+          <span class="filter-count" id="filterCount" hidden>0</span>
+        </div>
+        <div class="filter-grid">
+          <div class="filter-group">
+            <label for="searchName">Nome del bar</label>
+            <div class="input-wrap">
+              <i class="bi bi-search" aria-hidden="true"></i>
+              <input type="search" id="searchName" placeholder="Es. Bar Centrale">
+            </div>
+          </div>
+          <div class="filter-group">
+            <label for="searchCity">Città</label>
+            <div class="input-wrap">
+              <i class="bi bi-geo-alt" aria-hidden="true"></i>
+              <input type="search" id="searchCity" placeholder="Es. Bellinzona">
+            </div>
+          </div>
+          <div class="filter-group">
+            <label for="filterDistance">Distanza max (km)</label>
+            <div class="range-wrap">
+              <input type="range" id="filterDistance" min="0" max="30" step="1" list="distTicks" aria-live="polite">
+              <datalist id="distTicks">
+                <option value="0"></option>
+                <option value="5"></option>
+                <option value="10"></option>
+                <option value="15"></option>
+                <option value="20"></option>
+                <option value="25"></option>
+                <option value="30"></option>
+              </datalist>
+              <span class="value" id="distanceValue"></span>
+            </div>
+          </div>
+          <div class="filter-group rating-group">
+            <label for="filterRating">Rating minimo <i class="bi bi-info-circle" title="Mostra solo bar con rating ≥ valore selezionato" aria-hidden="true"></i></label>
+            <div class="rating-stars" id="ratingStars" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"></div>
+            <span class="value" id="ratingValue"></span>
+            <input type="hidden" id="filterRating">
+          </div>
+          <div class="filter-group check-group">
+            <label><input type="checkbox" id="filterOpen"> Aperti ora</label>
+            <label><input type="checkbox" id="filterClosed"> Chiusi ora</label>
+          </div>
+          <div class="actions">
+            <button type="button" id="clearFilters" class="btn-link">Pulisci filtri</button>
+            <button type="button" id="applyFiltersBtn" class="btn-primary">Applica</button>
+          </div>
+        </div>
       </div>
+      <div class="active-filters" id="activeFilterChips"></div>
+      <div class="chips" id="categoryChips"></div>
       <ul class="bars all-bars" id="allBarList">
         {% for bar in bars %}
         <li>
