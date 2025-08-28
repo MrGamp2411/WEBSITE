@@ -7,6 +7,25 @@ function toNumber(v) {
 
 const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
+function debounce(fn, delay){
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+function throttle(fn, limit){
+  let waiting = false;
+  return (...args) => {
+    if (!waiting) {
+      fn.apply(this, args);
+      waiting = true;
+      setTimeout(() => waiting = false, limit);
+    }
+  };
+}
+
 function renderMeta(el, data) {
   const rating = toNumber(data.rating);
   const km = toNumber(data.distance_km);
@@ -52,10 +71,73 @@ document.addEventListener('DOMContentLoaded', () => {
   const cityInput = document.getElementById('searchCity');
   const distInput = document.getElementById('filterDistance');
   const ratingInput = document.getElementById('filterRating');
+  const ratingStars = document.getElementById('ratingStars');
+  const ratingValue = document.getElementById('ratingValue');
   const openCheck = document.getElementById('filterOpen');
   const closedCheck = document.getElementById('filterClosed');
   const chipsContainer = document.getElementById('categoryChips');
+  const activeChips = document.getElementById('activeFilterChips');
+  const filterBadge = document.getElementById('filterCount');
+  const distanceValue = document.getElementById('distanceValue');
   const activeCategories = new Set();
+
+  if (distInput) {
+    distInput.value = distInput.max || '30';
+    distanceValue.textContent = distInput.value + ' km';
+  }
+
+  let setRating = val => {
+    if (ratingInput) {
+      ratingInput.value = val || '';
+      ratingStars?.setAttribute('aria-valuenow', val || 0);
+      updateRatingDisplay();
+    }
+  };
+  let updateRatingDisplay = () => {
+    if (!ratingStars) return;
+    const val = toNumber(ratingInput?.value);
+    ratingValue.textContent = val ? '≥ ' + val.toFixed(1) : '';
+    const r = val || 0;
+    Array.from(ratingStars.children).forEach((s, i) => {
+      const idx = i + 1;
+      s.className = r >= idx ? 'bi bi-star-fill' : r >= idx - 0.5 ? 'bi bi-star-half' : 'bi bi-star';
+    });
+  };
+
+  if (ratingStars && ratingInput) {
+    for (let i = 0; i < 5; i++) {
+      const star = document.createElement('i');
+      star.className = 'bi bi-star';
+      star.dataset.index = i;
+      ratingStars.appendChild(star);
+    }
+    ratingStars.addEventListener('click', e => {
+      const star = e.target.closest('i');
+      if (!star) return;
+      const rect = star.getBoundingClientRect();
+      const half = (e.clientX - rect.left) > rect.width / 2 ? 1 : 0.5;
+      const val = parseInt(star.dataset.index) + half;
+      setRating(val);
+      applyFilters();
+    });
+    ratingStars.addEventListener('keydown', e => {
+      const curr = toNumber(ratingInput.value) || 0;
+      if (e.key === 'ArrowRight') {
+        setRating(Math.min(curr + 0.5, 5));
+        applyFilters();
+        e.preventDefault();
+      } else if (e.key === 'ArrowLeft') {
+        setRating(Math.max(curr - 0.5, 0));
+        applyFilters();
+        e.preventDefault();
+      } else if (e.key === ' ' || e.key === 'Enter') {
+        setRating(0);
+        applyFilters();
+        e.preventDefault();
+      }
+    });
+    updateRatingDisplay();
+  }
 
   if (chipsContainer) {
     const allCategories = [
@@ -113,10 +195,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function updateActiveChips() {
+    if (!activeChips) return;
+    activeChips.innerHTML = '';
+    const qName = norm(nameInput?.value);
+    const qCity = norm(cityInput?.value);
+    const maxDist = toNumber(distInput?.value);
+    const maxDefault = toNumber(distInput?.max || 30);
+    const useDist = maxDist != null && maxDist < maxDefault;
+    const minRating = toNumber(ratingInput?.value);
+    const showOpen = openCheck?.checked;
+    const showClosed = closedCheck?.checked;
+    if (qName) addChip('name', 'Nome del bar', nameInput.value);
+    if (qCity) addChip('city', 'Città', cityInput.value);
+    if (useDist) addChip('distance', 'Distanza ≤', distInput.value + ' km');
+    if (minRating != null) addChip('rating', 'Rating ≥', minRating.toFixed(1));
+    if (showOpen) addChip('open', 'Aperti ora', '');
+    if (showClosed) addChip('closed', 'Chiusi ora', '');
+    activeCategories.forEach(val => {
+      const label = chipsContainer?.querySelector(`.chip[data-value="${val}"]`)?.textContent || val;
+      addChip('category', 'Categoria', label, val);
+    });
+  }
+
+  function addChip(type, label, value, val) {
+    if (!activeChips) return;
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'filter-chip';
+    chip.dataset.filter = type;
+    if (val) chip.dataset.value = val;
+    chip.innerHTML = label + (value ? ': ' + value : '') + ' <i class="bi bi-x" aria-hidden="true"></i>';
+    activeChips.appendChild(chip);
+  }
+
   function applyFilters() {
     const qName = norm(nameInput?.value);
     const qCity = norm(cityInput?.value);
     const maxDist = toNumber(distInput?.value);
+    const maxDefault = toNumber(distInput?.max || 30);
+    const useDist = maxDist != null && maxDist < maxDefault;
     const minRating = toNumber(ratingInput?.value);
     const showOpen = openCheck?.checked;
     const showClosed = closedCheck?.checked;
@@ -126,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (qName && !norm(data.name).includes(qName)) show = false;
       if (qCity && !norm(data.city).includes(qCity)) show = false;
       const dist = toNumber(data.distance_km);
-      if (maxDist != null && (dist == null || dist > maxDist)) show = false;
+      if (useDist && (dist == null || dist > maxDist)) show = false;
       const rating = toNumber(data.rating);
       if (minRating != null && (rating == null || rating < minRating)) show = false;
       const isOpen = data.open === 'true';
@@ -138,10 +256,66 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       card.closest('li').hidden = !show;
     });
+    const activeCount = (qName ? 1 : 0) + (qCity ? 1 : 0) + (useDist ? 1 : 0) + (minRating != null ? 1 : 0) + (showOpen ? 1 : 0) + (showClosed ? 1 : 0) + activeCategories.size;
+    if (filterBadge) {
+      filterBadge.textContent = activeCount;
+      filterBadge.hidden = activeCount === 0;
+    }
+    updateActiveChips();
   }
 
-  [nameInput, cityInput, distInput, ratingInput].forEach(el => el?.addEventListener('input', applyFilters));
+  const debouncedApply = debounce(applyFilters, 250);
+  nameInput?.addEventListener('input', debouncedApply);
+  cityInput?.addEventListener('input', debouncedApply);
+  if (distInput) {
+    const updateDist = () => {
+      distanceValue.textContent = distInput.value + ' km';
+      applyFilters();
+    };
+    distInput.addEventListener('input', throttle(updateDist, 100));
+  }
+  if (ratingInput) {
+    // rating changes handled in setRating
+  }
   [openCheck, closedCheck].forEach(el => el?.addEventListener('change', applyFilters));
+
+  activeChips?.addEventListener('click', e => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    const type = chip.dataset.filter;
+    if (type === 'name') nameInput.value = '';
+    else if (type === 'city') cityInput.value = '';
+    else if (type === 'distance') {
+      distInput.value = distInput.max;
+      distanceValue.textContent = distInput.value + ' km';
+    } else if (type === 'rating') setRating(0);
+    else if (type === 'open') openCheck.checked = false;
+    else if (type === 'closed') closedCheck.checked = false;
+    else if (type === 'category') {
+      const val = chip.dataset.value;
+      activeCategories.delete(val);
+      const catChip = chipsContainer?.querySelector(`.chip[data-value="${val}"]`);
+      catChip?.classList.remove('active');
+    }
+    applyFilters();
+  });
+
+  document.getElementById('clearFilters')?.addEventListener('click', () => {
+    if (nameInput) nameInput.value = '';
+    if (cityInput) cityInput.value = '';
+    if (distInput) {
+      distInput.value = distInput.max;
+      distanceValue.textContent = distInput.value + ' km';
+    }
+    setRating(0);
+    if (openCheck) openCheck.checked = false;
+    if (closedCheck) closedCheck.checked = false;
+    activeCategories.clear();
+    chipsContainer?.querySelectorAll('.chip.active').forEach(ch => ch.classList.remove('active'));
+    applyFilters();
+  });
+
+  document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
 
   applyFilters();
 
