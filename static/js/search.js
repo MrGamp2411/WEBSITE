@@ -192,14 +192,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   let userLoc = null;
   let bars = await normalizeBars(rawBars, userLoc);
 
-  function sortNearby() {
-    const container = document.querySelector('.bar-section[data-section="nearby"] .cards');
-    if (!container) return;
-    const nearbyBars = bars
-      .filter(b => b.el.closest('[data-section="nearby"]'))
-      .sort((a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity));
-    nearbyBars.forEach(b => container.appendChild(b.el));
-  }
+function sortNearby() {
+  const container = document.querySelector('.bar-section[data-section="nearby"] .cards');
+  if (!container) return;
+  const viewAll = container.querySelector('.view-all-card');
+  const nearbyBars = bars
+    .filter(b => b.el.closest('[data-section="nearby"]'))
+    .sort((a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity));
+  nearbyBars.forEach(b => {
+    if (viewAll) {
+      container.insertBefore(b.el, viewAll);
+    } else {
+      container.appendChild(b.el);
+    }
+  });
+}
 
   bars.forEach(b => renderMeta(b.el, b));
   sortNearby();
