@@ -11,6 +11,7 @@
 - Cards on the `/bars` page are centered within their grid cells via `.bars.all-bars{justify-items:center;}`.
 - `/bars` now includes search inputs and filter controls (name, city, max distance, min rating, open/closed, categories) wired up in `static/js/view-all.js` and styled via `.bar-filters` in `components.css`.
 - `/bars` filter toolbar uses a grid layout with icon-labeled inputs, range slider, star rating selector, and active filter chips (markup in `templates/all_bars.html`, logic in `static/js/view-all.js`, styles in `components.css`).
+- The filter controls sit inside a responsive `.bar-filters` card that uses `auto-fit` grid columns to size itself to both screen width and filter content.
 - Filters on `/bars` are hidden by default and revealed via the `#toggleFilters` button, which also shows the active filter count.
 - When the filter panel is shown, the bar list and category chips are temporarily hidden to free screen space; this toggle logic lives in `static/js/view-all.js`.
 - Bars support a `bar_categories` field (comma-separated) with 30 predefined types (see `BAR_CATEGORIES` in `main.py`).
