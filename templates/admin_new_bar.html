@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>Create New Bar</h1>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <div id="map" style="height:400px;"></div>
 
@@ -23,6 +24,13 @@
   <label for="photo">Photo
     <input id="photo" type="file" name="photo">
   </label>
+    <label for="categories">Categories
+      <select id="categories" name="categories" multiple>
+        {% for c in bar_categories %}
+        <option value="{{ c }}"{% if selected_categories and c in selected_categories %} selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </label>
   <label for="manual_closed">
     <input id="manual_closed" name="manual_closed" type="checkbox"> Close bar manually
   </label>
@@ -46,23 +54,32 @@
   <input id="longitude" type="hidden" name="longitude" required>
   <button class="btn btn--primary" type="submit">Create Bar</button>
 </form>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-  const initialLat = 45.4642;
-  const initialLng = 9.1900;
-  const map = L.map('map').setView([initialLat, initialLng], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '© OpenStreetMap contributors'
-  }).addTo(map);
-  const marker = L.marker([initialLat, initialLng], {draggable:true}).addTo(map);
-  function updateInputs(e) {
-    const pos = e.target.getLatLng();
-    document.getElementById('latitude').value = pos.lat.toFixed(6);
-    document.getElementById('longitude').value = pos.lng.toFixed(6);
-  }
-  marker.on('dragend', updateInputs);
-  updateInputs({target: marker});
-</script>
-{% endblock %}
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const initialLat = 45.4642;
+    const initialLng = 9.1900;
+    const map = L.map('map').setView([initialLat, initialLng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    const marker = L.marker([initialLat, initialLng], {draggable:true}).addTo(map);
+    function updateInputs(e) {
+      const pos = e.target.getLatLng();
+      document.getElementById('latitude').value = pos.lat.toFixed(6);
+      document.getElementById('longitude').value = pos.lng.toFixed(6);
+    }
+    marker.on('dragend', updateInputs);
+    updateInputs({target: marker});
+
+    const catSelect = document.getElementById('categories');
+    catSelect.addEventListener('change', () => {
+      const selected = Array.from(catSelect.selectedOptions);
+      if (selected.length > 5) {
+        selected[selected.length - 1].selected = false;
+        alert('Select up to 5 categories');
+      }
+    });
+  </script>
+  {% endblock %}
 
