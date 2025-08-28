@@ -94,8 +94,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateBadge(count) {
     if (!filterBadge) return;
-    filterBadge.textContent = count;
-    filterBadge.hidden = count === 0;
+    const prev = parseInt(filterBadge.textContent) || 0;
+    if (count === 0) {
+      filterBadge.textContent = '';
+      filterBadge.hidden = true;
+    } else {
+      filterBadge.hidden = false;
+      filterBadge.textContent = count;
+      if (count !== prev) {
+        filterBadge.classList.remove('pulse');
+        void filterBadge.offsetWidth;
+        filterBadge.classList.add('pulse');
+      }
+    }
     localStorage.setItem('filtersCount', String(count));
   }
 

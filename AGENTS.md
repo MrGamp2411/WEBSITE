@@ -13,7 +13,7 @@
 - `/bars` filter toolbar uses a grid layout with icon-labeled inputs, range slider, star rating selector, and active filter chips (markup in `templates/all_bars.html`, logic in `static/js/view-all.js`, styles in `components.css`).
 - The filter controls sit inside a responsive `.bar-filters` card that uses `auto-fit` grid columns to size itself to both screen width and filter content.
 - Filters on `/bars` are hidden by default; the `#filters-toggle` button toggles the `#filters-panel`, rotates its chevron, updates the label between "Mostra filtri" and "Nascondi filtri", and shows a badge with the count of active filters (markup in `templates/all_bars.html`, logic in `static/js/view-all.js`, styles in `static/css/components.css`).
-- `#filters-toggle.btn-filter` is a ghost pill with a sliders icon, count badge, and chevron (see `components.css`).
+- `#filters-toggle.btn-filter` uses SiplyGo gradient-glass styling with a sliders icon, animated count badge, and chevron (see `components.css` & `static/js/view-all.js`).
 - `.bar-filters[hidden]{display:none;}` in `static/css/components.css` keeps the panel hidden until it's toggled.
 - Category chip group spans the full filter width via `.bar-filters .filter-group.categories` to keep chips inline until space runs out (see `templates/all_bars.html` and `static/css/components.css`).
 - Bars support a `bar_categories` field (comma-separated) with 30 predefined types (see `BAR_CATEGORIES` in `main.py`).
