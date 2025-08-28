@@ -23,3 +23,4 @@
 - Startup ensures the `bars` table includes a `bar_categories` column and `load_bars_from_db()` populates each bar's categories from that comma-separated field.
 - Core app routes reside in `main.py`, with models in `models.py` and database helpers in `database.py`.
 - A reusable `.cta-pill` component with primary and ghost variants is defined in `static/css/components.css` (minified in `static/css/components.min.css`) and powers the "Vedi tutti" link in `templates/search.html`; loading state handled in `static/js/search.js`.
+- The "Vedi tutti" button uses the `.cta-pill` styles without any hover or active animations, and `static/js/search.js` no longer swaps its arrow icon for a spinner.

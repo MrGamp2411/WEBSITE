@@ -436,20 +436,11 @@ body.dark-mode{
   text-decoration:none;
   font-weight:600;
   line-height:1;
-  transition:background .2s,color .2s,transform .2s;
-}
-
-.cta-pill i{
-  transition:transform .2s;
 }
 
 .cta-pill:focus-visible{
   outline:2px solid var(--sg-purple-600);
   outline-offset:2px;
-}
-
-.cta-pill:active{
-  transform:scale(.98);
 }
 
 .cta-pill--primary{
@@ -472,9 +463,5 @@ body.dark-mode{
 .cta-pill--ghost:hover,
 .cta-pill--ghost:focus{
   background:var(--sg-purple-100);
-}
-
-.cta-pill:hover i{
-  transform:translateX(2px);
 }
 
