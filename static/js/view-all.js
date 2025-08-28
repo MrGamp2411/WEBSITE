@@ -77,8 +77,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const closedCheck = document.getElementById('filterClosed');
   const chipsContainer = document.getElementById('categoryChips');
   const activeChips = document.getElementById('activeFilterChips');
-  const filterPanel = document.getElementById('barFilters');
-  const showFiltersBtn = document.getElementById('showFilters');
+  const filterPanel = document.getElementById('filters-panel');
+  const filtersToggle = document.getElementById('filters-toggle');
+  const filterBadge = filtersToggle?.querySelector('.badge');
+  const filterLabel = filtersToggle?.querySelector('.label');
   const distanceValue = document.getElementById('distanceValue');
   const activeCategories = new Set();
 
@@ -86,6 +88,33 @@ document.addEventListener('DOMContentLoaded', () => {
     distInput.value = distInput.max || '30';
     distanceValue.textContent = distInput.value + ' km';
   }
+
+  const storedCount = parseInt(localStorage.getItem('filtersCount')) || 0;
+  const storedOpen = localStorage.getItem('isOpen') === 'true';
+
+  function updateBadge(count) {
+    if (!filterBadge) return;
+    filterBadge.textContent = count;
+    filterBadge.hidden = count === 0;
+    localStorage.setItem('filtersCount', String(count));
+  }
+
+  function setFiltersOpen(open) {
+    if (!filterPanel || !filtersToggle || !filterLabel) return;
+    if (open) {
+      filterPanel.removeAttribute('hidden');
+      filtersToggle.setAttribute('aria-expanded', 'true');
+      filterLabel.textContent = 'Nascondi filtri';
+    } else {
+      filterPanel.setAttribute('hidden', '');
+      filtersToggle.setAttribute('aria-expanded', 'false');
+      filterLabel.textContent = 'Mostra filtri';
+    }
+    localStorage.setItem('isOpen', String(open));
+  }
+
+  updateBadge(storedCount);
+  setFiltersOpen(storedOpen);
 
   let setRating = val => {
     if (ratingInput) {
@@ -217,6 +246,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const label = chipsContainer?.querySelector(`.chip[data-value="${val}"]`)?.textContent || val;
       addChip('category', 'Categoria', label, val);
     });
+    const count = activeChips.childElementCount;
+    updateBadge(count);
   }
 
   function addChip(type, label, value, val) {
@@ -313,16 +344,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
 
-  showFiltersBtn?.addEventListener('click', () => {
-    if (!filterPanel || !showFiltersBtn) return;
-    const isHidden = filterPanel.hasAttribute('hidden');
-    if (isHidden) {
-      filterPanel.removeAttribute('hidden');
-      showFiltersBtn.textContent = 'Nascondi filtri';
-    } else {
-      filterPanel.setAttribute('hidden', '');
-      showFiltersBtn.textContent = 'Mostra filtri';
-    }
+  filtersToggle?.addEventListener('click', () => {
+    const open = filtersToggle.getAttribute('aria-expanded') !== 'true';
+    setFiltersOpen(open);
   });
 
   applyFilters();
