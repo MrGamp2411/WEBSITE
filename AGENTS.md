@@ -25,3 +25,4 @@
 - A reusable `.cta-pill` component with primary and ghost variants is defined in `static/css/components.css` (minified in `static/css/components.min.css`).
 - `.filters-toolbar` no longer draws a purple gradient line above the filter toggle; its background is now plain `var(--bg)`.
 - The "Vedi tutti" link in `templates/search.html` reuses the `.btn-filter` gradient-glass style, and `static/js/search.js` targets `.btn-filter` accordingly.
+- `.btn-filter` suppresses default link underlines with `text-decoration:none;` so "Vedi tutti" renders without a line beneath the text.
