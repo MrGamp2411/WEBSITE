@@ -6,57 +6,79 @@
       <div class="section-head">
         <h2>Tutti i bar</h2>
       </div>
-      <button type="button" id="toggleFilters" class="filter-toggle">Filtri <span class="filter-count" id="filterCount" hidden>0</span></button>
-      <div class="bar-filters" id="barFilters" hidden>
-        <div class="filter-grid">
-          <div class="filter-group">
-            <label for="searchName">Nome del bar</label>
-            <div class="input-wrap">
-              <i class="bi bi-search" aria-hidden="true"></i>
-              <input type="search" id="searchName" placeholder="Es. Bar Centrale">
+      <button type="button" id="filtersToggle" class="filters-toggle" aria-controls="filtersPanel" aria-expanded="false">
+        <i class="bi bi-sliders" aria-hidden="true"></i>
+        Filtri
+        <span id="filtersBadge" class="badge" hidden>0</span>
+      </button>
+      <div id="filtersOverlay" hidden></div>
+      <div class="bar-filters filters-panel" id="filtersPanel" hidden aria-hidden="true">
+        <form id="filtersForm" novalidate>
+          <div class="filter-grid">
+            <div class="filter-group">
+              <label for="filterName">Nome del bar</label>
+              <div class="input-wrap">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                <input type="search" id="filterName" placeholder="Es. Bar Centrale">
+                <button type="button" class="clear-input" data-target="filterName" aria-label="Pulisci" hidden>&times;</button>
+              </div>
             </div>
-          </div>
-          <div class="filter-group">
-            <label for="searchCity">Città</label>
-            <div class="input-wrap">
-              <i class="bi bi-geo-alt" aria-hidden="true"></i>
-              <input type="search" id="searchCity" placeholder="Es. Bellinzona">
+            <div class="filter-group">
+              <label for="filterCity">Città</label>
+              <div class="input-wrap">
+                <i class="bi bi-geo-alt" aria-hidden="true"></i>
+                <input type="search" id="filterCity" placeholder="Es. Bellinzona">
+                <button type="button" id="useLocation" class="use-location" aria-label="Usa posizione"><i class="bi bi-geo-alt"></i></button>
+              </div>
             </div>
-          </div>
-          <div class="filter-group">
-            <label for="filterDistance">Distanza max (km)</label>
-            <div class="range-wrap">
-              <input type="range" id="filterDistance" min="0" max="30" step="1" list="distTicks" aria-live="polite">
-              <datalist id="distTicks">
-                <option value="0"></option>
-                <option value="5"></option>
-                <option value="10"></option>
-                <option value="15"></option>
-                <option value="20"></option>
-                <option value="25"></option>
-                <option value="30"></option>
-              </datalist>
-              <span class="value" id="distanceValue"></span>
+            <div class="filter-group">
+              <label for="filterDistance">Distanza max (km)</label>
+              <div class="range-wrap">
+                <input type="range" id="filterDistance" min="0" max="30" step="1" list="distTicks" aria-live="polite">
+                <datalist id="distTicks">
+                  <option value="0"></option>
+                  <option value="5"></option>
+                  <option value="10"></option>
+                  <option value="15"></option>
+                  <option value="20"></option>
+                  <option value="25"></option>
+                  <option value="30"></option>
+                </datalist>
+                <output id="distanceValue">30 km</output>
+              </div>
             </div>
-          </div>
-          <div class="filter-group rating-group">
-            <label for="filterRating">Rating minimo <i class="bi bi-info-circle" title="Mostra solo bar con rating ≥ valore selezionato" aria-hidden="true"></i></label>
-            <div class="rating-stars" id="ratingStars" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"></div>
-            <span class="value" id="ratingValue"></span>
-            <input type="hidden" id="filterRating">
-          </div>
-          <div class="filter-group check-group">
-            <label><input type="checkbox" id="filterOpen"> Aperti ora</label>
-            <label><input type="checkbox" id="filterClosed"> Chiusi ora</label>
+            <div class="filter-group">
+              <fieldset class="rating-fieldset">
+                <legend>Rating minimo</legend>
+                <div id="ratingGroup" class="rating-group" role="radiogroup"></div>
+                <input type="hidden" id="filterRating" value="0">
+              </fieldset>
+            </div>
+            <div class="filter-group">
+              <fieldset class="open-fieldset">
+                <legend>Stato</legend>
+                <div class="segmented" id="openState" role="radiogroup">
+                  <label><input type="radio" name="open_state" value="ANY" checked> Qualsiasi</label>
+                  <label><input type="radio" name="open_state" value="OPEN_NOW"> Aperti ora</label>
+                  <label><input type="radio" name="open_state" value="CLOSED"> Chiusi ora</label>
+                </div>
+              </fieldset>
+            </div>
+            <div class="filter-group categories-group">
+              <span class="label">Categorie</span>
+              <div class="chips" id="categoryChips"></div>
+            </div>
           </div>
           <div class="actions">
-            <button type="button" id="clearFilters" class="btn-link">Pulisci filtri</button>
-            <button type="button" id="applyFiltersBtn" class="btn-primary">Applica</button>
+            <button type="button" id="filtersReset" class="btn-link">Pulisci</button>
+            <button type="button" id="filtersApply" class="btn-primary" disabled>
+              <span class="label">Applica</span>
+              <span class="spinner" hidden></span>
+            </button>
           </div>
-        </div>
+        </form>
       </div>
-      <div class="active-filters" id="activeFilterChips"></div>
-      <div class="chips" id="categoryChips"></div>
+      <div id="filtersSummary" class="filters-summary" hidden></div>
       <ul class="bars all-bars" id="allBarList">
         {% for bar in bars %}
         <li>
