@@ -12,6 +12,7 @@
 - `/bars` now includes search inputs and filter controls (name, city, max distance, min rating, open/closed, categories) wired up in `static/js/view-all.js` and styled via `.bar-filters` in `components.css`.
 - `/bars` filter toolbar uses a grid layout with icon-labeled inputs, range slider, star rating selector, and active filter chips (markup in `templates/all_bars.html`, logic in `static/js/view-all.js`, styles in `components.css`).
 - Filters on `/bars` are hidden by default and revealed via the `#toggleFilters` button, which also shows the active filter count.
+- When the filter panel is shown, the bar list and category chips are temporarily hidden to free screen space; this toggle logic lives in `static/js/view-all.js`.
 - Bars support a `bar_categories` field (comma-separated) with 30 predefined types (see `BAR_CATEGORIES` in `main.py`).
 - Admin forms `templates/admin_new_bar.html` and `templates/admin_edit_bar.html` offer multiselect inputs for these categories.
 - Category filter chips on `/bars` and search overlays draw from this predefined list in `static/js/view-all.js` and `static/js/search.js`.
