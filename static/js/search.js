@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const clearBtn = document.getElementById('clearFilters');
   const filterCount = document.getElementById('filterCount');
 
-  const viewAllLink = document.querySelector('.section-utility .cta-pill');
+  const viewAllLink = document.querySelector('.section-utility .btn-filter');
   viewAllLink?.addEventListener('click', () => {
     viewAllLink.setAttribute('aria-busy', 'true');
   });
