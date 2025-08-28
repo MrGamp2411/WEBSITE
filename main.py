@@ -374,6 +374,7 @@ def ensure_bar_columns() -> None:
         "promo_label": "VARCHAR(100)",
         "tags": "TEXT",
         "opening_hours": "TEXT",
+        "bar_categories": "TEXT",
     }
     missing = {name: ddl for name, ddl in required.items() if name not in columns}
     if missing:
@@ -532,6 +533,7 @@ def load_bars_from_db() -> None:
                 opening_hours=hours,
                 promo_label=b.promo_label,
                 tags=json.loads(b.tags) if b.tags else [],
+                bar_categories=b.bar_categories.split(",") if b.bar_categories else [],
             )
             # Load categories for the bar
             for c in b.categories:

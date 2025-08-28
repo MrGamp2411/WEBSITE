@@ -14,3 +14,4 @@
 - Admin forms `templates/admin_new_bar.html` and `templates/admin_edit_bar.html` offer multiselect inputs for these categories.
 - Category filter chips on `/bars` and search overlays draw from this predefined list in `static/js/view-all.js` and `static/js/search.js`.
 - Admin bar category selection is limited to five choices, enforced in both the form UI and server-side handlers.
+- Startup ensures the `bars` table includes a `bar_categories` column and `load_bars_from_db()` populates each bar's categories from that comma-separated field.
