@@ -28,6 +28,7 @@
 - The "View all" link in `templates/search.html` reuses the `.btn-filter` gradient-glass style, and `static/js/search.js` targets `.btn-filter` accordingly.
 - `.btn-filter` suppresses default link underlines with `text-decoration:none;` so "View all" renders without a line beneath the text.
 - Links displaying user credit (`.credit-pill`) also drop default underlines with `text-decoration:none;` in `components.css`.
+- User credit is persisted in the `users.credit` column; login loads the value and checkout/top-up operations commit updates back to the database.
 - Browse bars sections in `templates/search.html` append a "View all" card linking to `/bars` (excluded for the "Recently visited bars" section); these cards use `.browse-bars-card` styling and are ignored by data logic in `static/js/search.js`.
 - All UI text is now in English. Category names are defined in `main.py` and mirrored in `static/js/search.js` and `static/js/view-all.js`.
 - Sorting in `static/js/search.js` and `static/js/app.js` inserts bars before browse/view-all cards so those cards always stay at the end of their lists.

@@ -1145,7 +1145,7 @@ async def select_table(request: Request):
 
 
 @app.get("/cart/checkout")
-async def checkout(request: Request):
+async def checkout(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
@@ -1162,6 +1162,10 @@ async def checkout(request: Request):
     if user.credit < order_total:
         raise HTTPException(status_code=400, detail="Insufficient credit")
     user.credit -= order_total
+    db_user = db.query(User).filter(User.id == user.id).first()
+    if db_user:
+        db_user.credit = user.credit
+        db.commit()
     bar = bars.get(cart.bar_id) if cart.bar_id else None
     if bar:
         user.transactions.append(
@@ -1209,7 +1213,7 @@ async def wallet_transaction(request: Request, tx_id: int):
 
 
 @app.get("/topup", response_class=HTMLResponse)
-async def topup(request: Request):
+async def topup(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
@@ -1226,6 +1230,10 @@ async def topup(request: Request):
             return render_template("topup.html", request=request, error="Invalid amount")
         # In a real application, integrate with a payment gateway here
         user.credit += add_amount
+        db_user = db.query(User).filter(User.id == user.id).first()
+        if db_user:
+            db_user.credit = user.credit
+            db.commit()
         return render_template("topup.html", request=request, success=True, amount=add_amount)
     return render_template("topup.html", request=request)
 
@@ -1314,6 +1322,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
                         phone=db_user.phone or "",
                         prefix=db_user.prefix or "",
                         role=role_map.get(db_user.role, "customer"),
+                        credit=float(db_user.credit or 0),
                     )
                     users[user.id] = user
                     users_by_email[user.email] = user
@@ -2201,6 +2210,7 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         "customer": RoleEnum.CUSTOMER,
     }
     db_user.role = role_enum_map.get(role, RoleEnum.CUSTOMER)
+    db_user.credit = user.credit
     db.commit()
     # Update user-bar role association
     existing_role = (
