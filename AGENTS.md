@@ -12,7 +12,7 @@
 - `/bars` now includes search inputs and filter controls (name, city, max distance, min rating, open/closed, categories) wired up in `static/js/view-all.js` and styled via `.bar-filters` in `components.css`.
 - `/bars` filter toolbar uses a grid layout with icon-labeled inputs, range slider, star rating selector, and active filter chips (markup in `templates/all_bars.html`, logic in `static/js/view-all.js`, styles in `components.css`).
 - The filter controls sit inside a responsive `.bar-filters` card that uses `auto-fit` grid columns to size itself to both screen width and filter content.
-- Filters on `/bars` are hidden by default; the `#filters-toggle` button toggles the `#filters-panel`, rotates its chevron, updates the label between "Mostra filtri" and "Nascondi filtri", and shows a badge with the count of active filters (markup in `templates/all_bars.html`, logic in `static/js/view-all.js`, styles in `static/css/components.css`).
+- Filters on `/bars` are hidden by default; the `#filters-toggle` button toggles the `#filters-panel`, rotates its chevron, updates the label between "Show filters" and "Hide filters", and shows a badge with the count of active filters (markup in `templates/all_bars.html`, logic in `static/js/view-all.js`, styles in `static/css/components.css`).
 - `#filters-toggle.btn-filter` uses SiplyGo gradient-glass styling with a sliders icon, animated count badge, and chevron (see `components.css` & `static/js/view-all.js`).
 - `.bar-filters[hidden]{display:none;}` in `static/css/components.css` keeps the panel hidden until it's toggled.
 - Category chip group spans the full filter width via `.bar-filters .filter-group.categories` to keep chips inline until space runs out (see `templates/all_bars.html` and `static/css/components.css`).
@@ -24,5 +24,6 @@
 - Core app routes reside in `main.py`, with models in `models.py` and database helpers in `database.py`.
 - A reusable `.cta-pill` component with primary and ghost variants is defined in `static/css/components.css` (minified in `static/css/components.min.css`).
 - `.filters-toolbar` no longer draws a purple gradient line above the filter toggle; its background is now plain `var(--bg)`.
-- The "Vedi tutti" link in `templates/search.html` reuses the `.btn-filter` gradient-glass style, and `static/js/search.js` targets `.btn-filter` accordingly.
-- `.btn-filter` suppresses default link underlines with `text-decoration:none;` so "Vedi tutti" renders without a line beneath the text.
+- The "View all" link in `templates/search.html` reuses the `.btn-filter` gradient-glass style, and `static/js/search.js` targets `.btn-filter` accordingly.
+- `.btn-filter` suppresses default link underlines with `text-decoration:none;` so "View all" renders without a line beneath the text.
+- All UI text is now in English. Category names are defined in `main.py` and mirrored in `static/js/search.js` and `static/js/view-all.js`.

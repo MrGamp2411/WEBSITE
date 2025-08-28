@@ -18,7 +18,7 @@ def reset_db():
 
 
 def extract_recommended_section(html: str) -> str:
-    return html.split("Consigliati", 1)[1]
+    return html.split("Recommended", 1)[1]
 
 
 def test_recommended_only_open_within_20km():

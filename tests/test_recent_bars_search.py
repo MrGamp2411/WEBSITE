@@ -31,7 +31,7 @@ def test_search_recent_section_shows_only_visited():
         resp = client.get("/search")
         assert resp.status_code == 200
         assert 'data-section="recent"' in resp.text
-        recent_section = resp.text.split("Bar visitati di recente", 1)[1].split("I più vicini a te", 1)[0]
+        recent_section = resp.text.split("Recently visited bars", 1)[1].split("Closest to you", 1)[0]
         assert "Visited Bar" in recent_section
         assert "Other Bar" not in recent_section
 

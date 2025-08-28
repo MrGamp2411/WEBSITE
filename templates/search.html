@@ -3,17 +3,17 @@
 {% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
 <div class="search-page">
   <div class="section-utility container">
-    <a class="btn-filter" href="/bars" aria-label="Vedi tutti: Bar visitati di recente">
-      <span data-i18n="see_all">Vedi tutti</span>
+    <a class="btn-filter" href="/bars" aria-label="View all: Recently visited bars">
+      <span data-i18n="see_all">View all</span>
       <i class="bi bi-arrow-right" aria-hidden="true"></i>
     </a>
   </div>
   {% if bars or recent_bars %}
     {% set sections = [
-      ('recent', 'Bar visitati di recente'),
-      ('nearby', 'I più vicini a te'),
-      ('top', 'I più votati'),
-      ('popular', 'Consigliati')
+      ('recent', 'Recently visited bars'),
+      ('nearby', 'Closest to you'),
+      ('top', 'Top rated'),
+      ('popular', 'Recommended')
     ] %}
     {% for key, title in sections %}
       {% set items =
@@ -28,13 +28,13 @@
           <div class="section-head">
             <h2>{{ title }}</h2>
             <div class="scroller-nav">
-              <button class="scroll-btn prev" aria-label="Precedenti">‹</button>
-              <button class="scroll-btn next" aria-label="Successivi">›</button>
+              <button class="scroll-btn prev" aria-label="Previous">‹</button>
+              <button class="scroll-btn next" aria-label="Next">›</button>
             </div>
           </div>
           <div class="cards scroller" aria-label="{{ title }}" tabindex="0">
             {% for bar in items %}
-            <a class="bar-card{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
+              <a class="bar-card{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="Open {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
           {% if bar.photo_url %}
             <div class="thumb-wrapper">
             <img src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" class="thumb" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
@@ -72,7 +72,7 @@
     {% endfor %}
   {% else %}
   <div class="empty-state">
-    <p>Nessun bar trovato.</p>
+    <p>No bars found.</p>
   </div>
   {% endif %}
 </div>

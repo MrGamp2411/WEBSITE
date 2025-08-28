@@ -10,58 +10,58 @@
 </div>
 <nav class="tab-nav">
   <a href="#" data-tab="overview" class="active">Overview</a>
-  <a href="#" data-tab="revenue">Ricavi & Commissioni</a>
-  <a href="#" data-tab="orders">Ordini & Operatività</a>
-  <a href="#" data-tab="products">Prodotti / Menu</a>
-  <a href="#" data-tab="clients">Clienti & Crediti</a>
-  <a href="#" data-tab="finance">Finance</a>
-  <a href="#" data-tab="refunds">Rimborsi</a>
-  <a href="#" data-tab="exports">Esportazioni</a>
+    <a href="#" data-tab="revenue">Revenue & Fees</a>
+    <a href="#" data-tab="orders">Orders & Operations</a>
+    <a href="#" data-tab="products">Products / Menu</a>
+    <a href="#" data-tab="clients">Customers & Credits</a>
+    <a href="#" data-tab="finance">Finance</a>
+    <a href="#" data-tab="refunds">Refunds</a>
+    <a href="#" data-tab="exports">Exports</a>
 </nav>
 <div id="overview" class="tab-content active">
   <div class="dashboard-actions">
-    <div class="card" title="Numero totale di ordini effettuati nel periodo selezionato">
-      <h3>Ordini</h3><p>{{ stats.orders }}</p>
+      <div class="card" title="Total number of orders in the selected period">
+        <h3>Orders</h3><p>{{ stats.orders }}</p>
     </div>
-    <div class="card" title="Valore complessivo degli ordini prima di tasse e commissioni">
-      <h3>GMV lordo</h3><p>CHF {{ '%.2f'|format(stats.gmv_gross) }}</p>
+      <div class="card" title="Total order value before taxes and fees">
+        <h3>Gross GMV</h3><p>CHF {{ '%.2f'|format(stats.gmv_gross) }}</p>
     </div>
-    <div class="card" title="Valore complessivo degli ordini dopo tasse e commissioni">
-      <h3>GMV netto</h3><p>CHF {{ '%.2f'|format(stats.gmv_net) }}</p>
+      <div class="card" title="Total order value after taxes and fees">
+        <h3>Net GMV</h3><p>CHF {{ '%.2f'|format(stats.gmv_net) }}</p>
     </div>
-    <div class="card" title="Valore medio per ordine (Average Order Value)">
+      <div class="card" title="Average order value">
       <h3>AOV</h3><p>CHF {{ '%.2f'|format(stats.aov) }}</p>
     </div>
-    <div class="card" title="Importo e percentuale delle commissioni trattenute da SiplyGo">
-      <h3>Commissioni SiplyGo</h3><p>CHF {{ '%.2f'|format(stats.commission_amount) }} ({{ '%.1f'|format(stats.commission_pct) }}%)</p>
+      <div class="card" title="Commission amount and percentage retained by SiplyGo">
+        <h3>SiplyGo fees</h3><p>CHF {{ '%.2f'|format(stats.commission_amount) }} ({{ '%.1f'|format(stats.commission_pct) }}%)</p>
     </div>
-    <div class="card" title="Importo che spetta al bar dopo commissioni e tasse">
-      <h3>Netto al bar</h3><p>CHF {{ '%.2f'|format(stats.payout_total) }}</p>
+      <div class="card" title="Amount due to the bar after fees and taxes">
+        <h3>Net to bar</h3><p>CHF {{ '%.2f'|format(stats.payout_total) }}</p>
     </div>
-    <div class="card" title="Mance totali raccolte tramite la piattaforma">
+      <div class="card" title="Total tips collected via the platform">
       <h3>Tips</h3><p>CHF {{ '%.2f'|format(stats.tips) }}</p>
     </div>
-    <div class="card" title="Percentuale di ordini cancellati sul totale">
-      <h3>Tasso cancellazione</h3><p>{{ '%.1f'|format(stats.cancellation_rate) }}%</p>
+      <div class="card" title="Percentage of orders cancelled out of total">
+        <h3>Cancellation rate</h3><p>{{ '%.1f'|format(stats.cancellation_rate) }}%</p>
     </div>
   </div>
   <canvas id="gmvChart"></canvas>
   <div class="dashboard-actions">
-    <div class="card" title="Fascia oraria con il maggior numero di ordini">
-      <h4>Ora di picco</h4><p>{{ stats.peak_hour }}</p>
+      <div class="card" title="Time slot with highest number of orders">
+        <h4>Peak hour</h4><p>{{ stats.peak_hour }}</p>
     </div>
-    <div class="card" title="Categoria di prodotti con il maggior fatturato">
-      <h4>Categoria top</h4><p>{{ stats.top_category }}</p>
+      <div class="card" title="Product category with highest revenue">
+        <h4>Top category</h4><p>{{ stats.top_category }}</p>
     </div>
-    <div class="card" title="Bar con il maggior volume di vendite">
-      <h4>Bar top</h4><p>{{ stats.top_bar }}</p>
+      <div class="card" title="Bar with highest sales volume">
+        <h4>Top bar</h4><p>{{ stats.top_bar }}</p>
     </div>
   </div>
 </div>
 <div id="revenue" class="tab-content">
   <canvas id="revenueChart"></canvas>
   <table>
-    <tr><th>Bar</th><th>GMV</th><th>IVA</th><th>Commissione</th><th>Take rate</th><th>Netto</th></tr>
+      <tr><th>Bar</th><th>GMV</th><th>VAT</th><th>Commission</th><th>Take rate</th><th>Net</th></tr>
     {% for r in stats.revenue_bars %}
     <tr>
       <td>{{ r.bar }}</td>
@@ -74,13 +74,13 @@
     {% endfor %}
   </table>
 </div>
-<div id="orders" class="tab-content">
-  <canvas id="ordersChart"></canvas>
-  <p>Cancellazioni totali: {{ stats.cancelled_orders }}</p>
-</div>
+  <div id="orders" class="tab-content">
+    <canvas id="ordersChart"></canvas>
+    <p>Total cancellations: {{ stats.cancelled_orders }}</p>
+  </div>
 <div id="products" class="tab-content">
-  <table>
-    <tr><th>Prodotto</th><th>Quantità</th><th>Ricavi</th></tr>
+    <table>
+      <tr><th>Product</th><th>Quantity</th><th>Revenue</th></tr>
     {% for p in stats.top_products %}
     <tr>
       <td>{{ p.name }}</td>
@@ -92,15 +92,15 @@
 </div>
 <div id="clients" class="tab-content">
   <div class="dashboard-actions">
-    <div class="card" title="Clienti che hanno effettuato il primo ordine">
-      <h4>Nuovi</h4><p>{{ stats.new_customers }}</p>
+      <div class="card" title="Customers who placed their first order">
+        <h4>New</h4><p>{{ stats.new_customers }}</p>
     </div>
-    <div class="card" title="Clienti che hanno effettuato più di un ordine">
-      <h4>Ricorrenti</h4><p>{{ stats.returning_customers }}</p>
+      <div class="card" title="Customers who placed more than one order">
+        <h4>Returning</h4><p>{{ stats.returning_customers }}</p>
     </div>
   </div>
-  <table>
-    <tr><th>Cliente</th><th># ordini</th><th>Spesa</th><th>Ultimo acquisto</th></tr>
+    <table>
+      <tr><th>Customer</th><th># orders</th><th>Spend</th><th>Last purchase</th></tr>
     {% for c in stats.customers %}
     <tr>
       <td>{{ c.id }}</td>
@@ -112,8 +112,8 @@
   </table>
 </div>
 <div id="finance" class="tab-content">
-  <table>
-    <tr><th>Periodo</th><th>Importo</th><th>Stato</th></tr>
+    <table>
+      <tr><th>Period</th><th>Amount</th><th>Status</th></tr>
     {% for p in stats.payouts %}
     <tr>
       <td>{{ p.start }} – {{ p.end }}</td>
@@ -122,14 +122,14 @@
     </tr>
     {% endfor %}
   </table>
-  <p>IVA totale: CHF {{ '%.2f'|format(stats.vat_total) }}</p>
+    <p>Total VAT: CHF {{ '%.2f'|format(stats.vat_total) }}</p>
 </div>
-<div id="refunds" class="tab-content">
-  <p>Rimborsi totali: CHF {{ '%.2f'|format(stats.refund_total) }} ({{ stats.refund_count }} ordini)</p>
-</div>
-<div id="exports" class="tab-content">
-  <p>Esportazioni CSV e report programmati saranno disponibili prossimamente.</p>
-</div>
+  <div id="refunds" class="tab-content">
+    <p>Total refunds: CHF {{ '%.2f'|format(stats.refund_total) }} ({{ stats.refund_count }} orders)</p>
+  </div>
+  <div id="exports" class="tab-content">
+    <p>CSV exports and scheduled reports will be available soon.</p>
+  </div>
 <style>
 .tab-nav a{margin-right:1rem;cursor:pointer;}
 .tab-nav a.active{font-weight:bold;}
@@ -150,7 +150,7 @@ new Chart(ctx, {
     labels: labels,
     datasets: [
       {label: 'GMV', data: gmv, borderColor: '#0d6efd', fill: false},
-      {label: '# Ordini', data: orders, borderColor: '#6c757d', fill: false, yAxisID: 'y1'}
+        {label: '# Orders', data: orders, borderColor: '#6c757d', fill: false, yAxisID: 'y1'}
     ]
   },
   options: {
@@ -171,8 +171,8 @@ if (revData.length) {
     type: 'bar',
     data: {labels: revLabels, datasets: [
       {label: 'GMV', data: revGmv, backgroundColor: '#0d6efd'},
-      {label: 'Commissioni', data: revComm, backgroundColor: '#dc3545'},
-      {label: 'Netto', data: revNet, backgroundColor: '#198754'}
+        {label: 'Commission', data: revComm, backgroundColor: '#dc3545'},
+        {label: 'Net', data: revNet, backgroundColor: '#198754'}
     ]},
     options: {scales: {y: {beginAtZero: true}}}
   });
@@ -183,7 +183,7 @@ const hourOrders = {{ stats.hourly_orders|tojson }};
 new Chart(document.getElementById('ordersChart'), {
   type: 'line',
   data: {labels: hourLabels, datasets: [
-    {label: 'Ordini/ora', data: hourOrders, borderColor: '#0d6efd', fill: false}
+      {label: 'Orders/hour', data: hourOrders, borderColor: '#0d6efd', fill: false}
   ]},
   options: {scales: {y: {beginAtZero: true}}}
 });

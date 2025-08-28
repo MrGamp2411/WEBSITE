@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     const items = bars.map(bar => `
       <li data-bar-id="${bar.id}">
-        <a class="bar-card" href="/bars/${bar.id}" aria-label="Apri ${bar.name}">
+        <a class="bar-card" href="/bars/${bar.id}" aria-label="Open ${bar.name}">
           <div class="thumb-wrapper"><img class="thumb" src="${bar.photo_url || FALLBACK_IMG}" alt="${bar.name} photo" loading="lazy" decoding="async" width="400" height="225" srcset="${bar.photo_url || FALLBACK_IMG} 400w, ${bar.photo_url || FALLBACK_IMG} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='${FALLBACK_IMG}';this.onerror=null;"></div>
           <h3 class="title">${bar.name}</h3>
           <div class="bar-meta">
