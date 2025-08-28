@@ -58,6 +58,14 @@
             {% if bar.description_short or bar.description %}<p class="desc">{{ bar.description_short or bar.description }}</p>{% endif %}
             </a>
             {% endfor %}
+            {% if key != 'recent' %}
+            <a class="bar-card browse-bars-card view-all-card" href="/bars">
+              <div class="thumb-wrapper">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i>
+              </div>
+              <span>View all</span>
+            </a>
+            {% endif %}
           </div>
         </div>
       </section>
