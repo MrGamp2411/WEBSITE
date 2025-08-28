@@ -288,7 +288,7 @@ body.dark-mode{
     .nav-toggle:focus-visible{outline:2px solid Highlight;outline-offset:2px;}
       .nav-toggle svg{transform:scale(2);transform-origin:center;}
     .bars{grid-template-columns:1fr;}
-    .hdr-sub{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;}
+    .hdr-sub{display:flex;align-items:center;justify-content:space-between;padding:5px 12px;}
     .location-pill{flex:1;padding:10px 12px;border-radius:999px;border:1px solid #e5e7eb;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px;font-size:clamp(14px,3.8vw,16px);background:transparent;}
     .btn-icon{width:32px;height:32px;display:grid;place-items:center;background:transparent;border:0;}
     main{scroll-margin-top:60px;}
