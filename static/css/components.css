@@ -138,6 +138,7 @@ body.dark-mode{
   .bar-filters .actions{display:flex;gap:12px;margin-left:auto;}
   .bar-filters .btn-link{background:none;border:0;color:var(--brand);text-decoration:underline;padding:8px;font:inherit;cursor:pointer;}
   .bar-filters .btn-primary{background:var(--brand);color:#fff;border:0;border-radius:var(--filter-radius);padding:8px 16px;font:inherit;cursor:pointer;}
+  .bar-filters .filter-group.categories{grid-column:1/-1;}
   .active-filters{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;}
   .filter-chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--filter-border);border-radius:999px;padding:4px 8px;background:#fff;font-size:.875rem;}
   .filter-chip i{font-size:1rem;cursor:pointer;}
