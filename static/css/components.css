@@ -121,6 +121,7 @@ body.dark-mode{
 .nav-right .chip{min-height:44px;display:inline-flex;align-items:center;padding:0 var(--space-2);}
 
 .bars{display:grid;grid-template-columns:1fr;gap:var(--space-3);list-style:none;padding:0;}
+.bars.all-bars{justify-items:center;}
 .bars .bar-card{width:400px;max-width:400px;}
 .bars.all-bars .bar-card{width:350px;max-width:350px;}
 @media (min-width:768px){
