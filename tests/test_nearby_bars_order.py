@@ -17,7 +17,7 @@ def reset_db():
 
 
 def extract_nearby_section(html: str) -> str:
-    return html.split("I più vicini a te", 1)[1].split("I più votati", 1)[0]
+    return html.split("Closest to you", 1)[1].split("Top rated", 1)[0]
 
 
 def test_nearby_bars_sorted_by_distance():

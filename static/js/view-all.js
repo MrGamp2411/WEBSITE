@@ -115,11 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (open) {
       filterPanel.removeAttribute('hidden');
       filtersToggle.setAttribute('aria-expanded', 'true');
-      filterLabel.textContent = 'Nascondi filtri';
+      filterLabel.textContent = 'Hide filters';
     } else {
       filterPanel.setAttribute('hidden', '');
       filtersToggle.setAttribute('aria-expanded', 'false');
-      filterLabel.textContent = 'Mostra filtri';
+      filterLabel.textContent = 'Show filters';
     }
     localStorage.setItem('isOpen', String(open));
   }
@@ -182,36 +182,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (chipsContainer) {
     const allCategories = [
-      "Cocktail classico",
-      "Mixology&Signature",
-      "Enoteca/Vineria (Merlot)",
-      "Birreria artigianale",
-      "Pub/Irish pub",
+      "Classic cocktail",
+      "Mixology & Signature",
+      "Wine bar (Merlot)",
+      "Craft beer bar",
+      "Pub / Irish pub",
       "Gastropub",
       "Sports bar",
       "Lounge bar",
-      "Rooftop/Sky bar",
+      "Rooftop / Sky bar",
       "Speakeasy",
-      "Live music/Jazz bar",
+      "Live music / Jazz bar",
       "Piano bar",
       "Karaoke bar",
-      "Club/Discoteca bar",
-      "Aperitivo&Cicchetti",
-      "Caffetteria/Espresso bar",
-      "Pasticceria-bar",
-      "Paninoteca/Snack bar",
-      "Gelateria-bar",
-      "Bar di paese",
-      "Lakefront/Lido (lago)",
-      "Grotto ticinese",
+      "Club / Disco bar",
+      "Aperitif & Snacks",
+      "Coffee / Espresso bar",
+      "Pastry bar",
+      "Sandwich / Snack bar",
+      "Gelato bar",
+      "Local bar",
+      "Lakefront / Lido",
+      "Ticinese grotto",
       "Hotel bar",
-      "Shisha/Hookah lounge",
-      "Cigar&Whisky lounge",
+      "Shisha / Hookah lounge",
+      "Cigar & Whisky lounge",
       "Gin bar",
-      "Rum/Tiki bar",
-      "Tequila/Mezcalería",
-      "Biliardo&Darts pub",
-      "Afterwork/Business bar",
+      "Rum / Tiki bar",
+      "Tequila / Mezcaleria",
+      "Billiards & Darts pub",
+      "Afterwork / Business bar",
     ];
     allCategories.forEach(c => {
       const chip = document.createElement('button');
@@ -247,15 +247,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const minRating = toNumber(ratingInput?.value);
     const showOpen = openCheck?.checked;
     const showClosed = closedCheck?.checked;
-    if (qName) addChip('name', 'Nome del bar', nameInput.value);
-    if (qCity) addChip('city', 'Città', cityInput.value);
-    if (useDist) addChip('distance', 'Distanza ≤', distInput.value + ' km');
+    if (qName) addChip('name', 'Bar name', nameInput.value);
+    if (qCity) addChip('city', 'City', cityInput.value);
+    if (useDist) addChip('distance', 'Distance ≤', distInput.value + ' km');
     if (minRating != null) addChip('rating', 'Rating ≥', minRating.toFixed(1));
-    if (showOpen) addChip('open', 'Aperti ora', '');
-    if (showClosed) addChip('closed', 'Chiusi ora', '');
+    if (showOpen) addChip('open', 'Open now', '');
+    if (showClosed) addChip('closed', 'Closed now', '');
     activeCategories.forEach(val => {
       const label = chipsContainer?.querySelector(`.chip[data-value="${val}"]`)?.textContent || val;
-      addChip('category', 'Categoria', label, val);
+      addChip('category', 'Category', label, val);
     });
     const count = activeChips.childElementCount;
     updateBadge(count);

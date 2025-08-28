@@ -4,12 +4,12 @@
 <section class="bar-section">
     <div class="section-track">
       <div class="section-head">
-        <h2>Tutti i bar</h2>
+        <h2>All bars</h2>
       </div>
       <div class="filters-toolbar">
         <button type="button" id="filters-toggle" class="btn-filter" aria-expanded="false" aria-controls="filters-panel">
           <i class="bi bi-sliders" aria-hidden="true"></i>
-          <span class="label">Mostra filtri</span>
+          <span class="label">Show filters</span>
           <span class="badge" hidden>0</span>
           <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
         </button>
@@ -17,21 +17,21 @@
       <div class="bar-filters" id="filters-panel" hidden>
         <div class="filter-grid">
           <div class="filter-group">
-            <label for="searchName">Nome del bar</label>
+            <label for="searchName">Bar name</label>
             <div class="input-wrap">
               <i class="bi bi-search" aria-hidden="true"></i>
-              <input type="search" id="searchName" placeholder="Es. Bar Centrale">
+                <input type="search" id="searchName" placeholder="e.g. Central Bar">
             </div>
           </div>
           <div class="filter-group">
-            <label for="searchCity">Città</label>
+            <label for="searchCity">City</label>
             <div class="input-wrap">
               <i class="bi bi-geo-alt" aria-hidden="true"></i>
-              <input type="search" id="searchCity" placeholder="Es. Bellinzona">
+                <input type="search" id="searchCity" placeholder="e.g. Bellinzona">
             </div>
           </div>
           <div class="filter-group">
-            <label for="filterDistance">Distanza max (km)</label>
+            <label for="filterDistance">Max distance (km)</label>
             <div class="range-wrap">
               <input type="range" id="filterDistance" min="0" max="30" step="1" list="distTicks" aria-live="polite">
               <datalist id="distTicks">
@@ -47,22 +47,22 @@
             </div>
           </div>
           <div class="filter-group rating-group">
-            <label for="filterRating">Rating minimo <i class="bi bi-info-circle" title="Mostra solo bar con rating ≥ valore selezionato" aria-hidden="true"></i></label>
+              <label for="filterRating">Minimum rating <i class="bi bi-info-circle" title="Show only bars with rating ≥ selected value" aria-hidden="true"></i></label>
             <div class="rating-stars" id="ratingStars" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"></div>
             <span class="value" id="ratingValue"></span>
             <input type="hidden" id="filterRating">
           </div>
           <div class="filter-group check-group">
-            <label><input type="checkbox" id="filterOpen"> Aperti ora</label>
-            <label><input type="checkbox" id="filterClosed"> Chiusi ora</label>
+            <label><input type="checkbox" id="filterOpen"> Open now</label>
+            <label><input type="checkbox" id="filterClosed"> Closed now</label>
           </div>
           <div class="filter-group categories">
-            <label>Categorie</label>
+            <label>Categories</label>
             <div class="chips" id="categoryChips"></div>
           </div>
           <div class="actions">
-            <button type="button" id="clearFilters" class="btn-link">Pulisci filtri</button>
-            <button type="button" id="applyFiltersBtn" class="btn-primary">Applica</button>
+            <button type="button" id="clearFilters" class="btn-link">Clear filters</button>
+            <button type="button" id="applyFiltersBtn" class="btn-primary">Apply</button>
           </div>
         </div>
       </div>
@@ -70,7 +70,7 @@
       <ul class="bars all-bars" id="allBarList">
         {% for bar in bars %}
         <li>
-        <a class="bar-card{% if bar.promo_label %} featured{% endif %}{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" itemscope itemtype="https://schema.org/BarOrPub">
+        <a class="bar-card{% if bar.promo_label %} featured{% endif %}{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="Open {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" itemscope itemtype="https://schema.org/BarOrPub">
           <div class="thumb-wrapper">
             {% if bar.photo_url %}
             <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">

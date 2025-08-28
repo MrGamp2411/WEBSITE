@@ -75,36 +75,36 @@ from urllib.parse import urljoin
 
 # Predefined categories for bars (used for filtering and admin forms)
 BAR_CATEGORIES = [
-    "Cocktail classico",
-    "Mixology&Signature",
-    "Enoteca/Vineria (Merlot)",
-    "Birreria artigianale",
-    "Pub/Irish pub",
+    "Classic cocktail",
+    "Mixology & Signature",
+    "Wine bar (Merlot)",
+    "Craft beer bar",
+    "Pub / Irish pub",
     "Gastropub",
     "Sports bar",
     "Lounge bar",
-    "Rooftop/Sky bar",
+    "Rooftop / Sky bar",
     "Speakeasy",
-    "Live music/Jazz bar",
+    "Live music / Jazz bar",
     "Piano bar",
     "Karaoke bar",
-    "Club/Discoteca bar",
-    "Aperitivo&Cicchetti",
-    "Caffetteria/Espresso bar",
-    "Pasticceria-bar",
-    "Paninoteca/Snack bar",
-    "Gelateria-bar",
-    "Bar di paese",
-    "Lakefront/Lido (lago)",
-    "Grotto ticinese",
+    "Club / Disco bar",
+    "Aperitif & Snacks",
+    "Coffee / Espresso bar",
+    "Pastry bar",
+    "Sandwich / Snack bar",
+    "Gelato bar",
+    "Local bar",
+    "Lakefront / Lido",
+    "Ticinese grotto",
     "Hotel bar",
-    "Shisha/Hookah lounge",
-    "Cigar&Whisky lounge",
+    "Shisha / Hookah lounge",
+    "Cigar & Whisky lounge",
     "Gin bar",
-    "Rum/Tiki bar",
-    "Tequila/Mezcalería",
-    "Biliardo&Darts pub",
-    "Afterwork/Business bar",
+    "Rum / Tiki bar",
+    "Tequila / Mezcaleria",
+    "Billiards & Darts pub",
+    "Afterwork / Business bar",
 ]
 
 # -----------------------------------------------------------------------------
@@ -764,7 +764,7 @@ async def search_bars(
         or term in (bar.city or "").lower()
         or term in (bar.state or "").lower()
     ]
-    # Determine a random selection of open bars within 20km for the "Consigliati" section.
+    # Determine a random selection of open bars within 20km for the "Recommended" section.
     if lat is not None and lng is not None:
         nearby_pool = [
             b
@@ -788,7 +788,7 @@ async def search_bars(
         top_bars = rated_within[:5]
         top_bars_message = None
         if not top_bars:
-            top_bars_message = "Non ci sono bar nelle tue vicinanze."
+            top_bars_message = "No bars near you."
         # Sort search results by proximity when location is provided
         results.sort(key=lambda b: (b.distance_km is None, b.distance_km))
     else:

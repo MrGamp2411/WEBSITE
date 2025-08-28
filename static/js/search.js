@@ -121,36 +121,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (categoryChips) {
     const allCategories = [
-      "Cocktail classico",
-      "Mixology&Signature",
-      "Enoteca/Vineria (Merlot)",
-      "Birreria artigianale",
-      "Pub/Irish pub",
+      "Classic cocktail",
+      "Mixology & Signature",
+      "Wine bar (Merlot)",
+      "Craft beer bar",
+      "Pub / Irish pub",
       "Gastropub",
       "Sports bar",
       "Lounge bar",
-      "Rooftop/Sky bar",
+      "Rooftop / Sky bar",
       "Speakeasy",
-      "Live music/Jazz bar",
+      "Live music / Jazz bar",
       "Piano bar",
       "Karaoke bar",
-      "Club/Discoteca bar",
-      "Aperitivo&Cicchetti",
-      "Caffetteria/Espresso bar",
-      "Pasticceria-bar",
-      "Paninoteca/Snack bar",
-      "Gelateria-bar",
-      "Bar di paese",
-      "Lakefront/Lido (lago)",
-      "Grotto ticinese",
+      "Club / Disco bar",
+      "Aperitif & Snacks",
+      "Coffee / Espresso bar",
+      "Pastry bar",
+      "Sandwich / Snack bar",
+      "Gelato bar",
+      "Local bar",
+      "Lakefront / Lido",
+      "Ticinese grotto",
       "Hotel bar",
-      "Shisha/Hookah lounge",
-      "Cigar&Whisky lounge",
+      "Shisha / Hookah lounge",
+      "Cigar & Whisky lounge",
       "Gin bar",
-      "Rum/Tiki bar",
-      "Tequila/Mezcalería",
-      "Biliardo&Darts pub",
-      "Afterwork/Business bar",
+      "Rum / Tiki bar",
+      "Tequila / Mezcaleria",
+      "Billiards & Darts pub",
+      "Afterwork / Business bar",
     ];
     allCategories.forEach(c => {
       const chip = document.createElement('button');
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       if (!topSection.querySelector('.bar-card')) {
         const msg = document.createElement('p');
-        msg.textContent = 'Non ci sono bar nelle tue vicinanze.';
+        msg.textContent = 'No bars near you.';
         topSection.appendChild(msg);
       }
     }
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       if (!recommendedSection.querySelector('.bar-card')) {
         const msg = document.createElement('p');
-        msg.textContent = 'Non ci sono bar consigliati nelle tue vicinanze.';
+        msg.textContent = 'No recommended bars near you.';
         recommendedSection.appendChild(msg);
       }
     }
@@ -256,14 +256,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     distanceInput.disabled = true;
     const msg = document.createElement('p');
     msg.className = 'help';
-    msg.textContent = 'Nessuna distanza disponibile per questi risultati.';
+    msg.textContent = 'No distance available for these results.';
     distanceInput.closest('.group')?.appendChild(msg);
   }
   if (ratingInput && bars.every(b => b.rating == null)) {
     ratingInput.disabled = true;
     const msg = document.createElement('p');
     msg.className = 'help';
-    msg.textContent = 'Nessuna valutazione disponibile per questi risultati.';
+    msg.textContent = 'No rating available for these results.';
     ratingInput.closest('.group')?.appendChild(msg);
   }
 
@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (openCheckbox) {
       const group = openCheckbox.closest('.group');
       openCheckbox.checked = state.open_now;
-      openVal.textContent = state.open_now ? 'Sì' : 'No';
+      openVal.textContent = state.open_now ? 'Yes' : 'No';
       openVal.hidden = !state.open_now;
       group.dataset.active = state.open_now ? 'true' : 'false';
     }

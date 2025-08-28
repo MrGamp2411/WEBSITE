@@ -30,9 +30,9 @@ def test_analytics_page():
         _login_super_admin(client)
         resp = client.get("/admin/analytics")
         assert resp.status_code == 200
-        assert "Ordini" in resp.text
-        assert "GMV lordo" in resp.text
-        assert "GMV netto" in resp.text
-        assert "Ricavi & Commissioni" in resp.text
-        assert "Prodotti / Menu" in resp.text
-        assert "Rimborsi totali" in resp.text
+        assert "Orders" in resp.text
+        assert "Gross GMV" in resp.text
+        assert "Net GMV" in resp.text
+        assert "Revenue & Fees" in resp.text
+        assert "Products / Menu" in resp.text
+        assert "Total refunds" in resp.text

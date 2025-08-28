@@ -17,7 +17,7 @@ def reset_db():
 
 
 def extract_top_section(html: str) -> str:
-    return html.split("I più votati", 1)[1].split("Consigliati", 1)[0]
+    return html.split("Top rated", 1)[1].split("Recommended", 1)[0]
 
 
 def test_top_rated_within_5km():
@@ -63,7 +63,7 @@ def test_top_rated_no_nearby_message():
         section = extract_top_section(resp.text)
         assert "Far A" not in section
         assert "Far B" not in section
-        assert "Non ci sono bar nelle tue vicinanze." in section
+        assert "No bars near you." in section
 
 
 def test_top_rated_section_without_location():
