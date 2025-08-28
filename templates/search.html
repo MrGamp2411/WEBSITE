@@ -3,12 +3,7 @@
 {% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
 <div class="search-page">
   <div class="search-stick">
-    <label class="visually-hidden" for="barSearch">Cerca bar o città</label>
-    <input id="barSearch" type="search" placeholder="Cerca un bar o una città…" aria-label="Cerca bar o città" inputmode="search" autocomplete="off">
-    <button id="filterBtn" class="filter-btn" aria-label="Filtri">
-      <i class="bi bi-sliders"></i>
-      <span id="filterCount" class="cart-badge" hidden></span>
-    </button>
+    <a class="btn btn--primary" href="/bars">View All</a>
   </div>
   {% if bars or recent_bars %}
     {% set sections = [
@@ -75,74 +70,8 @@
   {% else %}
   <div class="empty-state">
     <p>Nessun bar trovato.</p>
-    <button type="button" id="clearFilters" class="btn btn--secondary">Clear filters</button>
   </div>
   {% endif %}
-</div>
-  <div id="filterOverlay" class="filter-overlay" hidden>
-  <div class="filter-sheet" role="dialog" aria-modal="true" aria-labelledby="filterTitle">
-    <div class="grabber" aria-hidden="true"></div>
-    <h2 id="filterTitle">Filtri</h2>
-    <form id="filterForm">
-      <div class="group" data-key="max_km" data-active="false">
-        <div class="group-head">
-          <label for="filterDistance">Max distance</label>
-          <div class="group-toggle">
-            <input type="checkbox" id="filterDistanceToggle">
-            <span id="filterDistanceVal" class="chip value-chip" hidden></span>
-          </div>
-        </div>
-        <input type="range" id="filterDistance" name="distance" min="1" max="50" step="1" value="50" aria-label="Max distance in kilometers" aria-valuenow="50">
-        <span id="filterDistanceAnnounce" class="visually-hidden" aria-live="polite"></span>
-        <p class="help inactive-hint">Attiva per filtrare</p>
-      </div>
-      <div class="group" data-key="min_rating" data-active="false">
-        <div class="group-head">
-          <label for="filterRating">Min rating</label>
-          <div class="group-toggle">
-            <input type="checkbox" id="filterRatingToggle">
-            <span id="filterRatingVal" class="chip value-chip" hidden></span>
-          </div>
-        </div>
-        <input type="range" id="filterRating" name="rating" min="0" max="5" step="0.1" value="0" aria-label="Minimum rating" aria-valuenow="0">
-        <span id="filterRatingAnnounce" class="visually-hidden" aria-live="polite"></span>
-        <p class="help inactive-hint">Attiva per filtrare</p>
-      </div>
-      <div class="group" data-key="categories" data-active="false">
-        <div class="group-head">
-          <p>Category</p>
-          <span id="filterCategoryVal" class="chip value-chip" hidden></span>
-        </div>
-        {% set cats = namespace(names=[]) %}
-        {% for bar in bars %}
-          {% for c in bar.categories %}
-            {% if c.name not in cats.names %}
-              {% set cats.names = cats.names + [c.name] %}
-            {% endif %}
-          {% endfor %}
-        {% endfor %}
-        <div id="filterCategoryChips" class="chips">
-          <button type="button" class="chip" data-value="">All</button>
-          {% for name in cats.names %}
-          <button type="button" class="chip" data-value="{{ name|lower }}">{{ name }}</button>
-          {% endfor %}
-        </div>
-        <p class="help inactive-hint">Seleziona per attivare</p>
-      </div>
-      <div class="group" data-key="open_now" data-active="false">
-        <div class="group-head">
-          <label for="filterOpen">Open now</label>
-          <span id="filterOpenVal" class="chip value-chip" hidden></span>
-        </div>
-        <input type="checkbox" id="filterOpen" name="open">
-        <p class="help inactive-hint">Attiva per filtrare</p>
-      </div>
-      <div class="sheet-footer">
-        <button type="button" class="btn reset">Reset</button>
-        <button type="submit" class="btn btn--primary apply" disabled>Apply</button>
-      </div>
-    </form>
-  </div>
 </div>
 {% endblock %}
 
