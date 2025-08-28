@@ -77,9 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const closedCheck = document.getElementById('filterClosed');
   const chipsContainer = document.getElementById('categoryChips');
   const activeChips = document.getElementById('activeFilterChips');
-  const filterBadge = document.getElementById('filterCount');
-  const toggleBtn = document.getElementById('toggleFilters');
   const filterPanel = document.getElementById('barFilters');
+  const showFiltersBtn = document.getElementById('showFilters');
   const distanceValue = document.getElementById('distanceValue');
   const activeCategories = new Set();
 
@@ -258,11 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       card.closest('li').hidden = !show;
     });
-    const activeCount = (qName ? 1 : 0) + (qCity ? 1 : 0) + (useDist ? 1 : 0) + (minRating != null ? 1 : 0) + (showOpen ? 1 : 0) + (showClosed ? 1 : 0) + activeCategories.size;
-    if (filterBadge) {
-      filterBadge.textContent = activeCount;
-      filterBadge.hidden = activeCount === 0;
-    }
     updateActiveChips();
   }
 
@@ -319,20 +313,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
 
-  toggleBtn?.addEventListener('click', () => {
-    const wasHidden = filterPanel?.hasAttribute('hidden');
-    if (wasHidden) {
-      filterPanel?.removeAttribute('hidden');
-    } else {
-      filterPanel?.setAttribute('hidden', '');
-    }
-    list?.toggleAttribute('hidden', wasHidden);
-    activeChips?.toggleAttribute('hidden', wasHidden);
-    toggleBtn?.setAttribute('aria-expanded', wasHidden ? 'true' : 'false');
-    const textNode = toggleBtn.childNodes[0];
-    if (textNode && textNode.nodeType === Node.TEXT_NODE) {
-      textNode.textContent = wasHidden ? 'Chiudi filtri ' : 'Filtri ';
-    }
+  showFiltersBtn?.addEventListener('click', () => {
+    filterPanel?.removeAttribute('hidden');
+    showFiltersBtn?.setAttribute('hidden', '');
   });
 
   applyFilters();
