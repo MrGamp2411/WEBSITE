@@ -49,6 +49,10 @@
             <label><input type="checkbox" id="filterOpen"> Aperti ora</label>
             <label><input type="checkbox" id="filterClosed"> Chiusi ora</label>
           </div>
+          <div class="filter-group">
+            <label>Categorie</label>
+            <div class="chips" id="categoryChips"></div>
+          </div>
           <div class="actions">
             <button type="button" id="clearFilters" class="btn-link">Pulisci filtri</button>
             <button type="button" id="applyFiltersBtn" class="btn-primary">Applica</button>
@@ -56,7 +60,6 @@
         </div>
       </div>
       <div class="active-filters" id="activeFilterChips"></div>
-      <div class="chips" id="categoryChips"></div>
       <ul class="bars all-bars" id="allBarList">
         {% for bar in bars %}
         <li>
