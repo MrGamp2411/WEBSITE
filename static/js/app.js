@@ -377,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const prev=section.querySelector('.scroll-btn.prev');
       const next=section.querySelector('.scroll-btn.next');
       if(!scroller) return;
-      const getWidth=()=>{const card=scroller.querySelector('.bar-card');if(!card) return 0;const style=getComputedStyle(card);return card.offsetWidth+parseFloat(style.marginRight)+parseFloat(style.marginLeft);};
+      const getWidth=()=>{const card=scroller.querySelector('li:not([hidden]) .bar-card');if(!card) return 0;const style=getComputedStyle(card);return card.offsetWidth+parseFloat(style.marginRight)+parseFloat(style.marginLeft);};
       let w=getWidth();
       const scrollBy=dir=>scroller.scrollBy({left:dir*w,behavior:'smooth'});
       prev?.addEventListener('click',()=>scrollBy(-1));
