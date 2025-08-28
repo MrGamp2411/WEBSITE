@@ -314,8 +314,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
 
   showFiltersBtn?.addEventListener('click', () => {
-    filterPanel?.removeAttribute('hidden');
-    showFiltersBtn?.setAttribute('hidden', '');
+    if (!filterPanel || !showFiltersBtn) return;
+    const isHidden = filterPanel.hasAttribute('hidden');
+    if (isHidden) {
+      filterPanel.removeAttribute('hidden');
+      showFiltersBtn.textContent = 'Nascondi filtri';
+    } else {
+      filterPanel.setAttribute('hidden', '');
+      showFiltersBtn.textContent = 'Mostra filtri';
+    }
   });
 
   applyFilters();
