@@ -9,3 +9,4 @@
 - A "View All" list of bars is available at `/bars`, rendered with `templates/all_bars.html` and enhanced by `static/js/view-all.js`.
 - On the `/bars` page, card widths are reduced by `50px` (to `350px` desktop and `250px` mobile) via `.bars.all-bars .bar-card` overrides in `components.css`.
 - Cards on the `/bars` page are centered within their grid cells via `.bars.all-bars{justify-items:center;}`.
+- `/bars` now includes search inputs and filter controls (name, city, max distance, min rating, open/closed, categories) wired up in `static/js/view-all.js` and styled via `.bar-filters` in `components.css`.

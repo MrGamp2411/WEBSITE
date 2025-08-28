@@ -2,14 +2,23 @@
 {% block content %}
 {% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjIxJz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
 <section class="bar-section">
-  <div class="section-track">
-    <div class="section-head">
-      <h2>Tutti i bar</h2>
-    </div>
-    <ul class="bars all-bars" id="allBarList">
-      {% for bar in bars %}
-      <li>
-        <a class="bar-card{% if bar.promo_label %} featured{% endif %}{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
+    <div class="section-track">
+      <div class="section-head">
+        <h2>Tutti i bar</h2>
+      </div>
+      <div class="bar-filters">
+        <input type="search" id="searchName" placeholder="Cerca per nome">
+        <input type="search" id="searchCity" placeholder="Cerca per città">
+        <input type="number" id="filterDistance" placeholder="Distanza max (km)" min="0" step="0.1">
+        <input type="number" id="filterRating" placeholder="Rating minimo" min="0" max="5" step="0.1">
+        <label><input type="checkbox" id="filterOpen"> Aperti ora</label>
+        <label><input type="checkbox" id="filterClosed"> Chiusi ora</label>
+        <div class="chips" id="categoryChips"></div>
+      </div>
+      <ul class="bars all-bars" id="allBarList">
+        {% for bar in bars %}
+        <li>
+        <a class="bar-card{% if bar.promo_label %} featured{% endif %}{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="Apri {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" data-categories="{{ bar.categories | map(attribute='name') | map('lower') | join(',') if bar.categories else '' }}" itemscope itemtype="https://schema.org/BarOrPub">
           <div class="thumb-wrapper">
             {% if bar.photo_url %}
             <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
