@@ -5,6 +5,8 @@ function toNumber(v) {
   return m ? parseFloat(m[0]) : null;
 }
 
+const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
 function renderMeta(el, data) {
   const rating = toNumber(data.rating);
   const km = toNumber(data.distance_km);
@@ -45,6 +47,76 @@ document.addEventListener('DOMContentLoaded', () => {
   const list = document.getElementById('allBarList');
   if (!list) return;
   const cards = Array.from(list.querySelectorAll('.bar-card'));
+
+  const nameInput = document.getElementById('searchName');
+  const cityInput = document.getElementById('searchCity');
+  const distInput = document.getElementById('filterDistance');
+  const ratingInput = document.getElementById('filterRating');
+  const openCheck = document.getElementById('filterOpen');
+  const closedCheck = document.getElementById('filterClosed');
+  const chipsContainer = document.getElementById('categoryChips');
+  const activeCategories = new Set();
+
+  if (chipsContainer) {
+    const catSet = new Set();
+    cards.forEach(card => {
+      (card.dataset.categories || '').split(',').map(norm).filter(Boolean).forEach(c => catSet.add(c));
+    });
+    Array.from(catSet).sort().forEach(c => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'chip';
+      chip.dataset.value = c;
+      chip.textContent = c;
+      chipsContainer.appendChild(chip);
+    });
+    chipsContainer.addEventListener('click', e => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      const val = chip.dataset.value;
+      if (activeCategories.has(val)) {
+        activeCategories.delete(val);
+        chip.classList.remove('active');
+      } else {
+        activeCategories.add(val);
+        chip.classList.add('active');
+      }
+      applyFilters();
+    });
+  }
+
+  function applyFilters() {
+    const qName = norm(nameInput?.value);
+    const qCity = norm(cityInput?.value);
+    const maxDist = toNumber(distInput?.value);
+    const minRating = toNumber(ratingInput?.value);
+    const showOpen = openCheck?.checked;
+    const showClosed = closedCheck?.checked;
+    cards.forEach(card => {
+      const data = card.dataset;
+      let show = true;
+      if (qName && !norm(data.name).includes(qName)) show = false;
+      if (qCity && !norm(data.city).includes(qCity)) show = false;
+      const dist = toNumber(data.distance_km);
+      if (maxDist != null && (dist == null || dist > maxDist)) show = false;
+      const rating = toNumber(data.rating);
+      if (minRating != null && (rating == null || rating < minRating)) show = false;
+      const isOpen = data.open === 'true';
+      if (showOpen && !isOpen) show = false;
+      if (showClosed && isOpen) show = false;
+      if (activeCategories.size > 0) {
+        const barCats = (data.categories || '').split(',').map(norm);
+        if (!barCats.some(c => activeCategories.has(c))) show = false;
+      }
+      card.closest('li').hidden = !show;
+    });
+  }
+
+  [nameInput, cityInput, distInput, ratingInput].forEach(el => el?.addEventListener('input', applyFilters));
+  [openCheck, closedCheck].forEach(el => el?.addEventListener('change', applyFilters));
+
+  applyFilters();
+
   function sortByDistance(lat, lng) {
     cards.forEach(card => {
       const bLat = toNumber(card.dataset.latitude);
@@ -64,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return (da == null ? Infinity : da) - (db == null ? Infinity : db);
     });
     items.forEach(li => list.appendChild(li));
+    applyFilters();
   }
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(pos => {
@@ -71,5 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   } else {
     cards.forEach(card => renderMeta(card, card.dataset));
+    applyFilters();
   }
 });
