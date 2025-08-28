@@ -26,3 +26,4 @@
 - `.filters-toolbar` no longer draws a purple gradient line above the filter toggle; its background is now plain `var(--bg)`.
 - The "Vedi tutti" link in `templates/search.html` reuses the `.btn-filter` gradient-glass style, and `static/js/search.js` targets `.btn-filter` accordingly.
 - `.btn-filter` suppresses default link underlines with `text-decoration:none;` so "Vedi tutti" renders without a line beneath the text.
+- Mobile layouts include a `.hdr-sub` bar under the header with a location selector and search icon. Its padding adds visible spacing between the header and the page content.
