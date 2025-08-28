@@ -114,6 +114,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const clearBtn = document.getElementById('clearFilters');
   const filterCount = document.getElementById('filterCount');
 
+  const viewAllLink = document.querySelector('.section-utility .cta-pill');
+  viewAllLink?.addEventListener('click', () => {
+    const icon = viewAllLink.querySelector('i');
+    if (icon) {
+      icon.className = 'spinner-border spinner-border-sm';
+    }
+    viewAllLink.setAttribute('aria-busy', 'true');
+  });
+
   if (categoryChips) {
     const allCategories = [
       "Cocktail classico",

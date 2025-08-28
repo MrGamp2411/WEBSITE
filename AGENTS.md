@@ -21,3 +21,4 @@
 - Admin bar category selection is limited to five choices, enforced in both the form UI and server-side handlers.
 - Startup ensures the `bars` table includes a `bar_categories` column and `load_bars_from_db()` populates each bar's categories from that comma-separated field.
 - Core app routes reside in `main.py`, with models in `models.py` and database helpers in `database.py`.
+- A reusable `.cta-pill` component with primary and ghost variants is defined in `static/css/components.css` (minified in `static/css/components.min.css`) and powers the "Vedi tutti" link in `templates/search.html`; loading state handled in `static/js/search.js`.

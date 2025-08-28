@@ -2,8 +2,11 @@
 {% block content %}
 {% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
 <div class="search-page">
-  <div class="search-stick">
-    <a class="btn btn--primary" href="/bars">View All</a>
+  <div class="section-utility container">
+    <a class="cta-pill cta-pill--primary" href="/bars" aria-label="Vedi tutti: Bar visitati di recente">
+      <span data-i18n="see_all">Vedi tutti</span>
+      <i class="bi bi-arrow-right" aria-hidden="true"></i>
+    </a>
   </div>
   {% if bars or recent_bars %}
     {% set sections = [
