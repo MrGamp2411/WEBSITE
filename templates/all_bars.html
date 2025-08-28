@@ -6,8 +6,15 @@
       <div class="section-head">
         <h2>Tutti i bar</h2>
       </div>
-      <button type="button" id="showFilters" class="filter-toggle" aria-controls="barFilters">Mostra filtri</button>
-      <div class="bar-filters" id="barFilters" hidden>
+      <div class="filters-toolbar">
+        <button type="button" id="filters-toggle" class="btn-filter" aria-expanded="false" aria-controls="filters-panel">
+          <i class="bi bi-sliders" aria-hidden="true"></i>
+          <span class="label">Mostra filtri</span>
+          <span class="badge" hidden>0</span>
+          <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="bar-filters" id="filters-panel" hidden>
         <div class="filter-grid">
           <div class="filter-group">
             <label for="searchName">Nome del bar</label>
