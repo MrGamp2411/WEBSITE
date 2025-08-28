@@ -15,6 +15,8 @@
     --sg-bg0:#FFFFFF; --sg-t1:rgba(124,58,237,.15); --sg-t2:rgba(196,181,253,.15); --sg-t3:rgba(124,58,237,.10);
     --sg-surface:#FFFFFF; --sg-card-radius:16px; --sg-card-border:rgba(16,12,40,.10); --sg-focus:#6D28D9;
     --sg-radius-xl:16px; --sg-shadow-sm:0 3px 10px rgba(16,12,40,.08), 0 1px 2px rgba(16,12,40,.04); --sg-shadow-md:0 10px 30px rgba(16,12,40,.12), 0 2px 6px rgba(16,12,40,.05); --sg-shadow-lg:0 20px 40px rgba(16,12,40,.18);
+    --sg-primary:#6E4AFC; --sg-primary-600:#5b3ee0; --sg-gradient:linear-gradient(90deg,#6E4AFC 0%,#B59CFF 100%);
+    --sg-glass:rgba(255,255,255,.7); --sg-shadow:0 8px 24px rgba(110,74,252,.12), 0 2px 6px rgba(17,24,39,.06); --sg-radius:18px;
   --color-success:#10B981; --color-warning:#F59E0B; --color-danger:#EF4444;
   /* tipografia */
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
