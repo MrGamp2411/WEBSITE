@@ -10,3 +10,5 @@
 - On the `/bars` page, card widths are reduced by `50px` (to `350px` desktop and `250px` mobile) via `.bars.all-bars .bar-card` overrides in `components.css`.
 - Cards on the `/bars` page are centered within their grid cells via `.bars.all-bars{justify-items:center;}`.
 - `/bars` now includes search inputs and filter controls (name, city, max distance, min rating, open/closed, categories) wired up in `static/js/view-all.js` and styled via `.bar-filters` in `components.css`.
+- `data-rating` and `data-distance_km` attributes in `templates/all_bars.html` preserve zero values so filters behave correctly.
+- In `static/js/view-all.js`, the open/closed filters only restrict results when exactly one checkbox is selected; checking both shows all bars.
