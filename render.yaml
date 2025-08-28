@@ -2,5 +2,6 @@ services:
   - type: web
     name: website
     env: python
+    # Install dependencies from requirements.txt, including itsdangerous
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
