@@ -776,6 +776,32 @@ async def search_bars(
     )
 
 
+@app.get("/bars", response_class=HTMLResponse)
+async def list_all_bars(
+    request: Request,
+    lat: float | None = None,
+    lng: float | None = None,
+    db: Session = Depends(get_db),
+):
+    db_bars = db.query(BarModel).all()
+    for bar in db_bars:
+        bar.photo_url = make_absolute_url(bar.photo_url, request)
+        bar.is_open_now = is_bar_open_now(bar)
+        if (
+            lat is not None
+            and lng is not None
+            and bar.latitude is not None
+            and bar.longitude is not None
+        ):
+            bar.distance_km = _haversine_km(
+                float(lat), float(lng), float(bar.latitude), float(bar.longitude)
+            )
+        else:
+            bar.distance_km = None
+    db_bars.sort(key=lambda b: (b.distance_km is None, b.distance_km))
+    return render_template("all_bars.html", request=request, bars=db_bars)
+
+
 @app.get("/api/search")
 async def api_search(q: str = "", request: Request = None):
     term = q.lower()
