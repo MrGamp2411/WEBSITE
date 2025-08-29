@@ -40,6 +40,7 @@
 - Bar detail page sections (`.product-section`) wrap the category name, description, and product carousel inside a card-style box.
 - `ensure_menu_item_columns()` in `main.py` now auto-adds a `photo` column so product images persist in the `menu_items` table.
 - Product edit view (`bar_edit_product_form` in `main.py`) pulls item data directly from the database so uploaded photos appear when editing.
+- Product photo uploads are saved in the `menu_items.photo` column and reloaded at startup via `load_bars_from_db()` so images persist after restarts.
 - Product edit and bar detail pages convert product `photo_url` values to absolute URLs so images render correctly.
 - `/bar/{bar_id}/categories/{category_id}/products` lists now include product photo thumbnails with a fallback placeholder.
 - File uploads retrieved via `request.form()` return Starlette `UploadFile` objects; check for a `.filename` attribute instead of using `isinstance(..., UploadFile)`.
