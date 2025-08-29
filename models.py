@@ -107,7 +107,7 @@ class MenuItem(Base):
     bar_id = Column(Integer, ForeignKey("bars.id"), nullable=False)
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
     name = Column(String(100), nullable=False)
-    description = Column(Text)
+    description = Column(String(190))
     price_chf = Column(Numeric(10, 2), nullable=False)
     vat_rate = Column(Numeric(4, 2), default=0)
     sku = Column(String(50))
