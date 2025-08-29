@@ -581,7 +581,7 @@ def load_bars_from_db() -> None:
                     id=c.id,
                     name=c.name,
                     description=c.description or "",
-                    display_order=c.sort_order,
+                    display_order=c.sort_order if c.sort_order is not None else 0,
                     photo_url=c.photo_url,
                 )
             # Load products for the bar
@@ -676,7 +676,7 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
             id=c.id,
             name=c.name,
             description=c.description or "",
-            display_order=c.sort_order,
+            display_order=c.sort_order if c.sort_order is not None else 0,
             photo_url=c.photo_url,
         )
     for item in b.menu_items:
