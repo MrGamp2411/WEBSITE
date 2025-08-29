@@ -325,8 +325,9 @@ body.dark-mode{
   flex-direction:column;
   gap:var(--space-2);
 }
-.product-section .section-head{padding:0 0 var(--space-1);}
-.product-section > p{margin:0;}
+.product-section .section-head{padding:0 0 var(--space-1);flex-direction:column;gap:var(--space-1);}
+.product-section .section-subhead{display:flex;align-items:center;justify-content:space-between;}
+.product-section .section-subhead p{margin:0;}
 .product-section .scroller{padding:0 0 var(--space-2);}
 .scroller{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:0 12px 12px;overscroll-behavior-x:contain;}
 .scroller::-webkit-scrollbar{display:none;}
