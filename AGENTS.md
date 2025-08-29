@@ -17,6 +17,7 @@
   - Category `sort_order` defaults to `0` when missing to avoid menu sorting errors
   - Bar detail page uses bar-card metadata for rating and geolocated distance
   - Bar detail page displays the bar's description beneath the address
+  - Bar detail page shows open/closed status using `bar.is_open_now`
   - Bar detail page lists weekly opening hours beneath the description
   - Bar detail info is rendered in `.bar-detail` (no card styling)
 - Products:
