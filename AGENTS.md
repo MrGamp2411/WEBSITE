@@ -54,3 +54,4 @@
 
 - Reverted alignment of bar detail product carousel arrows with category description; arrows remain left aligned.
 - Bar detail page no longer displays an "Edit Category" button for each category.
+- Product card body stacks description, price, and action button with a small gap; margins removed from `.description`, `.price`, and `.add-to-cart` in `static/css/components.css` (and minified) to tighten spacing.
