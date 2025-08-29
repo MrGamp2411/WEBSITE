@@ -2577,9 +2577,18 @@ async def bar_edit_product_form(
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     category = bar.categories.get(category_id)
-    product = bar.products.get(product_id)
-    if not category or not product:
+    db_item = db.get(MenuItem, product_id)
+    if not category or not db_item or db_item.category_id != category_id:
         raise HTTPException(status_code=404, detail="Product not found")
+    product = Product(
+        id=db_item.id,
+        category_id=db_item.category_id,
+        name=db_item.name,
+        price=float(db_item.price_chf),
+        description=db_item.description or "",
+        display_order=db_item.sort_order or 0,
+        photo_url=db_item.photo,
+    )
     if not user or not (
         user.is_super_admin
         or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
