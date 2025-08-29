@@ -49,3 +49,4 @@
 - Product photo uploads reuse the same file-saving approach as bar photos, storing paths in `menu_items.photo` and refreshing bar data after edits.
 - Editing a product without uploading a new photo preserves the existing `menu_items.photo` path so images survive restarts.
 - Product card images adopt bar card markup with `srcset`/`sizes` for responsive loading.
+- `save_upload()` centralises file saving for bars and products; product forms reuse it to persist uploaded photos.
