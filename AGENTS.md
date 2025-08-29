@@ -36,3 +36,4 @@
 - Logged-in greeting on the home page uses the `.info-section` layout with a waving hand emoji and a separate paragraph.
 - Bar detail page (`templates/bar_detail.html`) shows the bar's uploaded photo with a fallback placeholder.
 - Product cards mirror bar card styling (400px×450px desktop, 300px×400px mobile) with images; markup lives in `templates/bar_detail.html` and styles are in `static/css/components.css` (minified in `static/css/components.min.css`).
+- Product categories on the bar detail page use horizontal carousels with arrow controls. Markup is in `templates/bar_detail.html` and behavior lives in `static/js/app.js` (minified in `static/js/app.min.js`), computing widths from the first visible `.product-card` just like for bars.
