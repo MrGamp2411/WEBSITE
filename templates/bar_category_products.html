@@ -24,11 +24,7 @@
     <tr>
       <td>{{ product.display_order }}</td>
       <td>
-        {% if product.photo_url %}
-        <img src="{{ product.photo_url }}" alt="{{ product.name }} photo" width="50" height="28" loading="lazy">
-        {% else %}
-        <img src="{{ fallback_img }}" alt="" width="50" height="28" loading="lazy">
-        {% endif %}
+        <img src="{{ product.photo_url }}" alt="{{ product.name }} photo" width="50" height="28" loading="lazy" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
       </td>
       <td>{{ product.name }}</td>
       <td>{{ product.description }}</td>

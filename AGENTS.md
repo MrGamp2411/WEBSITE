@@ -42,16 +42,11 @@
 - The same helper also migrates legacy `photo_url` data into `photo`, keeping existing product images after schema updates.
 - Product edit view (`bar_edit_product_form` in `main.py`) pulls item data directly from the database so uploaded photos appear when editing.
 - Product photo uploads are saved in the `menu_items.photo` column and reloaded at startup via `load_bars_from_db()` so images persist after restarts.
-- Product cards read their images from this `menu_items.photo` field, so uploaded photos render in both admin listings and bar detail pages.
 - Product edit and bar detail pages convert product `photo_url` values to absolute URLs so images render correctly.
 - `/bar/{bar_id}/categories/{category_id}/products` lists now include product photo thumbnails with a fallback placeholder.
 - File uploads retrieved via `request.form()` return Starlette `UploadFile` objects; check for a `.filename` attribute instead of using `isinstance(..., UploadFile)`.
 - After creating or editing a product, `refresh_bar_from_db()` syncs the in-memory bar data with database changes.
-- Product photo uploads reuse the same file-saving approach as bar photos, storing paths in `menu_items.photo` and refreshing bar data after edits.
-- Editing a product without uploading a new photo preserves the existing `menu_items.photo` path so images survive restarts.
-- Product edit (`bar_edit_product` in `main.py`) validates the database record belongs to the requested category before applying updates and persists new photos via `save_upload()`.
 - Product card images adopt bar card markup with `srcset`/`sizes` for responsive loading.
-- `save_upload()` centralises file saving for bars and products; product forms reuse it to persist uploaded photos.
 - `templates/bar_edit_product.html` previews the current product photo with a placeholder fallback and limits uploads to images with `accept="image/*"`.
-- `save_upload()` streams uploaded files to disk in chunks and closes the upload handle so images are written to permanent storage rather than remaining in memory.
-- `save_upload()` resolves the `static/uploads` directory relative to the repository so photos persist even if the working directory changes.
+- Product images are stored in the `product_images` table and served through `/api/products/{product_id}/image`; uploading uses the same endpoint via `POST` with an `image` field.
+- Templates reference this endpoint directly for product photos and rely on `onerror` fallbacks when an image is missing.

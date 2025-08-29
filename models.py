@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import Enum as PyEnum
+from uuid import uuid4
 
 from sqlalchemy import (
     Boolean,
@@ -12,6 +13,7 @@ from sqlalchemy import (
     String,
     Text,
     Float,
+    LargeBinary,
 )
 from sqlalchemy.orm import relationship
 
@@ -130,6 +132,18 @@ class MenuVariant(Base):
     active = Column(Boolean, default=True)
 
     item = relationship("MenuItem", back_populates="variants")
+
+
+class ProductImage(Base):
+    __tablename__ = "product_images"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid4()))
+    product_id = Column(
+        Integer, ForeignKey("menu_items.id"), unique=True, nullable=False
+    )
+    mime = Column(String, nullable=False)
+    data = Column(LargeBinary, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 class Order(Base):

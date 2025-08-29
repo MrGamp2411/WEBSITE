@@ -40,7 +40,7 @@ from typing import Dict, List, Optional
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi import Depends, FastAPI, HTTPException, Request, status, UploadFile, File, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -62,6 +62,7 @@ from models import (
     RoleEnum,
     UserBarRole,
     Category as CategoryModel,
+    ProductImage,
 )
 from pydantic import BaseModel, constr
 from decimal import Decimal
@@ -582,7 +583,7 @@ def load_bars_from_db() -> None:
                     price=float(item.price_chf),
                     description=item.description or "",
                     display_order=item.sort_order or 0,
-                    photo_url=item.photo,
+                    photo_url=f"/api/products/{item.id}/image",
                 )
             # Load user assignments
             bar.bar_admin_ids = []
@@ -666,7 +667,7 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
             price=float(item.price_chf),
             description=item.description or "",
             display_order=item.sort_order or 0,
-            photo_url=item.photo,
+            photo_url=f"/api/products/{item.id}/image",
         )
     # Load user assignments
     bar.bar_admin_ids = []
@@ -756,6 +757,44 @@ def render_template(template_name: str, **context) -> HTMLResponse:
 # -----------------------------------------------------------------------------
 # Routes
 # -----------------------------------------------------------------------------
+
+
+@app.post("/api/products/{product_id}/image")
+async def upload_product_image(
+    product_id: int,
+    image: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    if not image.filename:
+        raise HTTPException(status_code=400, detail="Nessun file")
+    data = await image.read()
+    if not image.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File non immagine")
+    if len(data) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="File troppo grande (>5MB)")
+    db_item = db.get(MenuItem, product_id)
+    if not db_item:
+        raise HTTPException(status_code=404, detail="Product not found")
+    img = db.query(ProductImage).filter_by(product_id=product_id).first()
+    if img:
+        img.data = data
+        img.mime = image.content_type
+    else:
+        db.add(
+            ProductImage(product_id=product_id, data=data, mime=image.content_type)
+        )
+    db.commit()
+    refresh_bar_from_db(db_item.bar_id, db)
+    return Response(status_code=204)
+
+
+@app.get("/api/products/{product_id}/image")
+def get_product_image(product_id: int, db: Session = Depends(get_db)):
+    img = db.query(ProductImage).filter_by(product_id=product_id).first()
+    if not img:
+        raise HTTPException(status_code=404)
+    headers = {"Cache-Control": "public, max-age=31536000, immutable"}
+    return Response(content=img.data, media_type=img.mime, headers=headers)
 
 
 # Basic demo routes. Real applications would include additional error handling
@@ -2675,7 +2714,9 @@ async def bar_edit_product_form(
         price=float(db_item.price_chf),
         description=db_item.description or "",
         display_order=db_item.sort_order or 0,
-        photo_url=make_absolute_url(db_item.photo, request),
+        photo_url=make_absolute_url(
+            f"/api/products/{db_item.id}/image", request
+        ),
     )
     if not user or not (
         user.is_super_admin
@@ -2716,7 +2757,7 @@ async def bar_edit_product(
             price=float(db_item.price_chf),
             description=db_item.description or "",
             display_order=db_item.sort_order or 0,
-            photo_url=db_item.photo,
+            photo_url=f"/api/products/{db_item.id}/image",
         )
     if not user or not (
         user.is_super_admin
@@ -2729,7 +2770,6 @@ async def bar_edit_product(
     description = form.get("description")
     display_order = form.get("display_order") or product.display_order
     photo_file = form.get("photo")
-    photo_path = db_item.photo
     if name:
         product.name = db_item.name = name
     if description:
@@ -2748,9 +2788,19 @@ async def bar_edit_product(
         db_item.sort_order = order_val
     except ValueError:
         pass
-    photo_path = await save_upload(photo_file, photo_path)
-    product.photo_url = photo_path
-    db_item.photo = photo_path
+    if getattr(photo_file, "filename", ""):
+        data = await photo_file.read()
+        mime = photo_file.content_type or ""
+        if mime.startswith("image/") and len(data) <= 5 * 1024 * 1024:
+            img = db.query(ProductImage).filter_by(product_id=db_item.id).first()
+            if img:
+                img.data = data
+                img.mime = mime
+            else:
+                db.add(ProductImage(product_id=db_item.id, data=data, mime=mime))
+        await photo_file.close()
+    product.photo_url = f"/api/products/{db_item.id}/image"
+    db_item.photo = None
     db.commit()
     db.refresh(db_item)
     refresh_bar_from_db(bar_id, db)
