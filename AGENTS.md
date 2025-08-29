@@ -15,6 +15,7 @@
   - Categories stored in `bars.bar_categories`
   - Opening hours data is sanitized; invalid or non-dict values are treated as closed
   - Category `sort_order` defaults to `0` when missing to avoid menu sorting errors
+  - Bar detail page no longer shows distance or opening hours
 - Products:
   - Images stored in `menu_items.photo` and served via `/api/products/{id}/image`
   - `templates/bar_detail.html` shows products with carousels handled by `static/js/app.js`
