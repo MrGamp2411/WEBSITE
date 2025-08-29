@@ -34,3 +34,4 @@
 - All UI text is now in English. Category names are defined in `main.py` and mirrored in `static/js/search.js` and `static/js/view-all.js`.
 - Sorting in `static/js/search.js` and `static/js/app.js` inserts bars before browse/view-all cards so those cards always stay at the end of their lists.
 - Logged-in greeting on the home page uses the `.info-section` layout with a waving hand emoji and a separate paragraph.
+- Bar detail page (`templates/bar_detail.html`) shows the bar's uploaded photo with a fallback placeholder.
