@@ -21,10 +21,11 @@
   - Bar detail page uses bar-card metadata for rating and geolocated distance
   - Bar detail page displays the bar's description beneath the address
   - Bar detail page shows open/closed status using `bar.is_open_now`
+  - Bar detail page uses the same `.status` classes as bar cards for open/closed labels
   - Bar detail page lists weekly opening hours beneath the description
   - Bar detail info is rendered in `.bar-detail` (no card styling)
   - Bar detail layout: `.bar-cover` image (16/9), `.bar-meta` row with status/rating/distance, `.clamp`ed description, and `.bar-hours-card` grid (Mon–Thu / Fri–Sun)
-  - Open status uses `.status-open` (green) and closed status uses `.status-closed` (red); badges apply the same classes for background colors
+  - Open status uses `.status-open` (green) and closed status uses `.status-closed` (red)
 - Products:
   - Images stored in `menu_items.photo` and served via `/api/products/{id}/image`
   - `templates/bar_detail.html` shows products with carousels handled by `static/js/app.js`
