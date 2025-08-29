@@ -360,6 +360,17 @@ def ensure_prefix_column():
             conn.execute(text("ALTER TABLE users ADD COLUMN prefix VARCHAR(10)"))
 
 
+def ensure_credit_column() -> None:
+    """Add the `credit` column to users table if it's missing."""
+    inspector = inspect(engine)
+    columns = [col["name"] for col in inspector.get_columns("users")]
+    if "credit" not in columns:
+        with engine.begin() as conn:
+            conn.execute(
+                text("ALTER TABLE users ADD COLUMN credit NUMERIC(10, 2) DEFAULT 0")
+            )
+
+
 def ensure_bar_columns() -> None:
     """Ensure recently added columns exist on the bars table."""
     inspector = inspect(engine)
@@ -420,6 +431,7 @@ def on_startup():
     """Initialise database tables on startup."""
     Base.metadata.create_all(bind=engine)
     ensure_prefix_column()
+    ensure_credit_column()
     ensure_bar_columns()
     ensure_category_columns()
     ensure_menu_item_columns()
