@@ -38,3 +38,4 @@
 - Product cards mirror bar card styling (400px×450px desktop, 300px×400px mobile) with images; markup lives in `templates/bar_detail.html` and styles are in `static/css/components.css` (minified in `static/css/components.min.css`).
 - Product categories on the bar detail page use horizontal carousels with arrow controls. Markup is in `templates/bar_detail.html` and behavior lives in `static/js/app.js` (minified in `static/js/app.min.js`), computing widths from the first visible `.product-card` just like for bars.
 - Bar detail page sections (`.product-section`) wrap the category name, description, and product carousel inside a card-style box.
+- `ensure_menu_item_columns()` in `main.py` now auto-adds a `photo` column so product images persist in the `menu_items` table.
