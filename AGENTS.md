@@ -15,8 +15,9 @@
   - Categories stored in `bars.bar_categories`
   - Opening hours data is sanitized; invalid or non-dict values are treated as closed
   - Category `sort_order` defaults to `0` when missing to avoid menu sorting errors
-  - Bar detail page uses bar-card metadata for rating and geolocated distance; opening hours remain hidden
+  - Bar detail page uses bar-card metadata for rating and geolocated distance
   - Bar detail page displays the bar's description beneath the address
+  - Bar detail page lists weekly opening hours beneath the description
   - Bar detail info is rendered in `.bar-detail` (no card styling)
 - Products:
   - Images stored in `menu_items.photo` and served via `/api/products/{id}/image`
