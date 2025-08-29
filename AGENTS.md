@@ -50,3 +50,4 @@
 - `templates/bar_edit_product.html` previews the current product photo with a placeholder fallback and limits uploads to images with `accept="image/*"`.
 - Product images are stored in the `product_images` table and served through `/api/products/{product_id}/image`; uploading uses the same endpoint via `POST` with an `image` field.
 - Templates reference this endpoint directly for product photos and rely on `onerror` fallbacks when an image is missing.
+- Category creation and edit views no longer support image uploads, and `bar_detail.html` stops rendering category photos.

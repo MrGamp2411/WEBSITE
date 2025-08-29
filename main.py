@@ -2471,8 +2471,6 @@ async def bar_new_category(
     name = form.get("name")
     description = form.get("description")
     display_order = form.get("display_order") or 0
-    photo_file = form.get("photo")
-    photo_url = await save_upload(photo_file)
     if not name or not description:
         return render_template(
             "bar_new_category.html",
@@ -2488,7 +2486,6 @@ async def bar_new_category(
         bar_id=bar_id,
         name=name,
         description=description,
-        photo_url=photo_url,
         sort_order=order_val,
     )
     db.add(db_category)
@@ -2499,7 +2496,6 @@ async def bar_new_category(
         name=name,
         description=description,
         display_order=order_val,
-        photo_url=photo_url,
     )
     bar.categories[category.id] = category
     return RedirectResponse(
@@ -2851,7 +2847,6 @@ async def bar_edit_category(
     name = form.get("name")
     description = form.get("description")
     display_order = form.get("display_order") or category.display_order
-    photo_file = form.get("photo")
     db_category = db.get(CategoryModel, category_id)
     if name:
         category.name = name
@@ -2868,17 +2863,6 @@ async def bar_edit_category(
             db_category.sort_order = order_val
     except ValueError:
         pass
-    if getattr(photo_file, "filename", None):
-        uploads_dir = os.path.join("static", "uploads")
-        os.makedirs(uploads_dir, exist_ok=True)
-        _, ext = os.path.splitext(photo_file.filename)
-        filename = f"{uuid4().hex}{ext}"
-        file_path = os.path.join(uploads_dir, filename)
-        with open(file_path, "wb") as f:
-            f.write(await photo_file.read())
-        category.photo_url = f"/static/uploads/{filename}"
-        if db_category:
-            db_category.photo_url = category.photo_url
     if db_category:
         db.commit()
     return RedirectResponse(
