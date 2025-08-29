@@ -2518,16 +2518,7 @@ async def bar_new_product(
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
-    product = Product(
-        id=db_item.id,
-        category_id=category_id,
-        name=name,
-        price=price_val,
-        description=description,
-        display_order=order_val,
-        photo_url=photo_url,
-    )
-    bar.products[product.id] = product
+    refresh_bar_from_db(bar_id, db)
     return RedirectResponse(
         url=f"/bar/{bar_id}/categories/{category_id}/products",
         status_code=status.HTTP_303_SEE_OTHER,
@@ -2674,6 +2665,7 @@ async def bar_edit_product(
         db.add(db_item)
         db.commit()
         db.refresh(db_item)
+        refresh_bar_from_db(bar_id, db)
     return RedirectResponse(
         url=f"/bar/{bar_id}/categories/{category_id}/products",
         status_code=status.HTTP_303_SEE_OTHER,

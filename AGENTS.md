@@ -44,3 +44,4 @@
 - Product edit and bar detail pages convert product `photo_url` values to absolute URLs so images render correctly.
 - `/bar/{bar_id}/categories/{category_id}/products` lists now include product photo thumbnails with a fallback placeholder.
 - File uploads retrieved via `request.form()` return Starlette `UploadFile` objects; check for a `.filename` attribute instead of using `isinstance(..., UploadFile)`.
+- After creating or editing a product, `refresh_bar_from_db()` syncs the in-memory bar data with database changes.
