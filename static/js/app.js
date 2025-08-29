@@ -35,15 +35,12 @@ document.addEventListener('DOMContentLoaded', function() {
   function toKm(v){ if(v==null) return null; if(typeof v==='number') return v>=1000? v/1000 : v; const n=toNumber(v); return n; }
   function renderMeta(el, data){
     const rating = toNumber(data.rating);
-    const ratingCount = toNumber(data.rating_count);
     const km = toKm(data.distance_km);
     const rEl = el.querySelector('.bar-rating');
     const dEl = el.querySelector('.bar-distance');
     if(rEl){
       if(rating!=null){
-        let html = '<i class="bi bi-star-fill" aria-hidden="true"></i> <span class="rating-value">'+rating.toFixed(1)+'</span>';
-        if(ratingCount!=null) html += ' ('+ratingCount+')';
-        rEl.innerHTML = html;
+        rEl.innerHTML = '<i class="bi bi-star-fill" aria-hidden="true"></i> <span class="rating-value">'+rating.toFixed(1)+'</span>';
         rEl.hidden = false;
         rEl.dataset.hasRating = 'true';
       } else {
