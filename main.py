@@ -1154,6 +1154,8 @@ async def bar_detail(request: Request, bar_id: int):
     for prod in bar.products.values():
         prod.photo_url = make_absolute_url(prod.photo_url, request)
         category = bar.categories.get(prod.category_id)
+        if not category:
+            continue
         products_by_category.setdefault(category, []).append(prod)
     for prods in products_by_category.values():
         prods.sort(key=lambda p: p.display_order)
@@ -1186,6 +1188,8 @@ async def add_to_cart(request: Request, bar_id: int):
         products_by_category: Dict[Category, List[Product]] = {}
         for prod in bar.products.values():
             category = bar.categories.get(prod.category_id)
+            if not category:
+                continue
             products_by_category.setdefault(category, []).append(prod)
         return render_template(
             "bar_detail.html",
