@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   const searchInput = document.getElementById('barSearch') || document.getElementById('barSearchDesktop');
-  const barCards = () => document.querySelectorAll('.bar-card, .bar-detail');
+  const barCards = () => document.querySelectorAll('.bar-card');
   const locationInput = document.getElementById('locationInput') || document.getElementById('locationInputDesktop');
   const suggestionsBox = document.getElementById('searchSuggestions') || document.getElementById('searchSuggestionsDesktop');
   const locationSelectors = document.querySelectorAll('.location-selector');
