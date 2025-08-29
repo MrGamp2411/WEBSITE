@@ -2673,6 +2673,7 @@ async def bar_edit_product(
     if db_item:
         db.add(db_item)
         db.commit()
+        db.refresh(db_item)
     return RedirectResponse(
         url=f"/bar/{bar_id}/categories/{category_id}/products",
         status_code=status.HTTP_303_SEE_OTHER,
