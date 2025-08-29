@@ -18,8 +18,11 @@
   - Bar detail page uses bar-card metadata for rating and geolocated distance
   - Bar detail page displays the bar's description beneath the address
   - Bar detail page shows open/closed status using `bar.is_open_now`
-  - Bar detail page lists weekly opening hours beneath the description
-  - Bar detail info is rendered in `.bar-detail` (no card styling)
+- Bar detail page lists weekly opening hours beneath the description
+- Bar detail info is rendered in `.bar-detail` (no card styling)
+- Bar detail uses reusable macros in `templates/components/bar_components.html`
+- Additional JS for bar detail interactions in `static/js/bar_detail.js`
+- Bar model includes `rating_count` and `photos` fields; photos stored as JSON lists
 - Products:
   - Images stored in `menu_items.photo` and served via `/api/products/{id}/image`
   - `templates/bar_detail.html` shows products with carousels handled by `static/js/app.js`

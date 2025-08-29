@@ -63,9 +63,11 @@ class Bar(Base):
     active = Column(Boolean, default=True)
     zone = Column(String(50))
     rating = Column(Float, default=0.0)
+    rating_count = Column(Integer, default=0)
     is_open_now = Column(Boolean, default=False)
     manual_closed = Column(Boolean, default=False)
     promo_label = Column(String(100))
+    photos = Column(Text)
     tags = Column(Text)
     bar_categories = Column(Text)
 
