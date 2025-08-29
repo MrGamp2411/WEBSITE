@@ -414,7 +414,10 @@ def ensure_menu_item_columns() -> None:
     """Ensure expected columns exist on the menu_items table."""
     inspector = inspect(engine)
     columns = {col["name"] for col in inspector.get_columns("menu_items")}
-    required = {"sort_order": "INTEGER"}
+    required = {
+        "sort_order": "INTEGER",
+        "photo": "VARCHAR(255)",
+    }
     missing = {name: ddl for name, ddl in required.items() if name not in columns}
     if missing:
         with engine.begin() as conn:
