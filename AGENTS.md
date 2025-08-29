@@ -56,4 +56,3 @@
 - Bar detail page no longer displays an "Edit Category" button for each category.
 - Product card body stacks description, price, and action button with a small gap; margins removed from `.description`, `.price`, and `.add-to-cart` in `static/css/components.css` (and minified) to tighten spacing.
 - Product card description now grows to fill available space while the price and `Add to Cart` button remain pinned to the bottom with roughly `12px` of card padding and an `8px` gap between them.
-- Bar detail page (`templates/bar_detail.html`) includes a `.bar-info` section showing the bar's rating, geolocated distance, full address, open/closed status, and weekly opening hours; logic lives in `static/js/app.js` (minified in `static/js/app.min.js`).

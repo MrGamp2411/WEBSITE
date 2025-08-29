@@ -145,7 +145,8 @@ class Product:
         self.category_id = category_id
         self.name = name
         self.price = price
-        self.description = description
+        # Ensure product descriptions stay within 190 characters
+        self.description = description[:190]
         self.display_order = display_order
         self.photo_url = photo_url
 
@@ -2610,6 +2611,8 @@ async def bar_new_product(
     name = form.get("name")
     price = form.get("price")
     description = form.get("description")
+    if description:
+        description = description[:190]
     display_order = form.get("display_order") or 0
     photo_file = form.get("photo")
     photo_url = await save_upload(photo_file)
@@ -2764,6 +2767,8 @@ async def bar_edit_product(
     name = form.get("name")
     price = form.get("price")
     description = form.get("description")
+    if description:
+        description = description[:190]
     display_order = form.get("display_order") or product.display_order
     photo_file = form.get("photo")
     if name:
