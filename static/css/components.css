@@ -521,11 +521,6 @@ body.dark-mode{
   align-items:center;
   gap:4px;
 }
-.bar-detail .bar-status .badge{
-  font-size:.75rem;
-  font-weight:600;
-  padding:2px 6px;
-}
 .bar-address,
 .bar-desc{
   color:var(--muted);
