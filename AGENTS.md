@@ -46,3 +46,5 @@
 - `/bar/{bar_id}/categories/{category_id}/products` lists now include product photo thumbnails with a fallback placeholder.
 - File uploads retrieved via `request.form()` return Starlette `UploadFile` objects; check for a `.filename` attribute instead of using `isinstance(..., UploadFile)`.
 - After creating or editing a product, `refresh_bar_from_db()` syncs the in-memory bar data with database changes.
+- Product photo uploads reuse the same file-saving approach as bar photos, storing paths in `menu_items.photo` and refreshing bar data after edits.
+- Product card images adopt bar card markup with `srcset`/`sizes` for responsive loading.

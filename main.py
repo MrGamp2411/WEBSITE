@@ -111,6 +111,7 @@ BAR_CATEGORIES = [
 # Data models (in-memory for demonstration purposes)
 # -----------------------------------------------------------------------------
 
+
 class Category:
     def __init__(
         self,
@@ -391,7 +392,9 @@ def ensure_bar_columns() -> None:
     if missing:
         with engine.begin() as conn:
             for name, ddl in missing.items():
-                conn.execute(text(f"ALTER TABLE bars ADD COLUMN IF NOT EXISTS {name} {ddl}"))
+                conn.execute(
+                    text(f"ALTER TABLE bars ADD COLUMN IF NOT EXISTS {name} {ddl}")
+                )
 
 
 def ensure_category_columns() -> None:
@@ -450,6 +453,7 @@ def on_startup():
     seed_super_admin()
     load_bars_from_db()
 
+
 # Jinja2 environment for rendering HTML templates
 templates_env = Environment(
     loader=FileSystemLoader("templates"),
@@ -471,7 +475,6 @@ next_user_id = 1
 
 # Cart storage per user
 user_carts: Dict[int, Cart] = {}
-
 
 
 # -----------------------------------------------------------------------------
@@ -552,7 +555,8 @@ def load_bars_from_db() -> None:
                 description=b.description or "",
                 photo_url=b.photo_url,
                 rating=b.rating or 0.0,
-                is_open_now=is_open_now_from_hours(hours) and not (b.manual_closed or False),
+                is_open_now=is_open_now_from_hours(hours)
+                and not (b.manual_closed or False),
                 manual_closed=b.manual_closed or False,
                 opening_hours=hours,
                 promo_label=b.promo_label,
@@ -583,11 +587,7 @@ def load_bars_from_db() -> None:
             bar.bar_admin_ids = []
             bar.bartender_ids = []
             bar.pending_bartender_ids = []
-            roles = (
-                db.query(UserBarRole)
-                .filter(UserBarRole.bar_id == b.id)
-                .all()
-            )
+            roles = db.query(UserBarRole).filter(UserBarRole.bar_id == b.id).all()
             for r in roles:
                 if r.role == RoleEnum.BARADMIN:
                     bar.bar_admin_ids.append(r.user_id)
@@ -623,7 +623,8 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
             description=b.description or "",
             photo_url=b.photo_url,
             rating=b.rating or 0.0,
-            is_open_now=is_open_now_from_hours(hours) and not (b.manual_closed or False),
+            is_open_now=is_open_now_from_hours(hours)
+            and not (b.manual_closed or False),
             manual_closed=b.manual_closed or False,
             opening_hours=hours,
             promo_label=b.promo_label,
@@ -753,7 +754,10 @@ def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
     dlat = radians(lat2 - lat1)
     dlon = radians(lon2 - lon1)
-    a = sin(dlat / 2) ** 2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon / 2) ** 2
+    a = (
+        sin(dlat / 2) ** 2
+        + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon / 2) ** 2
+    )
     c = 2 * asin(sqrt(a))
     return 6371 * c
 
@@ -777,7 +781,9 @@ async def search_bars(
             and bar.latitude is not None
             and bar.longitude is not None
         ):
-            bar.distance_km = _haversine_km(float(lat), float(lng), float(bar.latitude), float(bar.longitude))
+            bar.distance_km = _haversine_km(
+                float(lat), float(lng), float(bar.latitude), float(bar.longitude)
+            )
         else:
             bar.distance_km = None
     results = [
@@ -793,9 +799,7 @@ async def search_bars(
         nearby_pool = [
             b
             for b in db_bars
-            if b.is_open_now
-            and b.distance_km is not None
-            and b.distance_km <= 20
+            if b.is_open_now and b.distance_km is not None and b.distance_km <= 20
         ]
     else:
         nearby_pool = [b for b in db_bars if b.is_open_now]
@@ -804,9 +808,7 @@ async def search_bars(
         rated_within = [
             b
             for b in results
-            if b.rating is not None
-            and b.distance_km is not None
-            and b.distance_km <= 5
+            if b.rating is not None and b.distance_km is not None and b.distance_km <= 5
         ]
         rated_within.sort(key=lambda b: (-b.rating, b.distance_km))
         top_bars = rated_within[:5]
@@ -875,10 +877,15 @@ async def api_search(q: str = "", request: Request = None):
             "city": bar.city,
             "state": bar.state,
             "description": bar.description,
-            "photo_url": make_absolute_url(bar.photo_url, request) if request else bar.photo_url,
+            "photo_url": (
+                make_absolute_url(bar.photo_url, request) if request else bar.photo_url
+            ),
         }
         for bar in bars.values()
-        if term in bar.name.lower() or term in bar.address.lower() or term in bar.city.lower() or term in bar.state.lower()
+        if term in bar.name.lower()
+        or term in bar.address.lower()
+        or term in bar.city.lower()
+        or term in bar.state.lower()
     ]
     return {"bars": results}
 
@@ -1007,7 +1014,9 @@ def create_order(order: OrderCreate, db: Session = Depends(get_db)):
             raise HTTPException(status_code=404, detail="Menu item not found")
         price = Decimal(menu_item.price_chf)
         line_total = price * item.qty
-        line_vat = calculate_vat_from_gross(price, Decimal(menu_item.vat_rate)) * item.qty
+        line_vat = (
+            calculate_vat_from_gross(price, Decimal(menu_item.vat_rate)) * item.qty
+        )
         vat_total += line_vat
         subtotal += line_total - line_vat
         order_items.append(
@@ -1039,7 +1048,9 @@ def create_order(order: OrderCreate, db: Session = Depends(get_db)):
     return db_order
 
 
-@app.post("/api/payouts/run", response_model=PayoutRead, status_code=status.HTTP_201_CREATED)
+@app.post(
+    "/api/payouts/run", response_model=PayoutRead, status_code=status.HTTP_201_CREATED
+)
 def run_payout(data: PayoutRunInput, db: Session = Depends(get_db)):
     """Aggregate completed orders for a bar within a date range and create a payout."""
     try:
@@ -1122,7 +1133,9 @@ async def add_to_cart(request: Request, bar_id: int):
     if cart.bar_id is None:
         cart.bar_id = bar_id
     cart.add(product)
-    return RedirectResponse(url=f"/bars/{bar_id}", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(
+        url=f"/bars/{bar_id}", status_code=status.HTTP_303_SEE_OTHER
+    )
 
 
 @app.get("/cart", response_class=HTMLResponse)
@@ -1183,7 +1196,9 @@ async def checkout(request: Request, db: Session = Depends(get_db)):
         except ValueError:
             raise HTTPException(status_code=400, detail="Invalid table")
     if cart.table_id is None:
-        raise HTTPException(status_code=400, detail="Please select a table before checking out")
+        raise HTTPException(
+            status_code=400, detail="Please select a table before checking out"
+        )
     order_total = cart.total_price()
     if user.credit < order_total:
         raise HTTPException(status_code=400, detail="Insufficient credit")
@@ -1253,14 +1268,18 @@ async def topup(request: Request, db: Session = Depends(get_db)):
             if add_amount <= 0:
                 raise ValueError
         except ValueError:
-            return render_template("topup.html", request=request, error="Invalid amount")
+            return render_template(
+                "topup.html", request=request, error="Invalid amount"
+            )
         # In a real application, integrate with a payment gateway here
         user.credit += add_amount
         db_user = db.query(User).filter(User.id == user.id).first()
         if db_user:
             db_user.credit = user.credit
             db.commit()
-        return render_template("topup.html", request=request, success=True, amount=add_amount)
+        return render_template(
+            "topup.html", request=request, success=True, amount=add_amount
+        )
     return render_template("topup.html", request=request)
 
 
@@ -1285,10 +1304,20 @@ async def register(request: Request, db: Session = Depends(get_db)):
     phone = form.get("phone")
     prefix = form.get("prefix")
     if all([username, password, email, phone, prefix]):
-        if username in users_by_username or db.query(User).filter(User.username == username).first():
-            return render_template("register.html", request=request, error="Username already taken")
-        if email in users_by_email or db.query(User).filter(User.email == email).first():
-            return render_template("register.html", request=request, error="Email already taken")
+        if (
+            username in users_by_username
+            or db.query(User).filter(User.username == username).first()
+        ):
+            return render_template(
+                "register.html", request=request, error="Username already taken"
+            )
+        if (
+            email in users_by_email
+            or db.query(User).filter(User.email == email).first()
+        ):
+            return render_template(
+                "register.html", request=request, error="Email already taken"
+            )
         password_hash = hashlib.sha256(password.encode("utf-8")).hexdigest()
         db_user = User(
             username=username,
@@ -1312,7 +1341,9 @@ async def register(request: Request, db: Session = Depends(get_db)):
         users_by_username[user.username] = user
         users_by_email[user.email] = user
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
-    return render_template("register.html", request=request, error="All fields are required")
+    return render_template(
+        "register.html", request=request, error="All fields are required"
+    )
 
 
 @app.get("/login", response_class=HTMLResponse)
@@ -1354,10 +1385,14 @@ async def login(request: Request, db: Session = Depends(get_db)):
                     users_by_email[user.email] = user
                     users_by_username[user.username] = user
         if not user or user.password != password:
-            return render_template("login.html", request=request, error="Invalid credentials")
+            return render_template(
+                "login.html", request=request, error="Invalid credentials"
+            )
         request.session["user_id"] = user.id
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
-    return render_template("login.html", request=request, error="Email and password required")
+    return render_template(
+        "login.html", request=request, error="Email and password required"
+    )
 
 
 @app.get("/logout")
@@ -1383,6 +1418,7 @@ async def dashboard(request: Request):
 
 
 # Admin management endpoints
+
 
 @app.get("/admin/bars", response_class=HTMLResponse)
 async def admin_bars_view(request: Request, db: Session = Depends(get_db)):
@@ -1426,7 +1462,9 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
     manual_closed = form.get("manual_closed") == "on"
     promo_label = form.get("promo_label")
     tags = form.get("tags")
-    tags_json = json.dumps([t.strip() for t in tags.split(",") if t.strip()]) if tags else None
+    tags_json = (
+        json.dumps([t.strip() for t in tags.split(",") if t.strip()]) if tags else None
+    )
     hours = {}
     for i in range(7):
         o = form.get(f"open_{i}")
@@ -1511,13 +1549,17 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
 
 
 @app.get("/admin/bars/edit/{bar_id}", response_class=HTMLResponse)
-async def edit_bar_options(request: Request, bar_id: int, db: Session = Depends(get_db)):
+async def edit_bar_options(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
     """Display links to different bar management pages."""
     user = get_current_user(request)
     bar = db.get(BarModel, bar_id)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
-    if not user or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)):
+    if not user or not (
+        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template("admin_edit_bar_options.html", request=request, bar=bar)
 
@@ -1528,7 +1570,9 @@ async def edit_bar_form(request: Request, bar_id: int, db: Session = Depends(get
     bar = db.get(BarModel, bar_id)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
-    if not user or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)):
+    if not user or not (
+        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     tags_csv = ", ".join(json.loads(bar.tags)) if bar.tags else ""
     selected_categories = bar.bar_categories.split(",") if bar.bar_categories else []
@@ -1550,7 +1594,9 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
     bar = db.get(BarModel, bar_id)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
-    if not user or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)):
+    if not user or not (
+        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
     name = form.get("name")
@@ -1566,7 +1612,9 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
     manual_closed = form.get("manual_closed") == "on"
     promo_label = form.get("promo_label")
     tags = form.get("tags")
-    tags_json = json.dumps([t.strip() for t in tags.split(",") if t.strip()]) if tags else None
+    tags_json = (
+        json.dumps([t.strip() for t in tags.split(",") if t.strip()]) if tags else None
+    )
     hours = {}
     for i in range(7):
         o = form.get(f"open_{i}")
@@ -1634,10 +1682,14 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
             mem_bar.manual_closed = manual_closed
             mem_bar.is_open_now = is_open_now_from_hours(hours) and not manual_closed
             mem_bar.promo_label = promo_label
-            mem_bar.tags = [t.strip() for t in tags.split(",") if t.strip()] if tags else []
+            mem_bar.tags = (
+                [t.strip() for t in tags.split(",") if t.strip()] if tags else []
+            )
             mem_bar.bar_categories = categories
         if user.is_super_admin:
-            return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
+            return RedirectResponse(
+                url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER
+            )
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(
         "admin_edit_bar.html",
@@ -1659,17 +1711,29 @@ async def delete_bar(request: Request, bar_id: int, db: Session = Depends(get_db
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     # Remove dependent records to satisfy foreign key constraints
-    menu_item_ids = [m.id for m in db.query(MenuItem.id).filter(MenuItem.bar_id == bar_id)]
+    menu_item_ids = [
+        m.id for m in db.query(MenuItem.id).filter(MenuItem.bar_id == bar_id)
+    ]
     if menu_item_ids:
-        db.query(MenuVariant).filter(MenuVariant.menu_item_id.in_(menu_item_ids)).delete(synchronize_session=False)
-    db.query(MenuItem).filter(MenuItem.bar_id == bar_id).delete(synchronize_session=False)
+        db.query(MenuVariant).filter(
+            MenuVariant.menu_item_id.in_(menu_item_ids)
+        ).delete(synchronize_session=False)
+    db.query(MenuItem).filter(MenuItem.bar_id == bar_id).delete(
+        synchronize_session=False
+    )
 
-    db.query(CategoryModel).filter(CategoryModel.bar_id == bar_id).delete(synchronize_session=False)
-    db.query(UserBarRole).filter(UserBarRole.bar_id == bar_id).delete(synchronize_session=False)
+    db.query(CategoryModel).filter(CategoryModel.bar_id == bar_id).delete(
+        synchronize_session=False
+    )
+    db.query(UserBarRole).filter(UserBarRole.bar_id == bar_id).delete(
+        synchronize_session=False
+    )
 
     order_ids = [o.id for o in db.query(Order.id).filter(Order.bar_id == bar_id)]
     if order_ids:
-        db.query(OrderItem).filter(OrderItem.order_id.in_(order_ids)).delete(synchronize_session=False)
+        db.query(OrderItem).filter(OrderItem.order_id.in_(order_ids)).delete(
+            synchronize_session=False
+        )
     db.query(Order).filter(Order.bar_id == bar_id).delete(synchronize_session=False)
 
     db.query(Payout).filter(Payout.bar_id == bar_id).delete(synchronize_session=False)
@@ -1681,16 +1745,18 @@ async def delete_bar(request: Request, bar_id: int, db: Session = Depends(get_db
 
 
 @app.get("/admin/bars/{bar_id}/users", response_class=HTMLResponse)
-async def manage_bar_users(request: Request, bar_id: int, db: Session = Depends(get_db)):
+async def manage_bar_users(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
     user = get_current_user(request)
     bar = refresh_bar_from_db(bar_id, db)
-    if not bar or not user or not (
-        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    if (
+        not bar
+        or not user
+        or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    staff = [
-        _load_demo_user(uid, db) for uid in bar.bar_admin_ids + bar.bartender_ids
-    ]
+    staff = [_load_demo_user(uid, db) for uid in bar.bar_admin_ids + bar.bartender_ids]
     return render_template(
         "admin_bar_users.html", request=request, bar=bar, staff=staff
     )
@@ -1702,8 +1768,13 @@ async def manage_bar_users_post(
 ):
     current = get_current_user(request)
     bar = refresh_bar_from_db(bar_id, db)
-    if not bar or not current or not (
-        current.is_super_admin or (current.is_bar_admin and current.bar_id == bar_id)
+    if (
+        not bar
+        or not current
+        or not (
+            current.is_super_admin
+            or (current.is_bar_admin and current.bar_id == bar_id)
+        )
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
@@ -1760,9 +1831,15 @@ async def manage_bar_users_post(
         prefix = form.get("prefix")
         if not all([username, email, password, phone, prefix]) or role not in role_map:
             error = "All fields are required"
-        elif username in users_by_username or db.query(User).filter(User.username == username).first():
+        elif (
+            username in users_by_username
+            or db.query(User).filter(User.username == username).first()
+        ):
             error = "Username already taken"
-        elif email in users_by_email or db.query(User).filter(User.email == email).first():
+        elif (
+            email in users_by_email
+            or db.query(User).filter(User.email == email).first()
+        ):
             error = "Email already taken"
         else:
             password_hash = hashlib.sha256(password.encode("utf-8")).hexdigest()
@@ -1800,9 +1877,7 @@ async def manage_bar_users_post(
             else:
                 bar.bartender_ids.append(demo.id)
             message = "User created"
-    staff = [
-        _load_demo_user(uid, db) for uid in bar.bar_admin_ids + bar.bartender_ids
-    ]
+    staff = [_load_demo_user(uid, db) for uid in bar.bar_admin_ids + bar.bartender_ids]
     return render_template(
         "admin_bar_users.html",
         request=request,
@@ -1861,9 +1936,7 @@ async def admin_analytics(request: Request, db: Session = Depends(get_db)):
     gmv_net = gmv_gross
     aov = gmv_gross / total_orders if total_orders else 0
     commission_pct = (commission_amount / gmv_gross * 100) if gmv_gross else 0
-    cancellation_rate = (
-        cancelled_orders / total_orders * 100 if total_orders else 0
-    )
+    cancellation_rate = cancelled_orders / total_orders * 100 if total_orders else 0
 
     daily = (
         db.query(
@@ -1881,7 +1954,7 @@ async def admin_analytics(request: Request, db: Session = Depends(get_db)):
 
     peak = (
         db.query(
-            extract('hour', Order.created_at).label("hour"),
+            extract("hour", Order.created_at).label("hour"),
             func.count(Order.id).label("cnt"),
         )
         .group_by("hour")
@@ -1938,7 +2011,7 @@ async def admin_analytics(request: Request, db: Session = Depends(get_db)):
 
     hourly = (
         db.query(
-            extract('hour', Order.created_at).label("hour"),
+            extract("hour", Order.created_at).label("hour"),
             func.count(Order.id).label("cnt"),
         )
         .group_by("hour")
@@ -2137,7 +2210,11 @@ async def edit_user(request: Request, user_id: int, db: Session = Depends(get_db
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(
-        "admin_edit_user.html", request=request, user=user, bars=bars.values(), current=current
+        "admin_edit_user.html",
+        request=request,
+        user=user,
+        bars=bars.values(),
+        current=current,
     )
 
 
@@ -2163,7 +2240,11 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     credit = form.get("credit")
     if not (username and email is not None and role is not None):
         return render_template(
-            "admin_edit_user.html", request=request, user=user, bars=bars.values(), current=current
+            "admin_edit_user.html",
+            request=request,
+            user=user,
+            bars=bars.values(),
+            current=current,
         )
     if username != user.username and (
         username in users_by_username
@@ -2178,8 +2259,7 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
             error="Username already taken",
         )
     if email != user.email and (
-        email in users_by_email
-        or db.query(User).filter(User.email == email).first()
+        email in users_by_email or db.query(User).filter(User.email == email).first()
     ):
         return render_template(
             "admin_edit_user.html",
@@ -2250,7 +2330,9 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         else:
             db.add(
                 UserBarRole(
-                    user_id=user_id, bar_id=user.bar_id, role=role_enum_map.get(role, RoleEnum.CUSTOMER)
+                    user_id=user_id,
+                    bar_id=user.bar_id,
+                    role=role_enum_map.get(role, RoleEnum.CUSTOMER),
                 )
             )
     elif existing_role:
@@ -2403,9 +2485,7 @@ async def bar_delete_category(
     )
 
 
-@app.get(
-    "/bar/{bar_id}/categories/{category_id}/products", response_class=HTMLResponse
-)
+@app.get("/bar/{bar_id}/categories/{category_id}/products", response_class=HTMLResponse)
 async def bar_category_products(
     request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
 ):
@@ -2534,9 +2614,7 @@ async def bar_new_product(
     )
 
 
-@app.post(
-    "/bar/{bar_id}/categories/{category_id}/products/{product_id}/delete"
-)
+@app.post("/bar/{bar_id}/categories/{category_id}/products/{product_id}/delete")
 async def bar_delete_product(
     request: Request,
     bar_id: int,
@@ -2634,6 +2712,7 @@ async def bar_edit_product(
     description = form.get("description")
     display_order = form.get("display_order") or product.display_order
     photo_file = form.get("photo")
+    photo_url = product.photo_url
     db_item = db.get(MenuItem, product_id)
     if name:
         product.name = name
@@ -2667,10 +2746,10 @@ async def bar_edit_product(
         file_path = os.path.join(uploads_dir, filename)
         with open(file_path, "wb") as f:
             f.write(await photo_file.read())
-        product.photo_url = f"/static/uploads/{filename}"
-        if db_item:
-            db_item.photo = product.photo_url
+        photo_url = f"/static/uploads/{filename}"
+    product.photo_url = photo_url
     if db_item:
+        db_item.photo = photo_url
         db.add(db_item)
         db.commit()
         db.refresh(db_item)
@@ -2681,9 +2760,7 @@ async def bar_edit_product(
     )
 
 
-@app.get(
-    "/bar/{bar_id}/categories/{category_id}/edit", response_class=HTMLResponse
-)
+@app.get("/bar/{bar_id}/categories/{category_id}/edit", response_class=HTMLResponse)
 async def bar_edit_category_form(
     request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
 ):
