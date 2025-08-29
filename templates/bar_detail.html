@@ -14,6 +14,15 @@
 </div>
 <address>{{ bar.address }}, {{ bar.city }}{% if bar.state %}, {{ bar.state }}{% endif %}</address>
 <p class="desc">{{ bar.description }}</p>
+{% if opening_hours %}
+<ul class="opening-hours">
+  {% for h in opening_hours %}
+  <li>{{ h.day }}:
+    {% if h.open and h.close %}{{ h.open }} - {{ h.close }}{% else %}Closed{% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
 </section>
 {% if error %}
 <p class="error">{{ error }}</p>
