@@ -696,6 +696,22 @@ def make_absolute_url(url: Optional[str], request: Request) -> Optional[str]:
     return url
 
 
+async def save_upload(file, existing_path: Optional[str] = None) -> Optional[str]:
+    """Persist an uploaded file and return its relative URL.
+
+    If ``file`` has no filename, ``existing_path`` is returned unchanged."""
+    if getattr(file, "filename", None):
+        uploads_dir = os.path.join("static", "uploads")
+        os.makedirs(uploads_dir, exist_ok=True)
+        _, ext = os.path.splitext(file.filename)
+        filename = f"{uuid4().hex}{ext}"
+        file_path = os.path.join(uploads_dir, filename)
+        with open(file_path, "wb") as f:
+            f.write(await file.read())
+        return f"/static/uploads/{filename}"
+    return existing_path
+
+
 def render_template(template_name: str, **context) -> HTMLResponse:
     request: Optional[Request] = context.get("request")
     if request is not None:
@@ -2409,16 +2425,7 @@ async def bar_new_category(
     description = form.get("description")
     display_order = form.get("display_order") or 0
     photo_file = form.get("photo")
-    photo_url = None
-    if getattr(photo_file, "filename", None):
-        uploads_dir = os.path.join("static", "uploads")
-        os.makedirs(uploads_dir, exist_ok=True)
-        _, ext = os.path.splitext(photo_file.filename)
-        filename = f"{uuid4().hex}{ext}"
-        file_path = os.path.join(uploads_dir, filename)
-        with open(file_path, "wb") as f:
-            f.write(await photo_file.read())
-        photo_url = f"/static/uploads/{filename}"
+    photo_url = await save_upload(photo_file)
     if not name or not description:
         return render_template(
             "bar_new_category.html",
@@ -2562,16 +2569,7 @@ async def bar_new_product(
     description = form.get("description")
     display_order = form.get("display_order") or 0
     photo_file = form.get("photo")
-    photo_url = None
-    if getattr(photo_file, "filename", None):
-        uploads_dir = os.path.join("static", "uploads")
-        os.makedirs(uploads_dir, exist_ok=True)
-        _, ext = os.path.splitext(photo_file.filename)
-        filename = f"{uuid4().hex}{ext}"
-        file_path = os.path.join(uploads_dir, filename)
-        with open(file_path, "wb") as f:
-            f.write(await photo_file.read())
-        photo_url = f"/static/uploads/{filename}"
+    photo_url = await save_upload(photo_file)
     if not name or not description or not price:
         return render_template(
             "bar_new_product.html",
@@ -2738,15 +2736,7 @@ async def bar_edit_product(
             db_item.sort_order = order_val
     except ValueError:
         pass
-    if getattr(photo_file, "filename", None):
-        uploads_dir = os.path.join("static", "uploads")
-        os.makedirs(uploads_dir, exist_ok=True)
-        _, ext = os.path.splitext(photo_file.filename)
-        filename = f"{uuid4().hex}{ext}"
-        file_path = os.path.join(uploads_dir, filename)
-        with open(file_path, "wb") as f:
-            f.write(await photo_file.read())
-        photo_path = f"/static/uploads/{filename}"
+    photo_path = await save_upload(photo_file, photo_path)
     product.photo_url = photo_path
     if db_item:
         db_item.photo = photo_path
