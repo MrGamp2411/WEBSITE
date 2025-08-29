@@ -1,33 +1,48 @@
 {% extends "layout.html" %}
 {% block content %}
-{% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
+{% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjIxJz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
 <section class="bar-detail" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" itemscope itemtype="https://schema.org/BarOrPub">
-<h1 class="title" itemprop="name">{{ bar.name }}</h1>
-{% if bar.photo_url %}
-<img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
-{% else %}
-<img class="thumb" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
-{% endif %}
-{% if bar.is_open_now %}
-<span class="status status-open">Open now</span>
-{% else %}
-<span class="status status-closed">Closed now</span>
-{% endif %}
-<div class="bar-meta">
-  {% if bar.rating %}<span class="bar-rating"><i class="bi bi-star-fill" aria-hidden="true"></i> {{ '%.1f'|format(bar.rating) }}</span>{% endif %}
-  <span class="bar-distance" data-has-distance="true" hidden></span>
-</div>
-<address>{{ bar.address }}, {{ bar.city }}{% if bar.state %}, {{ bar.state }}{% endif %}</address>
-<p class="desc">{{ bar.description }}</p>
-{% if opening_hours %}
-<ul class="opening-hours">
-  {% for h in opening_hours %}
-  <li>{{ h.day }}:
-    {% if h.open and h.close %}{{ h.open }} - {{ h.close }}{% else %}Closed{% endif %}
-  </li>
-  {% endfor %}
-</ul>
-{% endif %}
+  <div class="bar-cover-wrapper">
+    {% if bar.photo_url %}
+    <img class="bar-cover" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
+    {% else %}
+    <img class="bar-cover" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
+    {% endif %}
+  </div>
+  <h1 class="bar-title" itemprop="name">{{ bar.name }}</h1>
+  <div class="bar-meta">
+    <span class="bar-status">
+      <i class="bi bi-circle-fill {% if bar.is_open_now %}status-open{% else %}status-closed{% endif %}" aria-hidden="true"></i>
+      <span class="badge">{% if bar.is_open_now %}Open now{% else %}Closed now{% endif %}</span>
+    </span>
+    {% if bar.rating %}<span class="bar-rating"><i class="bi bi-star-fill" aria-hidden="true"></i> {{ '%.1f'|format(bar.rating) }}</span>{% endif %}
+    <span class="bar-distance" data-has-distance="true" hidden><i class="bi bi-geo-alt" aria-hidden="true"></i> <span class="distance-value"></span></span>
+  </div>
+  <p class="bar-address">{{ bar.address }}, {{ bar.city }}{% if bar.state %}, {{ bar.state }}{% endif %}</p>
+  <p class="bar-desc clamp" itemprop="description">{{ bar.description }}</p>
+  {% if opening_hours %}
+  <section class="bar-hours-card">
+    <h2 class="bar-hours-title">Opening hours</h2>
+    <div class="hours">
+      <div class="hours-col">
+        {% for h in opening_hours[:4] %}
+        <div class="hour-row">
+          <span>{{ h.day }}</span>
+          <span>{% if h.open and h.close %}{{ h.open }} - {{ h.close }}{% else %}Closed{% endif %}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="hours-col">
+        {% for h in opening_hours[4:] %}
+        <div class="hour-row">
+          <span>{{ h.day }}</span>
+          <span>{% if h.open and h.close %}{{ h.open }} - {{ h.close }}{% else %}Closed{% endif %}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
 </section>
 {% if error %}
 <p class="error">{{ error }}</p>
