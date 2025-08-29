@@ -493,6 +493,7 @@ body.dark-mode{
   display:flex;
   flex-direction:column;
   gap:16px;
+  margin-bottom:var(--space-4);
 }
 .bar-cover-wrapper{
   width:100%;
