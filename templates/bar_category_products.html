@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
+{% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
 <h1>Products in {{ category.name }} for {{ bar.name }}</h1>
 
 <div class="toolbar" style="margin-bottom:1rem;">
@@ -11,6 +12,7 @@
   <thead>
     <tr>
       <th>Order</th>
+      <th>Photo</th>
       <th>Name</th>
       <th>Description</th>
       <th>Price (CHF)</th>
@@ -21,6 +23,13 @@
     {% for product in products %}
     <tr>
       <td>{{ product.display_order }}</td>
+      <td>
+        {% if product.photo_url %}
+        <img src="{{ product.photo_url }}" alt="{{ product.name }} photo" width="50" height="28" loading="lazy">
+        {% else %}
+        <img src="{{ fallback_img }}" alt="" width="50" height="28" loading="lazy">
+        {% endif %}
+      </td>
       <td>{{ product.name }}</td>
       <td>{{ product.description }}</td>
       <td>{{ "%.2f"|format(product.price) }}</td>

@@ -61,7 +61,11 @@ def test_edit_product_shows_uploaded_photo():
 
     resp = client.get(f"/bar/{bar_id}/categories/{category_id}/products/{item_id}/edit")
     assert resp.status_code == 200
-    assert "/static/uploads/beer.jpg" in resp.text
+    assert "http://testserver/static/uploads/beer.jpg" in resp.text
+
+    detail = client.get(f"/bars/{bar_id}")
+    assert detail.status_code == 200
+    assert "http://testserver/static/uploads/beer.jpg" in detail.text
 
     users.clear()
     users_by_email.clear()
