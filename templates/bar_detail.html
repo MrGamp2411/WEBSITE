@@ -29,16 +29,18 @@
             <img class="thumb" src="{{ product.photo_url }}" alt="{{ product.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ product.photo_url }} 400w, {{ product.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
           </div>
           <h3 class="title">{{ product.name }}</h3>
-          <p class="desc">{{ product.description }}</p>
-          <p><strong>CHF {{ '%.2f'|format(product.price) }}</strong></p>
-          {% if user %}
-          <form class="form form--inline" method="post" action="/bars/{{ bar.id }}/add_to_cart">
-            <input type="hidden" name="product_id" value="{{ product.id }}">
-            <button class="btn btn--primary btn--small" type="submit">Add to Cart</button>
-          </form>
-          {% else %}
-          <a class="btn" href="/login">Login to order</a>
-          {% endif %}
+          <div class="card-body">
+            <p class="desc description">{{ product.description }}</p>
+            <p class="price"><strong>CHF {{ '%.2f'|format(product.price) }}</strong></p>
+            {% if user %}
+            <form class="form form--inline" method="post" action="/bars/{{ bar.id }}/add_to_cart">
+              <input type="hidden" name="product_id" value="{{ product.id }}">
+              <button class="btn btn--primary btn--small add-to-cart" type="submit">Add to Cart</button>
+            </form>
+            {% else %}
+            <a class="btn add-to-cart" href="/login">Login to order</a>
+            {% endif %}
+          </div>
         </article>
       </li>
       {% endfor %}
