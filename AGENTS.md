@@ -12,6 +12,7 @@
   - Templates live under `templates/`
   - JavaScript: `static/js/app.js` (shared/carousels), `static/js/search.js`, `static/js/view-all.js`
   - Bar & product card size: 400×450 desktop, 300×400 mobile
+  - Global footer: `templates/layout.html` uses `.site-footer` styled in `static/css/components.css`
 - Bars:
   - `/bars` page uses `templates/all_bars.html` and `static/js/view-all.js`
   - `BAR_CATEGORIES` defined in `main.py`; reused in `search.js` and `view-all.js`
