@@ -39,6 +39,7 @@
 - Product categories on the bar detail page use horizontal carousels with arrow controls. Markup is in `templates/bar_detail.html` and behavior lives in `static/js/app.js` (minified in `static/js/app.min.js`), computing widths from the first visible `.product-card` just like for bars.
 - Bar detail page sections (`.product-section`) wrap the category name, description, and product carousel inside a card-style box.
 - `ensure_menu_item_columns()` in `main.py` now auto-adds a `photo` column so product images persist in the `menu_items` table.
+- The same helper also migrates legacy `photo_url` data into `photo`, keeping existing product images after schema updates.
 - Product edit view (`bar_edit_product_form` in `main.py`) pulls item data directly from the database so uploaded photos appear when editing.
 - Product photo uploads are saved in the `menu_items.photo` column and reloaded at startup via `load_bars_from_db()` so images persist after restarts.
 - Product edit and bar detail pages convert product `photo_url` values to absolute URLs so images render correctly.

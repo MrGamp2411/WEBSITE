@@ -427,6 +427,15 @@ def ensure_menu_item_columns() -> None:
                         f"ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS {name} {ddl}"
                     )
                 )
+    # Migrate legacy `photo_url` data to the new `photo` column if present.
+    if ("photo" in columns or "photo" in missing) and "photo_url" in columns:
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "UPDATE menu_items SET photo = photo_url "
+                    "WHERE photo IS NULL AND photo_url IS NOT NULL"
+                )
+            )
 
 
 @app.on_event("startup")
