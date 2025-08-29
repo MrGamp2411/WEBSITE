@@ -39,5 +39,5 @@ def test_bar_detail_has_rating_and_distance_placeholders():
     assert 'data-latitude="0.0"' in resp.text
     assert 'data-longitude="0.0"' in resp.text
     assert '<span class="bar-rating"><i class="bi bi-star-fill" aria-hidden="true"></i> 4.5</span>' in resp.text
-    assert '<span class="bar-distance" data-has-distance="true" hidden></span>' in resp.text
+    assert '<span class="bar-distance" data-has-distance="true" hidden><i class="bi bi-geo-alt" aria-hidden="true"></i> <span class="distance-value"></span></span>' in resp.text
 

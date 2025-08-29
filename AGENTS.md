@@ -22,6 +22,7 @@
   - Bar detail page shows open/closed status using `bar.is_open_now`
   - Bar detail page lists weekly opening hours beneath the description
   - Bar detail info is rendered in `.bar-detail` (no card styling)
+  - Bar detail layout: `.bar-cover` image (16/9), `.bar-meta` row with status/rating/distance, `.clamp`ed description, and `.bar-hours-card` grid (Mon–Thu / Fri–Sun)
 - Products:
   - Images stored in `menu_items.photo` and served via `/api/products/{id}/image`
   - `templates/bar_detail.html` shows products with carousels handled by `static/js/app.js`
