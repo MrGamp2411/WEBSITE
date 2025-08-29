@@ -170,13 +170,11 @@ class Bar:
         description: str = "",
         photo_url: Optional[str] = None,
         rating: float = 0.0,
-        rating_count: int = 0,
         is_open_now: bool = False,
         manual_closed: bool = False,
         opening_hours: Optional[Dict[str, Dict[str, str]]] = None,
         promo_label: Optional[str] = None,
         tags: Optional[List[str]] = None,
-        photos: Optional[List[str]] = None,
         bar_categories: Optional[List[str]] = None,
     ):
         self.id = id
@@ -189,13 +187,11 @@ class Bar:
         self.description = description
         self.photo_url = photo_url
         self.rating = rating
-        self.rating_count = rating_count
         self.is_open_now = is_open_now
         self.manual_closed = manual_closed
         self.opening_hours = opening_hours or {}
         self.promo_label = promo_label
         self.tags = tags or []
-        self.photos = photos or []
         self.bar_categories = bar_categories or []
         self.categories: Dict[int, Category] = {}
         self.products: Dict[int, Product] = {}
@@ -550,7 +546,6 @@ def weekly_hours_list(hours: Optional[Dict[str, Dict[str, str]]]) -> List[Dict[s
     ]
     if not isinstance(hours, dict):
         hours = {}
-    today_idx = datetime.utcnow().weekday()
     result: List[Dict[str, Optional[str]]] = []
     for idx, day in enumerate(days):
         info = hours.get(str(idx)) if hours else None
@@ -558,14 +553,7 @@ def weekly_hours_list(hours: Optional[Dict[str, Dict[str, str]]]) -> List[Dict[s
         if isinstance(info, dict):
             open_time = info.get("open")
             close_time = info.get("close")
-        result.append(
-            {
-                "day": day,
-                "open": open_time,
-                "close": close_time,
-                "is_today": idx == today_idx,
-            }
-        )
+        result.append({"day": day, "open": open_time, "close": close_time})
     return result
 
 
@@ -607,14 +595,12 @@ def load_bars_from_db() -> None:
                 description=b.description or "",
                 photo_url=b.photo_url,
                 rating=b.rating or 0.0,
-                rating_count=b.rating_count or 0,
                 is_open_now=is_open_now_from_hours(hours)
                 and not (b.manual_closed or False),
                 manual_closed=b.manual_closed or False,
                 opening_hours=hours,
                 promo_label=b.promo_label,
                 tags=json.loads(b.tags) if b.tags else [],
-                photos=json.loads(b.photos) if b.photos else [],
                 bar_categories=b.bar_categories.split(",") if b.bar_categories else [],
             )
             # Load categories for the bar
@@ -682,14 +668,12 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
             description=b.description or "",
             photo_url=b.photo_url,
             rating=b.rating or 0.0,
-            rating_count=b.rating_count or 0,
             is_open_now=is_open_now_from_hours(hours)
             and not (b.manual_closed or False),
             manual_closed=b.manual_closed or False,
             opening_hours=hours,
             promo_label=b.promo_label,
             tags=json.loads(b.tags) if b.tags else [],
-            photos=json.loads(b.photos) if b.photos else [],
         )
         bars[bar_id] = bar
     else:
@@ -1033,13 +1017,11 @@ class BarCreate(BaseModel):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     rating: Optional[float] = 0.0
-    rating_count: Optional[int] = 0
     is_open_now: Optional[bool] = False
     opening_hours: Optional[Dict[str, Dict[str, str]]] = None
     manual_closed: Optional[bool] = False
     promo_label: Optional[str] = None
     tags: Optional[str] = None
-    photos: Optional[str] = None
     bar_categories: Optional[str] = None
 
 
@@ -1055,13 +1037,11 @@ class BarRead(BaseModel):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     rating: float = 0.0
-    rating_count: int = 0
     is_open_now: bool = False
     opening_hours: Optional[Dict[str, Dict[str, str]]] = None
     manual_closed: bool = False
     promo_label: Optional[str] = None
     tags: Optional[str] = None
-    photos: Optional[str] = None
     bar_categories: Optional[str] = None
 
     class Config:
@@ -1598,16 +1578,11 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
     if description:
         description = description[:120]
     rating = form.get("rating")
-    rating_count = form.get("rating_count")
     manual_closed = form.get("manual_closed") == "on"
     promo_label = form.get("promo_label")
     tags = form.get("tags")
     tags_json = (
         json.dumps([t.strip() for t in tags.split(",") if t.strip()]) if tags else None
-    )
-    photos = form.get("photos")
-    photos_json = (
-        json.dumps([p.strip() for p in photos.split(",") if p.strip()]) if photos else None
     )
     hours = {}
     for i in range(7):
@@ -1682,13 +1657,11 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
         description=description,
         photo_url=photo_url,
         rating=float(rating) if rating else 0.0,
-        rating_count=0,
         is_open_now=is_open_now_from_hours(hours) and not manual_closed,
         manual_closed=manual_closed,
         opening_hours=hours,
         promo_label=promo_label,
         tags=[t.strip() for t in tags.split(",") if t.strip()] if tags else [],
-        photos=[],
         bar_categories=categories,
     )
     return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
@@ -1721,7 +1694,6 @@ async def edit_bar_form(request: Request, bar_id: int, db: Session = Depends(get
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     tags_csv = ", ".join(json.loads(bar.tags)) if bar.tags else ""
-    photos_csv = ", ".join(json.loads(bar.photos)) if bar.photos else ""
     selected_categories = bar.bar_categories.split(",") if bar.bar_categories else []
     try:
         hours = json.loads(bar.opening_hours) if bar.opening_hours else {}
@@ -1734,7 +1706,6 @@ async def edit_bar_form(request: Request, bar_id: int, db: Session = Depends(get
         request=request,
         bar=bar,
         tags_csv=tags_csv,
-        photos_csv=photos_csv,
         hours=hours,
         bar_categories=BAR_CATEGORIES,
         selected_categories=selected_categories,
@@ -1813,13 +1784,11 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
         bar.description = description
         bar.photo_url = photo_url
         bar.rating = float(rating) if rating else 0.0
-        bar.rating_count = int(rating_count) if rating_count else 0
         bar.opening_hours = opening_hours
         bar.manual_closed = manual_closed
         bar.is_open_now = is_open_now_from_hours(hours) and not manual_closed
         bar.promo_label = promo_label
         bar.tags = tags_json
-        bar.photos = photos_json
         bar.bar_categories = categories_csv
         db.commit()
         mem_bar = bars.get(bar_id)
@@ -1833,16 +1802,12 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
             mem_bar.description = description
             mem_bar.photo_url = photo_url
             mem_bar.rating = float(rating) if rating else 0.0
-            mem_bar.rating_count = int(rating_count) if rating_count else 0
             mem_bar.opening_hours = hours
             mem_bar.manual_closed = manual_closed
             mem_bar.is_open_now = is_open_now_from_hours(hours) and not manual_closed
             mem_bar.promo_label = promo_label
             mem_bar.tags = (
                 [t.strip() for t in tags.split(",") if t.strip()] if tags else []
-            )
-            mem_bar.photos = (
-                [p.strip() for p in photos.split(",") if p.strip()] if photos else []
             )
             mem_bar.bar_categories = categories
         if user.is_super_admin:

@@ -1,41 +1,39 @@
 {% extends "layout.html" %}
-{% import "components/bar_components.html" as bc %}
 {% block content %}
-{% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjIxJz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
-<section class="bar-detail" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-rating_count="{{ bar.rating_count or '' }}" data-distance_km="{{ bar.distance_km or '' }}" itemscope itemtype="https://schema.org/BarOrPub">
-  <header class="bar-header">
-    {{ bc.status_badge(bar.is_open_now) }}
-    <h1 class="title" itemprop="name">{{ bar.name }}</h1>
-    <div class="bar-actions">
-      <button class="icon-btn" aria-label="Save"><i class="bi bi-bookmark"></i></button>
-      <button class="icon-btn" aria-label="Share"><i class="bi bi-share"></i></button>
-    </div>
-  </header>
-  <div class="bar-cover">
-    {% if bar.photo_url %}
-      <img src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
-    {% else %}
-      <div class="placeholder"><i class="bi bi-cup"></i></div>
-    {% endif %}
-  </div>
-  {{ bc.meta(bar) }}
-  {{ bc.description(bar.description) }}
-  {{ bc.opening_hours(opening_hours) }}
-  {% if bar.tags %}
-    <ul class="chips">
-      {% for t in bar.tags %}
-      <li class="chip">{{ t }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-  {{ bc.photo_strip(bar.photos) }}
+{% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
+<section class="bar-detail" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" itemscope itemtype="https://schema.org/BarOrPub">
+<h1 class="title" itemprop="name">{{ bar.name }}</h1>
+{% if bar.photo_url %}
+<img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
+{% else %}
+<img class="thumb" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
+{% endif %}
+{% if bar.is_open_now %}
+<span class="status status-open">Open now</span>
+{% else %}
+<span class="status status-closed">Closed now</span>
+{% endif %}
+<div class="bar-meta">
+  {% if bar.rating %}<span class="bar-rating"><i class="bi bi-star-fill" aria-hidden="true"></i> {{ '%.1f'|format(bar.rating) }}</span>{% endif %}
+  <span class="bar-distance" data-has-distance="true" hidden></span>
+</div>
+<address>{{ bar.address }}, {{ bar.city }}{% if bar.state %}, {{ bar.state }}{% endif %}</address>
+<p class="desc">{{ bar.description }}</p>
+{% if opening_hours %}
+<ul class="opening-hours">
+  {% for h in opening_hours %}
+  <li>{{ h.day }}:
+    {% if h.open and h.close %}{{ h.open }} - {{ h.close }}{% else %}Closed{% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
 </section>
-{{ bc.sticky_actions(bar) }}
 {% if error %}
 <p class="error">{{ error }}</p>
 {% endif %}
 {% for category, products in products_by_category %}
-  <section class="category product-section" id="products">
+  <section class="category product-section">
     <div class="section-head">
       <h2>{{ category.name }}</h2>
       <div class="scroller-nav">
@@ -70,8 +68,4 @@
     </ul>
   </section>
 {% endfor %}
-{% endblock %}
-{% block scripts %}
-{{ super() }}
-<script src="/static/js/bar_detail.min.js" defer></script>
 {% endblock %}

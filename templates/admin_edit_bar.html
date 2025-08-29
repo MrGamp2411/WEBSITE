@@ -30,9 +30,6 @@
   <label for="rating">Rating
     <input id="rating" name="rating" type="number" min="0" max="5" step="0.1" value="{{ bar.rating or 0 }}">
   </label>
-  <label for="rating_count">Rating Count
-    <input id="rating_count" name="rating_count" type="number" min="0" step="1" value="{{ bar.rating_count or 0 }}">
-  </label>
   <label for="categories">Categories
     <select id="categories" name="categories" multiple>
       {% for c in bar_categories %}
@@ -65,9 +62,6 @@
   </label>
   <label for="tags">Tags
     <input id="tags" name="tags" value="{{ tags_csv }}">
-  </label>
-  <label for="photos">Photos (comma-separated URLs)
-    <input id="photos" name="photos" value="{{ photos_csv }}">
   </label>
   <input id="latitude" name="latitude" type="hidden" value="{{ bar.latitude }}">
   <input id="longitude" name="longitude" type="hidden" value="{{ bar.longitude }}">
