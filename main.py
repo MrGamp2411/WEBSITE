@@ -2712,8 +2712,8 @@ async def bar_edit_product(
     description = form.get("description")
     display_order = form.get("display_order") or product.display_order
     photo_file = form.get("photo")
-    photo_url = product.photo_url
     db_item = db.get(MenuItem, product_id)
+    photo_path = db_item.photo if db_item else product.photo_url
     if name:
         product.name = name
         if db_item:
@@ -2746,11 +2746,10 @@ async def bar_edit_product(
         file_path = os.path.join(uploads_dir, filename)
         with open(file_path, "wb") as f:
             f.write(await photo_file.read())
-        photo_url = f"/static/uploads/{filename}"
-    product.photo_url = photo_url
+        photo_path = f"/static/uploads/{filename}"
+    product.photo_url = photo_path
     if db_item:
-        db_item.photo = photo_url
-        db.add(db_item)
+        db_item.photo = photo_path
         db.commit()
         db.refresh(db_item)
         refresh_bar_from_db(bar_id, db)
