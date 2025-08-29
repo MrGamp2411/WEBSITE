@@ -39,7 +39,7 @@ from typing import Dict, List, Optional
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from fastapi import Depends, FastAPI, HTTPException, Request, status, UploadFile
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -1437,7 +1437,7 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
     categories_csv = ",".join(categories) if categories else None
     photo_file = form.get("photo")
     photo_url = None
-    if isinstance(photo_file, UploadFile) and photo_file.filename:
+    if getattr(photo_file, "filename", None):
         uploads_dir = os.path.join("static", "uploads")
         os.makedirs(uploads_dir, exist_ok=True)
         _, ext = os.path.splitext(photo_file.filename)
@@ -1579,7 +1579,7 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
     categories_csv = ",".join(categories) if categories else None
     photo_file = form.get("photo")
     photo_url = bar.photo_url
-    if isinstance(photo_file, UploadFile) and photo_file.filename:
+    if getattr(photo_file, "filename", None):
         uploads_dir = os.path.join("static", "uploads")
         os.makedirs(uploads_dir, exist_ok=True)
         _, ext = os.path.splitext(photo_file.filename)
@@ -2319,7 +2319,7 @@ async def bar_new_category(
     display_order = form.get("display_order") or 0
     photo_file = form.get("photo")
     photo_url = None
-    if isinstance(photo_file, UploadFile) and photo_file.filename:
+    if getattr(photo_file, "filename", None):
         uploads_dir = os.path.join("static", "uploads")
         os.makedirs(uploads_dir, exist_ok=True)
         _, ext = os.path.splitext(photo_file.filename)
@@ -2474,7 +2474,7 @@ async def bar_new_product(
     display_order = form.get("display_order") or 0
     photo_file = form.get("photo")
     photo_url = None
-    if isinstance(photo_file, UploadFile) and photo_file.filename:
+    if getattr(photo_file, "filename", None):
         uploads_dir = os.path.join("static", "uploads")
         os.makedirs(uploads_dir, exist_ok=True)
         _, ext = os.path.splitext(photo_file.filename)
@@ -2659,7 +2659,7 @@ async def bar_edit_product(
             db_item.sort_order = order_val
     except ValueError:
         pass
-    if isinstance(photo_file, UploadFile) and photo_file.filename:
+    if getattr(photo_file, "filename", None):
         uploads_dir = os.path.join("static", "uploads")
         os.makedirs(uploads_dir, exist_ok=True)
         _, ext = os.path.splitext(photo_file.filename)
@@ -2739,7 +2739,7 @@ async def bar_edit_category(
             db_category.sort_order = order_val
     except ValueError:
         pass
-    if isinstance(photo_file, UploadFile) and photo_file.filename:
+    if getattr(photo_file, "filename", None):
         uploads_dir = os.path.join("static", "uploads")
         os.makedirs(uploads_dir, exist_ok=True)
         _, ext = os.path.splitext(photo_file.filename)
