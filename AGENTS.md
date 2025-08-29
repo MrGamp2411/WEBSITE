@@ -13,6 +13,7 @@
   - `/bars` page uses `templates/all_bars.html` and `static/js/view-all.js`
   - `BAR_CATEGORIES` defined in `main.py`; reused in `search.js` and `view-all.js`
   - Categories stored in `bars.bar_categories`
+  - Opening hours data is sanitized; invalid or non-dict values are treated as closed
 - Products:
   - Images stored in `menu_items.photo` and served via `/api/products/{id}/image`
   - `templates/bar_detail.html` shows products with carousels handled by `static/js/app.js`
