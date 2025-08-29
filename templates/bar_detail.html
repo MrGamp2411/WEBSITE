@@ -8,6 +8,7 @@
 <img class="thumb" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
 {% endif %}
 <p>{{ bar.address }}, {{ bar.city }}, {{ bar.state }}</p>
+<p class="desc">{{ bar.description }}</p>
 {% if error %}
 <p class="error">{{ error }}</p>
 {% endif %}
