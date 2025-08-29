@@ -21,9 +21,6 @@
       </div>
     </div>
     <p>{{ category.description }}</p>
-    {% if category.photo_url %}
-    <img src="{{ category.photo_url }}" alt="{{ category.name }} photo" style="max-width:200px;"/>
-    {% endif %}
     {% if user and (user.is_super_admin or (user.bar_id == bar.id and (user.is_bar_admin or user.is_bartender))) %}
     <a class="btn btn--small" href="/bar/{{ bar.id }}/categories/{{ category.id }}/edit">Edit Category</a>
     {% endif %}
