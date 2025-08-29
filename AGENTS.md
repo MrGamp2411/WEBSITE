@@ -1,59 +1,22 @@
 # AGENT Notes
 
-- `static/css/components.css` (and its minified counterpart) contains styles for cards and bars.
-- Desktop bar card width and height are fixed at `400px` and `450px`.
-- Desktop bar card height was reduced by 50px.
-- Mobile card styles remain at `width:300px` and `height:400px` via media queries.
-- Bar card markup resides in `templates/home.html` and `templates/search.html`, while related behavior lives in `static/js/app.js` and `static/js/search.js`.
-- Carousel arrow controls compute width from the first *visible* card; hiding the first item can break navigation if not accounted for.
-- Search page carousels now mirror home page behavior, computing width from the first visible `.bar-card` so arrow navigation works regardless of markup.
-- A "View All" list of bars is available at `/bars`, rendered with `templates/all_bars.html` and enhanced by `static/js/view-all.js`.
-- On the `/bars` page, card widths are reduced by `50px` (to `350px` desktop and `250px` mobile) via `.bars.all-bars .bar-card` overrides in `components.css`.
-- Cards on the `/bars` page are centered within their grid cells via `.bars.all-bars{justify-items:center;}`.
-- `/bars` now includes search inputs and filter controls (name, city, max distance, min rating, open/closed, categories) wired up in `static/js/view-all.js` and styled via `.bar-filters` in `components.css`.
-- `/bars` filter toolbar uses a grid layout with icon-labeled inputs, range slider, star rating selector, and active filter chips (markup in `templates/all_bars.html`, logic in `static/js/view-all.js`, styles in `components.css`).
-- The filter controls sit inside a responsive `.bar-filters` card that uses `auto-fit` grid columns to size itself to both screen width and filter content.
-- Filters on `/bars` are hidden by default; the `#filters-toggle` button toggles the `#filters-panel`, rotates its chevron, updates the label between "Show filters" and "Hide filters", and shows a badge with the count of active filters (markup in `templates/all_bars.html`, logic in `static/js/view-all.js`, styles in `static/css/components.css`).
-- `#filters-toggle.btn-filter` uses SiplyGo gradient-glass styling with a sliders icon, animated count badge, and chevron (see `components.css` & `static/js/view-all.js`).
-- `.bar-filters[hidden]{display:none;}` in `static/css/components.css` keeps the panel hidden until it's toggled.
-- Category chip group spans the full filter width via `.bar-filters .filter-group.categories` to keep chips inline until space runs out (see `templates/all_bars.html` and `static/css/components.css`).
-- Bars support a `bar_categories` field (comma-separated) with 30 predefined types (see `BAR_CATEGORIES` in `main.py`).
-- Admin forms `templates/admin_new_bar.html` and `templates/admin_edit_bar.html` offer multiselect inputs for these categories.
-- Category filter chips on `/bars` and search overlays draw from this predefined list in `static/js/view-all.js` and `static/js/search.js`.
-- Admin bar category selection is limited to five choices, enforced in both the form UI and server-side handlers.
-- Startup ensures the `bars` table includes a `bar_categories` column and `load_bars_from_db()` populates each bar's categories from that comma-separated field.
-- Core app routes reside in `main.py`, with models in `models.py` and database helpers in `database.py`.
-- A reusable `.cta-pill` component with primary and ghost variants is defined in `static/css/components.css` (minified in `static/css/components.min.css`).
-- `.filters-toolbar` no longer draws a purple gradient line above the filter toggle; its background is now plain `var(--bg)`.
-- The "View all" link in `templates/search.html` reuses the `.btn-filter` gradient-glass style, and `static/js/search.js` targets `.btn-filter` accordingly.
-- `.btn-filter` suppresses default link underlines with `text-decoration:none;` so "View all" renders without a line beneath the text.
-- Links displaying user credit (`.credit-pill`) also drop default underlines with `text-decoration:none;` in `components.css`.
-- User credit is persisted in the `users.credit` column; login loads the value and checkout/top-up operations commit updates back to the database.
-- Startup auto-adds the `users.credit` column via `ensure_credit_column()` to prevent deployment errors when the column is missing.
-- Browse bars sections in `templates/search.html` append a "View all" card linking to `/bars` (excluded for the "Recently visited bars" section); these cards use `.browse-bars-card` styling and are ignored by data logic in `static/js/search.js`.
-- All UI text is now in English. Category names are defined in `main.py` and mirrored in `static/js/search.js` and `static/js/view-all.js`.
-- Sorting in `static/js/search.js` and `static/js/app.js` inserts bars before browse/view-all cards so those cards always stay at the end of their lists.
-- Logged-in greeting on the home page uses the `.info-section` layout with a waving hand emoji and a separate paragraph.
-- Bar detail page (`templates/bar_detail.html`) shows the bar's uploaded photo with a fallback placeholder.
-- Product cards mirror bar card styling (400px×450px desktop, 300px×400px mobile) with images; markup lives in `templates/bar_detail.html` and styles are in `static/css/components.css` (minified in `static/css/components.min.css`).
-- Product categories on the bar detail page use horizontal carousels with arrow controls. Markup is in `templates/bar_detail.html` and behavior lives in `static/js/app.js` (minified in `static/js/app.min.js`), computing widths from the first visible `.product-card` just like for bars.
-- Bar detail page sections (`.product-section`) wrap the category name, description, and product carousel inside a card-style box.
-- `ensure_menu_item_columns()` in `main.py` now auto-adds a `photo` column so product images persist in the `menu_items` table.
-- The same helper also migrates legacy `photo_url` data into `photo`, keeping existing product images after schema updates.
-- Product edit view (`bar_edit_product_form` in `main.py`) pulls item data directly from the database so uploaded photos appear when editing.
-- Product photo uploads are saved in the `menu_items.photo` column and reloaded at startup via `load_bars_from_db()` so images persist after restarts.
-- Product edit and bar detail pages convert product `photo_url` values to absolute URLs so images render correctly.
-- `/bar/{bar_id}/categories/{category_id}/products` lists now include product photo thumbnails with a fallback placeholder.
-- File uploads retrieved via `request.form()` return Starlette `UploadFile` objects; check for a `.filename` attribute instead of using `isinstance(..., UploadFile)`.
-- After creating or editing a product, `refresh_bar_from_db()` syncs the in-memory bar data with database changes.
-- Product card images adopt bar card markup with `srcset`/`sizes` for responsive loading.
-- `templates/bar_edit_product.html` previews the current product photo with a placeholder fallback and limits uploads to images with `accept="image/*"`.
-- Product images are stored in the `product_images` table and served through `/api/products/{product_id}/image`; uploading uses the same endpoint via `POST` with an `image` field.
-- Templates reference this endpoint directly for product photos and rely on `onerror` fallbacks when an image is missing.
-- Category creation and edit views no longer support image uploads, and `bar_detail.html` stops rendering category photos.
-
-- Reverted alignment of bar detail product carousel arrows with category description; arrows remain left aligned.
-- Bar detail page no longer displays an "Edit Category" button for each category.
-- Product card body stacks description, price, and action button with a small gap; margins removed from `.description`, `.price`, and `.add-to-cart` in `static/css/components.css` (and minified) to tighten spacing.
-- Product card description now grows to fill available space while the price and `Add to Cart` button remain pinned to the bottom with roughly `12px` of card padding and an `8px` gap between them.
-- Bar detail view skips products with missing categories to prevent rendering errors when data is inconsistent.
+- Core modules:
+  - `main.py` – routes and helpers
+  - `models.py` – data models
+  - `database.py` – database utilities
+- Front-end mapping:
+  - Styles in `static/css/components.css` (`components.min.css` for minified)
+  - Templates live under `templates/`
+  - JavaScript: `static/js/app.js` (shared/carousels), `static/js/search.js`, `static/js/view-all.js`
+  - Bar & product card size: 400×450 desktop, 300×400 mobile
+- Bars:
+  - `/bars` page uses `templates/all_bars.html` and `static/js/view-all.js`
+  - `BAR_CATEGORIES` defined in `main.py`; reused in `search.js` and `view-all.js`
+  - Categories stored in `bars.bar_categories`
+- Products:
+  - Images stored in `menu_items.photo` and served via `/api/products/{id}/image`
+  - `templates/bar_detail.html` shows products with carousels handled by `static/js/app.js`
+- Users:
+  - Credit stored in `users.credit`; ensured by `ensure_credit_column()` on startup
+- Testing:
+  - Run `pytest`
