@@ -314,6 +314,20 @@ body.dark-mode{
 @media (min-width:768px){.section-track{background:#FFF;backdrop-filter:none;margin:8px 0 24px;}}
 .section-head{display:flex;align-items:center;justify-content:space-between;padding:0 12px 8px;}
 .section-head h2{margin:0;font-size:1.125rem;}
+.product-section{
+  border:1px solid var(--sg-card-border);
+  border-radius:var(--sg-card-radius);
+  background:var(--sg-surface);
+  box-shadow:var(--sg-shadow-sm);
+  padding:var(--space-2);
+  margin-bottom:var(--space-4);
+  display:flex;
+  flex-direction:column;
+  gap:var(--space-2);
+}
+.product-section .section-head{padding:0 0 var(--space-1);}
+.product-section > p{margin:0;}
+.product-section .scroller{padding:0 0 var(--space-2);}
 .scroller{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:0 12px 12px;overscroll-behavior-x:contain;}
 .scroller::-webkit-scrollbar{display:none;}
 .scroller{scrollbar-width:none;}
