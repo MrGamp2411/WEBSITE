@@ -508,6 +508,8 @@ def is_open_now_from_hours(hours: Dict[str, Dict[str, str]]) -> bool:
     ``BAR_TIMEZONE`` environment variable (falling back to ``TZ`` if set).
     If neither variable is defined the server's local timezone is used.
     """
+    if not isinstance(hours, dict):
+        return False
     tz_name = os.getenv("BAR_TIMEZONE") or os.getenv("TZ")
     now = datetime.now(ZoneInfo(tz_name)) if tz_name else datetime.now()
     day = str(now.weekday())
@@ -537,6 +539,8 @@ def is_bar_open_now(bar: BarModel) -> bool:
         hours = json.loads(bar.opening_hours)
     except Exception:
         return False
+    if not isinstance(hours, dict):
+        return False
     return is_open_now_from_hours(hours)
 
 
@@ -546,7 +550,12 @@ def load_bars_from_db() -> None:
     try:
         bars.clear()
         for b in db.query(BarModel).all():
-            hours = json.loads(b.opening_hours) if b.opening_hours else {}
+            try:
+                hours = json.loads(b.opening_hours) if b.opening_hours else {}
+                if not isinstance(hours, dict):
+                    hours = {}
+            except Exception:
+                hours = {}
             bar = Bar(
                 id=b.id,
                 name=b.name,
@@ -614,7 +623,12 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
         return None
     bar = bars.get(bar_id)
     if not bar:
-        hours = json.loads(b.opening_hours) if b.opening_hours else {}
+        try:
+            hours = json.loads(b.opening_hours) if b.opening_hours else {}
+            if not isinstance(hours, dict):
+                hours = {}
+        except Exception:
+            hours = {}
         bar = Bar(
             id=b.id,
             name=b.name,
@@ -644,7 +658,12 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
         bar.description = b.description or ""
         bar.photo_url = b.photo_url
         bar.rating = b.rating or 0.0
-        hours = json.loads(b.opening_hours) if b.opening_hours else {}
+        try:
+            hours = json.loads(b.opening_hours) if b.opening_hours else {}
+            if not isinstance(hours, dict):
+                hours = {}
+        except Exception:
+            hours = {}
         bar.opening_hours = hours
         bar.manual_closed = b.manual_closed or False
         bar.is_open_now = is_open_now_from_hours(hours) and not bar.manual_closed
@@ -1644,7 +1663,12 @@ async def edit_bar_form(request: Request, bar_id: int, db: Session = Depends(get
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     tags_csv = ", ".join(json.loads(bar.tags)) if bar.tags else ""
     selected_categories = bar.bar_categories.split(",") if bar.bar_categories else []
-    hours = json.loads(bar.opening_hours) if bar.opening_hours else {}
+    try:
+        hours = json.loads(bar.opening_hours) if bar.opening_hours else {}
+        if not isinstance(hours, dict):
+            hours = {}
+    except Exception:
+        hours = {}
     return render_template(
         "admin_edit_bar.html",
         request=request,
