@@ -8,7 +8,12 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 from decimal import Decimal
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, engine, SessionLocal  # noqa: E402
-from models import Bar as BarModel, Category as CategoryModel, MenuItem  # noqa: E402
+from models import (
+    Bar as BarModel,
+    Category as CategoryModel,
+    MenuItem,
+    ProductImage,
+)  # noqa: E402
 from main import (
     app,
     DemoUser,
@@ -68,29 +73,23 @@ def test_upload_product_photo_updates_db_and_renders():
 
     file_content = b"img"
     client.post(
-        f"/bar/{bar_id}/categories/{category_id}/products/{item_id}/edit",
-        data={
-            "name": "Beer",
-            "price": "5.00",
-            "description": "desc",
-            "display_order": "0",
-        },
-        files={"photo": ("beer.jpg", file_content, "image/jpeg")},
+        f"/api/products/{item_id}/image",
+        files={"image": ("beer.jpg", file_content, "image/jpeg")},
     )
 
     edit = client.get(
         f"/bar/{bar_id}/categories/{category_id}/products/{item_id}/edit"
     )
     assert edit.status_code == 200
-    assert "http://testserver/static/uploads/" in edit.text
+    assert f"/api/products/{item_id}/image" in edit.text
 
     detail = client.get(f"/bars/{bar_id}")
     assert detail.status_code == 200
 
     db = SessionLocal()
-    db_item = db.get(MenuItem, item_id)
-    assert db_item.photo and db_item.photo.startswith("/static/uploads/")
-    assert f"http://testserver{db_item.photo}" in detail.text
+    db_img = db.query(ProductImage).filter_by(product_id=item_id).first()
+    assert db_img and db_img.mime == "image/jpeg" and db_img.data == file_content
+    assert f"/api/products/{item_id}/image" in detail.text
     db.close()
 
     users.clear()
@@ -140,22 +139,15 @@ def test_product_photo_persists_after_restart():
 
     file_content = b"img"
     client.post(
-        f"/bar/{bar_id}/categories/{category_id}/products/{item_id}/edit",
-        data={
-            "name": "Beer",
-            "price": "5.00",
-            "description": "desc",
-            "display_order": "0",
-        },
-        files={"photo": ("beer.jpg", file_content, "image/jpeg")},
+        f"/api/products/{item_id}/image",
+        files={"image": ("beer.jpg", file_content, "image/jpeg")},
     )
 
     load_bars_from_db()
     photo_path = bars[bar_id].products[item_id].photo_url
-    assert photo_path.startswith("/static/uploads/")
-    assert os.path.exists(photo_path.lstrip("/"))
+    assert photo_path == f"/api/products/{item_id}/image"
     detail = client.get(f"/bars/{bar_id}")
-    assert f"http://testserver{photo_path}" in detail.text
+    assert f"/api/products/{item_id}/image" in detail.text
 
     users.clear()
     users_by_email.clear()

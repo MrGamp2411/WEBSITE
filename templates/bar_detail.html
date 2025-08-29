@@ -32,11 +32,7 @@
       <li>
         <article class="product-card">
           <div class="thumb-wrapper">
-            {% if product.photo_url %}
             <img class="thumb" src="{{ product.photo_url }}" alt="{{ product.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ product.photo_url }} 400w, {{ product.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
-            {% else %}
-            <img class="thumb" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
-            {% endif %}
           </div>
           <h3 class="title">{{ product.name }}</h3>
           <p class="desc">{{ product.description }}</p>

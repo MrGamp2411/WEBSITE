@@ -8,7 +8,12 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 from decimal import Decimal
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, engine, SessionLocal  # noqa: E402
-from models import Bar as BarModel, Category as CategoryModel, MenuItem  # noqa: E402
+from models import (
+    Bar as BarModel,
+    Category as CategoryModel,
+    MenuItem,
+    ProductImage,
+)  # noqa: E402
 from main import app, DemoUser, users, users_by_email, users_by_username, bars  # noqa: E402
 
 
@@ -37,11 +42,12 @@ def test_edit_product_shows_uploaded_photo():
         name="Beer",
         description="Nice",
         price_chf=Decimal("5.00"),
-        photo="/static/uploads/beer.jpg",
     )
     db.add(item)
     db.commit()
     db.refresh(item)
+    db.add(ProductImage(product_id=item.id, mime="image/jpeg", data=b"img"))
+    db.commit()
     bar_id, category_id, item_id = bar.id, category.id, item.id
     db.close()
 
@@ -61,11 +67,11 @@ def test_edit_product_shows_uploaded_photo():
 
     resp = client.get(f"/bar/{bar_id}/categories/{category_id}/products/{item_id}/edit")
     assert resp.status_code == 200
-    assert "http://testserver/static/uploads/beer.jpg" in resp.text
+    assert f"/api/products/{item_id}/image" in resp.text
 
     detail = client.get(f"/bars/{bar_id}")
     assert detail.status_code == 200
-    assert "http://testserver/static/uploads/beer.jpg" in detail.text
+    assert f"/api/products/{item_id}/image" in detail.text
 
     users.clear()
     users_by_email.clear()
