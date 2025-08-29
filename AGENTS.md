@@ -54,3 +54,4 @@
 - `save_upload()` centralises file saving for bars and products; product forms reuse it to persist uploaded photos.
 - `templates/bar_edit_product.html` previews the current product photo with a placeholder fallback and limits uploads to images with `accept="image/*"`.
 - `save_upload()` streams uploaded files to disk in chunks and closes the upload handle so images are written to permanent storage rather than remaining in memory.
+- `save_upload()` resolves the `static/uploads` directory relative to the repository so photos persist even if the working directory changes.

@@ -35,6 +35,7 @@ import os
 import hashlib
 import json
 import random
+from pathlib import Path
 from typing import Dict, List, Optional
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -702,11 +703,12 @@ async def save_upload(file, existing_path: Optional[str] = None) -> Optional[str
     If ``file`` has no filename, ``existing_path`` is returned unchanged."""
     filename = getattr(file, "filename", None)
     if filename:
-        uploads_dir = os.path.join("static", "uploads")
-        os.makedirs(uploads_dir, exist_ok=True)
+        base_dir = Path(__file__).resolve().parent
+        uploads_dir = base_dir / "static" / "uploads"
+        uploads_dir.mkdir(parents=True, exist_ok=True)
         _, ext = os.path.splitext(filename)
         filename = f"{uuid4().hex}{ext}"
-        file_path = os.path.join(uploads_dir, filename)
+        file_path = uploads_dir / filename
         with open(file_path, "wb") as f:
             while True:
                 chunk = await file.read(1024 * 1024)
