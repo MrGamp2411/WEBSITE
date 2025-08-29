@@ -700,14 +700,20 @@ async def save_upload(file, existing_path: Optional[str] = None) -> Optional[str
     """Persist an uploaded file and return its relative URL.
 
     If ``file`` has no filename, ``existing_path`` is returned unchanged."""
-    if getattr(file, "filename", None):
+    filename = getattr(file, "filename", None)
+    if filename:
         uploads_dir = os.path.join("static", "uploads")
         os.makedirs(uploads_dir, exist_ok=True)
-        _, ext = os.path.splitext(file.filename)
+        _, ext = os.path.splitext(filename)
         filename = f"{uuid4().hex}{ext}"
         file_path = os.path.join(uploads_dir, filename)
         with open(file_path, "wb") as f:
-            f.write(await file.read())
+            while True:
+                chunk = await file.read(1024 * 1024)
+                if not chunk:
+                    break
+                f.write(chunk)
+        await file.close()
         return f"/static/uploads/{filename}"
     return existing_path
 

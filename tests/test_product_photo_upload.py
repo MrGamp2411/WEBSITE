@@ -151,7 +151,11 @@ def test_product_photo_persists_after_restart():
     )
 
     load_bars_from_db()
-    assert bars[bar_id].products[item_id].photo_url.startswith("/static/uploads/")
+    photo_path = bars[bar_id].products[item_id].photo_url
+    assert photo_path.startswith("/static/uploads/")
+    assert os.path.exists(photo_path.lstrip("/"))
+    detail = client.get(f"/bars/{bar_id}")
+    assert f"http://testserver{photo_path}" in detail.text
 
     users.clear()
     users_by_email.clear()
