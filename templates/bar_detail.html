@@ -21,9 +21,6 @@
       </div>
     </div>
     <p>{{ category.description }}</p>
-    {% if user and (user.is_super_admin or (user.bar_id == bar.id and (user.is_bar_admin or user.is_bartender))) %}
-    <a class="btn btn--small" href="/bar/{{ bar.id }}/categories/{{ category.id }}/edit">Edit Category</a>
-    {% endif %}
     <ul class="products scroller">
       {% for product in products %}
       <li>
