@@ -48,5 +48,6 @@
 - After creating or editing a product, `refresh_bar_from_db()` syncs the in-memory bar data with database changes.
 - Product photo uploads reuse the same file-saving approach as bar photos, storing paths in `menu_items.photo` and refreshing bar data after edits.
 - Editing a product without uploading a new photo preserves the existing `menu_items.photo` path so images survive restarts.
+- Product edit (`bar_edit_product` in `main.py`) validates the database record belongs to the requested category before applying updates and persists new photos via `save_upload()`.
 - Product card images adopt bar card markup with `srcset`/`sizes` for responsive loading.
 - `save_upload()` centralises file saving for bars and products; product forms reuse it to persist uploaded photos.
