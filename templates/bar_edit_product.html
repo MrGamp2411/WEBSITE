@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
+{% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
 <h1>Edit Product {{ product.name }}</h1>
 <form class="form" method="post" enctype="multipart/form-data">
   <label for="name">Name
@@ -15,10 +16,12 @@
     <input id="display_order" type="number" name="display_order" value="{{ product.display_order }}">
   </label>
   {% if product.photo_url %}
-  <img src="{{ product.photo_url }}" alt="{{ product.name }} photo" style="max-width:200px;"/>
+  <img src="{{ product.photo_url }}" alt="{{ product.name }} photo" style="max-width:200px;" loading="lazy" decoding="async" onerror="this.src='{{ fallback_img }}';this.onerror=null;" width="400" height="225" />
+  {% else %}
+  <img src="{{ fallback_img }}" alt="" style="max-width:200px;" loading="lazy" width="400" height="225" />
   {% endif %}
   <label for="photo">Photo
-    <input id="photo" type="file" name="photo">
+    <input id="photo" type="file" name="photo" accept="image/*">
   </label>
   <button class="btn btn--primary" type="submit">Update</button>
 </form>

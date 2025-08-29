@@ -42,6 +42,7 @@
 - The same helper also migrates legacy `photo_url` data into `photo`, keeping existing product images after schema updates.
 - Product edit view (`bar_edit_product_form` in `main.py`) pulls item data directly from the database so uploaded photos appear when editing.
 - Product photo uploads are saved in the `menu_items.photo` column and reloaded at startup via `load_bars_from_db()` so images persist after restarts.
+- Product cards read their images from this `menu_items.photo` field, so uploaded photos render in both admin listings and bar detail pages.
 - Product edit and bar detail pages convert product `photo_url` values to absolute URLs so images render correctly.
 - `/bar/{bar_id}/categories/{category_id}/products` lists now include product photo thumbnails with a fallback placeholder.
 - File uploads retrieved via `request.form()` return Starlette `UploadFile` objects; check for a `.filename` attribute instead of using `isinstance(..., UploadFile)`.
@@ -51,3 +52,4 @@
 - Product edit (`bar_edit_product` in `main.py`) validates the database record belongs to the requested category before applying updates and persists new photos via `save_upload()`.
 - Product card images adopt bar card markup with `srcset`/`sizes` for responsive loading.
 - `save_upload()` centralises file saving for bars and products; product forms reuse it to persist uploaded photos.
+- `templates/bar_edit_product.html` previews the current product photo with a placeholder fallback and limits uploads to images with `accept="image/*"`.

@@ -86,11 +86,11 @@ def test_upload_product_photo_updates_db_and_renders():
 
     detail = client.get(f"/bars/{bar_id}")
     assert detail.status_code == 200
-    assert "http://testserver/static/uploads/" in detail.text
 
     db = SessionLocal()
     db_item = db.get(MenuItem, item_id)
     assert db_item.photo and db_item.photo.startswith("/static/uploads/")
+    assert f"http://testserver{db_item.photo}" in detail.text
     db.close()
 
     users.clear()
