@@ -24,20 +24,25 @@
     <ul class="products">
       {% for product in products %}
       <li>
-        <article class="card">
-          <div class="card__body">
-            <h3 class="card__title">{{ product.name }}</h3>
-            <p>{{ product.description }}</p>
-            <p><strong>CHF {{ product.price }}</strong></p>
-            {% if user %}
-            <form class="form form--inline" method="post" action="/bars/{{ bar.id }}/add_to_cart">
-              <input type="hidden" name="product_id" value="{{ product.id }}">
-              <button class="btn btn--primary btn--small" type="submit">Add to Cart</button>
-            </form>
+        <article class="product-card">
+          <div class="thumb-wrapper">
+            {% if product.photo_url %}
+            <img class="thumb" src="{{ product.photo_url }}" alt="{{ product.name }} photo" loading="lazy" width="400" height="225" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
             {% else %}
-            <a class="btn" href="/login">Login to order</a>
+            <img class="thumb" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
             {% endif %}
           </div>
+          <h3 class="title">{{ product.name }}</h3>
+          <p class="desc">{{ product.description }}</p>
+          <p><strong>CHF {{ '%.2f'|format(product.price) }}</strong></p>
+          {% if user %}
+          <form class="form form--inline" method="post" action="/bars/{{ bar.id }}/add_to_cart">
+            <input type="hidden" name="product_id" value="{{ product.id }}">
+            <button class="btn btn--primary btn--small" type="submit">Add to Cart</button>
+          </form>
+          {% else %}
+          <a class="btn" href="/login">Login to order</a>
+          {% endif %}
         </article>
       </li>
       {% endfor %}
