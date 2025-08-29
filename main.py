@@ -529,34 +529,6 @@ def is_open_now_from_hours(hours: Dict[str, Dict[str, str]]) -> bool:
     return start <= now_t < end
 
 
-def weekly_hours_list(hours: Optional[Dict[str, Dict[str, str]]]) -> List[Dict[str, Optional[str]]]:
-    """Return a list of weekly opening hours for display purposes.
-
-    The input ``hours`` mapping uses string keys ``0``-``6`` for Monday-Sunday.
-    Any missing or malformed entries are treated as closed for that day.
-    """
-    days = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-    ]
-    if not isinstance(hours, dict):
-        hours = {}
-    result: List[Dict[str, Optional[str]]] = []
-    for idx, day in enumerate(days):
-        info = hours.get(str(idx)) if hours else None
-        open_time = close_time = None
-        if isinstance(info, dict):
-            open_time = info.get("open")
-            close_time = info.get("close")
-        result.append({"day": day, "open": open_time, "close": close_time})
-    return result
-
-
 def is_bar_open_now(bar: BarModel) -> bool:
     """Determine if a bar is currently open considering manual closures."""
     if getattr(bar, "manual_closed", False):
@@ -1189,7 +1161,6 @@ async def bar_detail(request: Request, bar_id: int):
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     bar.photo_url = make_absolute_url(bar.photo_url, request)
-    bar.distance_km = None
     recent = request.session.get("recent_bar_ids", [])
     if bar.id in recent:
         recent.remove(bar.id)
@@ -1215,9 +1186,6 @@ async def bar_detail(request: Request, bar_id: int):
         request=request,
         bar=bar,
         products_by_category=sorted_products,
-        opening_hours=weekly_hours_list(bar.opening_hours)
-        if bar.opening_hours
-        else [],
     )
 
 
