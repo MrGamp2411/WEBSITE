@@ -2696,9 +2696,20 @@ async def bar_edit_product(
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     category = bar.categories.get(category_id)
-    product = bar.products.get(product_id)
-    if not category or not product:
+    db_item = db.get(MenuItem, product_id)
+    if not category or not db_item or db_item.category_id != category_id:
         raise HTTPException(status_code=404, detail="Product not found")
+    product = bar.products.get(product_id)
+    if not product:
+        product = Product(
+            id=db_item.id,
+            category_id=db_item.category_id,
+            name=db_item.name,
+            price=float(db_item.price_chf),
+            description=db_item.description or "",
+            display_order=db_item.sort_order or 0,
+            photo_url=db_item.photo,
+        )
     if not user or not (
         user.is_super_admin
         or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
@@ -2710,39 +2721,31 @@ async def bar_edit_product(
     description = form.get("description")
     display_order = form.get("display_order") or product.display_order
     photo_file = form.get("photo")
-    db_item = db.get(MenuItem, product_id)
-    photo_path = db_item.photo if db_item else product.photo_url
+    photo_path = db_item.photo
     if name:
-        product.name = name
-        if db_item:
-            db_item.name = name
+        product.name = db_item.name = name
     if description:
-        product.description = description
-        if db_item:
-            db_item.description = description
+        product.description = db_item.description = description
     if price:
         try:
             price_val = float(price)
             price_dec = Decimal(price)
             product.price = price_val
-            if db_item:
-                db_item.price_chf = price_dec
+            db_item.price_chf = price_dec
         except ValueError:
             pass
     try:
         order_val = int(display_order)
         product.display_order = order_val
-        if db_item:
-            db_item.sort_order = order_val
+        db_item.sort_order = order_val
     except ValueError:
         pass
     photo_path = await save_upload(photo_file, photo_path)
     product.photo_url = photo_path
-    if db_item:
-        db_item.photo = photo_path
-        db.commit()
-        db.refresh(db_item)
-        refresh_bar_from_db(bar_id, db)
+    db_item.photo = photo_path
+    db.commit()
+    db.refresh(db_item)
+    refresh_bar_from_db(bar_id, db)
     return RedirectResponse(
         url=f"/bar/{bar_id}/categories/{category_id}/products",
         status_code=status.HTTP_303_SEE_OTHER,
