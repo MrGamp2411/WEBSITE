@@ -53,3 +53,4 @@
 - Category creation and edit views no longer support image uploads, and `bar_detail.html` stops rendering category photos.
 
 - Reverted alignment of bar detail product carousel arrows with category description; arrows remain left aligned.
+- Bar detail page no longer displays an "Edit Category" button for each category.
