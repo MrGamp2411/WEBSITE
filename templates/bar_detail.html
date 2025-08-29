@@ -12,8 +12,14 @@
 <p class="error">{{ error }}</p>
 {% endif %}
 {% for category, products in products_by_category %}
-  <section class="category">
-    <h2>{{ category.name }}</h2>
+  <section class="category product-section">
+    <div class="section-head">
+      <h2>{{ category.name }}</h2>
+      <div class="scroller-nav">
+        <button class="scroll-btn prev" aria-label="Previous">‹</button>
+        <button class="scroll-btn next" aria-label="Next">›</button>
+      </div>
+    </div>
     <p>{{ category.description }}</p>
     {% if category.photo_url %}
     <img src="{{ category.photo_url }}" alt="{{ category.name }} photo" style="max-width:200px;"/>
@@ -21,7 +27,7 @@
     {% if user and (user.is_super_admin or (user.bar_id == bar.id and (user.is_bar_admin or user.is_bartender))) %}
     <a class="btn btn--small" href="/bar/{{ bar.id }}/categories/{{ category.id }}/edit">Edit Category</a>
     {% endif %}
-    <ul class="products">
+    <ul class="products scroller">
       {% for product in products %}
       <li>
         <article class="product-card">

@@ -375,12 +375,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Carousel controls
   function setupCarousels(){
-    document.querySelectorAll('.bar-section').forEach(section=>{
+    document.querySelectorAll('.bar-section,.product-section').forEach(section=>{
       const scroller=section.querySelector('.scroller');
       const prev=section.querySelector('.scroll-btn.prev');
       const next=section.querySelector('.scroll-btn.next');
       if(!scroller) return;
-      const getWidth=()=>{const card=scroller.querySelector('li:not([hidden]) .bar-card');if(!card) return 0;const style=getComputedStyle(card);return card.offsetWidth+parseFloat(style.marginRight)+parseFloat(style.marginLeft);};
+      const getWidth=()=>{const card=scroller.querySelector('li:not([hidden]) .bar-card,li:not([hidden]) .product-card');if(!card) return 0;const style=getComputedStyle(card);return card.offsetWidth+parseFloat(style.marginRight)+parseFloat(style.marginLeft);};
       let w=getWidth();
       const scrollBy=dir=>scroller.scrollBy({left:dir*w,behavior:'smooth'});
       prev?.addEventListener('click',()=>scrollBy(-1));
