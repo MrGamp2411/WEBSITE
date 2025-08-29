@@ -62,6 +62,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
   barCards().forEach(card => renderMeta(card, card.dataset));
 
+  const barInfo = document.querySelector('.bar-info');
+  if (barInfo) {
+    renderMeta(barInfo, barInfo.dataset);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const { latitude, longitude } = pos.coords;
+        const bLat = parseFloat(barInfo.dataset.latitude);
+        const bLon = parseFloat(barInfo.dataset.longitude);
+        if (isFinite(bLat) && isFinite(bLon)) {
+          const toRad = deg => deg * Math.PI / 180;
+          const R = 6371;
+          const dLat = toRad(bLat - latitude);
+          const dLon = toRad(bLon - longitude);
+          const a = Math.sin(dLat/2)**2 + Math.cos(toRad(latitude)) * Math.cos(toRad(bLat)) * Math.sin(dLon/2)**2;
+          const c = 2 * R * Math.asin(Math.sqrt(a));
+          barInfo.dataset.distance_km = c;
+          renderMeta(barInfo, { rating: barInfo.dataset.rating, distance_km: c });
+        }
+      });
+    }
+  }
+
   function debounce(fn, delay=300){let t;return (...args)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,args),delay);};}
 
   function filterBars(term) {
