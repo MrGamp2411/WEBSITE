@@ -1057,6 +1057,7 @@ async def bar_detail(request: Request, bar_id: int):
     bar = bars.get(bar_id)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
+    bar.photo_url = make_absolute_url(bar.photo_url, request)
     recent = request.session.get("recent_bar_ids", [])
     if bar.id in recent:
         recent.remove(bar.id)
@@ -1067,6 +1068,7 @@ async def bar_detail(request: Request, bar_id: int):
     # group products by category
     products_by_category: Dict[Category, List[Product]] = {}
     for prod in bar.products.values():
+        prod.photo_url = make_absolute_url(prod.photo_url, request)
         category = bar.categories.get(prod.category_id)
         products_by_category.setdefault(category, []).append(prod)
     for prods in products_by_category.values():
@@ -2414,6 +2416,8 @@ async def bar_category_products(
         [p for p in bar.products.values() if p.category_id == category_id],
         key=lambda p: p.display_order,
     )
+    for p in products:
+        p.photo_url = make_absolute_url(p.photo_url, request)
     return render_template(
         "bar_category_products.html",
         request=request,
@@ -2587,7 +2591,7 @@ async def bar_edit_product_form(
         price=float(db_item.price_chf),
         description=db_item.description or "",
         display_order=db_item.sort_order or 0,
-        photo_url=db_item.photo,
+        photo_url=make_absolute_url(db_item.photo, request),
     )
     if not user or not (
         user.is_super_admin
