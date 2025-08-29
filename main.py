@@ -1161,6 +1161,7 @@ async def bar_detail(request: Request, bar_id: int):
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     bar.photo_url = make_absolute_url(bar.photo_url, request)
+    bar.distance_km = None
     recent = request.session.get("recent_bar_ids", [])
     if bar.id in recent:
         recent.remove(bar.id)
