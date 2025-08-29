@@ -4,6 +4,9 @@
   - `main.py` – routes and helpers
   - `models.py` – data models
   - `database.py` – database utilities
+  - `audit.py` – records user actions to `AuditLog`
+  - `finance.py` – VAT and payout calculations
+  - `payouts.py` – schedule periodic payouts for bars
 - Front-end mapping:
   - Styles in `static/css/components.css` (`components.min.css` for minified)
   - Templates live under `templates/`
@@ -15,8 +18,13 @@
   - Categories stored in `bars.bar_categories`
   - Opening hours data is sanitized; invalid or non-dict values are treated as closed
   - Category `sort_order` defaults to `0` when missing to avoid menu sorting errors
-    - Bar detail page no longer shows rating, distance, open/closed status, or opening hours
+  - Bar detail page uses bar-card metadata for rating and geolocated distance
   - Bar detail page displays the bar's description beneath the address
+  - Bar detail page shows open/closed status using `bar.is_open_now`
+  - Bar detail page lists weekly opening hours beneath the description
+  - Bar detail info is rendered in `.bar-detail` (no card styling)
+  - Bar detail layout: `.bar-cover` image (16/9), `.bar-meta` row with status/rating/distance, `.clamp`ed description, and `.bar-hours-card` grid (Mon–Thu / Fri–Sun)
+  - Open status uses `.status-open` (green) and closed status uses `.status-closed` (red); badges apply the same classes for background colors
 - Products:
   - Images stored in `menu_items.photo` and served via `/api/products/{id}/image`
   - `templates/bar_detail.html` shows products with carousels handled by `static/js/app.js`
