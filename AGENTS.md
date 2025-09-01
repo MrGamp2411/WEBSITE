@@ -49,7 +49,8 @@
   - Navigating away from the active bar shows a blocking popup in `templates/layout.html` styled via `.cart-blocker` and `.cart-popup`.
   - `cart.html` displays the current bar's name, lists its tables for selection, and shows a wallet link for adding funds.
   - The popup offers "Remove products" (clears cart via `POST /cart/clear`) or "Go to the bar menu".
-  - Wallet pages clear `cart_bar_id` to prevent the cart popup from appearing.
+  - Wallet and top-up pages clear `cart_bar_id` to prevent the cart popup from appearing.
+  - The top-up page at `/topup` renders `templates/topup.html` and suppresses the cart popup by passing `cart_bar_id` and `cart_bar_name` as `None`.
 - Users:
   - Credit stored in `users.credit`; ensured by `ensure_credit_column()` on startup
 - Testing:
