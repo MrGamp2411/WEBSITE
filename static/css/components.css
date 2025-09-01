@@ -570,3 +570,6 @@ body.dark-mode{
   justify-content:space-between;
 }
 
+.qty-controls{display:inline-flex;align-items:center;gap:var(--space-1);}
+.qty-display{min-width:1.5em;text-align:center;}
+
