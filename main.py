@@ -1537,7 +1537,11 @@ async def topup(request: Request, db: Session = Depends(get_db)):
                 raise ValueError
         except ValueError:
             return render_template(
-                "topup.html", request=request, error="Invalid amount"
+                "topup.html",
+                request=request,
+                error="Invalid amount",
+                cart_bar_id=None,
+                cart_bar_name=None,
             )
         # In a real application, integrate with a payment gateway here
         user.credit += add_amount
@@ -1546,9 +1550,16 @@ async def topup(request: Request, db: Session = Depends(get_db)):
             db_user.credit = user.credit
             db.commit()
         return render_template(
-            "topup.html", request=request, success=True, amount=add_amount
+            "topup.html",
+            request=request,
+            success=True,
+            amount=add_amount,
+            cart_bar_id=None,
+            cart_bar_name=None,
         )
-    return render_template("topup.html", request=request)
+    return render_template(
+        "topup.html", request=request, cart_bar_id=None, cart_bar_name=None
+    )
 
 
 # -----------------------------------------------------------------------------
