@@ -35,6 +35,8 @@
   - `/bars/{bar_id}/add_to_cart` accepts POST form submissions
     and returns JSON `{count, totalFormatted, items[]}` when `Accept: application/json`
   - `/cart/update` and `/cart/checkout` also expect POST form data
+  - `static/js/app.js` uses a delegated submit listener on `.add-to-cart-form`
+    to prevent page reloads. Rebuild `app.min.js` after changes.
 - Users:
   - Credit stored in `users.credit`; ensured by `ensure_credit_column()` on startup
 - Testing:

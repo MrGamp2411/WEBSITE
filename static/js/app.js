@@ -392,43 +392,43 @@ document.addEventListener('DOMContentLoaded', function() {
   setupCarousels();
 
   // Add to cart without page reload
-  document.querySelectorAll('.add-to-cart-form').forEach(form => {
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      const btn = form.querySelector('button[type="submit"]');
-      if (btn?.disabled) return;
-      const badge = document.querySelector('.cart-badge');
-      const prev = badge ? parseInt(badge.textContent, 10) || 0 : 0;
-      const data = new URLSearchParams(new FormData(form));
-      btn.disabled = true;
-      const original = btn.textContent;
-      btn.textContent = 'Adding…';
-      if (badge) badge.textContent = prev + 1;
-      try {
-        const res = await fetch(form.action, {
-          method: 'POST',
-          body: data,
-          headers: { Accept: 'application/json' },
-        });
-        if (!res.ok) throw new Error();
-        const json = await res.json();
-        if (badge) badge.textContent = json.count;
-        const totalEl = document.querySelector('.mini-cart-total');
-        if (totalEl && json.totalFormatted) totalEl.textContent = json.totalFormatted;
-        const list = document.querySelector('.mini-cart-items');
-        if (list && Array.isArray(json.items)) {
-          list.innerHTML = json.items
-            .map(i => `<li>${i.qty}× ${i.name} - ${i.lineTotal}</li>`)
-            .join('');
-        }
-      } catch (err) {
-        if (badge) badge.textContent = prev;
-        alert('Failed to add to cart');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = original;
+  document.addEventListener('submit', async e => {
+    if (!e.target.matches('.add-to-cart-form')) return;
+    const form = e.target;
+    e.preventDefault();
+    const btn = form.querySelector('button[type="submit"]');
+    if (btn?.disabled) return;
+    const badge = document.querySelector('.cart-badge');
+    const prev = badge ? parseInt(badge.textContent, 10) || 0 : 0;
+    const data = new URLSearchParams(new FormData(form));
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = 'Adding…';
+    if (badge) badge.textContent = prev + 1;
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { Accept: 'application/json' },
+      });
+      if (!res.ok) throw new Error();
+      const json = await res.json();
+      if (badge) badge.textContent = json.count;
+      const totalEl = document.querySelector('.mini-cart-total');
+      if (totalEl && json.totalFormatted) totalEl.textContent = json.totalFormatted;
+      const list = document.querySelector('.mini-cart-items');
+      if (list && Array.isArray(json.items)) {
+        list.innerHTML = json.items
+          .map(i => `<li>${i.qty}× ${i.name} - ${i.lineTotal}</li>`)
+          .join('');
       }
-    });
+    } catch (err) {
+      if (badge) badge.textContent = prev;
+      alert('Failed to add to cart');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
   });
 
 });
