@@ -505,4 +505,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  const clearBtn=document.querySelector('.js-clear-cart');
+  if(clearBtn){
+    clearBtn.addEventListener('click',async()=>{
+      clearBtn.disabled=true;
+      try{
+        await fetch('/cart/clear',{method:'POST',headers:{Accept:'application/json'}});
+        location.reload();
+      }catch(err){
+        alert('Failed to clear cart');
+        clearBtn.disabled=false;
+      }
+    });
+  }
+
 });

@@ -859,6 +859,14 @@ def render_template(template_name: str, **context) -> HTMLResponse:
                 "cart_count",
                 sum(item.quantity for item in cart.items.values()),
             )
+            if cart.bar_id:
+                bar = bars.get(cart.bar_id)
+                if bar:
+                    context.setdefault("cart_bar_id", bar.id)
+                    context.setdefault("cart_bar_name", bar.name)
+        bar_obj = context.get("bar")
+        if bar_obj and hasattr(bar_obj, "id"):
+            context.setdefault("current_bar_id", bar_obj.id)
         recent_ids = request.session.get("recent_bar_ids", [])
         if recent_ids:
             with SessionLocal() as db:
@@ -1377,6 +1385,20 @@ async def view_cart(request: Request):
         cart=cart,
         bar=current_bar,
     )
+
+
+@app.post("/cart/clear")
+async def clear_cart(request: Request):
+    """Remove all items from the user's cart."""
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    cart = get_cart_for_user(user)
+    cart.clear()
+    save_cart_for_user(user.id, cart)
+    if "application/json" in request.headers.get("accept", ""):
+        return JSONResponse({"cleared": True})
+    return RedirectResponse(url="/cart", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.post("/cart/update")
