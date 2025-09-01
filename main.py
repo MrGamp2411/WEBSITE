@@ -35,6 +35,7 @@ import os
 import hashlib
 import json
 import random
+from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Optional
 from datetime import datetime
@@ -45,6 +46,8 @@ from fastapi import (
     FastAPI,
     HTTPException,
     Request,
+    WebSocket,
+    WebSocketDisconnect,
     status,
     UploadFile,
     File,
@@ -376,6 +379,65 @@ app.add_middleware(
 
 # Enable server-side sessions for authentication
 app.add_middleware(SessionMiddleware, secret_key="dev-secret")
+
+
+# -----------------------------------------------------------------------------
+# WebSocket order update manager
+# -----------------------------------------------------------------------------
+
+
+class OrderWSManager:
+    """Manages WebSocket connections for order updates."""
+
+    def __init__(self):
+        self.bar_connections: Dict[int, List[WebSocket]] = defaultdict(list)
+        self.user_connections: Dict[int, List[WebSocket]] = defaultdict(list)
+
+    async def connect_bar(self, bar_id: int, websocket: WebSocket):
+        await websocket.accept()
+        self.bar_connections[bar_id].append(websocket)
+
+    async def connect_user(self, user_id: int, websocket: WebSocket):
+        await websocket.accept()
+        self.user_connections[user_id].append(websocket)
+
+    def disconnect_bar(self, bar_id: int, websocket: WebSocket):
+        if websocket in self.bar_connections.get(bar_id, []):
+            self.bar_connections[bar_id].remove(websocket)
+
+    def disconnect_user(self, user_id: int, websocket: WebSocket):
+        if websocket in self.user_connections.get(user_id, []):
+            self.user_connections[user_id].remove(websocket)
+
+    async def broadcast_bar(self, bar_id: int, message: Dict[str, object]):
+        for ws in list(self.bar_connections.get(bar_id, [])):
+            try:
+                await ws.send_json(message)
+            except WebSocketDisconnect:
+                self.disconnect_bar(bar_id, ws)
+
+    async def broadcast_user(self, user_id: int, message: Dict[str, object]):
+        for ws in list(self.user_connections.get(user_id, [])):
+            try:
+                await ws.send_json(message)
+            except WebSocketDisconnect:
+                self.disconnect_user(user_id, ws)
+
+
+order_ws_manager = OrderWSManager()
+
+
+async def send_order_update(order: Order):
+    """Broadcast order updates to bartender and customer channels."""
+    data = {
+        "id": order.id,
+        "status": order.status,
+        "bar_id": order.bar_id,
+        "customer_id": order.customer_id,
+    }
+    await order_ws_manager.broadcast_bar(order.bar_id, {"type": "order", "order": data})
+    if order.customer_id:
+        await order_ws_manager.broadcast_user(order.customer_id, {"type": "order", "order": data})
 
 
 def seed_super_admin():
@@ -1163,6 +1225,24 @@ class OrderRead(BaseModel):
         orm_mode = True
 
 
+class OrderItemRead(BaseModel):
+    id: int
+    menu_item_id: int
+    qty: int
+    menu_item_name: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
+
+class OrderWithItemsRead(OrderRead):
+    items: List[OrderItemRead]
+
+
+class OrderStatusUpdate(BaseModel):
+    status: str
+
+
 class PayoutRunInput(BaseModel):
     bar_id: int
     period_start: datetime
@@ -1202,7 +1282,7 @@ def create_bar(data: BarCreate, db: Session = Depends(get_db)):
 
 
 @app.post("/api/orders", response_model=OrderRead, status_code=status.HTTP_201_CREATED)
-def create_order(order: OrderCreate, db: Session = Depends(get_db)):
+async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
     """Create an order and compute platform fee and payout."""
     bar = db.get(BarModel, order.bar_id)
     if not bar:
@@ -1243,12 +1323,13 @@ def create_order(order: OrderCreate, db: Session = Depends(get_db)):
         vat_total=vat_total,
         fee_platform_5pct=fee,
         payout_due_to_bar=payout,
-        status="completed",
+        status="pending",
         items=order_items,
     )
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
+    await send_order_update(db_order)
     return db_order
 
 
@@ -1494,12 +1575,13 @@ async def checkout(
         bar_id=cart.bar_id,
         customer_id=user.id,
         subtotal=order_total,
-        status="paid",
+        status="pending",
         paid_at=datetime.utcnow(),
         items=order_items,
     )
     db.add(db_order)
     db.commit()
+    await send_order_update(db_order)
     if bar:
         user.transactions.append(
             Transaction(
@@ -1531,13 +1613,75 @@ async def order_history(request: Request, db: Session = Depends(get_db)):
         .order_by(Order.created_at.desc())
         .all()
     )
+    pending_orders = [o for o in orders if o.status != "completed"]
+    completed_orders = [o for o in orders if o.status == "completed"]
     return render_template(
         "order_history.html",
         request=request,
-        orders=orders,
+        user=user,
+        pending_orders=pending_orders,
+        completed_orders=completed_orders,
         cart_bar_id=None,
         cart_bar_name=None,
     )
+
+
+@app.get(
+    "/api/bars/{bar_id}/orders",
+    response_model=List[OrderWithItemsRead],
+)
+async def get_bar_orders(
+    bar_id: int, request: Request, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    if not user or not user.is_bartender or user.bar_id != bar_id:
+        raise HTTPException(status_code=403, detail="Not authorised")
+    orders = (
+        db.query(Order)
+        .filter(Order.bar_id == bar_id, Order.status != "completed")
+        .order_by(Order.created_at.desc())
+        .all()
+    )
+    return orders
+
+
+@app.post("/api/orders/{order_id}/status")
+async def update_order_status(
+    order_id: int,
+    data: OrderStatusUpdate,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    user = get_current_user(request)
+    order = db.get(Order, order_id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    if not user or not user.is_bartender or user.bar_id != order.bar_id:
+        raise HTTPException(status_code=403, detail="Not authorised")
+    order.status = data.status
+    db.commit()
+    await send_order_update(order)
+    return {"status": order.status}
+
+
+@app.websocket("/ws/bar/{bar_id}/orders")
+async def ws_bar_orders(websocket: WebSocket, bar_id: int):
+    await order_ws_manager.connect_bar(bar_id, websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        order_ws_manager.disconnect_bar(bar_id, websocket)
+
+
+@app.websocket("/ws/user/{user_id}/orders")
+async def ws_user_orders(websocket: WebSocket, user_id: int):
+    await order_ws_manager.connect_user(user_id, websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        order_ws_manager.disconnect_user(user_id, websocket)
 
 
 # -----------------------------------------------------------------------------

@@ -1,11 +1,26 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>Order History</h1>
-<ul>
-  {% for order in orders %}
-  <li>Order #{{ order.id }} - CHF {{ "%.2f"|format(order.subtotal) }}</li>
+
+<h2>Pending Orders</h2>
+<ul id="pending-orders">
+  {% for order in pending_orders %}
+  <li id="user-order-{{ order.id }}">Order #{{ order.id }} - <span class="status">{{ order.status }}</span></li>
   {% else %}
-  <li>No orders yet.</li>
+  <li>No pending orders.</li>
   {% endfor %}
 </ul>
+
+<h2>Order Completed</h2>
+<ul id="completed-orders">
+  {% for order in completed_orders %}
+  <li id="user-order-{{ order.id }}">Order #{{ order.id }} - <span class="status">{{ order.status }}</span></li>
+  {% else %}
+  <li>No completed orders.</li>
+  {% endfor %}
+</ul>
+<script src="/static/js/orders.js"></script>
+<script>
+  initUser({{ user.id }});
+</script>
 {% endblock %}
