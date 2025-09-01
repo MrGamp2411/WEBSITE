@@ -14,6 +14,12 @@
     <h3>Working at {{ bar.name }}</h3>
   </div>
 </div>
+<h2>Incoming Orders</h2>
+<ul id="orders"></ul>
+<script src="/static/js/orders.js"></script>
+<script>
+  initBartender({{ bar.id }});
+</script>
 {% else %}
 <p>No bar assigned.</p>
 {% endif %}
