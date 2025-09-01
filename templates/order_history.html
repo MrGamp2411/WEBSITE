@@ -7,8 +7,8 @@
   {% for order in pending_orders %}
   <li id="user-order-{{ order.id }}">
     Order #{{ order.id }} - <span class="status">{{ order.status }}</span><br>
-    Customer: {{ order.customer.username }} ({{ order.customer.prefix }} {{ order.customer.phone }})<br>
-    Table: {{ order.table.name if order.table }}
+    Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})<br>
+    Table: {{ order.table_name or '' }}
     <ul>
       {% for item in order.items %}
       <li>{{ item.qty }}× {{ item.menu_item.name }}</li>
@@ -20,13 +20,13 @@
   {% endfor %}
 </ul>
 
-<h2>Order Completed</h2>
+<h2>Completed Orders</h2>
 <ul id="completed-orders">
   {% for order in completed_orders %}
   <li id="user-order-{{ order.id }}">
     Order #{{ order.id }} - <span class="status">{{ order.status }}</span><br>
-    Customer: {{ order.customer.username }} ({{ order.customer.prefix }} {{ order.customer.phone }})<br>
-    Table: {{ order.table.name if order.table }}
+    Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})<br>
+    Table: {{ order.table_name or '' }}
     <ul>
       {% for item in order.items %}
       <li>{{ item.qty }}× {{ item.menu_item.name }}</li>
