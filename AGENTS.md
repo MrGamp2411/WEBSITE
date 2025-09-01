@@ -59,6 +59,7 @@
   - Admin user edits persist credit and current bar assignment; `_load_demo_user` hydrates both from the database
   - Admin users list loads each user's `bar_id` and `credit` directly from the database so assignments survive restarts
   - Admin user edits update passwords and refresh user caches so new assignments replace old data
+  - Login fetches the user's bar assignment from the database so the bar is available immediately after authentication
   - Admin user edit form: `templates/admin_edit_user.html` posts fields
     (`username`, `password`, `email`, `prefix`, `phone`, `role`, `bar_id`, `credit`)
     to `/admin/users/edit/{id}`
