@@ -55,6 +55,7 @@
   - The top-up page at `/topup` renders `templates/topup.html` and suppresses the cart popup by passing `cart_bar_id` and `cart_bar_name` as `None`.
 - Users:
   - Credit stored in `users.credit`; ensured by `ensure_credit_column()` on startup
+  - Admin user edits clear old bar roles before saving new assignments
 - Orders:
   - `/orders` page renders `templates/order_history.html` with past `Order` entries for the current user.
   - Checkout persists orders to the database and redirects to `/orders`.

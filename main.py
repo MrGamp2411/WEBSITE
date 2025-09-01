@@ -2996,28 +2996,19 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         "bartender": RoleEnum.BARTENDER,
         "customer": RoleEnum.CUSTOMER,
     }
-    db_user.role = role_enum_map.get(role, RoleEnum.CUSTOMER)
+    role_enum = role_enum_map.get(role, RoleEnum.CUSTOMER)
+    db_user.role = role_enum
     db_user.credit = user.credit
-    db.commit()
-    # Update user-bar role association
-    existing_role = (
-        db.query(UserBarRole)
-        .filter(UserBarRole.user_id == user_id, UserBarRole.bar_id == user.bar_id)
-        .first()
-    )
+    # Update user-bar role association: remove previous roles then add new assignment
+    db.query(UserBarRole).filter(UserBarRole.user_id == user_id).delete()
     if user.bar_id:
-        if existing_role:
-            existing_role.role = role_enum_map.get(role, RoleEnum.CUSTOMER)
-        else:
-            db.add(
-                UserBarRole(
-                    user_id=user_id,
-                    bar_id=user.bar_id,
-                    role=role_enum_map.get(role, RoleEnum.CUSTOMER),
-                )
+        db.add(
+            UserBarRole(
+                user_id=user_id,
+                bar_id=user.bar_id,
+                role=role_enum,
             )
-    elif existing_role:
-        db.delete(existing_role)
+        )
     db.commit()
     # Update in-memory bar assignments
     for b in bars.values():
