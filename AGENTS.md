@@ -47,6 +47,7 @@
   - Cart contents persist in the database via the `user_carts` table so they survive server restarts.
   - Cart items are limited to one bar at a time.
   - Navigating away from the active bar shows a blocking popup in `templates/layout.html` styled via `.cart-blocker` and `.cart-popup`.
+  - `cart.html` displays the current bar's name, lists its tables for selection, and shows a wallet link for adding funds.
   - The popup offers "Remove products" (clears cart via `POST /cart/clear`) or "Go to the bar menu".
 - Users:
   - Credit stored in `users.credit`; ensured by `ensure_credit_column()` on startup

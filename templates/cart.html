@@ -2,6 +2,10 @@
 {% block content %}
 <h1>Your Cart</h1>
 {% if cart.items %}
+{% if bar %}
+<p>Ordering from {{ bar.name }}</p>
+{% endif %}
+<p>Wallet: CHF {{ "%.2f"|format(user.credit) }} (<a href="/wallet">Add funds</a>)</p>
 <table class="table">
   <thead>
     <tr><th>Item</th><th>Quantity</th><th>Price</th><th>Total</th><th>Actions</th></tr>
