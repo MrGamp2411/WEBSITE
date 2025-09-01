@@ -3002,7 +3002,10 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     db_user.role = role_enum
     db_user.credit = Decimal(str(user.credit))
     # Update user-bar role association: remove previous roles then add new assignment
-    db.query(UserBarRole).filter(UserBarRole.user_id == user_id).delete()
+    db.query(UserBarRole).filter(UserBarRole.user_id == user_id).delete(
+        synchronize_session=False
+    )
+    db.flush()
     if user.bar_id:
         db.add(
             UserBarRole(
@@ -3012,6 +3015,10 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
             )
         )
     db.commit()
+    # Update in-memory user caches to reflect new data
+    users[user.id] = user
+    users_by_username[user.username] = user
+    users_by_email[user.email] = user
     # Update in-memory bar assignments
     for b in bars.values():
         if user_id in b.bar_admin_ids:
