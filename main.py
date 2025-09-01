@@ -1499,6 +1499,8 @@ async def wallet(request: Request):
         "wallet.html",
         request=request,
         transactions=user.transactions,
+        cart_bar_id=None,
+        cart_bar_name=None,
     )
 
 
@@ -1514,6 +1516,8 @@ async def wallet_transaction(request: Request, tx_id: int):
         "transaction_detail.html",
         request=request,
         tx=tx,
+        cart_bar_id=None,
+        cart_bar_name=None,
     )
 
 
