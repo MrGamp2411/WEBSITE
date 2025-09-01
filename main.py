@@ -2872,6 +2872,8 @@ def _load_demo_user(user_id: int, db: Session) -> DemoUser:
         phone=db_user.phone or "",
         prefix=db_user.prefix or "",
         role=role_map.get(db_user.role, "customer"),
+        bar_id=(db_user.bar_roles[0].bar_id if db_user.bar_roles else None),
+        credit=float(db_user.credit or 0),
     )
     users[user.id] = user
     users_by_username[user.username] = user
@@ -2998,7 +3000,7 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     }
     role_enum = role_enum_map.get(role, RoleEnum.CUSTOMER)
     db_user.role = role_enum
-    db_user.credit = user.credit
+    db_user.credit = Decimal(str(user.credit))
     # Update user-bar role association: remove previous roles then add new assignment
     db.query(UserBarRole).filter(UserBarRole.user_id == user_id).delete()
     if user.bar_id:
