@@ -4,7 +4,10 @@
   <h1>Order Placed</h1>
   <p>Your order has been placed successfully!</p>
   <p>Total paid: CHF {{ "%.2f"|format(total) }}</p>
+  <p>Payment method: {{ payment_method.replace('_', ' ')|title }}</p>
+  {% if payment_method == 'wallet' %}
   <p>Remaining credit: CHF {{ "%.2f"|format(remaining) }}</p>
+  {% endif %}
   <p>Thank you for ordering with SiplyGo.</p>
   <a class="btn btn--primary" href="/">Return to home</a>
 </div>
