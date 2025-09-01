@@ -2822,12 +2822,16 @@ async def admin_users_view(request: Request, db: Session = Depends(get_db)):
     }
     for db_user in db_users:
         existing = users.get(db_user.id)
+        bar_id = db_user.bar_roles[0].bar_id if db_user.bar_roles else None
+        credit = float(db_user.credit or 0)
         if existing:
             existing.username = db_user.username
             existing.email = db_user.email
             existing.phone = db_user.phone or ""
             existing.prefix = db_user.prefix or ""
             existing.role = role_map.get(db_user.role, "customer")
+            existing.bar_id = bar_id
+            existing.credit = credit
         else:
             demo = DemoUser(
                 id=db_user.id,
@@ -2837,6 +2841,8 @@ async def admin_users_view(request: Request, db: Session = Depends(get_db)):
                 phone=db_user.phone or "",
                 prefix=db_user.prefix or "",
                 role=role_map.get(db_user.role, "customer"),
+                bar_id=bar_id,
+                credit=credit,
             )
             users[demo.id] = demo
             users_by_username[demo.username] = demo
