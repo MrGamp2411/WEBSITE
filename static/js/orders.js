@@ -25,6 +25,7 @@ function initBartender(barId) {
       `<div class="card__body">` +
       `<h3 class="card__title">Order #${order.id} - <span class=\"status\">${order.status}</span></h3>` +
       `<p>Customer: ${order.customer_name || ''} (${order.customer_prefix || ''} ${order.customer_phone || ''})</p>` +
+      `<p>Bar: ${order.bar_name || ''}</p>` +
       `<p>Table: ${order.table_name || ''}</p>` +
       `<p>Payment: ${formatPayment(order.payment_method)}</p>` +
       `<p>Total: CHF ${order.total.toFixed(2)}</p>` +
@@ -64,6 +65,7 @@ function initUser(userId) {
       `<div class="card__body">` +
       `<h3 class="card__title">Order #${order.id} - <span class=\"status\">${order.status}</span></h3>` +
       `<p>Customer: ${order.customer_name || ''} (${order.customer_prefix || ''} ${order.customer_phone || ''})</p>` +
+      `<p>Bar: ${order.bar_name || ''}</p>` +
       `<p>Table: ${order.table_name || ''}</p>` +
       `<p>Payment: ${formatPayment(order.payment_method)}</p>` +
       `<p>Total: CHF ${order.total.toFixed(2)}</p>` +

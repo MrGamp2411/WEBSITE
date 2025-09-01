@@ -192,6 +192,7 @@ class Order(Base):
     items = relationship("OrderItem", back_populates="order")
     customer = relationship("User")
     table = relationship("Table")
+    bar = relationship("Bar")
 
     @property
     def customer_name(self):
@@ -208,6 +209,10 @@ class Order(Base):
     @property
     def table_name(self):
         return self.table.name if self.table else None
+
+    @property
+    def bar_name(self):
+        return self.bar.name if self.bar else None
 
     @property
     def total(self):
