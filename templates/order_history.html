@@ -5,7 +5,16 @@
 <h2>Pending Orders</h2>
 <ul id="pending-orders">
   {% for order in pending_orders %}
-  <li id="user-order-{{ order.id }}">Order #{{ order.id }} - <span class="status">{{ order.status }}</span></li>
+  <li id="user-order-{{ order.id }}">
+    Order #{{ order.id }} - <span class="status">{{ order.status }}</span><br>
+    Customer: {{ order.customer.username }} ({{ order.customer.prefix }} {{ order.customer.phone }})<br>
+    Table: {{ order.table.name if order.table }}
+    <ul>
+      {% for item in order.items %}
+      <li>{{ item.qty }}× {{ item.menu_item.name }}</li>
+      {% endfor %}
+    </ul>
+  </li>
   {% else %}
   <li>No pending orders.</li>
   {% endfor %}
@@ -14,7 +23,16 @@
 <h2>Order Completed</h2>
 <ul id="completed-orders">
   {% for order in completed_orders %}
-  <li id="user-order-{{ order.id }}">Order #{{ order.id }} - <span class="status">{{ order.status }}</span></li>
+  <li id="user-order-{{ order.id }}">
+    Order #{{ order.id }} - <span class="status">{{ order.status }}</span><br>
+    Customer: {{ order.customer.username }} ({{ order.customer.prefix }} {{ order.customer.phone }})<br>
+    Table: {{ order.table.name if order.table }}
+    <ul>
+      {% for item in order.items %}
+      <li>{{ item.qty }}× {{ item.menu_item.name }}</li>
+      {% endfor %}
+    </ul>
+  </li>
   {% else %}
   <li>No completed orders.</li>
   {% endfor %}

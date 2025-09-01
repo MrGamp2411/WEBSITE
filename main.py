@@ -434,6 +434,19 @@ async def send_order_update(order: Order):
         "status": order.status,
         "bar_id": order.bar_id,
         "customer_id": order.customer_id,
+        "customer_name": order.customer_name,
+        "customer_prefix": order.customer_prefix,
+        "customer_phone": order.customer_phone,
+        "table_name": order.table_name,
+        "items": [
+            {
+                "id": i.id,
+                "menu_item_id": i.menu_item_id,
+                "qty": i.qty,
+                "menu_item_name": i.menu_item_name,
+            }
+            for i in order.items
+        ],
     }
     await order_ws_manager.broadcast_bar(order.bar_id, {"type": "order", "order": data})
     if order.customer_id:
@@ -1220,6 +1233,10 @@ class OrderRead(BaseModel):
     fee_platform_5pct: float
     payout_due_to_bar: float
     status: str
+    customer_name: Optional[str] = None
+    customer_prefix: Optional[str] = None
+    customer_phone: Optional[str] = None
+    table_name: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -1574,6 +1591,7 @@ async def checkout(
     db_order = Order(
         bar_id=cart.bar_id,
         customer_id=user.id,
+        table_id=cart.table_id,
         subtotal=order_total,
         status="pending",
         paid_at=datetime.utcnow(),

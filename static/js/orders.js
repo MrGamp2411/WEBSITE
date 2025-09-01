@@ -5,19 +5,27 @@ function initBartender(barId) {
     if (!li) {
       li = document.createElement('li');
       li.id = 'order-' + order.id;
-      li.innerHTML = `Order #${order.id} - <span class="status">${order.status}</span> ` +
-        `<button data-status="preparing">Accept</button> ` +
-        `<button data-status="ready">Ready</button> ` +
-        `<button data-status="completed">Complete</button>`;
       list.appendChild(li);
-      li.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', () => updateStatus(order.id, btn.dataset.status));
-      });
-    } else {
-      li.querySelector('.status').textContent = order.status;
-      if (order.status === 'completed') {
-        li.remove();
-      }
+    }
+    let actions = '';
+    if (order.status === 'pending') {
+      actions = `<button data-status="preparing">Accept</button>`;
+    } else if (order.status === 'preparing') {
+      actions = `<button data-status="ready">Ready</button>`;
+    } else if (order.status === 'ready') {
+      actions = `<button data-status="completed">Complete</button>`;
+    }
+    li.innerHTML =
+      `Order #${order.id} - <span class="status">${order.status}</span><br>` +
+      `Customer: ${order.customer_name || ''} (${order.customer_prefix || ''} ${order.customer_phone || ''})<br>` +
+      `Table: ${order.table_name || ''}<ul>` +
+      order.items.map(i => `<li>${i.qty}× ${i.menu_item_name || ''}</li>`).join('') +
+      `</ul>` + actions;
+    li.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => updateStatus(order.id, btn.dataset.status));
+    });
+    if (order.status === 'completed') {
+      li.remove();
     }
   }
   fetch(`/api/bars/${barId}/orders`).then(r => r.json()).then(data => data.forEach(render));
@@ -33,20 +41,28 @@ function initBartender(barId) {
 function initUser(userId) {
   const pending = document.getElementById('pending-orders');
   const completed = document.getElementById('completed-orders');
+  function render(order) {
+    let li = document.getElementById('user-order-' + order.id);
+    if (!li) {
+      li = document.createElement('li');
+      li.id = 'user-order-' + order.id;
+    }
+    li.innerHTML =
+      `Order #${order.id} - <span class="status">${order.status}</span><br>` +
+      `Customer: ${order.customer_name || ''} (${order.customer_prefix || ''} ${order.customer_phone || ''})<br>` +
+      `Table: ${order.table_name || ''}<ul>` +
+      order.items.map(i => `<li>${i.qty}× ${i.menu_item_name || ''}</li>`).join('') +
+      `</ul>`;
+    return li;
+  }
   const ws = new WebSocket(`ws://${location.host}/ws/user/${userId}/orders`);
   ws.onmessage = ev => {
     const data = JSON.parse(ev.data);
     if (data.type === 'order') {
-      let li = document.getElementById('user-order-' + data.order.id);
-      if (li) {
-        li.querySelector('.status').textContent = data.order.status;
-        if (data.order.status === 'completed') {
-          completed.appendChild(li);
-        }
-      } else if (data.order.status !== 'completed') {
-        li = document.createElement('li');
-        li.id = 'user-order-' + data.order.id;
-        li.innerHTML = `Order #${data.order.id} - <span class="status">${data.order.status}</span>`;
+      const li = render(data.order);
+      if (data.order.status === 'completed') {
+        completed.appendChild(li);
+      } else {
         pending.appendChild(li);
       }
     }
