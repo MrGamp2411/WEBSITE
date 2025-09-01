@@ -51,7 +51,7 @@ from fastapi import (
     Response,
     Form,
 )
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -1263,6 +1263,9 @@ async def add_to_cart(
     if cart.bar_id is None:
         cart.bar_id = bar_id
     cart.add(product)
+    if "application/json" in request.headers.get("accept", ""):
+        count = sum(item.quantity for item in cart.items.values())
+        return JSONResponse({"cart_count": count})
     return RedirectResponse(
         url=f"/bars/{bar_id}", status_code=status.HTTP_303_SEE_OTHER
     )

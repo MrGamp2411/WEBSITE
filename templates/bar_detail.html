@@ -68,7 +68,7 @@
             <p class="desc description">{{ product.description }}</p>
             <p class="price"><strong>CHF {{ '%.2f'|format(product.price) }}</strong></p>
             {% if user %}
-            <form class="form form--inline" method="post" action="/bars/{{ bar.id }}/add_to_cart">
+            <form class="form form--inline add-to-cart-form" method="post" action="/bars/{{ bar.id }}/add_to_cart">
               <input type="hidden" name="product_id" value="{{ product.id }}">
               <button class="btn btn--primary btn--small add-to-cart" type="submit">Add to Cart</button>
             </form>
