@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Edit Table for {{ bar.name }}</h1>
+<form class="form" method="post">
+  <label for="name">Name
+    <input id="name" name="name" value="{{ table.name }}" required>
+  </label>
+  <label for="description">Description
+    <input id="description" name="description" value="{{ table.description }}">
+  </label>
+  <button class="btn btn--primary" type="submit">Save</button>
+</form>
+{% endblock %}

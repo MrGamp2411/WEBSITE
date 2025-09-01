@@ -2095,6 +2095,19 @@ async def manage_bar_tables(
     )
 
 
+@app.get("/admin/bars/{bar_id}/tables/new", response_class=HTMLResponse)
+async def new_bar_table_form(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar or not user or not (
+        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template("admin_bar_new_table.html", request=request, bar=bar)
+
+
 @app.post("/admin/bars/{bar_id}/tables/new")
 async def add_bar_table(
     request: Request, bar_id: int, db: Session = Depends(get_db)
@@ -2119,6 +2132,64 @@ async def add_bar_table(
     db.refresh(table)
     bar.tables[table.id] = Table(
         id=table.id, name=name, description=description or ""
+    )
+    return RedirectResponse(
+        url=f"/admin/bars/{bar_id}/tables",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@app.get("/admin/bars/{bar_id}/tables/{table_id}/edit", response_class=HTMLResponse)
+async def edit_bar_table_form(
+    request: Request, bar_id: int, table_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar or not user or not (
+        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    table = bar.tables.get(table_id)
+    if not table:
+        return RedirectResponse(
+            url=f"/admin/bars/{bar_id}/tables",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    return render_template(
+        "admin_bar_edit_table.html", request=request, bar=bar, table=table
+    )
+
+
+@app.post("/admin/bars/{bar_id}/tables/{table_id}/edit")
+async def edit_bar_table(
+    request: Request, bar_id: int, table_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar or not user or not (
+        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    db_table = db.get(TableModel, table_id)
+    if not db_table or db_table.bar_id != bar_id:
+        return RedirectResponse(
+            url=f"/admin/bars/{bar_id}/tables",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    form = await request.form()
+    name = form.get("name")
+    description = form.get("description")
+    if not name:
+        return RedirectResponse(
+            url=f"/admin/bars/{bar_id}/tables/{table_id}/edit",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    db_table.name = name
+    db_table.description = description
+    db.commit()
+    db.refresh(db_table)
+    bar.tables[table_id] = Table(
+        id=db_table.id, name=db_table.name, description=db_table.description or ""
     )
     return RedirectResponse(
         url=f"/admin/bars/{bar_id}/tables",
