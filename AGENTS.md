@@ -66,6 +66,6 @@
   - Order listings include customer name/phone, table, and line items for both bartender and user history.
   - `order_history.html` uses `order.customer_name`, `order.customer_prefix`, `order.customer_phone`, and `order.table_name` to avoid `None` errors when related records are missing.
   - `order_history.html` displays line items via `item.menu_item_name` to handle missing menu items gracefully.
-  - `ensure_order_columns()` in `main.py` adds missing columns to the `orders` table at startup.
+  - `ensure_order_columns()` in `main.py` adds missing columns (e.g., `table_id`, `status`) to the `orders` table at startup.
 - Testing:
   - Run `pytest`
