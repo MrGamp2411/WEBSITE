@@ -438,6 +438,8 @@ async def send_order_update(order: Order):
         "customer_prefix": order.customer_prefix,
         "customer_phone": order.customer_phone,
         "table_name": order.table_name,
+        "payment_method": order.payment_method,
+        "total": order.total,
         "items": [
             {
                 "id": i.id,
@@ -573,6 +575,7 @@ def ensure_order_columns() -> None:
         "fee_platform_5pct": "NUMERIC(10, 2) DEFAULT 0",
         "payout_due_to_bar": "NUMERIC(10, 2) DEFAULT 0",
         "status": "VARCHAR(30) DEFAULT 'pending'",
+        "payment_method": "VARCHAR(30)",
         "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
         "paid_at": "TIMESTAMP",
         "cancelled_at": "TIMESTAMP",
@@ -1258,6 +1261,8 @@ class OrderRead(BaseModel):
     fee_platform_5pct: float
     payout_due_to_bar: float
     status: str
+    payment_method: Optional[str] = None
+    total: float
     customer_name: Optional[str] = None
     customer_prefix: Optional[str] = None
     customer_phone: Optional[str] = None
@@ -1619,6 +1624,7 @@ async def checkout(
         table_id=cart.table_id,
         subtotal=order_total,
         status="pending",
+        payment_method=payment_method,
         paid_at=datetime.utcnow(),
         items=order_items,
     )

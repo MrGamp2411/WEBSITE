@@ -1,3 +1,7 @@
+function formatPayment(method) {
+  return method ? method.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase()) : '';
+}
+
 function initBartender(barId) {
   const list = document.getElementById('orders');
   function render(order) {
@@ -18,7 +22,9 @@ function initBartender(barId) {
     li.innerHTML =
       `Order #${order.id} - <span class="status">${order.status}</span><br>` +
       `Customer: ${order.customer_name || ''} (${order.customer_prefix || ''} ${order.customer_phone || ''})<br>` +
-      `Table: ${order.table_name || ''}<ul>` +
+      `Table: ${order.table_name || ''}<br>` +
+      `Payment: ${formatPayment(order.payment_method)}<br>` +
+      `Total: CHF ${order.total.toFixed(2)}<ul>` +
       order.items.map(i => `<li>${i.qty}× ${i.menu_item_name || ''}</li>`).join('') +
       `</ul>` + actions;
     li.querySelectorAll('button').forEach(btn => {
@@ -50,7 +56,9 @@ function initUser(userId) {
     li.innerHTML =
       `Order #${order.id} - <span class="status">${order.status}</span><br>` +
       `Customer: ${order.customer_name || ''} (${order.customer_prefix || ''} ${order.customer_phone || ''})<br>` +
-      `Table: ${order.table_name || ''}<ul>` +
+      `Table: ${order.table_name || ''}<br>` +
+      `Payment: ${formatPayment(order.payment_method)}<br>` +
+      `Total: CHF ${order.total.toFixed(2)}<ul>` +
       order.items.map(i => `<li>${i.qty}× ${i.menu_item_name || ''}</li>`).join('') +
       `</ul>`;
     return li;
