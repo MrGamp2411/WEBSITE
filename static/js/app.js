@@ -406,11 +406,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const product=form.querySelector('input[name="product_id"]');
     const controls=document.createElement('div');
     controls.className='qty-controls';
-    controls.innerHTML=`<button type="button" class="btn btn--small qty-minus" aria-label="Decrease quantity">-</button><span class="qty-display">${qty}</span><button type="button" class="btn btn--small qty-plus" aria-label="Increase quantity">+</button>`;
+    controls.innerHTML=`<button type="button" class="btn btn--primary btn--small qty-minus" aria-label="Decrease quantity">-</button><span class="qty-display">${qty}</span><button type="button" class="btn btn--primary btn--small qty-plus" aria-label="Increase quantity">+</button>`;
     form.innerHTML='';
     if(product) form.append(product);
     form.append(controls);
   }
+
+  async function hydrateQuantityControls(){
+    const forms=document.querySelectorAll('.add-to-cart-form');
+    if(!forms.length) return;
+    try{
+      const res=await fetch('/cart',{headers:{Accept:'application/json'}});
+      if(!res.ok) return;
+      const json=await res.json();
+      updateMiniCart(json);
+      forms.forEach(f=>{
+        const id=f.querySelector('input[name="product_id"]')?.value;
+        const item=json.items?.find(i=>i.id===Number(id));
+        if(item) showQuantityControls(f,item.qty);
+      });
+    }catch(err){
+      console.error('Cart fetch failed',err);
+    }
+  }
+  hydrateQuantityControls();
 
   // Add to cart without page reload
   document.addEventListener('submit',async e=>{

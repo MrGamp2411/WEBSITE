@@ -1291,6 +1291,22 @@ async def view_cart(request: Request):
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     cart = get_cart_for_user(user)
     current_bar: Optional[Bar] = bars.get(cart.bar_id) if cart.bar_id else None
+    if "application/json" in request.headers.get("accept", ""):
+        count = sum(item.quantity for item in cart.items.values())
+        total = cart.total_price()
+        items = [
+            {
+                "id": item.product.id,
+                "name": item.product.name,
+                "qty": item.quantity,
+                "price": f"CHF {item.product.price:.2f}",
+                "lineTotal": f"CHF {item.total:.2f}",
+            }
+            for item in cart.items.values()
+        ]
+        return JSONResponse(
+            {"count": count, "totalFormatted": f"CHF {total:.2f}", "items": items}
+        )
     return render_template(
         "cart.html",
         request=request,
