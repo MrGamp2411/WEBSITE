@@ -1481,6 +1481,25 @@ async def checkout(
             db_user.credit = user.credit
             db.commit()
     bar = bars.get(cart.bar_id) if cart.bar_id else None
+    order_items = [
+        OrderItem(
+            menu_item_id=item.product.id,
+            qty=item.quantity,
+            unit_price=item.product.price,
+            line_total=item.product.price * item.quantity,
+        )
+        for item in cart.items.values()
+    ]
+    db_order = Order(
+        bar_id=cart.bar_id,
+        customer_id=user.id,
+        subtotal=order_total,
+        status="paid",
+        paid_at=datetime.utcnow(),
+        items=order_items,
+    )
+    db.add(db_order)
+    db.commit()
     if bar:
         user.transactions.append(
             Transaction(
@@ -1493,12 +1512,31 @@ async def checkout(
         )
     cart.clear()
     save_cart_for_user(user.id, cart)
+    return RedirectResponse(url="/orders", status_code=status.HTTP_303_SEE_OTHER)
+
+
+# -----------------------------------------------------------------------------
+# Orders
+# -----------------------------------------------------------------------------
+
+
+@app.get("/orders", response_class=HTMLResponse)
+async def order_history(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    orders = (
+        db.query(Order)
+        .filter(Order.customer_id == user.id)
+        .order_by(Order.created_at.desc())
+        .all()
+    )
     return render_template(
-        "order_success.html",
+        "order_history.html",
         request=request,
-        total=order_total,
-        remaining=user.credit,
-        payment_method=payment_method,
+        orders=orders,
+        cart_bar_id=None,
+        cart_bar_name=None,
     )
 
 
