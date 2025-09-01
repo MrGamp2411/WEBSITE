@@ -568,6 +568,7 @@ def ensure_order_columns() -> None:
     inspector = inspect(engine)
     columns = {col["name"] for col in inspector.get_columns("orders")}
     required = {
+        "table_id": "INTEGER",
         "vat_total": "NUMERIC(10, 2) DEFAULT 0",
         "fee_platform_5pct": "NUMERIC(10, 2) DEFAULT 0",
         "payout_due_to_bar": "NUMERIC(10, 2) DEFAULT 0",
