@@ -73,6 +73,7 @@ from models import (
     UserBarRole,
     Category as CategoryModel,
     ProductImage,
+    Table as TableModel,
 )
 from pydantic import BaseModel, constr
 from decimal import Decimal
@@ -162,9 +163,10 @@ class Product:
 
 
 class Table:
-    def __init__(self, id: int, name: str):
+    def __init__(self, id: int, name: str, description: str = ""):
         self.id = id
         self.name = name
+        self.description = description
 
 
 class Bar:
@@ -478,7 +480,6 @@ templates_env = Environment(
 # -----------------------------------------------------------------------------
 
 bars: Dict[int, Bar] = {}
-next_table_id = 1
 
 # User storage
 users: Dict[int, DemoUser] = {}
@@ -633,6 +634,11 @@ def load_bars_from_db() -> None:
                     display_order=item.sort_order or 0,
                     photo_url=f"/api/products/{item.id}/image",
                 )
+            # Load tables for the bar
+            for t in b.tables:
+                bar.tables[t.id] = Table(
+                    id=t.id, name=t.name, description=t.description or ""
+                )
             # Load user assignments
             bar.bar_admin_ids = []
             bar.bartender_ids = []
@@ -709,6 +715,7 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
         bar.tags = json.loads(b.tags) if b.tags else []
         bar.categories.clear()
         bar.products.clear()
+        bar.tables.clear()
     for c in b.categories:
         bar.categories[c.id] = Category(
             id=c.id,
@@ -726,6 +733,10 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
             description=item.description or "",
             display_order=item.sort_order or 0,
             photo_url=f"/api/products/{item.id}/image",
+        )
+    for t in b.tables:
+        bar.tables[t.id] = Table(
+            id=t.id, name=t.name, description=t.description or ""
         )
     # Load user assignments
     bar.bar_admin_ids = []
@@ -2065,6 +2076,74 @@ async def manage_bar_users_post(
         staff=staff,
         error=error,
         message=message,
+    )
+
+
+@app.get("/admin/bars/{bar_id}/tables", response_class=HTMLResponse)
+async def manage_bar_tables(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar or not user or not (
+        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    tables = sorted(bar.tables.values(), key=lambda t: t.id)
+    return render_template(
+        "admin_bar_tables.html", request=request, bar=bar, tables=tables
+    )
+
+
+@app.post("/admin/bars/{bar_id}/tables/new")
+async def add_bar_table(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar or not user or not (
+        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    name = form.get("name")
+    description = form.get("description")
+    if not name:
+        return RedirectResponse(
+            url=f"/admin/bars/{bar_id}/tables",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    table = TableModel(bar_id=bar_id, name=name, description=description)
+    db.add(table)
+    db.commit()
+    db.refresh(table)
+    bar.tables[table.id] = Table(
+        id=table.id, name=name, description=description or ""
+    )
+    return RedirectResponse(
+        url=f"/admin/bars/{bar_id}/tables",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@app.post("/admin/bars/{bar_id}/tables/{table_id}/delete")
+async def delete_bar_table(
+    request: Request, bar_id: int, table_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar or not user or not (
+        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    db_table = db.get(TableModel, table_id)
+    if db_table and db_table.bar_id == bar_id:
+        db.delete(db_table)
+        db.commit()
+        bar.tables.pop(table_id, None)
+    return RedirectResponse(
+        url=f"/admin/bars/{bar_id}/tables",
+        status_code=status.HTTP_303_SEE_OTHER,
     )
 
 

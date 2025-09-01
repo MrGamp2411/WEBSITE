@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Manage Tables for {{ bar.name }}</h1>
+<form class="form" method="post" action="/admin/bars/{{ bar.id }}/tables/new">
+  <label for="name">Table Name
+    <input id="name" name="name" required>
+  </label>
+  <label for="description">Description
+    <input id="description" name="description">
+  </label>
+  <button class="btn btn--primary" type="submit">Add Table</button>
+</form>
+{% if tables %}
+<table class="table">
+  <thead>
+    <tr><th>#</th><th>Name</th><th>Description</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+    {% for t in tables %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ t.name }}</td>
+      <td>{{ t.description }}</td>
+      <td>
+        <form method="post" action="/admin/bars/{{ bar.id }}/tables/{{ t.id }}/delete" style="display:inline" onsubmit="return confirm('Delete table?');">
+          <button class="btn" type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No tables yet.</p>
+{% endif %}
+{% endblock %}
