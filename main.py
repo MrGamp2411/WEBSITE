@@ -563,6 +563,29 @@ def ensure_menu_item_columns() -> None:
             )
 
 
+def ensure_order_columns() -> None:
+    """Ensure expected columns exist on the orders table."""
+    inspector = inspect(engine)
+    columns = {col["name"] for col in inspector.get_columns("orders")}
+    required = {
+        "vat_total": "NUMERIC(10, 2) DEFAULT 0",
+        "fee_platform_5pct": "NUMERIC(10, 2) DEFAULT 0",
+        "payout_due_to_bar": "NUMERIC(10, 2) DEFAULT 0",
+        "status": "VARCHAR(30) DEFAULT 'pending'",
+        "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "paid_at": "TIMESTAMP",
+        "cancelled_at": "TIMESTAMP",
+        "refund_amount": "NUMERIC(10, 2) DEFAULT 0",
+        "notes": "TEXT",
+        "source_channel": "VARCHAR(30)",
+    }
+    missing = {name: ddl for name, ddl in required.items() if name not in columns}
+    if missing:
+        with engine.begin() as conn:
+            for name, ddl in missing.items():
+                conn.execute(text(f"ALTER TABLE orders ADD COLUMN {name} {ddl}"))
+
+
 @app.on_event("startup")
 def on_startup():
     """Initialise database tables on startup."""
@@ -572,6 +595,7 @@ def on_startup():
     ensure_bar_columns()
     ensure_category_columns()
     ensure_menu_item_columns()
+    ensure_order_columns()
     seed_super_admin()
     load_bars_from_db()
 
