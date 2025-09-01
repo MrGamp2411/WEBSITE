@@ -3,42 +3,46 @@
 <h1>Order History</h1>
 
 <h2>Pending Orders</h2>
-<ul id="pending-orders">
+<ul id="pending-orders" class="order-list">
   {% for order in pending_orders %}
-  <li id="user-order-{{ order.id }}">
-    Order #{{ order.id }} - <span class="status">{{ order.status }}</span><br>
-    Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})<br>
-    Table: {{ order.table_name or '' }}<br>
-    Payment method: {{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}<br>
-    Total: CHF {{ "%.2f"|format(order.total) }}
-    <ul>
-      {% for item in order.items %}
-      <li>{{ item.qty }}× {{ item.menu_item_name or 'Unknown item' }}</li>
-      {% endfor %}
-    </ul>
+  <li id="user-order-{{ order.id }}" class="card">
+    <div class="card__body">
+      <h3 class="card__title">Order #{{ order.id }} - <span class="status">{{ order.status }}</span></h3>
+      <p>Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</p>
+      <p>Table: {{ order.table_name or '' }}</p>
+      <p>Payment method: {{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</p>
+      <p>Total: CHF {{ "%.2f"|format(order.total) }}</p>
+      <ul>
+        {% for item in order.items %}
+        <li>{{ item.qty }}× {{ item.menu_item_name or 'Unknown item' }}</li>
+        {% endfor %}
+      </ul>
+    </div>
   </li>
   {% else %}
-  <li>No pending orders.</li>
+  <li class="card"><div class="card__body">No pending orders.</div></li>
   {% endfor %}
 </ul>
 
 <h2>Completed Orders</h2>
-<ul id="completed-orders">
+<ul id="completed-orders" class="order-list">
   {% for order in completed_orders %}
-  <li id="user-order-{{ order.id }}">
-    Order #{{ order.id }} - <span class="status">{{ order.status }}</span><br>
-    Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})<br>
-    Table: {{ order.table_name or '' }}<br>
-    Payment method: {{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}<br>
-    Total: CHF {{ "%.2f"|format(order.total) }}
-    <ul>
-      {% for item in order.items %}
-      <li>{{ item.qty }}× {{ item.menu_item_name or 'Unknown item' }}</li>
-      {% endfor %}
-    </ul>
+  <li id="user-order-{{ order.id }}" class="card">
+    <div class="card__body">
+      <h3 class="card__title">Order #{{ order.id }} - <span class="status">{{ order.status }}</span></h3>
+      <p>Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</p>
+      <p>Table: {{ order.table_name or '' }}</p>
+      <p>Payment method: {{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</p>
+      <p>Total: CHF {{ "%.2f"|format(order.total) }}</p>
+      <ul>
+        {% for item in order.items %}
+        <li>{{ item.qty }}× {{ item.menu_item_name or 'Unknown item' }}</li>
+        {% endfor %}
+      </ul>
+    </div>
   </li>
   {% else %}
-  <li>No completed orders.</li>
+  <li class="card"><div class="card__body">No completed orders.</div></li>
   {% endfor %}
 </ul>
 <script src="/static/js/orders.js"></script>
