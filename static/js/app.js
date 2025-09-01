@@ -391,4 +391,22 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   setupCarousels();
 
+  // Add to cart without page reload
+  document.querySelectorAll('.add-to-cart-form').forEach(form => {
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const data = new URLSearchParams(new FormData(form));
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { Accept: 'application/json' },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        const badge = document.querySelector('.cart-badge');
+        if (badge) badge.textContent = json.cart_count;
+      }
+    });
+  });
+
 });
