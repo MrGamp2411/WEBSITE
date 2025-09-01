@@ -1900,6 +1900,9 @@ async def login(request: Request, db: Session = Depends(get_db)):
                         RoleEnum.BARTENDER: "bartender",
                         RoleEnum.CUSTOMER: "customer",
                     }
+                    bar_id = (
+                        db_user.bar_roles[0].bar_id if db_user.bar_roles else None
+                    )
                     user = DemoUser(
                         id=db_user.id,
                         username=db_user.username,
@@ -1908,6 +1911,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
                         phone=db_user.phone or "",
                         prefix=db_user.prefix or "",
                         role=role_map.get(db_user.role, "customer"),
+                        bar_id=bar_id,
                         credit=float(db_user.credit or 0),
                     )
                     users[user.id] = user
