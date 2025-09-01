@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Order History</h1>
+<ul>
+  {% for order in orders %}
+  <li>Order #{{ order.id }} - CHF {{ "%.2f"|format(order.subtotal) }}</li>
+  {% else %}
+  <li>No orders yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
