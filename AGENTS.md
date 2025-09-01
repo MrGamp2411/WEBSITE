@@ -44,6 +44,7 @@
   - `/cart` returns JSON when `Accept: application/json` to hydrate quantity controls on load.
   - Quantity buttons `.qty-minus`/`.qty-plus` use the same `btn--primary btn--small` styling as "Add to Cart".
   - Quantity button clicks are delegated with `closest()` to support nested elements and desktop interactions.
+  - Cart contents persist in the database via the `user_carts` table so they survive server restarts.
 - Users:
   - Credit stored in `users.credit`; ensured by `ensure_credit_column()` on startup
 - Testing:

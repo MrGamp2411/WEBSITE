@@ -74,6 +74,7 @@ from models import (
     Category as CategoryModel,
     ProductImage,
     Table as TableModel,
+    UserCart,
 )
 from pydantic import BaseModel, constr
 from decimal import Decimal
@@ -321,6 +322,29 @@ class Cart:
         self.table_id = None
         self.bar_id = None
 
+    def to_dict(self) -> Dict[str, object]:
+        return {
+            "items": [
+                {"product_id": pid, "quantity": item.quantity}
+                for pid, item in self.items.items()
+            ],
+            "table_id": self.table_id,
+            "bar_id": self.bar_id,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, object]) -> "Cart":
+        cart = cls()
+        cart.bar_id = data.get("bar_id")
+        cart.table_id = data.get("table_id")
+        bar = bars.get(cart.bar_id) if cart.bar_id else None
+        if bar:
+            for item in data.get("items", []):
+                product = bar.products.get(item["product_id"])
+                if product:
+                    cart.items[product.id] = CartItem(product, item["quantity"])
+        return cart
+
 
 # -----------------------------------------------------------------------------
 # Application initialisation
@@ -491,6 +515,36 @@ next_user_id = 1
 user_carts: Dict[int, Cart] = {}
 
 
+def load_cart_from_db(user_id: int) -> Cart:
+    with SessionLocal() as db:
+        uc = db.get(UserCart, user_id)
+        if uc and uc.items_json:
+            data = {
+                "items": json.loads(uc.items_json),
+                "table_id": uc.table_id,
+                "bar_id": uc.bar_id,
+            }
+            return Cart.from_dict(data)
+    return Cart()
+
+
+def save_cart_for_user(user_id: int, cart: Cart) -> None:
+    with SessionLocal() as db:
+        uc = db.get(UserCart, user_id)
+        if not cart.items:
+            if uc:
+                db.delete(uc)
+                db.commit()
+            return
+        if uc is None:
+            uc = UserCart(user_id=user_id)
+            db.add(uc)
+        uc.bar_id = cart.bar_id
+        uc.table_id = cart.table_id
+        uc.items_json = json.dumps(cart.to_dict()["items"])
+        db.commit()
+
+
 # -----------------------------------------------------------------------------
 # Helper functions
 # -----------------------------------------------------------------------------
@@ -504,7 +558,11 @@ def get_current_user(request: Request) -> Optional[DemoUser]:
 
 
 def get_cart_for_user(user: DemoUser) -> Cart:
-    return user_carts.setdefault(user.id, Cart())
+    cart = user_carts.get(user.id)
+    if cart is None:
+        cart = load_cart_from_db(user.id)
+        user_carts[user.id] = cart
+    return cart
 
 
 def slugify(value: str) -> str:
@@ -540,7 +598,9 @@ def is_open_now_from_hours(hours: Dict[str, Dict[str, str]]) -> bool:
     return start <= now_t < end
 
 
-def weekly_hours_list(hours: Optional[Dict[str, Dict[str, str]]]) -> List[Dict[str, Optional[str]]]:
+def weekly_hours_list(
+    hours: Optional[Dict[str, Dict[str, str]]],
+) -> List[Dict[str, Optional[str]]]:
     """Return a list of weekly opening hours for display purposes.
 
     The input ``hours`` mapping uses string keys ``0``-``6`` for Monday-Sunday.
@@ -735,9 +795,7 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
             photo_url=f"/api/products/{item.id}/image",
         )
     for t in b.tables:
-        bar.tables[t.id] = Table(
-            id=t.id, name=t.name, description=t.description or ""
-        )
+        bar.tables[t.id] = Table(id=t.id, name=t.name, description=t.description or "")
     # Load user assignments
     bar.bar_admin_ids = []
     bar.bartender_ids = []
@@ -849,9 +907,7 @@ async def upload_product_image(
         img.data = data
         img.mime = image.content_type
     else:
-        db.add(
-            ProductImage(product_id=product_id, data=data, mime=image.content_type)
-        )
+        db.add(ProductImage(product_id=product_id, data=data, mime=image.content_type))
     db.commit()
     refresh_bar_from_db(db_item.bar_id, db)
     return Response(status_code=204)
@@ -1236,16 +1292,12 @@ async def bar_detail(request: Request, bar_id: int):
         request=request,
         bar=bar,
         products_by_category=sorted_products,
-        opening_hours=weekly_hours_list(bar.opening_hours)
-        if bar.opening_hours
-        else [],
+        opening_hours=weekly_hours_list(bar.opening_hours) if bar.opening_hours else [],
     )
 
 
 @app.post("/bars/{bar_id}/add_to_cart")
-async def add_to_cart(
-    request: Request, bar_id: int, product_id: int = Form(...)
-):
+async def add_to_cart(request: Request, bar_id: int, product_id: int = Form(...)):
     """Add a product to the cart from a submitted form."""
     user = get_current_user(request)
     if not user:
@@ -1274,6 +1326,7 @@ async def add_to_cart(
     if cart.bar_id is None:
         cart.bar_id = bar_id
     cart.add(product)
+    save_cart_for_user(user.id, cart)
     if "application/json" in request.headers.get("accept", ""):
         count = sum(item.quantity for item in cart.items.values())
         total = cart.total_price()
@@ -1336,6 +1389,7 @@ async def update_cart(
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     cart = get_cart_for_user(user)
     cart.update_quantity(product_id, quantity)
+    save_cart_for_user(user.id, cart)
     if "application/json" in request.headers.get("accept", ""):
         count = sum(item.quantity for item in cart.items.values())
         total = cart.total_price()
@@ -1366,6 +1420,7 @@ async def select_table(request: Request):
         raise HTTPException(status_code=400, detail="Invalid table")
     cart = get_cart_for_user(user)
     cart.table_id = table_id
+    save_cart_for_user(user.id, cart)
     return RedirectResponse(url="/cart", status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -1399,6 +1454,7 @@ async def checkout(
             Transaction(bar.id, bar.name, list(cart.items.values()), order_total)
         )
     cart.clear()
+    save_cart_for_user(user.id, cart)
     return render_template(
         "order_success.html",
         request=request,
@@ -2085,8 +2141,10 @@ async def manage_bar_tables(
 ):
     user = get_current_user(request)
     bar = refresh_bar_from_db(bar_id, db)
-    if not bar or not user or not (
-        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    if (
+        not bar
+        or not user
+        or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     tables = sorted(bar.tables.values(), key=lambda t: t.id)
@@ -2101,21 +2159,23 @@ async def new_bar_table_form(
 ):
     user = get_current_user(request)
     bar = refresh_bar_from_db(bar_id, db)
-    if not bar or not user or not (
-        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    if (
+        not bar
+        or not user
+        or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template("admin_bar_new_table.html", request=request, bar=bar)
 
 
 @app.post("/admin/bars/{bar_id}/tables/new")
-async def add_bar_table(
-    request: Request, bar_id: int, db: Session = Depends(get_db)
-):
+async def add_bar_table(request: Request, bar_id: int, db: Session = Depends(get_db)):
     user = get_current_user(request)
     bar = refresh_bar_from_db(bar_id, db)
-    if not bar or not user or not (
-        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    if (
+        not bar
+        or not user
+        or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
@@ -2130,9 +2190,7 @@ async def add_bar_table(
     db.add(table)
     db.commit()
     db.refresh(table)
-    bar.tables[table.id] = Table(
-        id=table.id, name=name, description=description or ""
-    )
+    bar.tables[table.id] = Table(id=table.id, name=name, description=description or "")
     return RedirectResponse(
         url=f"/admin/bars/{bar_id}/tables",
         status_code=status.HTTP_303_SEE_OTHER,
@@ -2145,8 +2203,10 @@ async def edit_bar_table_form(
 ):
     user = get_current_user(request)
     bar = refresh_bar_from_db(bar_id, db)
-    if not bar or not user or not (
-        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    if (
+        not bar
+        or not user
+        or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     table = bar.tables.get(table_id)
@@ -2166,8 +2226,10 @@ async def edit_bar_table(
 ):
     user = get_current_user(request)
     bar = refresh_bar_from_db(bar_id, db)
-    if not bar or not user or not (
-        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    if (
+        not bar
+        or not user
+        or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     db_table = db.get(TableModel, table_id)
@@ -2203,8 +2265,10 @@ async def delete_bar_table(
 ):
     user = get_current_user(request)
     bar = refresh_bar_from_db(bar_id, db)
-    if not bar or not user or not (
-        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+    if (
+        not bar
+        or not user
+        or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     db_table = db.get(TableModel, table_id)
@@ -2979,9 +3043,7 @@ async def bar_edit_product_form(
         price=float(db_item.price_chf),
         description=db_item.description or "",
         display_order=db_item.sort_order or 0,
-        photo_url=make_absolute_url(
-            f"/api/products/{db_item.id}/image", request
-        ),
+        photo_url=make_absolute_url(f"/api/products/{db_item.id}/image", request),
     )
     if not user or not (
         user.is_super_admin

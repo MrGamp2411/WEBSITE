@@ -46,6 +46,17 @@ class User(Base):
     bar_roles = relationship("UserBarRole", back_populates="user")
 
 
+class UserCart(Base):
+    __tablename__ = "user_carts"
+
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+    bar_id = Column(Integer, nullable=True)
+    table_id = Column(Integer, nullable=True)
+    items_json = Column(Text)
+
+    user = relationship("User")
+
+
 class Bar(Base):
     __tablename__ = "bars"
 
@@ -253,4 +264,3 @@ class AuditLog(Base):
     ip = Column(String(50))
     user_agent = Column(String(255))
     created_at = Column(DateTime, default=datetime.utcnow)
-
