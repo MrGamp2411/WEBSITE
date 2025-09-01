@@ -71,6 +71,7 @@ class Bar(Base):
 
     categories = relationship("Category", back_populates="bar")
     menu_items = relationship("MenuItem", back_populates="bar")
+    tables = relationship("Table", back_populates="bar")
 
 
 class UserBarRole(Base):
@@ -119,6 +120,17 @@ class MenuItem(Base):
     bar = relationship("Bar", back_populates="menu_items")
     category = relationship("Category", back_populates="items")
     variants = relationship("MenuVariant", back_populates="item")
+
+
+class Table(Base):
+    __tablename__ = "tables"
+
+    id = Column(Integer, primary_key=True)
+    bar_id = Column(Integer, ForeignKey("bars.id"), nullable=False)
+    name = Column(String(100), nullable=False)
+    description = Column(Text)
+
+    bar = relationship("Bar", back_populates="tables")
 
 
 class MenuVariant(Base):
