@@ -38,6 +38,7 @@ def test_checkout_succeeds_when_order_columns_missing():
         cols = {c["name"] for c in insp.get_columns("orders")}
         assert "status" in cols  # added by ensure_order_columns()
         assert "table_id" in cols  # added by ensure_order_columns()
+        assert "payment_method" in cols  # added by ensure_order_columns()
 
         db = SessionLocal()
         bar = Bar(name="Test Bar", slug="test-bar")

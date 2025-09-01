@@ -8,7 +8,9 @@
   <li id="user-order-{{ order.id }}">
     Order #{{ order.id }} - <span class="status">{{ order.status }}</span><br>
     Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})<br>
-    Table: {{ order.table_name or '' }}
+    Table: {{ order.table_name or '' }}<br>
+    Payment method: {{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}<br>
+    Total: CHF {{ "%.2f"|format(order.total) }}
     <ul>
       {% for item in order.items %}
       <li>{{ item.qty }}× {{ item.menu_item_name or 'Unknown item' }}</li>
@@ -26,7 +28,9 @@
   <li id="user-order-{{ order.id }}">
     Order #{{ order.id }} - <span class="status">{{ order.status }}</span><br>
     Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})<br>
-    Table: {{ order.table_name or '' }}
+    Table: {{ order.table_name or '' }}<br>
+    Payment method: {{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}<br>
+    Total: CHF {{ "%.2f"|format(order.total) }}
     <ul>
       {% for item in order.items %}
       <li>{{ item.qty }}× {{ item.menu_item_name or 'Unknown item' }}</li>

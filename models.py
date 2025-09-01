@@ -181,6 +181,7 @@ class Order(Base):
     fee_platform_5pct = Column(Numeric(10, 2), default=0)
     payout_due_to_bar = Column(Numeric(10, 2), default=0)
     status = Column(String(30), default="pending")
+    payment_method = Column(String(30))
     created_at = Column(DateTime, default=datetime.utcnow)
     paid_at = Column(DateTime)
     cancelled_at = Column(DateTime)
@@ -207,6 +208,10 @@ class Order(Base):
     @property
     def table_name(self):
         return self.table.name if self.table else None
+
+    @property
+    def total(self):
+        return float(self.subtotal + self.vat_total)
 
 
 class OrderItem(Base):
