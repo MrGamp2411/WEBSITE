@@ -9,6 +9,7 @@
     <div class="card__body">
       <h3 class="card__title">Order #{{ order.id }} - <span class="status">{{ order.status }}</span></h3>
       <p>Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</p>
+      <p>Bar: {{ order.bar_name or '' }}</p>
       <p>Table: {{ order.table_name or '' }}</p>
       <p>Payment method: {{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</p>
       <p>Total: CHF {{ "%.2f"|format(order.total) }}</p>
@@ -31,6 +32,7 @@
     <div class="card__body">
       <h3 class="card__title">Order #{{ order.id }} - <span class="status">{{ order.status }}</span></h3>
       <p>Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</p>
+      <p>Bar: {{ order.bar_name or '' }}</p>
       <p>Table: {{ order.table_name or '' }}</p>
       <p>Payment method: {{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</p>
       <p>Total: CHF {{ "%.2f"|format(order.total) }}</p>

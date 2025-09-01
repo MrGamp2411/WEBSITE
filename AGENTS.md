@@ -67,6 +67,7 @@
   - Orders store `payment_method`; `order.total` returns `subtotal + vat_total` and both fields are displayed in order listings.
   - `order_history.html` uses `order.customer_name`, `order.customer_prefix`, `order.customer_phone`, and `order.table_name` to avoid `None` errors when related records are missing.
   - `order_history.html` displays line items via `item.menu_item_name` to handle missing menu items gracefully.
+  - Order cards display the bar's name via `order.bar_name`.
   - Order views render each order inside a `.card` and group them in `.order-list` containers for consistent styling.
   - `ensure_order_columns()` in `main.py` adds missing columns (e.g., `table_id`, `status`) to the `orders` table at startup.
 - Testing:

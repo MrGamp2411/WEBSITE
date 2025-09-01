@@ -438,6 +438,7 @@ async def send_order_update(order: Order):
         "customer_prefix": order.customer_prefix,
         "customer_phone": order.customer_phone,
         "table_name": order.table_name,
+        "bar_name": order.bar_name,
         "payment_method": order.payment_method,
         "total": order.total,
         "items": [
@@ -1267,6 +1268,7 @@ class OrderRead(BaseModel):
     customer_prefix: Optional[str] = None
     customer_phone: Optional[str] = None
     table_name: Optional[str] = None
+    bar_name: Optional[str] = None
 
     class Config:
         orm_mode = True
