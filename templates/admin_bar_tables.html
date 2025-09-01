@@ -1,15 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>Manage Tables for {{ bar.name }}</h1>
-<form class="form" method="post" action="/admin/bars/{{ bar.id }}/tables/new">
-  <label for="name">Table Name
-    <input id="name" name="name" required>
-  </label>
-  <label for="description">Description
-    <input id="description" name="description">
-  </label>
-  <button class="btn btn--primary" type="submit">Add Table</button>
-</form>
+
+<div class="toolbar" style="margin-bottom:1rem;">
+  <a class="btn btn--primary" href="/admin/bars/{{ bar.id }}/tables/new">Add Table</a>
+</div>
+
 {% if tables %}
 <table class="table">
   <thead>
@@ -22,6 +18,7 @@
       <td>{{ t.name }}</td>
       <td>{{ t.description }}</td>
       <td>
+        <a class="btn" href="/admin/bars/{{ bar.id }}/tables/{{ t.id }}/edit">Edit</a>
         <form method="post" action="/admin/bars/{{ bar.id }}/tables/{{ t.id }}/delete" style="display:inline" onsubmit="return confirm('Delete table?');">
           <button class="btn" type="submit">Delete</button>
         </form>

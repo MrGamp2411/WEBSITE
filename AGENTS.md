@@ -28,7 +28,7 @@
   - Bar detail layout: `.bar-cover` image (16/9), `.bar-meta` row with status/rating/distance, `.clamp`ed description, and `.bar-hours-card` grid (Mon–Thu / Fri–Sun)
   - `.bar-detail` has `margin-bottom: var(--space-4)` to add space before product categories
   - Open status uses `.status-open` (green) and closed status uses `.status-closed` (red)
-  - Bar edit options page now links to table management (`templates/admin_bar_tables.html`) where staff can add tables with descriptions stored in the `tables` DB table; descriptions are only for staff use
+  - Bar edit options page links to table management (`templates/admin_bar_tables.html`) where staff can add, edit, and delete tables. Add and edit forms live in `templates/admin_bar_new_table.html` and `templates/admin_bar_edit_table.html`; table descriptions are for staff only
 - Products:
   - Images stored in `menu_items.photo` and served via `/api/products/{id}/image`
   - `templates/bar_detail.html` shows products with carousels handled by `static/js/app.js`
