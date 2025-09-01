@@ -57,7 +57,11 @@
   - Credit stored in `users.credit`; ensured by `ensure_credit_column()` on startup
   - Admin user edits clear old bar roles before saving new assignments
   - Admin user edits persist credit and current bar assignment; `_load_demo_user` hydrates both from the database
+  - Admin users list loads each user's `bar_id` and `credit` directly from the database so assignments survive restarts
   - Admin user edits update passwords and refresh user caches so new assignments replace old data
+  - Admin user edit form: `templates/admin_edit_user.html` posts fields
+    (`username`, `password`, `email`, `prefix`, `phone`, `role`, `bar_id`, `credit`)
+    to `/admin/users/edit/{id}`
 - Orders:
   - `/orders` page renders `templates/order_history.html` with past `Order` entries for the current user.
   - Checkout persists orders to the database and redirects to `/orders`.

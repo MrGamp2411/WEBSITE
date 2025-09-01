@@ -2,6 +2,7 @@ import os
 import sys
 import pathlib
 import hashlib
+import re
 
 # Use shared in-memory SQLite database
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
@@ -215,3 +216,70 @@ def test_update_user_password_change():
     expected_hash = hashlib.sha256("newpass".encode("utf-8")).hexdigest()
     assert updated.password_hash == expected_hash
     db.close()
+
+
+def test_admin_users_shows_reassigned_bar_after_restart():
+    db = SessionLocal()
+    password_hash = hashlib.sha256("pass".encode("utf-8")).hexdigest()
+    bar1 = Bar(name="ReloadBar1", slug="reloadbar1")
+    bar2 = Bar(name="ReloadBar2", slug="reloadbar2")
+    db.add_all([bar1, bar2])
+    db.commit()
+    bar1_id, bar1_name = bar1.id, bar1.name
+    bar2_id, bar2_name = bar2.id, bar2.name
+    user = User(
+        username="reloaduser",
+        email="reload@example.com",
+        password_hash=password_hash,
+        role=RoleEnum.BARADMIN,
+    )
+    db.add(user)
+    db.commit()
+    user_id = user.id
+    db.add(UserBarRole(user_id=user_id, bar_id=bar1_id, role=RoleEnum.BARADMIN))
+    db.commit()
+    db.close()
+
+    db = SessionLocal()
+    refresh_bar_from_db(bar1_id, db)
+    refresh_bar_from_db(bar2_id, db)
+    db.close()
+
+    with TestClient(app) as client:
+        _login_super_admin(client)
+        form = {
+            "username": "reloaduser",
+            "password": "",
+            "email": "reload@example.com",
+            "prefix": "",
+            "phone": "",
+            "role": "bar_admin",
+            "bar_id": str(bar2_id),
+            "credit": "0",
+        }
+        resp = client.post(
+            f"/admin/users/edit/{user_id}", data=form, follow_redirects=False
+        )
+        assert resp.status_code == 303
+
+    # Simulate application restart by clearing in-memory caches
+    from main import users, users_by_username, users_by_email, bars
+
+    users.clear()
+    users_by_username.clear()
+    users_by_email.clear()
+    bars.clear()
+
+    db = SessionLocal()
+    refresh_bar_from_db(bar1_id, db)
+    refresh_bar_from_db(bar2_id, db)
+    db.close()
+
+    with TestClient(app) as client:
+        _login_super_admin(client)
+        resp = client.get("/admin/users")
+        assert resp.status_code == 200
+        pattern = re.compile(
+            rf"<tr>\s*<td>reloaduser</td>.*?<td>{bar2_name}</td>", re.DOTALL
+        )
+        assert pattern.search(resp.text)
