@@ -1265,7 +1265,20 @@ async def add_to_cart(
     cart.add(product)
     if "application/json" in request.headers.get("accept", ""):
         count = sum(item.quantity for item in cart.items.values())
-        return JSONResponse({"cart_count": count})
+        total = cart.total_price()
+        items = [
+            {
+                "id": item.product.id,
+                "name": item.product.name,
+                "qty": item.quantity,
+                "price": f"CHF {item.product.price:.2f}",
+                "lineTotal": f"CHF {item.total:.2f}",
+            }
+            for item in cart.items.values()
+        ]
+        return JSONResponse(
+            {"count": count, "totalFormatted": f"CHF {total:.2f}", "items": items}
+        )
     return RedirectResponse(
         url=f"/bars/{bar_id}", status_code=status.HTTP_303_SEE_OTHER
     )
