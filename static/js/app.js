@@ -459,8 +459,8 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   document.addEventListener('click',async e=>{
-    const btn=e.target;
-    if(!btn.matches('.qty-plus,.qty-minus')) return;
+    const btn=e.target.closest('.qty-plus,.qty-minus');
+    if(!btn) return;
     const form=btn.closest('.add-to-cart-form');
     if(!form) return;
     e.preventDefault();
