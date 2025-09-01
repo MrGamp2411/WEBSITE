@@ -277,7 +277,14 @@ class TransactionItem:
 
 
 class Transaction:
-    def __init__(self, bar_id: int, bar_name: str, items: List[CartItem], total: float):
+    def __init__(
+        self,
+        bar_id: int,
+        bar_name: str,
+        items: List[CartItem],
+        total: float,
+        payment_method: str,
+    ):
         self.bar_id = bar_id
         self.bar_name = bar_name
         self.items = [
@@ -285,6 +292,7 @@ class Transaction:
             for item in items
         ]
         self.total = total
+        self.payment_method = payment_method
 
 
 class Cart:
@@ -1450,6 +1458,7 @@ async def select_table(request: Request):
 async def checkout(
     request: Request,
     table_id: Optional[int] = Form(None),
+    payment_method: str = Form(...),
     db: Session = Depends(get_db),
 ):
     user = get_current_user(request)
@@ -1463,17 +1472,24 @@ async def checkout(
             status_code=400, detail="Please select a table before checking out"
         )
     order_total = cart.total_price()
-    if user.credit < order_total:
-        raise HTTPException(status_code=400, detail="Insufficient credit")
-    user.credit -= order_total
-    db_user = db.query(User).filter(User.id == user.id).first()
-    if db_user:
-        db_user.credit = user.credit
-        db.commit()
+    if payment_method == "wallet":
+        if user.credit < order_total:
+            raise HTTPException(status_code=400, detail="Insufficient credit")
+        user.credit -= order_total
+        db_user = db.query(User).filter(User.id == user.id).first()
+        if db_user:
+            db_user.credit = user.credit
+            db.commit()
     bar = bars.get(cart.bar_id) if cart.bar_id else None
     if bar:
         user.transactions.append(
-            Transaction(bar.id, bar.name, list(cart.items.values()), order_total)
+            Transaction(
+                bar.id,
+                bar.name,
+                list(cart.items.values()),
+                order_total,
+                payment_method,
+            )
         )
     cart.clear()
     save_cart_for_user(user.id, cart)
@@ -1482,6 +1498,7 @@ async def checkout(
         request=request,
         total=order_total,
         remaining=user.credit,
+        payment_method=payment_method,
     )
 
 
