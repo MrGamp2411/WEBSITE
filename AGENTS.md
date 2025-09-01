@@ -64,5 +64,6 @@
   - API endpoints `/api/bars/{bar_id}/orders` (GET) and `/api/orders/{id}/status` (POST) list and update orders.
   - Bartender sees a single action button per order: Accept → Ready → Complete.
   - Order listings include customer name/phone, table, and line items for both bartender and user history.
+  - `ensure_order_columns()` in `main.py` adds missing columns to the `orders` table at startup.
 - Testing:
   - Run `pytest`
