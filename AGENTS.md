@@ -31,6 +31,9 @@
 - Products:
   - Images stored in `menu_items.photo` and served via `/api/products/{id}/image`
   - `templates/bar_detail.html` shows products with carousels handled by `static/js/app.js`
+- Cart:
+  - `/bars/{bar_id}/add_to_cart` accepts POST form submissions
+  - `/cart/update` and `/cart/checkout` also expect POST form data
 - Users:
   - Credit stored in `users.credit`; ensured by `ensure_credit_column()` on startup
 - Testing:

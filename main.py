@@ -40,7 +40,17 @@ from typing import Dict, List, Optional
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from fastapi import Depends, FastAPI, HTTPException, Request, status, UploadFile, File, Response
+from fastapi import (
+    Depends,
+    FastAPI,
+    HTTPException,
+    Request,
+    status,
+    UploadFile,
+    File,
+    Response,
+    Form,
+)
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -1221,13 +1231,14 @@ async def bar_detail(request: Request, bar_id: int):
     )
 
 
-@app.get("/bars/{bar_id}/add_to_cart")
-async def add_to_cart(request: Request, bar_id: int):
-    """Add a product to the cart using query parameters (e.g. ?product_id=1)."""
+@app.post("/bars/{bar_id}/add_to_cart")
+async def add_to_cart(
+    request: Request, bar_id: int, product_id: int = Form(...)
+):
+    """Add a product to the cart from a submitted form."""
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
-    product_id = int(request.query_params.get("product_id", 0))
     bar = bars.get(bar_id)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
@@ -1272,17 +1283,14 @@ async def view_cart(request: Request):
     )
 
 
-@app.get("/cart/update")
-async def update_cart(request: Request):
-    """Update item quantity or remove item in the cart using query parameters."""
+@app.post("/cart/update")
+async def update_cart(
+    request: Request, product_id: int = Form(...), quantity: int = Form(...)
+):
+    """Update item quantity or remove an item in the cart."""
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
-    try:
-        product_id = int(request.query_params.get("product_id", 0))
-        quantity = int(request.query_params.get("quantity", 0))
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid parameters")
     cart = get_cart_for_user(user)
     cart.update_quantity(product_id, quantity)
     return RedirectResponse(url="/cart", status_code=status.HTTP_303_SEE_OTHER)
@@ -1302,18 +1310,18 @@ async def select_table(request: Request):
     return RedirectResponse(url="/cart", status_code=status.HTTP_303_SEE_OTHER)
 
 
-@app.get("/cart/checkout")
-async def checkout(request: Request, db: Session = Depends(get_db)):
+@app.post("/cart/checkout")
+async def checkout(
+    request: Request,
+    table_id: Optional[int] = Form(None),
+    db: Session = Depends(get_db),
+):
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     cart = get_cart_for_user(user)
-    table_id = request.query_params.get("table_id")
     if table_id is not None:
-        try:
-            cart.table_id = int(table_id)
-        except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid table")
+        cart.table_id = table_id
     if cart.table_id is None:
         raise HTTPException(
             status_code=400, detail="Please select a table before checking out"
