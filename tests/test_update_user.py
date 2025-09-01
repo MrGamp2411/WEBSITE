@@ -177,3 +177,41 @@ def test_update_user_credit_and_bar_assignment():
     assert len(roles) == 1
     assert roles[0].bar_id == bar2_id
     db.close()
+
+
+def test_update_user_password_change():
+    db = SessionLocal()
+    old_hash = hashlib.sha256("old".encode("utf-8")).hexdigest()
+    user = User(
+        username="userpw",
+        email="userpw@example.com",
+        password_hash=old_hash,
+        role=RoleEnum.CUSTOMER,
+    )
+    db.add(user)
+    db.commit()
+    user_id = user.id
+    db.close()
+
+    with TestClient(app) as client:
+        _login_super_admin(client)
+        form = {
+            "username": "userpw",
+            "password": "newpass",
+            "email": "userpw@example.com",
+            "prefix": "",
+            "phone": "",
+            "role": "customer",
+            "bar_id": "",
+            "credit": "0",
+        }
+        resp = client.post(
+            f"/admin/users/edit/{user_id}", data=form, follow_redirects=False
+        )
+        assert resp.status_code == 303
+
+    db = SessionLocal()
+    updated = db.query(User).filter(User.id == user_id).first()
+    expected_hash = hashlib.sha256("newpass".encode("utf-8")).hexdigest()
+    assert updated.password_hash == expected_hash
+    db.close()
