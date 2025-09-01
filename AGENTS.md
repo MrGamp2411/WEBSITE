@@ -33,7 +33,7 @@
   - `templates/bar_detail.html` shows products with carousels handled by `static/js/app.js`
 - Cart:
   - `/bars/{bar_id}/add_to_cart` accepts POST form submissions
-    and returns JSON `{cart_count}` when `Accept: application/json`
+    and returns JSON `{count, totalFormatted, items[]}` when `Accept: application/json`
   - `/cart/update` and `/cart/checkout` also expect POST form data
 - Users:
   - Credit stored in `users.credit`; ensured by `ensure_credit_column()` on startup

@@ -47,4 +47,7 @@ def test_add_to_cart_returns_json_count():
             headers={"accept": "application/json"},
         )
         assert resp.status_code == 200
-        assert resp.json()["cart_count"] == 1
+        data = resp.json()
+        assert data["count"] == 1
+        assert data["totalFormatted"] == "CHF 5.00"
+        assert data["items"][0]["id"] == item_id
