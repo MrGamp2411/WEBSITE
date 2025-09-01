@@ -9,6 +9,7 @@ function initBartender(barId) {
     if (!li) {
       li = document.createElement('li');
       li.id = 'order-' + order.id;
+      li.className = 'card';
       list.appendChild(li);
     }
     let actions = '';
@@ -19,14 +20,19 @@ function initBartender(barId) {
     } else if (order.status === 'ready') {
       actions = `<button data-status="completed">Complete</button>`;
     }
+    const actionsHtml = actions ? `<div class="order-actions">${actions}</div>` : '';
     li.innerHTML =
-      `Order #${order.id} - <span class="status">${order.status}</span><br>` +
-      `Customer: ${order.customer_name || ''} (${order.customer_prefix || ''} ${order.customer_phone || ''})<br>` +
-      `Table: ${order.table_name || ''}<br>` +
-      `Payment: ${formatPayment(order.payment_method)}<br>` +
-      `Total: CHF ${order.total.toFixed(2)}<ul>` +
+      `<div class="card__body">` +
+      `<h3 class="card__title">Order #${order.id} - <span class=\"status\">${order.status}</span></h3>` +
+      `<p>Customer: ${order.customer_name || ''} (${order.customer_prefix || ''} ${order.customer_phone || ''})</p>` +
+      `<p>Table: ${order.table_name || ''}</p>` +
+      `<p>Payment: ${formatPayment(order.payment_method)}</p>` +
+      `<p>Total: CHF ${order.total.toFixed(2)}</p>` +
+      `<ul>` +
       order.items.map(i => `<li>${i.qty}× ${i.menu_item_name || ''}</li>`).join('') +
-      `</ul>` + actions;
+      `</ul>` +
+      actionsHtml +
+      `</div>`;
     li.querySelectorAll('button').forEach(btn => {
       btn.addEventListener('click', () => updateStatus(order.id, btn.dataset.status));
     });
@@ -52,15 +58,19 @@ function initUser(userId) {
     if (!li) {
       li = document.createElement('li');
       li.id = 'user-order-' + order.id;
+      li.className = 'card';
     }
     li.innerHTML =
-      `Order #${order.id} - <span class="status">${order.status}</span><br>` +
-      `Customer: ${order.customer_name || ''} (${order.customer_prefix || ''} ${order.customer_phone || ''})<br>` +
-      `Table: ${order.table_name || ''}<br>` +
-      `Payment: ${formatPayment(order.payment_method)}<br>` +
-      `Total: CHF ${order.total.toFixed(2)}<ul>` +
+      `<div class="card__body">` +
+      `<h3 class="card__title">Order #${order.id} - <span class=\"status\">${order.status}</span></h3>` +
+      `<p>Customer: ${order.customer_name || ''} (${order.customer_prefix || ''} ${order.customer_phone || ''})</p>` +
+      `<p>Table: ${order.table_name || ''}</p>` +
+      `<p>Payment: ${formatPayment(order.payment_method)}</p>` +
+      `<p>Total: CHF ${order.total.toFixed(2)}</p>` +
+      `<ul>` +
       order.items.map(i => `<li>${i.qty}× ${i.menu_item_name || ''}</li>`).join('') +
-      `</ul>`;
+      `</ul>` +
+      `</div>`;
     return li;
   }
   const ws = new WebSocket(`ws://${location.host}/ws/user/${userId}/orders`);
