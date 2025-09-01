@@ -40,6 +40,8 @@
     to prevent page reloads. Rebuild `app.min.js` after changes.
   - After adding a product, the "Add to Cart" button becomes quantity controls
     handled in `static/js/app.js` and styled via `.qty-controls` in `static/css/components.css`
+  - `/cart` returns JSON when `Accept: application/json` to hydrate quantity controls on load.
+  - Quantity buttons `.qty-minus`/`.qty-plus` use the same `btn--primary btn--small` styling as "Add to Cart".
 - Users:
   - Credit stored in `users.credit`; ensured by `ensure_credit_column()` on startup
 - Testing:
