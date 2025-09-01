@@ -175,6 +175,7 @@ class Order(Base):
     id = Column(Integer, primary_key=True)
     bar_id = Column(Integer, ForeignKey("bars.id"), nullable=False)
     customer_id = Column(Integer, ForeignKey("users.id"))
+    table_id = Column(Integer, ForeignKey("tables.id"))
     subtotal = Column(Numeric(10, 2), default=0)
     vat_total = Column(Numeric(10, 2), default=0)
     fee_platform_5pct = Column(Numeric(10, 2), default=0)
@@ -188,6 +189,24 @@ class Order(Base):
     source_channel = Column(String(30))
 
     items = relationship("OrderItem", back_populates="order")
+    customer = relationship("User")
+    table = relationship("Table")
+
+    @property
+    def customer_name(self):
+        return self.customer.username if self.customer else None
+
+    @property
+    def customer_prefix(self):
+        return self.customer.prefix if self.customer else None
+
+    @property
+    def customer_phone(self):
+        return self.customer.phone if self.customer else None
+
+    @property
+    def table_name(self):
+        return self.table.name if self.table else None
 
 
 class OrderItem(Base):
@@ -205,6 +224,10 @@ class OrderItem(Base):
     order = relationship("Order", back_populates="items")
     menu_item = relationship("MenuItem")
     variant = relationship("MenuVariant")
+
+    @property
+    def menu_item_name(self):
+        return self.menu_item.name if self.menu_item else None
 
 
 class Payout(Base):
