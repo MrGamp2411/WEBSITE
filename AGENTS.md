@@ -35,8 +35,11 @@
   - `/bars/{bar_id}/add_to_cart` accepts POST form submissions
     and returns JSON `{count, totalFormatted, items[]}` when `Accept: application/json`
   - `/cart/update` and `/cart/checkout` also expect POST form data
+  - `/cart/update` returns JSON when `Accept: application/json`
   - `static/js/app.js` uses a delegated submit listener on `.add-to-cart-form`
     to prevent page reloads. Rebuild `app.min.js` after changes.
+  - After adding a product, the "Add to Cart" button becomes quantity controls
+    handled in `static/js/app.js` and styled via `.qty-controls` in `static/css/components.css`
 - Users:
   - Credit stored in `users.credit`; ensured by `ensure_credit_column()` on startup
 - Testing:

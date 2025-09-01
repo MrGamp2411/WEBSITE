@@ -391,43 +391,98 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   setupCarousels();
 
+  function updateMiniCart(json){
+    const badge=document.querySelector('.cart-badge');
+    if(badge&&typeof json.count==="number") badge.textContent=json.count;
+    const totalEl=document.querySelector('.mini-cart-total');
+    if(totalEl&&json.totalFormatted) totalEl.textContent=json.totalFormatted;
+    const list=document.querySelector('.mini-cart-items');
+    if(list&&Array.isArray(json.items)){
+      list.innerHTML=json.items.map(i=>`<li>${i.qty}× ${i.name} - ${i.lineTotal}</li>`).join('');
+    }
+  }
+
+  function showQuantityControls(form,qty){
+    const product=form.querySelector('input[name="product_id"]');
+    const controls=document.createElement('div');
+    controls.className='qty-controls';
+    controls.innerHTML=`<button type="button" class="btn btn--small qty-minus" aria-label="Decrease quantity">-</button><span class="qty-display">${qty}</span><button type="button" class="btn btn--small qty-plus" aria-label="Increase quantity">+</button>`;
+    form.innerHTML='';
+    if(product) form.append(product);
+    form.append(controls);
+  }
+
   // Add to cart without page reload
-  document.addEventListener('submit', async e => {
-    if (!e.target.matches('.add-to-cart-form')) return;
-    const form = e.target;
+  document.addEventListener('submit',async e=>{
+    if(!e.target.matches('.add-to-cart-form')) return;
+    const form=e.target;
     e.preventDefault();
-    const btn = form.querySelector('button[type="submit"]');
-    if (btn?.disabled) return;
-    const badge = document.querySelector('.cart-badge');
-    const prev = badge ? parseInt(badge.textContent, 10) || 0 : 0;
-    const data = new URLSearchParams(new FormData(form));
-    btn.disabled = true;
-    const original = btn.textContent;
-    btn.textContent = 'Adding…';
-    if (badge) badge.textContent = prev + 1;
-    try {
-      const res = await fetch(form.action, {
-        method: 'POST',
-        body: data,
-        headers: { Accept: 'application/json' },
-      });
-      if (!res.ok) throw new Error();
-      const json = await res.json();
-      if (badge) badge.textContent = json.count;
-      const totalEl = document.querySelector('.mini-cart-total');
-      if (totalEl && json.totalFormatted) totalEl.textContent = json.totalFormatted;
-      const list = document.querySelector('.mini-cart-items');
-      if (list && Array.isArray(json.items)) {
-        list.innerHTML = json.items
-          .map(i => `<li>${i.qty}× ${i.name} - ${i.lineTotal}</li>`)
-          .join('');
-      }
-    } catch (err) {
-      if (badge) badge.textContent = prev;
+    const btn=form.querySelector('button[type="submit"]');
+    if(btn?.disabled) return;
+    const data=new URLSearchParams(new FormData(form));
+    btn.disabled=true;
+    const original=btn.textContent;
+    btn.textContent='Adding…';
+    try{
+      const res=await fetch(form.action,{method:'POST',body:data,headers:{Accept:'application/json'}});
+      if(!res.ok) throw new Error();
+      const json=await res.json();
+      updateMiniCart(json);
+      const id=data.get('product_id');
+      const item=json.items?.find(i=>i.id===Number(id));
+      showQuantityControls(form,item?item.qty:1);
+    }catch(err){
       alert('Failed to add to cart');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = original;
+    }finally{
+      btn.disabled=false;
+      btn.textContent=original;
+    }
+  });
+
+  document.addEventListener('click',async e=>{
+    const btn=e.target;
+    if(!btn.matches('.qty-plus,.qty-minus')) return;
+    const form=btn.closest('.add-to-cart-form');
+    if(!form) return;
+    e.preventDefault();
+    const productInput=form.querySelector('input[name="product_id"]');
+    const display=form.querySelector('.qty-display');
+    if(!productInput||!display) return;
+    let qty=parseInt(display.textContent,10)||0;
+    btn.disabled=true;
+    try{
+      if(btn.matches('.qty-plus')){
+        const data=new URLSearchParams({product_id:productInput.value});
+        const res=await fetch(form.action,{method:'POST',body:data,headers:{Accept:'application/json'}});
+        if(!res.ok) throw new Error();
+        const json=await res.json();
+        updateMiniCart(json);
+        const item=json.items?.find(i=>i.id===Number(productInput.value));
+        qty=item?item.qty:qty+1;
+        display.textContent=qty;
+      }else{
+        qty-=1;
+        const data=new URLSearchParams({product_id:productInput.value,quantity:qty});
+        const res=await fetch('/cart/update',{method:'POST',body:data,headers:{Accept:'application/json'}});
+        if(!res.ok) throw new Error();
+        const json=await res.json();
+        updateMiniCart(json);
+        if(qty<=0){
+          form.innerHTML='';
+          form.append(productInput);
+          const add=document.createElement('button');
+          add.className='btn btn--primary btn--small add-to-cart';
+          add.type='submit';
+          add.textContent='Add to Cart';
+          form.append(add);
+        }else{
+          display.textContent=qty;
+        }
+      }
+    }catch(err){
+      alert('Cart update failed');
+    }finally{
+      btn.disabled=false;
     }
   });
 
