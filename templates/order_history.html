@@ -12,6 +12,7 @@
       <p>Bar: {{ order.bar_name or '' }}</p>
       <p>Table: {{ order.table_name or '' }}</p>
       <p>Payment method: {{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</p>
+      {% if order.notes %}<p>Notes: {{ order.notes }}</p>{% endif %}
       <p>Total: CHF {{ "%.2f"|format(order.total) }}</p>
       <p>Ordered at: {{ order.created_at|format_time }}</p>
       {% if order.ready_at %}
@@ -39,6 +40,7 @@
       <p>Bar: {{ order.bar_name or '' }}</p>
       <p>Table: {{ order.table_name or '' }}</p>
       <p>Payment method: {{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</p>
+      {% if order.notes %}<p>Notes: {{ order.notes }}</p>{% endif %}
       <p>Total: CHF {{ "%.2f"|format(order.total) }}</p>
       <p>Ordered at: {{ order.created_at|format_time }}</p>
       {% if order.ready_at %}
