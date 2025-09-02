@@ -27,11 +27,10 @@
     <option value="customer" {% if user.role=='customer' %}selected{% endif %}>Customer</option>
   </select>
 
-  <label for="bar_id">Bar</label>
-  <select id="bar_id" name="bar_id">
-    <option value="" {% if not user.bar_id %}selected{% endif %}>None</option>
+  <label for="bar_ids">Bars</label>
+  <select id="bar_ids" name="bar_ids" multiple>
     {% for b in bars %}
-    <option value="{{ b.id }}" {% if user.bar_id==b.id %}selected{% endif %}>{{ b.name }}</option>
+    <option value="{{ b.id }}" {% if b.id in user.bar_ids %}selected{% endif %}>{{ b.name }}</option>
     {% endfor %}
   </select>
 
@@ -42,7 +41,6 @@
     <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>Bar Admin</option>
     <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>Bartender</option>
   </select>
-  <input type="hidden" name="bar_id" value="{{ current.bar_id }}">
   <input type="hidden" name="credit" value="{{ user.credit }}">
   {% endif %}
 
