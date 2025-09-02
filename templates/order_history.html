@@ -24,6 +24,11 @@
         <li>{{ item.qty }}× {{ item.menu_item_name or 'Unknown item' }}</li>
         {% endfor %}
       </ul>
+      {% if order.status == 'PLACED' %}
+      <div class="order-actions">
+        <button class="cancel-order" data-order-id="{{ order.id }}" data-status="CANCELED">Cancel</button>
+      </div>
+      {% endif %}
     </div>
   </li>
   {% else %}

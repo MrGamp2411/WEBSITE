@@ -120,6 +120,9 @@ function initUser(userId) {
     const prep = order.ready_at ? `<p>Prep time: ${diffMinutes(order.created_at, order.ready_at)} min</p>` : '';
     const notes = order.notes ? `<p>Notes: ${order.notes}</p>` : '';
     const refund = order.status === 'CANCELED' && order.refund_amount ? `<p>Refunded: CHF ${order.refund_amount.toFixed(2)}</p>` : '';
+    const actions = order.status === 'PLACED'
+      ? `<div class="order-actions"><button data-order-id="${order.id}" data-status="CANCELED">Cancel</button></div>`
+      : '';
     li.innerHTML =
       `<div class="card__body">` +
       `<h3 class="card__title">Order #${order.id} - <span class=\"status status-${order.status.toLowerCase()}\">${formatStatus(order.status)}</span></h3>` +
@@ -135,6 +138,7 @@ function initUser(userId) {
       `<ul>` +
       order.items.map(i => `<li>${i.qty}× ${i.menu_item_name || ''}</li>`).join('') +
       `</ul>` +
+      actions +
       `</div>`;
     return li;
   }
@@ -151,6 +155,12 @@ function initUser(userId) {
       }
     }
   };
+  pending.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-status]');
+    if (btn) {
+      updateStatus(btn.dataset.orderId, btn.dataset.status);
+    }
+  });
 }
 
 function updateStatus(orderId, status, onUpdate) {

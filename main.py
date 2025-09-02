@@ -1757,11 +1757,21 @@ async def update_order_status(
     order = db.get(Order, order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
-    if not user or not user.is_bartender or order.bar_id not in user.bar_ids:
-        raise HTTPException(status_code=403, detail="Not authorised")
 
     new_status = data.status.upper()
     allowed = ALLOWED_STATUS_TRANSITIONS.get(order.status, [])
+
+    is_bartender = bool(user and user.is_bartender and order.bar_id in user.bar_ids)
+    is_customer_cancel = (
+        user
+        and order.customer_id == user.id
+        and order.status == "PLACED"
+        and new_status == "CANCELED"
+    )
+
+    if not is_bartender and not is_customer_cancel:
+        raise HTTPException(status_code=403, detail="Not authorised")
+
     if new_status not in allowed:
         raise HTTPException(
             status_code=400,

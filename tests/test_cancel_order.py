@@ -155,3 +155,38 @@ def test_cancel_order_reflected_in_html():
     users.clear()
     users_by_email.clear()
     users_by_username.clear()
+
+
+def test_customer_can_cancel_pending_order():
+    setup_db()
+    with TestClient(app) as client:
+        ids = create_order(client, 'card')
+        client.post('/login', data={'email': ids['customer_email'], 'password': 'pass'})
+        resp = client.post(f"/api/orders/{ids['order_id']}/status", json={'status': 'CANCELED'})
+        assert resp.status_code == 200
+        db = SessionLocal()
+        order = db.get(Order, ids['order_id'])
+        user = db.get(User, ids['customer_id'])
+        db.close()
+        assert order.status == 'CANCELED'
+        assert float(user.credit) == ids['customer_initial_credit'] + ids['order_total']
+    user_carts.clear()
+    users.clear()
+    users_by_email.clear()
+    users_by_username.clear()
+
+
+def test_customer_cannot_cancel_after_acceptance():
+    setup_db()
+    with TestClient(app) as client:
+        ids = create_order(client, 'card')
+        client.post('/login', data={'email': ids['bartender_email'], 'password': 'pass'})
+        client.post(f"/api/orders/{ids['order_id']}/status", json={'status': 'ACCEPTED'})
+        client.get('/logout')
+        client.post('/login', data={'email': ids['customer_email'], 'password': 'pass'})
+        resp = client.post(f"/api/orders/{ids['order_id']}/status", json={'status': 'CANCELED'})
+        assert resp.status_code == 403
+    user_carts.clear()
+    users.clear()
+    users_by_email.clear()
+    users_by_username.clear()

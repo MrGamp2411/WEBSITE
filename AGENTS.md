@@ -104,6 +104,7 @@
 - Cancelling an order refunds the total to the customer's wallet when paid by card or wallet; pay-at-bar orders are removed without refund.
 - User cache (`users`) is updated when an order is canceled so the wallet shows the refunded credit.
 - Order history and live order views display refund amounts for canceled orders.
+- Customers may cancel their own `PLACED` orders from the order history page using the cancel button; this posts `CANCELED` via `/api/orders/{id}/status`.
 - Admin dashboard includes a testing-only "Delete all orders" button at `/admin/orders/clear` to remove every order record.
 - Testing:
   - Run `pytest`
