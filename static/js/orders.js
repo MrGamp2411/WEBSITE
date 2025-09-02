@@ -44,12 +44,26 @@ function initBartender(barId) {
   fetch(`/api/bars/${barId}/orders`).then(r => r.json()).then(data => data.forEach(render));
   const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
   const ws = new WebSocket(`${protocol}://${location.host}/ws/bar/${barId}/orders`);
+  let ping;
+  ws.onopen = () => {
+    ping = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send('ping');
+      }
+    }, 30000);
+  };
   ws.onmessage = ev => {
     const data = JSON.parse(ev.data);
     if (data.type === 'order') {
       render(data.order);
     }
   };
+  ws.onclose = () => {
+    if (ping) {
+      clearInterval(ping);
+    }
+  };
+  ws.onerror = () => ws.close();
 }
 
 function initUser(userId) {

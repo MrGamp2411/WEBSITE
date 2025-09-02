@@ -5,8 +5,11 @@
   <h2>Incoming Orders</h2>
   <ul id="orders" class="order-list"></ul>
 </div>
-<script src="/static/js/orders.js"></script>
+<script src="/static/js/orders.js" defer></script>
 <script>
-  initBartender({{ bar.id }});
+  document.addEventListener('DOMContentLoaded', () => {
+    // start bartender WebSocket listener for live orders
+    initBartender({{ bar.id }});
+  });
 </script>
 {% endblock %}
