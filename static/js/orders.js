@@ -43,6 +43,7 @@ function initBartender(barId) {
     const notes = order.notes ? `<p>Notes: ${order.notes}</p>` : '';
     const refund = order.status === 'CANCELED' && order.refund_amount ? `<p>Refund: CHF ${order.refund_amount.toFixed(2)}</p>` : '';
     li.className = 'card card--' + order.status.toLowerCase();
+    li.dataset.status = order.status;
     li.innerHTML =
       `<div class="card__body">` +
       `<h3 class="card__title">Order #${order.id} - <span class=\"status status-${order.status.toLowerCase()}\">${formatStatus(order.status)}</span></h3>` +
@@ -69,7 +70,11 @@ function initBartender(barId) {
       preparing.prepend(li);
     } else if (order.status === 'READY') {
       ready.prepend(li);
-    } else if (order.status === 'COMPLETED' || order.status === 'CANCELED') {
+    } else if (
+      order.status === 'COMPLETED' ||
+      order.status === 'CANCELED' ||
+      order.status === 'REJECTED'
+    ) {
       completed.prepend(li);
     }
   }
@@ -116,6 +121,7 @@ function initUser(userId) {
       li.className = 'card';
     }
     li.className = 'card card--' + order.status.toLowerCase();
+    li.dataset.status = order.status;
     const placed = formatTime(order.created_at);
     const prep = order.ready_at ? `<p>Prep time: ${diffMinutes(order.created_at, order.ready_at)} min</p>` : '';
     const notes = order.notes ? `<p>Notes: ${order.notes}</p>` : '';
@@ -148,7 +154,9 @@ function initUser(userId) {
     const data = JSON.parse(ev.data);
     if (data.type === 'order') {
       const li = render(data.order);
-      if (data.order.status === 'COMPLETED' || data.order.status === 'CANCELED') {
+      if (
+        ['COMPLETED', 'CANCELED', 'REJECTED'].includes(data.order.status)
+      ) {
         completed.appendChild(li);
       } else {
         pending.appendChild(li);

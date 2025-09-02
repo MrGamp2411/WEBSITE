@@ -80,8 +80,8 @@
   - API endpoints `/api/bars/{bar_id}/orders` (GET) and `/api/orders/{id}/status` (POST) list and update orders.
   - Order status updates return the updated order; `static/js/orders.js` re-renders immediately after POST so bartenders see new states without reloading.
   - Bartenders can accept or cancel incoming orders; after acceptance, actions progress Ready → Complete.
-  - Orders are grouped into four sections: Incoming (`PLACED`), Preparing (`ACCEPTED`), Ready (`READY`), and Completed (`COMPLETED`/`CANCELED`).
-  - The `/orders` route treats `CANCELED` orders as completed so they're excluded from pending.
+  - Orders are grouped into four sections: Incoming (`PLACED`), Preparing (`ACCEPTED`), Ready (`READY`), and Completed (`COMPLETED`/`CANCELED`/`REJECTED`).
+  - The `/orders` route treats `CANCELED` and `REJECTED` orders as completed so they're excluded from pending.
   - Order statuses progress `PLACED → ACCEPTED → READY → COMPLETED` (with optional `CANCELED/REJECTED`).
   - Valid transitions are enforced server-side via `ALLOWED_STATUS_TRANSITIONS` in `main.py`.
   - Order listings include customer name/phone, table, and line items for both bartender and user history.
@@ -95,6 +95,7 @@
   - `order_history.html` displays line items via `item.menu_item_name` to handle missing menu items gracefully.
   - Order cards display the bar's name via `order.bar_name`.
     - Order views render each order inside a `.card` and group them in `.order-list` containers for consistent styling.
+    - Each order card `<li>` exposes `data-status` with the raw status for client-side updates.
     - `.order-list` is a flex container that wraps so order cards can flow horizontally.
     - Order list cards match bar card width (400px desktop, 300px mobile) while allowing their height to expand with content.
     - Order card backgrounds reflect status via `card--placed` (blue), `card--accepted` (orange), `card--ready` (green), `card--completed` (default surface), and `card--canceled` (red).
