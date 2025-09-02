@@ -89,10 +89,12 @@
   - `order_history.html` uses `order.customer_name`, `order.customer_prefix`, `order.customer_phone`, and `order.table_name` to avoid `None` errors when related records are missing.
   - `order_history.html` displays line items via `item.menu_item_name` to handle missing menu items gracefully.
   - Order cards display the bar's name via `order.bar_name`.
-  - Order views render each order inside a `.card` and group them in `.order-list` containers for consistent styling.
-  - `.order-list` is a flex container that wraps so order cards can flow horizontally.
-  - Order list cards match bar card width (400px desktop, 300px mobile) while allowing their height to expand with content.
-  - Status labels are title-cased for display with `status status-<status>` classes (`formatStatus` in `orders.js`; `order.status|replace('_', ' ')|title` in templates).
+    - Order views render each order inside a `.card` and group them in `.order-list` containers for consistent styling.
+    - `.order-list` is a flex container that wraps so order cards can flow horizontally.
+    - Order list cards match bar card width (400px desktop, 300px mobile) while allowing their height to expand with content.
+    - `.order-list .card__body` uses `gap: var(--space-1)` and removes default margins on child `p` and `ul` elements to tighten spacing.
+    - `order_history.html` displays the order's placement time with `order.created_at` formatted as `HH:MM`.
+    - Status labels are title-cased for display with `status status-<status>` classes (`formatStatus` in `orders.js`; `order.status|replace('_', ' ')|title` in templates).
   - `ensure_order_columns()` in `main.py` adds missing columns (e.g., `table_id`, `status`) to the `orders` table at startup.
 - Testing:
   - Run `pytest`
