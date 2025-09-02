@@ -84,6 +84,7 @@
   - Order listings include customer name/phone, table, and line items for both bartender and user history.
   - Bartender dashboards prepend newly received orders to each status list so the latest orders appear first.
   - Orders record `accepted_at` and `ready_at` timestamps; bartender cards show placement time and preparation duration via `orders.js`.
+  - User order cards show placement time and preparation duration using `order_history.html` and `orders.js`.
   - `orders.js` sends a keep-alive ping every 30s so bartender WebSocket connections stay open and receive new orders instantly.
   - Bartender WebSocket connections automatically reconnect if the socket closes.
   - Orders store `payment_method`; `order.total` returns `subtotal + vat_total` and both fields are displayed in order listings.

@@ -110,6 +110,8 @@ function initUser(userId) {
       li.id = 'user-order-' + order.id;
       li.className = 'card';
     }
+    const placed = formatTime(order.created_at);
+    const prep = order.ready_at ? `<p>Prep time: ${diffMinutes(order.created_at, order.ready_at)} min</p>` : '';
     li.innerHTML =
       `<div class="card__body">` +
       `<h3 class="card__title">Order #${order.id} - <span class=\"status status-${order.status.toLowerCase()}\">${formatStatus(order.status)}</span></h3>` +
@@ -118,6 +120,8 @@ function initUser(userId) {
       `<p>Table: ${order.table_name || ''}</p>` +
       `<p>Payment: ${formatPayment(order.payment_method)}</p>` +
       `<p>Total: CHF ${order.total.toFixed(2)}</p>` +
+      `<p>Ordered at: ${placed}</p>` +
+      prep +
       `<ul>` +
       order.items.map(i => `<li>${i.qty}× ${i.menu_item_name || ''}</li>`).join('') +
       `</ul>` +
