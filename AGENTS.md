@@ -72,6 +72,7 @@
   - Bartenders manage live orders in `bartender_orders.html` using `static/js/orders.js`.
   - The bartender dashboard lists assigned bars as `.bar-card` links to `/dashboard/bar/{id}/orders`.
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
+  - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.
   - API endpoints `/api/bars/{bar_id}/orders` (GET) and `/api/orders/{id}/status` (POST) list and update orders.
   - Bartender sees a single action button per order: Accept → Ready → Complete.
   - Order listings include customer name/phone, table, and line items for both bartender and user history.
