@@ -33,7 +33,7 @@ def test_run_payout_creates_audit_log():
         vat_total=Decimal("7.70"),
         fee_platform_5pct=Decimal("5.00"),
         payout_due_to_bar=Decimal("102.70"),
-        status="completed",
+        status="COMPLETED",
         created_at=now,
     )
     db.add(order)

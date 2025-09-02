@@ -26,7 +26,7 @@ def schedule_payout(db: Session, bar_id: int, period_start: datetime, period_end
         func.sum(Order.payout_due_to_bar).label("payout_total")
     ).filter(
         Order.bar_id == bar_id,
-        Order.status == "completed",
+        Order.status == "COMPLETED",
         Order.created_at >= period_start,
         Order.created_at <= period_end,
     ).first()

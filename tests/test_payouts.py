@@ -32,7 +32,7 @@ def test_schedule_payout_creates_record():
             vat_total=Decimal("7.70"),
             fee_platform_5pct=Decimal("5.00"),
             payout_due_to_bar=Decimal("102.70"),
-            status="completed",
+            status="COMPLETED",
             created_at=now,
         ),
         Order(
@@ -41,7 +41,7 @@ def test_schedule_payout_creates_record():
             vat_total=Decimal("3.85"),
             fee_platform_5pct=Decimal("2.50"),
             payout_due_to_bar=Decimal("51.35"),
-            status="completed",
+            status="COMPLETED",
             created_at=now,
         ),
     ]

@@ -77,6 +77,8 @@
   - API endpoints `/api/bars/{bar_id}/orders` (GET) and `/api/orders/{id}/status` (POST) list and update orders.
   - Order status updates return the updated order; `static/js/orders.js` re-renders immediately after POST so bartenders see new states without reloading.
   - Bartender sees a single action button per order: Accept → Ready → Complete.
+  - Order statuses progress `PLACED → ACCEPTED → READY → COMPLETED` (with optional `CANCELED/REJECTED`).
+  - Valid transitions are enforced server-side via `ALLOWED_STATUS_TRANSITIONS` in `main.py`.
   - Order listings include customer name/phone, table, and line items for both bartender and user history.
   - Bartender dashboards prepend newly received orders to the list so the latest orders appear at the top.
   - `orders.js` sends a keep-alive ping every 30s so bartender WebSocket connections stay open and receive new orders instantly.
@@ -85,6 +87,7 @@
   - `order_history.html` displays line items via `item.menu_item_name` to handle missing menu items gracefully.
   - Order cards display the bar's name via `order.bar_name`.
   - Order views render each order inside a `.card` and group them in `.order-list` containers for consistent styling.
+  - Status labels are title-cased for display with `status status-<status>` classes (`formatStatus` in `orders.js`; `order.status|replace('_', ' ')|title` in templates).
   - `ensure_order_columns()` in `main.py` adds missing columns (e.g., `table_id`, `status`) to the `orders` table at startup.
 - Testing:
   - Run `pytest`
