@@ -10,7 +10,7 @@ function initBartender(barId) {
       li = document.createElement('li');
       li.id = 'order-' + order.id;
       li.className = 'card';
-      list.appendChild(li);
+      list.prepend(li);
     }
     let actions = '';
     if (order.status === 'pending') {
