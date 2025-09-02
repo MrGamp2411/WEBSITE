@@ -1772,6 +1772,17 @@ async def update_order_status(
         order.accepted_at = now
     if new_status == "READY" and not order.ready_at:
         order.ready_at = now
+    if new_status == "CANCELED" and not order.cancelled_at:
+        order.cancelled_at = now
+        refund = Decimal(order.total)
+        if order.payment_method in ("card", "wallet"):
+            order.refund_amount = refund
+            if order.customer_id:
+                customer = db.get(User, order.customer_id)
+                if customer:
+                    customer.credit = Decimal(customer.credit or 0) + refund
+        else:
+            order.refund_amount = Decimal("0")
     db.commit()
     order_data = await send_order_update(order)
     return {"status": order.status, "order": order_data}

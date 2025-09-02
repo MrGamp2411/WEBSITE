@@ -79,8 +79,8 @@
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.
   - API endpoints `/api/bars/{bar_id}/orders` (GET) and `/api/orders/{id}/status` (POST) list and update orders.
   - Order status updates return the updated order; `static/js/orders.js` re-renders immediately after POST so bartenders see new states without reloading.
-  - Bartender sees a single action button per order: Accept → Ready → Complete.
-  - Orders are grouped into four sections: Incoming (`PLACED`), Preparing (`ACCEPTED`), Ready (`READY`), and Completed (`COMPLETED`).
+  - Bartenders can accept or cancel incoming orders; after acceptance, actions progress Ready → Complete.
+  - Orders are grouped into four sections: Incoming (`PLACED`), Preparing (`ACCEPTED`), Ready (`READY`), and Completed (`COMPLETED`/`CANCELED`).
   - Order statuses progress `PLACED → ACCEPTED → READY → COMPLETED` (with optional `CANCELED/REJECTED`).
   - Valid transitions are enforced server-side via `ALLOWED_STATUS_TRANSITIONS` in `main.py`.
   - Order listings include customer name/phone, table, and line items for both bartender and user history.
@@ -96,11 +96,12 @@
     - Order views render each order inside a `.card` and group them in `.order-list` containers for consistent styling.
     - `.order-list` is a flex container that wraps so order cards can flow horizontally.
     - Order list cards match bar card width (400px desktop, 300px mobile) while allowing their height to expand with content.
-    - Order card backgrounds reflect status via `card--placed` (blue), `card--accepted` (orange), `card--ready` (green), and `card--completed` (default surface).
+    - Order card backgrounds reflect status via `card--placed` (blue), `card--accepted` (orange), `card--ready` (green), `card--completed` (default surface), and `card--canceled` (red).
     - `.order-list .card__body` uses `gap: var(--space-1)` and removes default margins on child `p` and `ul` elements to tighten spacing.
   - `order_history.html` displays placement times via the `format_time` filter so displayed hours honor `BAR_TIMEZONE`.
   - Status labels are title-cased for display with `status status-<status>` classes (`formatStatus` in `orders.js`; `order.status|replace('_', ' ')|title` in templates).
   - `ensure_order_columns()` in `main.py` adds missing columns (e.g., `table_id`, `status`) to the `orders` table at startup.
+  - Cancelling an order refunds the total to the customer's wallet when paid by card or wallet; pay-at-bar orders are removed without refund.
   - Admin dashboard includes a testing-only "Delete all orders" button at `/admin/orders/clear` to remove every order record.
 - Testing:
   - Run `pytest`

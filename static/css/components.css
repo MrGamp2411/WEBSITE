@@ -114,8 +114,10 @@ body.dark-mode{
 .status{font-weight:600;}
 .status-open{color:#10B981;}
 .status-closed{color:#dc2626;}
+.status-canceled{color:#dc2626;}
 .badge.status-open{background:#10B981;}
 .badge.status-closed{background:#dc2626;}
+.badge.status-canceled{background:#dc2626;}
 
 .card{background:var(--surface);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:.25s;display:flex;flex-direction:column;}
 @media (max-width:768px){.card{max-height:400px;}}
@@ -294,6 +296,7 @@ body.dark-mode{
 .card--accepted{background:#FFEDD5;}
 .card--ready{background:#D1FAE5;}
 .card--completed{background:var(--surface);}
+.card--canceled{background:#FECACA;}
 
 /* utilities */
 .alert{padding:var(--space-2);border-radius:var(--radius);margin-bottom:var(--space-3);}

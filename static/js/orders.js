@@ -31,7 +31,7 @@ function initBartender(barId) {
     }
     let actions = '';
     if (order.status === 'PLACED') {
-      actions = `<button data-status="ACCEPTED">Accept</button>`;
+      actions = `<button data-status="ACCEPTED">Accept</button><button data-status="CANCELED">Cancel</button>`;
     } else if (order.status === 'ACCEPTED') {
       actions = `<button data-status="READY">Ready</button>`;
     } else if (order.status === 'READY') {
@@ -67,7 +67,7 @@ function initBartender(barId) {
       preparing.prepend(li);
     } else if (order.status === 'READY') {
       ready.prepend(li);
-    } else if (order.status === 'COMPLETED') {
+    } else if (order.status === 'COMPLETED' || order.status === 'CANCELED') {
       completed.prepend(li);
     }
   }
@@ -140,7 +140,7 @@ function initUser(userId) {
     const data = JSON.parse(ev.data);
     if (data.type === 'order') {
       const li = render(data.order);
-      if (data.order.status === 'COMPLETED') {
+      if (data.order.status === 'COMPLETED' || data.order.status === 'CANCELED') {
         completed.appendChild(li);
       } else {
         pending.appendChild(li);
