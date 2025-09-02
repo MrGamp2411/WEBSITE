@@ -8,17 +8,38 @@
     <p>{{ user.prefix }} {{ user.phone }}</p>
   </div>
 </div>
-{% if bar %}
+{% if bars %}
 <div class="dashboard-actions">
-  <div class="card">
-    <h3>Working at {{ bar.name }}</h3>
-  </div>
+  <ul class="bars">
+    {% for bar in bars %}
+    <li>
+      <div class="bar-card" role="button" tabindex="0" data-bar-id="{{ bar.id }}">
+        <div class="thumb-wrapper">
+          {% if bar.photo_url %}
+          <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" width="400" height="225">
+          {% endif %}
+        </div>
+        <h3 class="title">{{ bar.name }}</h3>
+        <address>{{ bar.city }}{% if bar.state %}, {{ bar.state }}{% endif %}</address>
+        <p class="desc">{{ bar.description }}</p>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
 </div>
-<h2>Incoming Orders</h2>
-<ul id="orders" class="order-list"></ul>
+<div id="orders-section" hidden>
+  <h2>Incoming Orders</h2>
+  <ul id="orders" class="order-list"></ul>
+</div>
 <script src="/static/js/orders.js"></script>
 <script>
-  initBartender({{ bar.id }});
+  document.querySelectorAll('.bar-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const barId = card.dataset.barId;
+      document.getElementById('orders-section').hidden = false;
+      initBartender(barId);
+    });
+  });
 </script>
 {% else %}
 <p>No bar assigned.</p>

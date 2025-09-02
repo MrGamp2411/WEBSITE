@@ -68,6 +68,7 @@
   - Checkout persists orders to the database and redirects to `/orders`.
   - Mobile hamburger menu links to order history via `bi bi-clock-history` icon.
   - Bartenders manage live orders in `bartender_dashboard.html` using `static/js/orders.js`.
+  - The bartender dashboard lists assigned bars as `.bar-card` elements; clicking a card loads live orders for that bar.
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
   - API endpoints `/api/bars/{bar_id}/orders` (GET) and `/api/orders/{id}/status` (POST) list and update orders.
   - Bartender sees a single action button per order: Accept → Ready → Complete.

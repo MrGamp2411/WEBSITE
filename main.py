@@ -1946,7 +1946,10 @@ async def dashboard(request: Request):
         return render_template("bar_admin_dashboard.html", request=request, bar=bar)
     if user.is_bartender:
         bar = bars.get(user.bar_id)
-        return render_template("bartender_dashboard.html", request=request, bar=bar)
+        bar_list = [bar] if bar else []
+        return render_template(
+            "bartender_dashboard.html", request=request, bars=bar_list
+        )
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 
