@@ -62,7 +62,7 @@
   - Login fetches the user's bar assignment from the database so the bar is available immediately after authentication
   - Admin user edit form: `templates/admin_edit_user.html` posts fields
     (`username`, `password`, `email`, `prefix`, `phone`, `role`, `bar_ids`, `credit`)
-    to `/admin/users/edit/{id}`
+    to `/admin/users/edit/{id}`. Bar selection uses checkboxes for easier multi-bar assignment.
   - Bar admins and bartenders may be assigned to multiple bars. `bar_ids` lists are used
     throughout to manage permissions and dashboard views.
 - Orders:

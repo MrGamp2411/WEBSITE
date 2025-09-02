@@ -27,12 +27,12 @@
     <option value="customer" {% if user.role=='customer' %}selected{% endif %}>Customer</option>
   </select>
 
-  <label for="bar_ids">Bars</label>
-  <select id="bar_ids" name="bar_ids" multiple>
+  <fieldset>
+    <legend>Bars</legend>
     {% for b in bars %}
-    <option value="{{ b.id }}" {% if b.id in user.bar_ids %}selected{% endif %}>{{ b.name }}</option>
+    <label><input type="checkbox" name="bar_ids" value="{{ b.id }}" {% if b.id in user.bar_ids %}checked{% endif %}> {{ b.name }}</label>
     {% endfor %}
-  </select>
+  </fieldset>
 
   <label for="credit">Credit</label>
   <input id="credit" name="credit" type="number" step="0.01" value="{{ user.credit }}" required>
