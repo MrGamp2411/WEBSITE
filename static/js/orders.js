@@ -2,6 +2,8 @@ function formatPayment(method) {
   return method ? method.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase()) : '';
 }
 
+const wsScheme = location.protocol === 'https:' ? 'wss' : 'ws';
+
 function initBartender(barId) {
   const list = document.getElementById('orders');
   function render(order) {
@@ -42,7 +44,7 @@ function initBartender(barId) {
     }
   }
   fetch(`/api/bars/${barId}/orders`).then(r => r.json()).then(data => data.forEach(render));
-  const ws = new WebSocket(`ws://${location.host}/ws/bar/${barId}/orders`);
+  const ws = new WebSocket(`${wsScheme}://${location.host}/ws/bar/${barId}/orders`);
   ws.onmessage = ev => {
     const data = JSON.parse(ev.data);
     if (data.type === 'order') {
@@ -75,7 +77,7 @@ function initUser(userId) {
       `</div>`;
     return li;
   }
-  const ws = new WebSocket(`ws://${location.host}/ws/user/${userId}/orders`);
+  const ws = new WebSocket(`${wsScheme}://${location.host}/ws/user/${userId}/orders`);
   ws.onmessage = ev => {
     const data = JSON.parse(ev.data);
     if (data.type === 'order') {
