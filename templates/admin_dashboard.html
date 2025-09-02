@@ -29,6 +29,13 @@
     <p>View platform analytics.</p>
     <a class="btn btn--primary" href="/admin/analytics">View Analytics</a>
   </div>
+  <div class="card">
+    <h3>Testing</h3>
+    <p>Delete all orders for a clean slate.</p>
+    <form method="post" action="/admin/orders/clear" onsubmit="return confirm('Delete all orders?');">
+      <button class="btn btn--danger" type="submit">Delete All Orders</button>
+    </form>
+  </div>
 </div>
 {% endblock %}
 
