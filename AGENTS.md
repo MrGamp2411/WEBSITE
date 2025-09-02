@@ -69,7 +69,8 @@
   - `/orders` page renders `templates/order_history.html` with past `Order` entries for the current user.
   - Checkout persists orders to the database and redirects to `/orders`.
   - Mobile hamburger menu links to order history via `bi bi-clock-history` icon.
-  - Bartenders manage live orders in `bartender_orders.html` using `static/js/orders.js`.
+  - Bartenders manage live orders in `bartender_orders.html` using `static/js/orders.js`,
+    which loads with `defer` and initializes `initBartender(bar.id)` on `DOMContentLoaded`.
   - The bartender dashboard lists assigned bars as `.bar-card` links to `/dashboard/bar/{id}/orders`.
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.
@@ -78,6 +79,7 @@
   - Bartender sees a single action button per order: Accept → Ready → Complete.
   - Order listings include customer name/phone, table, and line items for both bartender and user history.
   - Bartender dashboards prepend newly received orders to the list so the latest orders appear at the top.
+  - `orders.js` sends a keep-alive ping every 30s so bartender WebSocket connections stay open and receive new orders instantly.
   - Orders store `payment_method`; `order.total` returns `subtotal + vat_total` and both fields are displayed in order listings.
   - `order_history.html` uses `order.customer_name`, `order.customer_prefix`, `order.customer_phone`, and `order.table_name` to avoid `None` errors when related records are missing.
   - `order_history.html` displays line items via `item.menu_item_name` to handle missing menu items gracefully.
