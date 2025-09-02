@@ -6,6 +6,17 @@ function formatStatus(status) {
   return status ? status.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase()) : '';
 }
 
+function formatTime(dt) {
+  if (!dt) return '';
+  const d = new Date(dt + 'Z');
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function diffMinutes(start, end) {
+  if (!start || !end) return 0;
+  return Math.round((new Date(end + 'Z') - new Date(start + 'Z')) / 60000);
+}
+
 function initBartender(barId) {
   const incoming = document.getElementById('incoming-orders');
   const preparing = document.getElementById('preparing-orders');
@@ -27,6 +38,8 @@ function initBartender(barId) {
       actions = `<button data-status="COMPLETED">Complete</button>`;
     }
     const actionsHtml = actions ? `<div class="order-actions">${actions}</div>` : '';
+    const placed = formatTime(order.created_at);
+    const prep = order.ready_at ? `<p>Prep time: ${diffMinutes(order.created_at, order.ready_at)} min</p>` : '';
     li.innerHTML =
       `<div class="card__body">` +
       `<h3 class="card__title">Order #${order.id} - <span class=\"status status-${order.status.toLowerCase()}\">${formatStatus(order.status)}</span></h3>` +
@@ -35,6 +48,8 @@ function initBartender(barId) {
       `<p>Table: ${order.table_name || ''}</p>` +
       `<p>Payment: ${formatPayment(order.payment_method)}</p>` +
       `<p>Total: CHF ${order.total.toFixed(2)}</p>` +
+      `<p>Placed: ${placed}</p>` +
+      prep +
       `<ul>` +
       order.items.map(i => `<li>${i.qty}× ${i.menu_item_name || ''}</li>`).join('') +
       `</ul>` +
