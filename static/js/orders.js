@@ -40,6 +40,7 @@ function initBartender(barId) {
     const actionsHtml = actions ? `<div class="order-actions">${actions}</div>` : '';
     const placed = formatTime(order.created_at);
     const prep = order.ready_at ? `<p>Prep time: ${diffMinutes(order.created_at, order.ready_at)} min</p>` : '';
+    li.className = 'card card--' + order.status.toLowerCase();
     li.innerHTML =
       `<div class="card__body">` +
       `<h3 class="card__title">Order #${order.id} - <span class=\"status status-${order.status.toLowerCase()}\">${formatStatus(order.status)}</span></h3>` +
@@ -110,6 +111,7 @@ function initUser(userId) {
       li.id = 'user-order-' + order.id;
       li.className = 'card';
     }
+    li.className = 'card card--' + order.status.toLowerCase();
     const placed = formatTime(order.created_at);
     const prep = order.ready_at ? `<p>Prep time: ${diffMinutes(order.created_at, order.ready_at)} min</p>` : '';
     li.innerHTML =
