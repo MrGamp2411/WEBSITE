@@ -37,7 +37,7 @@ import json
 import random
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -435,7 +435,7 @@ class OrderWSManager:
 order_ws_manager = OrderWSManager()
 
 
-async def send_order_update(order: Order):
+async def send_order_update(order: Order) -> Dict[str, Any]:
     """Broadcast order updates to bartender and customer channels."""
     data = {
         "id": order.id,
@@ -462,7 +462,7 @@ async def send_order_update(order: Order):
     await order_ws_manager.broadcast_bar(order.bar_id, {"type": "order", "order": data})
     if order.customer_id:
         await order_ws_manager.broadcast_user(order.customer_id, {"type": "order", "order": data})
-
+    return data
 
 def seed_super_admin():
     """Ensure a SuperAdmin user exists based on environment variables."""
@@ -1723,8 +1723,8 @@ async def update_order_status(
         raise HTTPException(status_code=403, detail="Not authorised")
     order.status = data.status
     db.commit()
-    await send_order_update(order)
-    return {"status": order.status}
+    order_data = await send_order_update(order)
+    return {"status": order.status, "order": order_data}
 
 
 @app.websocket("/ws/bar/{bar_id}/orders")

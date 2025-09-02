@@ -74,6 +74,7 @@
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.
   - API endpoints `/api/bars/{bar_id}/orders` (GET) and `/api/orders/{id}/status` (POST) list and update orders.
+  - Order status updates return the updated order; `static/js/orders.js` re-renders immediately after POST so bartenders see new states without reloading.
   - Bartender sees a single action button per order: Accept → Ready → Complete.
   - Order listings include customer name/phone, table, and line items for both bartender and user history.
   - Orders store `payment_method`; `order.total` returns `subtotal + vat_total` and both fields are displayed in order listings.
