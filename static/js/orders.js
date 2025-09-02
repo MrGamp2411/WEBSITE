@@ -41,6 +41,7 @@ function initBartender(barId) {
     const placed = formatTime(order.created_at);
     const prep = order.ready_at ? `<p>Prep time: ${diffMinutes(order.created_at, order.ready_at)} min</p>` : '';
     const notes = order.notes ? `<p>Notes: ${order.notes}</p>` : '';
+    const refund = order.status === 'CANCELED' && order.refund_amount ? `<p>Refund: CHF ${order.refund_amount.toFixed(2)}</p>` : '';
     li.className = 'card card--' + order.status.toLowerCase();
     li.innerHTML =
       `<div class="card__body">` +
@@ -50,6 +51,7 @@ function initBartender(barId) {
       `<p>Table: ${order.table_name || ''}</p>` +
       `<p>Payment: ${formatPayment(order.payment_method)}</p>` +
       `<p>Total: CHF ${order.total.toFixed(2)}</p>` +
+      refund +
       `<p>Placed: ${placed}</p>` +
       prep +
       notes +
@@ -117,6 +119,7 @@ function initUser(userId) {
     const placed = formatTime(order.created_at);
     const prep = order.ready_at ? `<p>Prep time: ${diffMinutes(order.created_at, order.ready_at)} min</p>` : '';
     const notes = order.notes ? `<p>Notes: ${order.notes}</p>` : '';
+    const refund = order.status === 'CANCELED' && order.refund_amount ? `<p>Refunded: CHF ${order.refund_amount.toFixed(2)}</p>` : '';
     li.innerHTML =
       `<div class="card__body">` +
       `<h3 class="card__title">Order #${order.id} - <span class=\"status status-${order.status.toLowerCase()}\">${formatStatus(order.status)}</span></h3>` +
@@ -125,6 +128,7 @@ function initUser(userId) {
       `<p>Table: ${order.table_name || ''}</p>` +
       `<p>Payment: ${formatPayment(order.payment_method)}</p>` +
       `<p>Total: CHF ${order.total.toFixed(2)}</p>` +
+      refund +
       `<p>Ordered at: ${placed}</p>` +
       prep +
       notes +

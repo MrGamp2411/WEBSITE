@@ -79,7 +79,9 @@ def create_order(client, payment_method):
 
 def cancel_order(client, ids):
     client.post('/login', data={'email': ids['bartender_email'], 'password': 'pass'})
-    return client.post(f"/api/orders/{ids['order_id']}/status", json={'status': 'CANCELED'})
+    resp = client.post(f"/api/orders/{ids['order_id']}/status", json={'status': 'CANCELED'})
+    client.get('/logout')
+    return resp
 
 
 def test_cancel_order_refunds_wallet_and_card():
@@ -117,6 +119,38 @@ def test_cancel_bar_order_no_refund():
         assert float(user.credit) == ids['customer_initial_credit']
         assert Decimal(order.refund_amount) == Decimal('0')
         assert order.cancelled_at is not None
+    user_carts.clear()
+    users.clear()
+    users_by_email.clear()
+    users_by_username.clear()
+
+
+def test_cancel_order_updates_user_cache():
+    setup_db()
+    with TestClient(app) as client:
+        ids = create_order(client, 'card')
+        cached = users_by_email[ids['customer_email']]
+        assert cached.credit == ids['customer_initial_credit']
+        resp = cancel_order(client, ids)
+        assert resp.status_code == 200
+        cached_after = users_by_email[ids['customer_email']]
+        assert cached_after.credit == ids['customer_initial_credit'] + ids['order_total']
+    user_carts.clear()
+    users.clear()
+    users_by_email.clear()
+    users_by_username.clear()
+
+
+def test_cancel_order_reflected_in_html():
+    setup_db()
+    with TestClient(app) as client:
+        ids = create_order(client, 'card')
+        cancel_order(client, ids)
+        client.post('/login', data={'email': ids['customer_email'], 'password': 'pass'})
+        wallet = client.get('/wallet')
+        assert f"CHF {ids['customer_initial_credit'] + ids['order_total']:.2f}" in wallet.text
+        orders_page = client.get('/orders')
+        assert f"Refunded: CHF {ids['order_total']:.2f}" in orders_page.text
     user_carts.clear()
     users.clear()
     users_by_email.clear()
