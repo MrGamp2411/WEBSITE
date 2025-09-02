@@ -89,6 +89,7 @@
   - `order_history.html` displays line items via `item.menu_item_name` to handle missing menu items gracefully.
   - Order cards display the bar's name via `order.bar_name`.
   - Order views render each order inside a `.card` and group them in `.order-list` containers for consistent styling.
+  - Order list cards match bar card width (400px desktop, 300px mobile) while allowing their height to expand with content.
   - Status labels are title-cased for display with `status status-<status>` classes (`formatStatus` in `orders.js`; `order.status|replace('_', ' ')|title` in templates).
   - `ensure_order_columns()` in `main.py` adds missing columns (e.g., `table_id`, `status`) to the `orders` table at startup.
 - Testing:
