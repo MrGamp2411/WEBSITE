@@ -7,14 +7,16 @@ function formatStatus(status) {
 }
 
 function initBartender(barId) {
-  const list = document.getElementById('orders');
+  const incoming = document.getElementById('incoming-orders');
+  const preparing = document.getElementById('preparing-orders');
+  const ready = document.getElementById('ready-orders');
+  const completed = document.getElementById('completed-orders');
   function render(order) {
     let li = document.getElementById('order-' + order.id);
     if (!li) {
       li = document.createElement('li');
       li.id = 'order-' + order.id;
       li.className = 'card';
-      list.prepend(li);
     }
     let actions = '';
     if (order.status === 'PLACED') {
@@ -41,8 +43,14 @@ function initBartender(barId) {
     li.querySelectorAll('button').forEach(btn => {
       btn.addEventListener('click', () => updateStatus(order.id, btn.dataset.status, render));
     });
-    if (order.status === 'COMPLETED') {
-      li.remove();
+    if (order.status === 'PLACED') {
+      incoming.prepend(li);
+    } else if (order.status === 'ACCEPTED') {
+      preparing.prepend(li);
+    } else if (order.status === 'READY') {
+      ready.prepend(li);
+    } else if (order.status === 'COMPLETED') {
+      completed.prepend(li);
     }
   }
   function load() {
