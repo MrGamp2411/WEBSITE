@@ -229,7 +229,7 @@ class DemoUser:
         phone: str = "",
         prefix: str = "",
         role: str = "customer",
-        bar_id: Optional[int] = None,
+        bar_ids: Optional[List[int]] = None,
         pending_bar_id: Optional[int] = None,
         credit: float = 0.0,
     ):
@@ -240,7 +240,7 @@ class DemoUser:
         self.phone = phone
         self.prefix = prefix
         self.role = role
-        self.bar_id = bar_id
+        self.bar_ids = bar_ids or []
         self.pending_bar_id = pending_bar_id
         self.credit = credit
         self.transactions: List[Transaction] = []
@@ -256,6 +256,14 @@ class DemoUser:
     @property
     def is_bartender(self) -> bool:
         return self.role == "bartender"
+
+    @property
+    def bar_id(self) -> Optional[int]:
+        return self.bar_ids[0] if self.bar_ids else None
+
+    @bar_id.setter
+    def bar_id(self, value: Optional[int]) -> None:
+        self.bar_ids = [value] if value is not None else []
 
 
 class CartItem:
@@ -820,12 +828,14 @@ def load_bars_from_db() -> None:
                 if r.role == RoleEnum.BARADMIN:
                     bar.bar_admin_ids.append(r.user_id)
                     if r.user_id in users:
-                        users[r.user_id].bar_id = b.id
+                        if b.id not in users[r.user_id].bar_ids:
+                            users[r.user_id].bar_ids.append(b.id)
                         users[r.user_id].role = "bar_admin"
                 elif r.role == RoleEnum.BARTENDER:
                     bar.bartender_ids.append(r.user_id)
                     if r.user_id in users:
-                        users[r.user_id].bar_id = b.id
+                        if b.id not in users[r.user_id].bar_ids:
+                            users[r.user_id].bar_ids.append(b.id)
                         users[r.user_id].role = "bartender"
             bars[b.id] = bar
     finally:
@@ -917,12 +927,14 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
         if r.role == RoleEnum.BARADMIN:
             bar.bar_admin_ids.append(r.user_id)
             if r.user_id in users:
-                users[r.user_id].bar_id = bar_id
+                if bar_id not in users[r.user_id].bar_ids:
+                    users[r.user_id].bar_ids.append(bar_id)
                 users[r.user_id].role = "bar_admin"
         elif r.role == RoleEnum.BARTENDER:
             bar.bartender_ids.append(r.user_id)
             if r.user_id in users:
-                users[r.user_id].bar_id = bar_id
+                if bar_id not in users[r.user_id].bar_ids:
+                    users[r.user_id].bar_ids.append(bar_id)
                 users[r.user_id].role = "bartender"
     return bar
 
@@ -1685,7 +1697,7 @@ async def get_bar_orders(
     bar_id: int, request: Request, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
-    if not user or not user.is_bartender or user.bar_id != bar_id:
+    if not user or not user.is_bartender or bar_id not in user.bar_ids:
         raise HTTPException(status_code=403, detail="Not authorised")
     orders = (
         db.query(Order)
@@ -1707,7 +1719,7 @@ async def update_order_status(
     order = db.get(Order, order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
-    if not user or not user.is_bartender or user.bar_id != order.bar_id:
+    if not user or not user.is_bartender or order.bar_id not in user.bar_ids:
         raise HTTPException(status_code=403, detail="Not authorised")
     order.status = data.status
     db.commit()
@@ -1900,9 +1912,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
                         RoleEnum.BARTENDER: "bartender",
                         RoleEnum.CUSTOMER: "customer",
                     }
-                    bar_id = (
-                        db_user.bar_roles[0].bar_id if db_user.bar_roles else None
-                    )
+                    bar_ids = [r.bar_id for r in db_user.bar_roles]
                     user = DemoUser(
                         id=db_user.id,
                         username=db_user.username,
@@ -1911,7 +1921,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
                         phone=db_user.phone or "",
                         prefix=db_user.prefix or "",
                         role=role_map.get(db_user.role, "customer"),
-                        bar_id=bar_id,
+                        bar_ids=bar_ids,
                         credit=float(db_user.credit or 0),
                     )
                     users[user.id] = user
@@ -1942,11 +1952,12 @@ async def dashboard(request: Request):
     if user.is_super_admin:
         return render_template("admin_dashboard.html", request=request)
     if user.is_bar_admin:
-        bar = bars.get(user.bar_id)
-        return render_template("bar_admin_dashboard.html", request=request, bar=bar)
+        bar_list = [bars.get(bid) for bid in user.bar_ids if bars.get(bid)]
+        return render_template(
+            "bar_admin_dashboard.html", request=request, bars=bar_list
+        )
     if user.is_bartender:
-        bar = bars.get(user.bar_id)
-        bar_list = [bar] if bar else []
+        bar_list = [bars.get(bid) for bid in user.bar_ids if bars.get(bid)]
         return render_template(
             "bartender_dashboard.html", request=request, bars=bar_list
         )
@@ -1956,7 +1967,7 @@ async def dashboard(request: Request):
 @app.get("/dashboard/bar/{bar_id}/orders", response_class=HTMLResponse)
 async def bartender_orders(request: Request, bar_id: int):
     user = get_current_user(request)
-    if not user or not user.is_bartender or user.bar_id != bar_id:
+    if not user or not user.is_bartender or bar_id not in user.bar_ids:
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     bar = bars.get(bar_id)
     if not bar:
@@ -2105,7 +2116,7 @@ async def edit_bar_options(
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     if not user or not (
-        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+        user.is_super_admin or (user.is_bar_admin and bar_id in user.bar_ids)
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template("admin_edit_bar_options.html", request=request, bar=bar)
@@ -2118,7 +2129,7 @@ async def edit_bar_form(request: Request, bar_id: int, db: Session = Depends(get
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     if not user or not (
-        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+        user.is_super_admin or (user.is_bar_admin and bar_id in user.bar_ids)
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     tags_csv = ", ".join(json.loads(bar.tags)) if bar.tags else ""
@@ -2147,7 +2158,7 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     if not user or not (
-        user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id)
+        user.is_super_admin or (user.is_bar_admin and bar_id in user.bar_ids)
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
@@ -2305,7 +2316,7 @@ async def manage_bar_users(
     if (
         not bar
         or not user
-        or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id))
+        or not (user.is_super_admin or (user.is_bar_admin and bar_id in user.bar_ids))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     staff = [_load_demo_user(uid, db) for uid in bar.bar_admin_ids + bar.bartender_ids]
@@ -2325,7 +2336,7 @@ async def manage_bar_users_post(
         or not current
         or not (
             current.is_super_admin
-            or (current.is_bar_admin and current.bar_id == bar_id)
+            or (current.is_bar_admin and bar_id in current.bar_ids)
         )
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -2363,7 +2374,8 @@ async def manage_bar_users_post(
                 db.commit()
                 demo = _load_demo_user(db_user.id, db)
                 demo.role = role
-                demo.bar_id = bar_id
+                if bar_id not in demo.bar_ids:
+                    demo.bar_ids.append(bar_id)
                 if role == "bar_admin":
                     if demo.id not in bar.bar_admin_ids:
                         bar.bar_admin_ids.append(demo.id)
@@ -2419,7 +2431,7 @@ async def manage_bar_users_post(
                 phone=phone,
                 prefix=prefix,
                 role=role,
-                bar_id=bar_id,
+                bar_ids=[bar_id],
             )
             users[demo.id] = demo
             users_by_username[demo.username] = demo
@@ -2449,7 +2461,7 @@ async def manage_bar_tables(
     if (
         not bar
         or not user
-        or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id))
+        or not (user.is_super_admin or (user.is_bar_admin and bar_id in user.bar_ids))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     tables = sorted(bar.tables.values(), key=lambda t: t.id)
@@ -2467,7 +2479,7 @@ async def new_bar_table_form(
     if (
         not bar
         or not user
-        or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id))
+        or not (user.is_super_admin or (user.is_bar_admin and bar_id in user.bar_ids))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template("admin_bar_new_table.html", request=request, bar=bar)
@@ -2480,7 +2492,7 @@ async def add_bar_table(request: Request, bar_id: int, db: Session = Depends(get
     if (
         not bar
         or not user
-        or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id))
+        or not (user.is_super_admin or (user.is_bar_admin and bar_id in user.bar_ids))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
@@ -2511,7 +2523,7 @@ async def edit_bar_table_form(
     if (
         not bar
         or not user
-        or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id))
+        or not (user.is_super_admin or (user.is_bar_admin and bar_id in user.bar_ids))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     table = bar.tables.get(table_id)
@@ -2534,7 +2546,7 @@ async def edit_bar_table(
     if (
         not bar
         or not user
-        or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id))
+        or not (user.is_super_admin or (user.is_bar_admin and bar_id in user.bar_ids))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     db_table = db.get(TableModel, table_id)
@@ -2573,7 +2585,7 @@ async def delete_bar_table(
     if (
         not bar
         or not user
-        or not (user.is_super_admin or (user.is_bar_admin and user.bar_id == bar_id))
+        or not (user.is_super_admin or (user.is_bar_admin and bar_id in user.bar_ids))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     db_table = db.get(TableModel, table_id)
@@ -2598,9 +2610,11 @@ async def confirm_bartender(request: Request):
     if not user or not bar or user.pending_bar_id != bar_id:
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     user.role = "bartender"
-    user.bar_id = bar_id
+    if bar_id not in user.bar_ids:
+        user.bar_ids.append(bar_id)
     user.pending_bar_id = None
-    bar.bartender_ids.append(user.id)
+    if user.id not in bar.bartender_ids:
+        bar.bartender_ids.append(user.id)
     if user.id in bar.pending_bartender_ids:
         bar.pending_bartender_ids.remove(user.id)
     return render_template("bartender_confirm.html", request=request, bar=bar)
@@ -2840,7 +2854,7 @@ async def admin_users_view(request: Request, db: Session = Depends(get_db)):
     }
     for db_user in db_users:
         existing = users.get(db_user.id)
-        bar_id = db_user.bar_roles[0].bar_id if db_user.bar_roles else None
+        bar_ids = [r.bar_id for r in db_user.bar_roles]
         credit = float(db_user.credit or 0)
         if existing:
             existing.username = db_user.username
@@ -2848,7 +2862,7 @@ async def admin_users_view(request: Request, db: Session = Depends(get_db)):
             existing.phone = db_user.phone or ""
             existing.prefix = db_user.prefix or ""
             existing.role = role_map.get(db_user.role, "customer")
-            existing.bar_id = bar_id
+            existing.bar_ids = bar_ids
             existing.credit = credit
         else:
             demo = DemoUser(
@@ -2859,7 +2873,7 @@ async def admin_users_view(request: Request, db: Session = Depends(get_db)):
                 phone=db_user.phone or "",
                 prefix=db_user.prefix or "",
                 role=role_map.get(db_user.role, "customer"),
-                bar_id=bar_id,
+                bar_ids=bar_ids,
                 credit=credit,
             )
             users[demo.id] = demo
@@ -2888,6 +2902,7 @@ def _load_demo_user(user_id: int, db: Session) -> DemoUser:
         RoleEnum.BARTENDER: "bartender",
         RoleEnum.CUSTOMER: "customer",
     }
+    bar_ids = [r.bar_id for r in db_user.bar_roles]
     user = DemoUser(
         id=db_user.id,
         username=db_user.username,
@@ -2896,7 +2911,7 @@ def _load_demo_user(user_id: int, db: Session) -> DemoUser:
         phone=db_user.phone or "",
         prefix=db_user.prefix or "",
         role=role_map.get(db_user.role, "customer"),
-        bar_id=(db_user.bar_roles[0].bar_id if db_user.bar_roles else None),
+        bar_ids=bar_ids,
         credit=float(db_user.credit or 0),
     )
     users[user.id] = user
@@ -2913,7 +2928,10 @@ async def edit_user(request: Request, user_id: int, db: Session = Depends(get_db
     user = _load_demo_user(user_id, db)
     if not (
         current.is_super_admin
-        or (current.is_bar_admin and user.bar_id == current.bar_id)
+        or (
+            current.is_bar_admin
+            and any(bid in current.bar_ids for bid in user.bar_ids)
+        )
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(
@@ -2933,7 +2951,10 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     user = _load_demo_user(user_id, db)
     if not (
         current.is_super_admin
-        or (current.is_bar_admin and user.bar_id == current.bar_id)
+        or (
+            current.is_bar_admin
+            and any(bid in current.bar_ids for bid in user.bar_ids)
+        )
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
@@ -2943,8 +2964,8 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     prefix = form.get("prefix")
     phone = form.get("phone")
     role = form.get("role")
-    bar_id = form.get("bar_id")
     credit = form.get("credit")
+    bar_ids = [int(b) for b in form.getlist("bar_ids") if b]
     if not (username and email is not None and role is not None):
         return render_template(
             "admin_edit_user.html",
@@ -2992,10 +3013,10 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     user.phone = phone or ""
     if not current.is_super_admin:
         role = "bar_admin" if role == "bar_admin" else "bartender"
-        bar_id = str(current.bar_id)
+        bar_ids = current.bar_ids.copy()
         credit = str(user.credit)
     user.role = role
-    user.bar_id = int(bar_id) if bar_id else None
+    user.bar_ids = bar_ids
     try:
         user.credit = float(credit)
     except (TypeError, ValueError):
@@ -3030,11 +3051,11 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         synchronize_session=False
     )
     db.flush()
-    if user.bar_id:
+    for bid in user.bar_ids:
         db.add(
             UserBarRole(
                 user_id=user_id,
-                bar_id=user.bar_id,
+                bar_id=bid,
                 role=role_enum,
             )
         )
@@ -3049,12 +3070,14 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
             b.bar_admin_ids.remove(user_id)
         if user_id in b.bartender_ids:
             b.bartender_ids.remove(user_id)
-    if user.bar_id:
-        target = bars.get(user.bar_id) or refresh_bar_from_db(user.bar_id, db)
+    for bid in user.bar_ids:
+        target = bars.get(bid) or refresh_bar_from_db(bid, db)
         if role == "bar_admin":
-            target.bar_admin_ids.append(user_id)
+            if user_id not in target.bar_admin_ids:
+                target.bar_admin_ids.append(user_id)
         elif role == "bartender":
-            target.bartender_ids.append(user_id)
+            if user_id not in target.bartender_ids:
+                target.bartender_ids.append(user_id)
     return RedirectResponse(url="/admin/users", status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -3068,7 +3091,7 @@ async def bar_manage_categories(
         raise HTTPException(status_code=404, detail="Bar not found")
     if not user or not (
         user.is_super_admin
-        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     categories = sorted(bar.categories.values(), key=lambda c: c.display_order)
@@ -3090,7 +3113,7 @@ async def bar_new_category_form(
         raise HTTPException(status_code=404, detail="Bar not found")
     if not user or not (
         user.is_super_admin
-        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template("bar_new_category.html", request=request, bar=bar)
@@ -3106,7 +3129,7 @@ async def bar_new_category(
         raise HTTPException(status_code=404, detail="Bar not found")
     if not user or not (
         user.is_super_admin
-        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
@@ -3158,7 +3181,7 @@ async def bar_delete_category(
         raise HTTPException(status_code=404, detail="Category not found")
     if not user or not (
         user.is_super_admin
-        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     db.query(MenuItem).filter(MenuItem.category_id == category_id).delete(
@@ -3190,7 +3213,7 @@ async def bar_category_products(
         raise HTTPException(status_code=404, detail="Category not found")
     if not user or not (
         user.is_super_admin
-        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     products = sorted(
@@ -3224,7 +3247,7 @@ async def bar_new_product_form(
         raise HTTPException(status_code=404, detail="Category not found")
     if not user or not (
         user.is_super_admin
-        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(
@@ -3245,7 +3268,7 @@ async def bar_new_product(
         raise HTTPException(status_code=404, detail="Category not found")
     if not user or not (
         user.is_super_admin
-        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
@@ -3316,7 +3339,7 @@ async def bar_delete_product(
         raise HTTPException(status_code=404, detail="Product not found")
     if not user or not (
         user.is_super_admin
-        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     db.query(MenuItem).filter(MenuItem.id == product_id).delete()
@@ -3358,7 +3381,7 @@ async def bar_edit_product_form(
     )
     if not user or not (
         user.is_super_admin
-        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(
@@ -3399,7 +3422,7 @@ async def bar_edit_product(
         )
     if not user or not (
         user.is_super_admin
-        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
@@ -3463,7 +3486,7 @@ async def bar_edit_category_form(
         raise HTTPException(status_code=404, detail="Category not found")
     if not user or not (
         user.is_super_admin
-        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(
@@ -3484,7 +3507,7 @@ async def bar_edit_category(
         raise HTTPException(status_code=404, detail="Category not found")
     if not user or not (
         user.is_super_admin
-        or (user.bar_id == bar_id and (user.is_bar_admin or user.is_bartender))
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()

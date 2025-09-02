@@ -54,7 +54,7 @@ def test_update_user_details_without_password():
         "prefix": "+41",
         "phone": "763661800",
         "role": "bar_admin",
-        "bar_id": "",
+        "bar_ids": "",
         "credit": "5.0",
     }
         resp = client.post(
@@ -111,7 +111,7 @@ def test_update_user_reassign_bar():
             "prefix": "",
             "phone": "",
             "role": "bar_admin",
-            "bar_id": str(bar2_id),
+            "bar_ids": str(bar2_id),
             "credit": "0",
         }
         resp = client.post(
@@ -163,7 +163,7 @@ def test_update_user_credit_and_bar_assignment():
             "prefix": "",
             "phone": "",
             "role": "bar_admin",
-            "bar_id": str(bar2_id),
+            "bar_ids": str(bar2_id),
             "credit": "15.5",
         }
         resp = client.post(
@@ -177,6 +177,58 @@ def test_update_user_credit_and_bar_assignment():
     roles = db.query(UserBarRole).filter(UserBarRole.user_id == user_id).all()
     assert len(roles) == 1
     assert roles[0].bar_id == bar2_id
+    db.close()
+
+
+def test_update_user_multiple_bar_assignment():
+    db = SessionLocal()
+    password_hash = hashlib.sha256("pass".encode("utf-8")).hexdigest()
+    bar1 = Bar(name="Multi1", slug="multi1")
+    bar2 = Bar(name="Multi2", slug="multi2")
+    db.add_all([bar1, bar2])
+    db.commit()
+    bar1_id, bar2_id = bar1.id, bar2.id
+    user = User(
+        username="multibar",
+        email="multibar@example.com",
+        password_hash=password_hash,
+        role=RoleEnum.BARTENDER,
+    )
+    db.add(user)
+    db.commit()
+    user_id = user.id
+    db.close()
+
+    db = SessionLocal()
+    refresh_bar_from_db(bar1_id, db)
+    refresh_bar_from_db(bar2_id, db)
+    db.close()
+
+    with TestClient(app) as client:
+        _login_super_admin(client)
+        form = {
+            "username": "multibar",
+            "password": "",
+            "email": "multibar@example.com",
+            "prefix": "",
+            "phone": "",
+            "role": "bartender",
+            "bar_ids": [str(bar1_id), str(bar2_id)],
+            "credit": "0",
+        }
+        resp = client.post(
+            f"/admin/users/edit/{user_id}", data=form, follow_redirects=False
+        )
+        assert resp.status_code == 303
+
+    db = SessionLocal()
+    roles = (
+        db.query(UserBarRole)
+        .filter(UserBarRole.user_id == user_id)
+        .order_by(UserBarRole.bar_id)
+        .all()
+    )
+    assert [r.bar_id for r in roles] == [bar1_id, bar2_id]
     db.close()
 
 
@@ -203,7 +255,7 @@ def test_update_user_password_change():
             "prefix": "",
             "phone": "",
             "role": "customer",
-            "bar_id": "",
+            "bar_ids": "",
             "credit": "0",
         }
         resp = client.post(
@@ -254,7 +306,7 @@ def test_admin_users_shows_reassigned_bar_after_restart():
             "prefix": "",
             "phone": "",
             "role": "bar_admin",
-            "bar_id": str(bar2_id),
+            "bar_ids": str(bar2_id),
             "credit": "0",
         }
         resp = client.post(
@@ -280,6 +332,6 @@ def test_admin_users_shows_reassigned_bar_after_restart():
         resp = client.get("/admin/users")
         assert resp.status_code == 200
         pattern = re.compile(
-            rf"<tr>\s*<td>reloaduser</td>.*?<td>{bar2_name}</td>", re.DOTALL
+            rf"<tr>\s*<td>reloaduser</td>.*?<td>\s*{bar2_name}\s*</td>", re.DOTALL
         )
         assert pattern.search(resp.text)

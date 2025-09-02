@@ -19,7 +19,13 @@
       <td>{{ u.email }}</td>
       <td>{{ u.prefix }} {{ u.phone }}</td>
       <td>{{ u.role }}</td>
-      <td>{% if u.bar_id %}{{ bars[u.bar_id].name }}{% else %}-{% endif %}</td>
+      <td>
+        {% if u.bar_ids %}
+          {% for bid in u.bar_ids %}
+            {{ bars[bid].name }}{% if not loop.last %}, {% endif %}
+          {% endfor %}
+        {% else %}-{% endif %}
+      </td>
       <td>CHF {{ "%.2f"|format(u.credit) }}</td>
       <td><a href="/admin/users/edit/{{ u.id }}">Edit</a></td>
     </tr>

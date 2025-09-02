@@ -8,14 +8,16 @@
     <p>{{ user.prefix }} {{ user.phone }}</p>
   </div>
 </div>
-{% if bar %}
+{% if bars %}
 <div class="dashboard-actions">
+  {% for bar in bars %}
   <div class="card">
     <h3>{{ bar.name }}</h3>
     <a class="btn btn--primary" href="/admin/bars/edit/{{ bar.id }}">Edit Bar</a>
     <a class="btn" href="/admin/bars/{{ bar.id }}/users">Manage Users</a>
     <a class="btn" href="/bar/{{ bar.id }}/categories/new">Add Category</a>
   </div>
+  {% endfor %}
 </div>
 {% else %}
 <p>No bar assigned.</p>
