@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>{{ bar.name }} Orders</h1>
+<div id="orders-section">
+  <h2>Incoming Orders</h2>
+  <ul id="orders" class="order-list"></ul>
+</div>
+<script src="/static/js/orders.js"></script>
+<script>
+  initBartender({{ bar.id }});
+</script>
+{% endblock %}
