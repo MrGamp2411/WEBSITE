@@ -183,6 +183,8 @@ class Order(Base):
     status = Column(String(30), default="PLACED")
     payment_method = Column(String(30))
     created_at = Column(DateTime, default=datetime.utcnow)
+    accepted_at = Column(DateTime)
+    ready_at = Column(DateTime)
     paid_at = Column(DateTime)
     cancelled_at = Column(DateTime)
     refund_amount = Column(Numeric(10, 2), default=0)

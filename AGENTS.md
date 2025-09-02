@@ -83,6 +83,7 @@
   - Valid transitions are enforced server-side via `ALLOWED_STATUS_TRANSITIONS` in `main.py`.
   - Order listings include customer name/phone, table, and line items for both bartender and user history.
   - Bartender dashboards prepend newly received orders to each status list so the latest orders appear first.
+  - Orders record `accepted_at` and `ready_at` timestamps; bartender cards show placement time and preparation duration via `orders.js`.
   - `orders.js` sends a keep-alive ping every 30s so bartender WebSocket connections stay open and receive new orders instantly.
   - Bartender WebSocket connections automatically reconnect if the socket closes.
   - Orders store `payment_method`; `order.total` returns `subtotal + vat_total` and both fields are displayed in order listings.
@@ -93,7 +94,7 @@
     - `.order-list` is a flex container that wraps so order cards can flow horizontally.
     - Order list cards match bar card width (400px desktop, 300px mobile) while allowing their height to expand with content.
     - `.order-list .card__body` uses `gap: var(--space-1)` and removes default margins on child `p` and `ul` elements to tighten spacing.
-    - `order_history.html` displays the order's placement time with `order.created_at` formatted as `HH:MM`.
+    - `order_history.html` displays placement times via the `format_time` filter so displayed hours honor `BAR_TIMEZONE`.
     - Status labels are title-cased for display with `status status-<status>` classes (`formatStatus` in `orders.js`; `order.status|replace('_', ' ')|title` in templates).
   - `ensure_order_columns()` in `main.py` adds missing columns (e.g., `table_id`, `status`) to the `orders` table at startup.
 - Testing:

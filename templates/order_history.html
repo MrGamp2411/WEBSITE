@@ -13,7 +13,7 @@
       <p>Table: {{ order.table_name or '' }}</p>
       <p>Payment method: {{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</p>
       <p>Total: CHF {{ "%.2f"|format(order.total) }}</p>
-      <p>Ordered at: {{ order.created_at.strftime('%H:%M') if order.created_at else '' }}</p>
+      <p>Ordered at: {{ order.created_at|format_time }}</p>
       <ul>
         {% for item in order.items %}
         <li>{{ item.qty }}× {{ item.menu_item_name or 'Unknown item' }}</li>
@@ -37,7 +37,7 @@
       <p>Table: {{ order.table_name or '' }}</p>
       <p>Payment method: {{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</p>
       <p>Total: CHF {{ "%.2f"|format(order.total) }}</p>
-      <p>Ordered at: {{ order.created_at.strftime('%H:%M') if order.created_at else '' }}</p>
+      <p>Ordered at: {{ order.created_at|format_time }}</p>
       <ul>
         {% for item in order.items %}
         <li>{{ item.qty }}× {{ item.menu_item_name or 'Unknown item' }}</li>

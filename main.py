@@ -458,6 +458,9 @@ async def send_order_update(order: Order) -> Dict[str, Any]:
         "table_name": order.table_name,
         "bar_name": order.bar_name,
         "payment_method": order.payment_method,
+        "created_at": order.created_at.isoformat() if order.created_at else None,
+        "accepted_at": order.accepted_at.isoformat() if order.accepted_at else None,
+        "ready_at": order.ready_at.isoformat() if order.ready_at else None,
         "total": order.total,
         "items": [
             {
@@ -596,6 +599,8 @@ def ensure_order_columns() -> None:
         "status": "VARCHAR(30) DEFAULT 'PLACED'",
         "payment_method": "VARCHAR(30)",
         "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "accepted_at": "TIMESTAMP",
+        "ready_at": "TIMESTAMP",
         "paid_at": "TIMESTAMP",
         "cancelled_at": "TIMESTAMP",
         "refund_amount": "NUMERIC(10, 2) DEFAULT 0",
@@ -756,6 +761,20 @@ def weekly_hours_list(
             close_time = info.get("close")
         result.append({"day": day, "open": open_time, "close": close_time})
     return result
+
+
+def format_time(dt: Optional[datetime]) -> str:
+    """Format a UTC datetime to local HH:MM string using BAR_TIMEZONE/TZ."""
+    if not dt:
+        return ""
+    tz_name = os.getenv("BAR_TIMEZONE") or os.getenv("TZ")
+    tz = ZoneInfo(tz_name) if tz_name else None
+    dt = dt.replace(tzinfo=ZoneInfo("UTC"))
+    if tz:
+        dt = dt.astimezone(tz)
+    return dt.strftime("%H:%M")
+
+templates_env.filters["format_time"] = format_time
 
 
 def is_bar_open_now(bar: BarModel) -> bool:
@@ -1285,6 +1304,9 @@ class OrderRead(BaseModel):
     payout_due_to_bar: float
     status: str
     payment_method: Optional[str] = None
+    created_at: Optional[datetime] = None
+    accepted_at: Optional[datetime] = None
+    ready_at: Optional[datetime] = None
     total: float
     customer_name: Optional[str] = None
     customer_prefix: Optional[str] = None
@@ -1741,6 +1763,11 @@ async def update_order_status(
         )
 
     order.status = new_status
+    now = datetime.utcnow()
+    if new_status == "ACCEPTED" and not order.accepted_at:
+        order.accepted_at = now
+    if new_status == "READY" and not order.ready_at:
+        order.ready_at = now
     db.commit()
     order_data = await send_order_update(order)
     return {"status": order.status, "order": order_data}

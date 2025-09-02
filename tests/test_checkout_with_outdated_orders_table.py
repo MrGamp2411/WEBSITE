@@ -39,6 +39,8 @@ def test_checkout_succeeds_when_order_columns_missing():
         assert "status" in cols  # added by ensure_order_columns()
         assert "table_id" in cols  # added by ensure_order_columns()
         assert "payment_method" in cols  # added by ensure_order_columns()
+        assert "accepted_at" in cols  # added by ensure_order_columns()
+        assert "ready_at" in cols  # added by ensure_order_columns()
 
         db = SessionLocal()
         bar = Bar(name="Test Bar", slug="test-bar")
