@@ -289,6 +289,12 @@ body.dark-mode{
 @media (max-width:768px){.order-list .card{width:300px;max-width:300px;}}
 .order-actions{margin-top:var(--space-2);display:flex;gap:var(--space-2);}
 
+/* order status colors */
+.card--placed{background:#DBEAFE;}
+.card--accepted{background:#FFEDD5;}
+.card--ready{background:#D1FAE5;}
+.card--completed{background:var(--surface);}
+
 /* utilities */
 .alert{padding:var(--space-2);border-radius:var(--radius);margin-bottom:var(--space-3);}
 .alert-danger{background:#fee2e2;color:#991b1b;}

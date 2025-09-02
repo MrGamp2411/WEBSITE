@@ -5,7 +5,7 @@
 <h2>Pending Orders</h2>
 <ul id="pending-orders" class="order-list">
   {% for order in pending_orders %}
-  <li id="user-order-{{ order.id }}" class="card">
+  <li id="user-order-{{ order.id }}" class="card card--{{ order.status|lower }}">
     <div class="card__body">
       <h3 class="card__title">Order #{{ order.id }} - <span class="status status-{{ order.status|lower }}">{{ order.status|replace('_', ' ')|title }}</span></h3>
       <p>Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</p>
@@ -32,7 +32,7 @@
 <h2>Completed Orders</h2>
 <ul id="completed-orders" class="order-list">
   {% for order in completed_orders %}
-  <li id="user-order-{{ order.id }}" class="card">
+  <li id="user-order-{{ order.id }}" class="card card--{{ order.status|lower }}">
     <div class="card__body">
       <h3 class="card__title">Order #{{ order.id }} - <span class="status status-{{ order.status|lower }}">{{ order.status|replace('_', ' ')|title }}</span></h3>
       <p>Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</p>
