@@ -77,6 +77,7 @@
   - Order status updates return the updated order; `static/js/orders.js` re-renders immediately after POST so bartenders see new states without reloading.
   - Bartender sees a single action button per order: Accept → Ready → Complete.
   - Order listings include customer name/phone, table, and line items for both bartender and user history.
+  - Bartender dashboards prepend newly received orders to the list so the latest orders appear at the top.
   - Orders store `payment_method`; `order.total` returns `subtotal + vat_total` and both fields are displayed in order listings.
   - `order_history.html` uses `order.customer_name`, `order.customer_prefix`, `order.customer_phone`, and `order.table_name` to avoid `None` errors when related records are missing.
   - `order_history.html` displays line items via `item.menu_item_name` to handle missing menu items gracefully.
