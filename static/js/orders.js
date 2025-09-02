@@ -35,7 +35,7 @@ function initBartender(barId) {
       actionsHtml +
       `</div>`;
     li.querySelectorAll('button').forEach(btn => {
-      btn.addEventListener('click', () => updateStatus(order.id, btn.dataset.status));
+      btn.addEventListener('click', () => updateStatus(order.id, btn.dataset.status, render));
     });
     if (order.status === 'completed') {
       li.remove();
@@ -91,10 +91,16 @@ function initUser(userId) {
   };
 }
 
-function updateStatus(orderId, status) {
+function updateStatus(orderId, status, onUpdate) {
   fetch(`/api/orders/${orderId}/status`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status })
-  });
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (onUpdate && data.order) {
+        onUpdate(data.order);
+      }
+    });
 }
