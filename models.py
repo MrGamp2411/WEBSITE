@@ -180,7 +180,7 @@ class Order(Base):
     vat_total = Column(Numeric(10, 2), default=0)
     fee_platform_5pct = Column(Numeric(10, 2), default=0)
     payout_due_to_bar = Column(Numeric(10, 2), default=0)
-    status = Column(String(30), default="pending")
+    status = Column(String(30), default="PLACED")
     payment_method = Column(String(30))
     created_at = Column(DateTime, default=datetime.utcnow)
     paid_at = Column(DateTime)

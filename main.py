@@ -434,6 +434,16 @@ class OrderWSManager:
 
 order_ws_manager = OrderWSManager()
 
+# Allowed order state transitions
+ALLOWED_STATUS_TRANSITIONS = {
+    "PLACED": ["ACCEPTED", "REJECTED", "CANCELED"],
+    "ACCEPTED": ["READY", "CANCELED"],
+    "READY": ["COMPLETED", "CANCELED"],
+    "COMPLETED": [],
+    "CANCELED": [],
+    "REJECTED": [],
+}
+
 
 async def send_order_update(order: Order) -> Dict[str, Any]:
     """Broadcast order updates to bartender and customer channels."""
@@ -583,7 +593,7 @@ def ensure_order_columns() -> None:
         "vat_total": "NUMERIC(10, 2) DEFAULT 0",
         "fee_platform_5pct": "NUMERIC(10, 2) DEFAULT 0",
         "payout_due_to_bar": "NUMERIC(10, 2) DEFAULT 0",
-        "status": "VARCHAR(30) DEFAULT 'pending'",
+        "status": "VARCHAR(30) DEFAULT 'PLACED'",
         "payment_method": "VARCHAR(30)",
         "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
         "paid_at": "TIMESTAMP",
@@ -1384,7 +1394,7 @@ async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
         vat_total=vat_total,
         fee_platform_5pct=fee,
         payout_due_to_bar=payout,
-        status="pending",
+        status="PLACED",
         items=order_items,
     )
     db.add(db_order)
@@ -1637,7 +1647,7 @@ async def checkout(
         customer_id=user.id,
         table_id=cart.table_id,
         subtotal=order_total,
-        status="pending",
+        status="PLACED",
         payment_method=payment_method,
         paid_at=datetime.utcnow(),
         items=order_items,
@@ -1676,8 +1686,8 @@ async def order_history(request: Request, db: Session = Depends(get_db)):
         .order_by(Order.created_at.desc())
         .all()
     )
-    pending_orders = [o for o in orders if o.status != "completed"]
-    completed_orders = [o for o in orders if o.status == "completed"]
+    pending_orders = [o for o in orders if o.status != "COMPLETED"]
+    completed_orders = [o for o in orders if o.status == "COMPLETED"]
     return render_template(
         "order_history.html",
         request=request,
@@ -1701,7 +1711,7 @@ async def get_bar_orders(
         raise HTTPException(status_code=403, detail="Not authorised")
     orders = (
         db.query(Order)
-        .filter(Order.bar_id == bar_id, Order.status != "completed")
+        .filter(Order.bar_id == bar_id, Order.status != "COMPLETED")
         .order_by(Order.created_at.desc())
         .all()
     )
@@ -1721,7 +1731,16 @@ async def update_order_status(
         raise HTTPException(status_code=404, detail="Order not found")
     if not user or not user.is_bartender or order.bar_id not in user.bar_ids:
         raise HTTPException(status_code=403, detail="Not authorised")
-    order.status = data.status
+
+    new_status = data.status.upper()
+    allowed = ALLOWED_STATUS_TRANSITIONS.get(order.status, [])
+    if new_status not in allowed:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid transition {order.status} -> {new_status}",
+        )
+
+    order.status = new_status
     db.commit()
     order_data = await send_order_update(order)
     return {"status": order.status, "order": order_data}

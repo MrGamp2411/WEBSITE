@@ -2,6 +2,10 @@ function formatPayment(method) {
   return method ? method.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase()) : '';
 }
 
+function formatStatus(status) {
+  return status ? status.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase()) : '';
+}
+
 function initBartender(barId) {
   const list = document.getElementById('orders');
   function render(order) {
@@ -13,17 +17,17 @@ function initBartender(barId) {
       list.prepend(li);
     }
     let actions = '';
-    if (order.status === 'pending') {
-      actions = `<button data-status="preparing">Accept</button>`;
-    } else if (order.status === 'preparing') {
-      actions = `<button data-status="ready">Ready</button>`;
-    } else if (order.status === 'ready') {
-      actions = `<button data-status="completed">Complete</button>`;
+    if (order.status === 'PLACED') {
+      actions = `<button data-status="ACCEPTED">Accept</button>`;
+    } else if (order.status === 'ACCEPTED') {
+      actions = `<button data-status="READY">Ready</button>`;
+    } else if (order.status === 'READY') {
+      actions = `<button data-status="COMPLETED">Complete</button>`;
     }
     const actionsHtml = actions ? `<div class="order-actions">${actions}</div>` : '';
     li.innerHTML =
       `<div class="card__body">` +
-      `<h3 class="card__title">Order #${order.id} - <span class=\"status\">${order.status}</span></h3>` +
+      `<h3 class="card__title">Order #${order.id} - <span class=\"status status-${order.status.toLowerCase()}\">${formatStatus(order.status)}</span></h3>` +
       `<p>Customer: ${order.customer_name || ''} (${order.customer_prefix || ''} ${order.customer_phone || ''})</p>` +
       `<p>Bar: ${order.bar_name || ''}</p>` +
       `<p>Table: ${order.table_name || ''}</p>` +
@@ -37,7 +41,7 @@ function initBartender(barId) {
     li.querySelectorAll('button').forEach(btn => {
       btn.addEventListener('click', () => updateStatus(order.id, btn.dataset.status, render));
     });
-    if (order.status === 'completed') {
+    if (order.status === 'COMPLETED') {
       li.remove();
     }
   }
@@ -78,7 +82,7 @@ function initUser(userId) {
     }
     li.innerHTML =
       `<div class="card__body">` +
-      `<h3 class="card__title">Order #${order.id} - <span class=\"status\">${order.status}</span></h3>` +
+      `<h3 class="card__title">Order #${order.id} - <span class=\"status status-${order.status.toLowerCase()}\">${formatStatus(order.status)}</span></h3>` +
       `<p>Customer: ${order.customer_name || ''} (${order.customer_prefix || ''} ${order.customer_phone || ''})</p>` +
       `<p>Bar: ${order.bar_name || ''}</p>` +
       `<p>Table: ${order.table_name || ''}</p>` +
@@ -96,7 +100,7 @@ function initUser(userId) {
     const data = JSON.parse(ev.data);
     if (data.type === 'order') {
       const li = render(data.order);
-      if (data.order.status === 'completed') {
+      if (data.order.status === 'COMPLETED') {
         completed.appendChild(li);
       } else {
         pending.appendChild(li);
