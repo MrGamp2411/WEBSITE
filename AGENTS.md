@@ -95,8 +95,9 @@
     - `.order-list` is a flex container that wraps so order cards can flow horizontally.
     - Order list cards match bar card width (400px desktop, 300px mobile) while allowing their height to expand with content.
     - `.order-list .card__body` uses `gap: var(--space-1)` and removes default margins on child `p` and `ul` elements to tighten spacing.
-    - `order_history.html` displays placement times via the `format_time` filter so displayed hours honor `BAR_TIMEZONE`.
-    - Status labels are title-cased for display with `status status-<status>` classes (`formatStatus` in `orders.js`; `order.status|replace('_', ' ')|title` in templates).
+  - `order_history.html` displays placement times via the `format_time` filter so displayed hours honor `BAR_TIMEZONE`.
+  - Status labels are title-cased for display with `status status-<status>` classes (`formatStatus` in `orders.js`; `order.status|replace('_', ' ')|title` in templates).
   - `ensure_order_columns()` in `main.py` adds missing columns (e.g., `table_id`, `status`) to the `orders` table at startup.
+  - Admin dashboard includes a testing-only "Delete all orders" button at `/admin/orders/clear` to remove every order record.
 - Testing:
   - Run `pytest`

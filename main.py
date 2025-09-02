@@ -2674,6 +2674,17 @@ async def admin_dashboard(request: Request):
     return render_template("admin_dashboard.html", request=request)
 
 
+@app.post("/admin/orders/clear")
+async def admin_clear_orders(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    if not user or not user.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    db.query(OrderItem).delete()
+    db.query(Order).delete()
+    db.commit()
+    return RedirectResponse(url="/admin/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+
+
 @app.get("/admin/analytics", response_class=HTMLResponse)
 async def admin_analytics(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request)
