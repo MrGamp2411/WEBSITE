@@ -1946,8 +1946,22 @@ async def dashboard(request: Request):
         return render_template("bar_admin_dashboard.html", request=request, bar=bar)
     if user.is_bartender:
         bar = bars.get(user.bar_id)
-        return render_template("bartender_dashboard.html", request=request, bar=bar)
+        bar_list = [bar] if bar else []
+        return render_template(
+            "bartender_dashboard.html", request=request, bars=bar_list
+        )
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.get("/dashboard/bar/{bar_id}/orders", response_class=HTMLResponse)
+async def bartender_orders(request: Request, bar_id: int):
+    user = get_current_user(request)
+    if not user or not user.is_bartender or user.bar_id != bar_id:
+        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    bar = bars.get(bar_id)
+    if not bar:
+        raise HTTPException(status_code=404)
+    return render_template("bartender_orders.html", request=request, bar=bar)
 
 
 # Admin management endpoints
