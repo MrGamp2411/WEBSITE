@@ -73,6 +73,7 @@
     which loads with `defer` and initializes `initBartender(bar.id)` on `DOMContentLoaded`.
   - The bartender dashboard lists assigned bars as `.bar-card` links to `/dashboard/bar/{id}/orders`.
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
+  - WebSocket support depends on `uvicorn[standard]` (or another backend that provides the `websockets` library).
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.
   - API endpoints `/api/bars/{bar_id}/orders` (GET) and `/api/orders/{id}/status` (POST) list and update orders.
   - Order status updates return the updated order; `static/js/orders.js` re-renders immediately after POST so bartenders see new states without reloading.
