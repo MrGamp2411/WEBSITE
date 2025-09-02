@@ -101,7 +101,9 @@
   - `order_history.html` displays placement times via the `format_time` filter so displayed hours honor `BAR_TIMEZONE`.
   - Status labels are title-cased for display with `status status-<status>` classes (`formatStatus` in `orders.js`; `order.status|replace('_', ' ')|title` in templates).
   - `ensure_order_columns()` in `main.py` adds missing columns (e.g., `table_id`, `status`) to the `orders` table at startup.
-  - Cancelling an order refunds the total to the customer's wallet when paid by card or wallet; pay-at-bar orders are removed without refund.
-  - Admin dashboard includes a testing-only "Delete all orders" button at `/admin/orders/clear` to remove every order record.
+- Cancelling an order refunds the total to the customer's wallet when paid by card or wallet; pay-at-bar orders are removed without refund.
+- User cache (`users`) is updated when an order is canceled so the wallet shows the refunded credit.
+- Order history and live order views display refund amounts for canceled orders.
+- Admin dashboard includes a testing-only "Delete all orders" button at `/admin/orders/clear` to remove every order record.
 - Testing:
   - Run `pytest`

@@ -462,6 +462,7 @@ async def send_order_update(order: Order) -> Dict[str, Any]:
         "accepted_at": order.accepted_at.isoformat() if order.accepted_at else None,
         "ready_at": order.ready_at.isoformat() if order.ready_at else None,
         "total": order.total,
+        "refund_amount": float(order.refund_amount or 0),
         "notes": order.notes,
         "items": [
             {
@@ -1309,6 +1310,7 @@ class OrderRead(BaseModel):
     accepted_at: Optional[datetime] = None
     ready_at: Optional[datetime] = None
     total: float
+    refund_amount: float = 0
     notes: Optional[str] = None
     customer_name: Optional[str] = None
     customer_prefix: Optional[str] = None
@@ -1781,6 +1783,9 @@ async def update_order_status(
                 customer = db.get(User, order.customer_id)
                 if customer:
                     customer.credit = Decimal(customer.credit or 0) + refund
+                    cached = users.get(order.customer_id)
+                    if cached:
+                        cached.credit = float(customer.credit)
         else:
             order.refund_amount = Decimal("0")
     db.commit()
