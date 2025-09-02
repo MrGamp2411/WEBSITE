@@ -462,6 +462,7 @@ async def send_order_update(order: Order) -> Dict[str, Any]:
         "accepted_at": order.accepted_at.isoformat() if order.accepted_at else None,
         "ready_at": order.ready_at.isoformat() if order.ready_at else None,
         "total": order.total,
+        "notes": order.notes,
         "items": [
             {
                 "id": i.id,
@@ -1308,6 +1309,7 @@ class OrderRead(BaseModel):
     accepted_at: Optional[datetime] = None
     ready_at: Optional[datetime] = None
     total: float
+    notes: Optional[str] = None
     customer_name: Optional[str] = None
     customer_prefix: Optional[str] = None
     customer_phone: Optional[str] = None
@@ -1633,6 +1635,7 @@ async def checkout(
     request: Request,
     table_id: Optional[int] = Form(None),
     payment_method: str = Form(...),
+    notes: Optional[str] = Form(None),
     db: Session = Depends(get_db),
 ):
     user = get_current_user(request)
@@ -1673,6 +1676,7 @@ async def checkout(
         payment_method=payment_method,
         paid_at=datetime.utcnow(),
         items=order_items,
+        notes=notes,
     )
     db.add(db_order)
     db.commit()

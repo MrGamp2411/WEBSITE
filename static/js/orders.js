@@ -40,6 +40,7 @@ function initBartender(barId) {
     const actionsHtml = actions ? `<div class="order-actions">${actions}</div>` : '';
     const placed = formatTime(order.created_at);
     const prep = order.ready_at ? `<p>Prep time: ${diffMinutes(order.created_at, order.ready_at)} min</p>` : '';
+    const notes = order.notes ? `<p>Notes: ${order.notes}</p>` : '';
     li.className = 'card card--' + order.status.toLowerCase();
     li.innerHTML =
       `<div class="card__body">` +
@@ -51,6 +52,7 @@ function initBartender(barId) {
       `<p>Total: CHF ${order.total.toFixed(2)}</p>` +
       `<p>Placed: ${placed}</p>` +
       prep +
+      notes +
       `<ul>` +
       order.items.map(i => `<li>${i.qty}× ${i.menu_item_name || ''}</li>`).join('') +
       `</ul>` +
@@ -114,6 +116,7 @@ function initUser(userId) {
     li.className = 'card card--' + order.status.toLowerCase();
     const placed = formatTime(order.created_at);
     const prep = order.ready_at ? `<p>Prep time: ${diffMinutes(order.created_at, order.ready_at)} min</p>` : '';
+    const notes = order.notes ? `<p>Notes: ${order.notes}</p>` : '';
     li.innerHTML =
       `<div class="card__body">` +
       `<h3 class="card__title">Order #${order.id} - <span class=\"status status-${order.status.toLowerCase()}\">${formatStatus(order.status)}</span></h3>` +
@@ -124,6 +127,7 @@ function initUser(userId) {
       `<p>Total: CHF ${order.total.toFixed(2)}</p>` +
       `<p>Ordered at: ${placed}</p>` +
       prep +
+      notes +
       `<ul>` +
       order.items.map(i => `<li>${i.qty}× ${i.menu_item_name || ''}</li>`).join('') +
       `</ul>` +
