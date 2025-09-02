@@ -283,6 +283,9 @@ body.dark-mode{
 .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--space-3);list-style:none;padding:0;justify-items:center;}
 .order-list{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:flex-start;}
 .order-list .card{width:400px;max-width:400px;}
+.order-list .card__body{gap:var(--space-1);}
+.order-list .card__body p,
+.order-list .card__body ul{margin:0;}
 @media (max-width:768px){.order-list .card{width:300px;max-width:300px;}}
 .order-actions{margin-top:var(--space-2);display:flex;gap:var(--space-2);}
 
