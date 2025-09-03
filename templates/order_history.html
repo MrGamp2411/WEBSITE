@@ -13,14 +13,17 @@
     <div class="order-card__divider"></div>
     <section class="order-card__meta">
       <dl class="order-kv">
-        <div><dt>Customer</dt><dd>{{ order.customer_name or 'Unknown' }} <span class="muted">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</span></dd></div>
+        <div><dt>Total</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.total) }}</dd></div>
+        {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>Refunded</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
+        <div><dt>Placed</dt><dd class="num nowrap">{{ order.created_at|format_time }}</dd></div>
+
+        <div><dt>Customer</dt><dd>{{ order.customer_name or 'Unknown' }} <a href="tel:{{ (order.customer_prefix or '')|replace(' ', '') }}{{ (order.customer_phone or '')|replace(' ', '') }}">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</a></dd></div>
         <div><dt>Bar</dt><dd>{{ order.bar_name or '' }}</dd></div>
+
         <div><dt>Table</dt><dd>{{ order.table_name or '' }}</dd></div>
         <div><dt>Payment</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
         {% if order.notes %}<div><dt>Notes</dt><dd>{{ order.notes }}</dd></div>{% endif %}
-        <div><dt>Total</dt><dd class="num">CHF {{ "%.2f"|format(order.total) }}</dd></div>
-        {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>Refunded</dt><dd class="num">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
-        <div><dt>Placed</dt><dd class="num">{{ order.created_at|format_time }}</dd></div>
+
         {% if order.ready_at %}<div><dt>Prep time</dt><dd class="num">{{ ((order.ready_at - order.created_at).total_seconds() // 60)|int }} min</dd></div>{% endif %}
       </dl>
     </section>
@@ -54,14 +57,17 @@
     <div class="order-card__divider"></div>
     <section class="order-card__meta">
       <dl class="order-kv">
-        <div><dt>Customer</dt><dd>{{ order.customer_name or 'Unknown' }} <span class="muted">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</span></dd></div>
+        <div><dt>Total</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.total) }}</dd></div>
+        {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>Refunded</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
+        <div><dt>Placed</dt><dd class="num nowrap">{{ order.created_at|format_time }}</dd></div>
+
+        <div><dt>Customer</dt><dd>{{ order.customer_name or 'Unknown' }} <a href="tel:{{ (order.customer_prefix or '')|replace(' ', '') }}{{ (order.customer_phone or '')|replace(' ', '') }}">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</a></dd></div>
         <div><dt>Bar</dt><dd>{{ order.bar_name or '' }}</dd></div>
+
         <div><dt>Table</dt><dd>{{ order.table_name or '' }}</dd></div>
         <div><dt>Payment</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
         {% if order.notes %}<div><dt>Notes</dt><dd>{{ order.notes }}</dd></div>{% endif %}
-        <div><dt>Total</dt><dd class="num">CHF {{ "%.2f"|format(order.total) }}</dd></div>
-        {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>Refunded</dt><dd class="num">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
-        <div><dt>Placed</dt><dd class="num">{{ order.created_at|format_time }}</dd></div>
+
         {% if order.ready_at %}<div><dt>Prep time</dt><dd class="num">{{ ((order.ready_at - order.created_at).total_seconds() // 60)|int }} min</dd></div>{% endif %}
       </dl>
     </section>

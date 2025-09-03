@@ -55,7 +55,7 @@ function initBartender(barId) {
     }
     const actionsHtml = actions ? `<div class="order-actions">${actions}</div>` : '';
     const placed = formatTime(order.created_at);
-    const refund = order.status === 'CANCELED' && order.refund_amount ? `<div><dt>Refund</dt><dd class="num">CHF ${order.refund_amount.toFixed(2)}</dd></div>` : '';
+    const refund = order.status === 'CANCELED' && order.refund_amount ? `<div><dt>Refunded</dt><dd class="num nowrap">CHF ${order.refund_amount.toFixed(2)}</dd></div>` : '';
     const notes = order.notes ? `<div><dt>Notes</dt><dd>${order.notes}</dd></div>` : '';
     const prep = order.ready_at ? `<div><dt>Prep time</dt><dd class="num">${diffMinutes(order.created_at, order.ready_at)} min</dd></div>` : '';
     el.className = 'order-card card card--' + order.status.toLowerCase();
@@ -70,15 +70,17 @@ function initBartender(barId) {
       `</header>` +
       `<div class="order-card__divider"></div>` +
       `<section class="order-card__meta"><dl class="order-kv">` +
-      `<div><dt>Customer</dt><dd>${order.customer_name || ''} <span class="muted">(${order.customer_prefix || ''} ${order.customer_phone || ''})</span></dd></div>` +
+      `<div><dt>Total</dt><dd class="num nowrap">CHF ${order.total.toFixed(2)}</dd></div>` +
+      refund +
+      `<div><dt>Placed</dt><dd class="num nowrap">${placed}</dd></div>` +
+
+      `<div><dt>Customer</dt><dd>${order.customer_name || ''} <a href="tel:${(order.customer_prefix || '').replace(/\s+/g,'')}${(order.customer_phone || '').replace(/\s+/g,'')}">(${order.customer_prefix || ''} ${order.customer_phone || ''})</a></dd></div>` +
       `<div><dt>Bar</dt><dd>${order.bar_name || ''}</dd></div>` +
+
       `<div><dt>Table</dt><dd>${order.table_name || ''}</dd></div>` +
       `<div><dt>Payment</dt><dd>${formatPayment(order.payment_method)}</dd></div>` +
-      `<div><dt>Total</dt><dd class="num">CHF ${order.total.toFixed(2)}</dd></div>` +
-      refund +
-      `<div><dt>Placed</dt><dd class="num">${placed}</dd></div>` +
-      prep +
       notes +
+      prep +
       `</dl></section>` +
       `<div class="order-card__divider"></div>` +
       `<section class="order-card__items"><ul class="order-items">` +
@@ -149,7 +151,7 @@ function initUser(userId) {
     el.setAttribute('aria-labelledby', 'order-' + order.id + '-title');
     el.dataset.status = order.status;
     const placed = formatTime(order.created_at);
-    const refund = order.status === 'CANCELED' && order.refund_amount ? `<div><dt>Refunded</dt><dd class="num">CHF ${order.refund_amount.toFixed(2)}</dd></div>` : '';
+    const refund = order.status === 'CANCELED' && order.refund_amount ? `<div><dt>Refunded</dt><dd class="num nowrap">CHF ${order.refund_amount.toFixed(2)}</dd></div>` : '';
     const notes = order.notes ? `<div><dt>Notes</dt><dd>${order.notes}</dd></div>` : '';
     const prep = order.ready_at ? `<div><dt>Prep time</dt><dd class="num">${diffMinutes(order.created_at, order.ready_at)} min</dd></div>` : '';
     const actions = order.status === 'PLACED'
@@ -162,15 +164,17 @@ function initUser(userId) {
       `</header>` +
       `<div class="order-card__divider"></div>` +
       `<section class="order-card__meta"><dl class="order-kv">` +
-      `<div><dt>Customer</dt><dd>${order.customer_name || ''} <span class="muted">(${order.customer_prefix || ''} ${order.customer_phone || ''})</span></dd></div>` +
+      `<div><dt>Total</dt><dd class="num nowrap">CHF ${order.total.toFixed(2)}</dd></div>` +
+      refund +
+      `<div><dt>Placed</dt><dd class="num nowrap">${placed}</dd></div>` +
+
+      `<div><dt>Customer</dt><dd>${order.customer_name || ''} <a href="tel:${(order.customer_prefix || '').replace(/\s+/g,'')}${(order.customer_phone || '').replace(/\s+/g,'')}">(${order.customer_prefix || ''} ${order.customer_phone || ''})</a></dd></div>` +
       `<div><dt>Bar</dt><dd>${order.bar_name || ''}</dd></div>` +
+
       `<div><dt>Table</dt><dd>${order.table_name || ''}</dd></div>` +
       `<div><dt>Payment</dt><dd>${formatPayment(order.payment_method)}</dd></div>` +
-      `<div><dt>Total</dt><dd class="num">CHF ${order.total.toFixed(2)}</dd></div>` +
-      refund +
-      `<div><dt>Placed</dt><dd class="num">${placed}</dd></div>` +
-      prep +
       notes +
+      prep +
       `</dl></section>` +
       `<div class="order-card__divider"></div>` +
       `<section class="order-card__items"><ul class="order-items">` +
