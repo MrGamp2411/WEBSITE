@@ -49,6 +49,7 @@
   - Cart items are limited to one bar at a time.
   - Navigating away from the active bar shows a blocking popup in `templates/layout.html` styled via `.cart-blocker` and `.cart-popup`.
   - Bartenders can pause ordering from the orders dashboard; paused bars return 409 on `/bars/{id}/add_to_cart` and `app.js` shows a "service paused" popup.
+  - The cart page sets `window.orderingPaused` when a bar is paused so the service pause popup appears on load.
   - `cart.html` displays the current bar's name, lists its tables for selection, and shows a wallet link for adding funds.
   - Checkout form asks for payment method (credit card, wallet credit, or pay at bar);
     selection is handled by `/cart/checkout` and stored in `Transaction.payment_method`.
