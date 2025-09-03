@@ -39,3 +39,5 @@ def test_bar_admin_dashboard_shows_bar_cards():
         assert 'class="bar-card"' in resp.text
         assert f'href="/dashboard/bar/{bar.id}/orders"' in resp.text
         assert 'Manage Orders' in resp.text
+        assert 'Manage Users' not in resp.text
+        assert 'Add Category' not in resp.text
