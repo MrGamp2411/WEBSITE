@@ -10,17 +10,29 @@
 </div>
 {% if bars %}
 <div class="dashboard-actions">
-  {% for bar in bars %}
-  <div class="card">
-    <h3>{{ bar.name }}</h3>
-    <a class="btn btn--primary" href="/admin/bars/edit/{{ bar.id }}">Edit Bar</a>
-    <a class="btn" href="/admin/bars/{{ bar.id }}/users">Manage Users</a>
-    <a class="btn" href="/bar/{{ bar.id }}/categories/new">Add Category</a>
-  </div>
-  {% endfor %}
+  <ul class="bars">
+    {% for bar in bars %}
+    <li>
+      <div class="bar-card">
+        <div class="thumb-wrapper">
+          {% if bar.photo_url %}
+          <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" width="400" height="225">
+          {% endif %}
+        </div>
+        <h3 class="title">{{ bar.name }}</h3>
+        <address>{{ bar.city }}{% if bar.state %}, {{ bar.state }}{% endif %}</address>
+        <p class="desc">{{ bar.description }}</p>
+        <div class="bar-actions">
+          <a class="btn btn--primary" href="/admin/bars/edit/{{ bar.id }}">Edit Bar</a>
+          <a class="btn" href="/admin/bars/{{ bar.id }}/users">Manage Users</a>
+          <a class="btn" href="/bar/{{ bar.id }}/categories/new">Add Category</a>
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
 </div>
 {% else %}
 <p>No bar assigned.</p>
 {% endif %}
 {% endblock %}
-
