@@ -76,8 +76,7 @@
   - `templates/bartender_orders.html` groups orders into `<ul>` lists with IDs
     `incoming-orders`, `preparing-orders`, `ready-orders`, and `completed-orders`.
   - The bartender dashboard lists assigned bars as `.bar-card` links to `/dashboard/bar/{id}/orders`.
-  - The bar admin dashboard lists assigned bars as collapsible items: clicking a bar's name toggles a table of management links.
-  - Interactivity for the bar admin dashboard lives in `static/js/bar_admin_dashboard.js`.
+  - The bar admin dashboard lists assigned bars as `.bar-card` items with edit and management links.
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
   - WebSocket support depends on `uvicorn[standard]` (or another backend that provides the `websockets` library).
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.
@@ -116,3 +115,5 @@
 - Admin dashboard includes a testing-only "Delete all orders" button at `/admin/orders/clear` to remove every order record.
 - Testing:
   - Run `pytest`
+- Meta:
+  - Reverted merge commit 9bc986e (PR #315) in commit 11e13a9 to restore the bar admin dashboard to its previous state; `static/js/bar_admin_dashboard.js` was removed.

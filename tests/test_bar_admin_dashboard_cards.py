@@ -21,7 +21,7 @@ def setup_db():
     users_by_username.clear()
 
 
-def test_bar_admin_dashboard_shows_bar_sections():
+def test_bar_admin_dashboard_shows_bar_cards():
     setup_db()
     with TestClient(app) as client:
         db = SessionLocal()
@@ -36,5 +36,4 @@ def test_bar_admin_dashboard_shows_bar_sections():
         client.post('/login', data={'email': 'a@example.com', 'password': 'pass'})
         resp = client.get('/dashboard')
         assert resp.status_code == 200
-        assert 'class="bar-toggle"' in resp.text
-        assert 'class="bar-sections"' in resp.text
+        assert 'class="bar-card"' in resp.text
