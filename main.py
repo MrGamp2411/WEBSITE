@@ -1714,8 +1714,12 @@ async def order_history(request: Request, db: Session = Depends(get_db)):
         .order_by(Order.created_at.desc())
         .all()
     )
-    pending_orders = [o for o in orders if o.status not in ("COMPLETED", "CANCELED")]
-    completed_orders = [o for o in orders if o.status in ("COMPLETED", "CANCELED")]
+    pending_orders = [
+        o for o in orders if o.status not in ("COMPLETED", "CANCELED", "REJECTED")
+    ]
+    completed_orders = [
+        o for o in orders if o.status in ("COMPLETED", "CANCELED", "REJECTED")
+    ]
     return render_template(
         "order_history.html",
         request=request,
