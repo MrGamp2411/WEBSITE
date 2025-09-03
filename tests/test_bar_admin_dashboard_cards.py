@@ -37,3 +37,5 @@ def test_bar_admin_dashboard_shows_bar_cards():
         resp = client.get('/dashboard')
         assert resp.status_code == 200
         assert 'class="bar-card"' in resp.text
+        assert f'href="/dashboard/bar/{bar.id}/orders"' in resp.text
+        assert 'Manage Orders' in resp.text
