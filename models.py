@@ -169,6 +169,18 @@ class ProductImage(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+class BarClosing(Base):
+    __tablename__ = "bar_closings"
+
+    id = Column(Integer, primary_key=True)
+    bar_id = Column(Integer, ForeignKey("bars.id"), nullable=False)
+    closed_at = Column(DateTime, default=datetime.utcnow)
+    total_revenue = Column(Numeric(10, 2), default=0)
+
+    bar = relationship("Bar")
+    orders = relationship("Order", back_populates="closing")
+
+
 class Order(Base):
     __tablename__ = "orders"
 
@@ -190,11 +202,13 @@ class Order(Base):
     refund_amount = Column(Numeric(10, 2), default=0)
     notes = Column(Text)
     source_channel = Column(String(30))
+    closing_id = Column(Integer, ForeignKey("bar_closings.id"))
 
     items = relationship("OrderItem", back_populates="order")
     customer = relationship("User")
     table = relationship("Table")
     bar = relationship("Bar")
+    closing = relationship("BarClosing", back_populates="orders")
 
     @property
     def customer_name(self):
