@@ -83,3 +83,7 @@
   </section>
 {% endfor %}
 {% endblock %}
+
+{% block scripts %}
+<script>window.orderingPaused = {{ 'true' if bar.ordering_paused else 'false' }};</script>
+{% endblock %}

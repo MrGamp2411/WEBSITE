@@ -12,6 +12,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const locationInput = document.getElementById('locationInput') || document.getElementById('locationInputDesktop');
   const suggestionsBox = document.getElementById('searchSuggestions') || document.getElementById('searchSuggestionsDesktop');
   const locationSelectors = document.querySelectorAll('.location-selector');
+  const pausePopup = document.getElementById('servicePaused');
+  const closePause = document.querySelector('.js-close-service-paused');
+  function showPausePopup(){ if(pausePopup) pausePopup.hidden=false; }
+  if(closePause){ closePause.addEventListener('click',()=>{ if(pausePopup) pausePopup.hidden=true; }); }
 
   if (locationSelectors.length && locationInput) {
     locationSelectors.forEach(sel => {
@@ -436,6 +440,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if(!e.target.matches('.add-to-cart-form')) return;
     const form=e.target;
     e.preventDefault();
+    if(window.orderingPaused){ showPausePopup(); return; }
     const btn=form.querySelector('button[type="submit"]');
     if(btn?.disabled) return;
     const data=new URLSearchParams(new FormData(form));
@@ -443,7 +448,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const original=btn.textContent;
     btn.textContent='Adding…';
     try{
-      const res=await fetch(form.action,{method:'POST',body:data,headers:{Accept:'application/json'}});
+      const res=await fetch(form.action,{method:'POST',body=data,headers:{Accept:'application/json'}});
+      if(res.status===409){ window.orderingPaused=true; showPausePopup(); return; }
       if(!res.ok) throw new Error();
       const json=await res.json();
       updateMiniCart(json);
@@ -468,11 +474,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const display=form.querySelector('.qty-display');
     if(!productInput||!display) return;
     let qty=parseInt(display.textContent,10)||0;
+    if(btn.matches('.qty-plus') && window.orderingPaused){ showPausePopup(); return; }
     btn.disabled=true;
     try{
       if(btn.matches('.qty-plus')){
         const data=new URLSearchParams({product_id:productInput.value});
         const res=await fetch(form.action,{method:'POST',body:data,headers:{Accept:'application/json'}});
+        if(res.status===409){ window.orderingPaused=true; showPausePopup(); return; }
         if(!res.ok) throw new Error();
         const json=await res.json();
         updateMiniCart(json);
