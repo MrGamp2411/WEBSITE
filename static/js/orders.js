@@ -22,6 +22,21 @@ function initBartender(barId) {
   const preparing = document.getElementById('preparing-orders');
   const ready = document.getElementById('ready-orders');
   const completed = document.getElementById('completed-orders');
+
+  function insertSorted(container, element, ascending) {
+    const created = new Date(element.dataset.createdAt + 'Z');
+    const children = Array.from(container.children);
+    const index = children.findIndex(child => {
+      const childCreated = new Date(child.dataset.createdAt + 'Z');
+      return ascending ? childCreated > created : childCreated < created;
+    });
+    if (index === -1) {
+      container.appendChild(element);
+    } else {
+      container.insertBefore(element, children[index]);
+    }
+  }
+
   function render(order) {
     let li = document.getElementById('order-' + order.id);
     if (!li) {
@@ -44,6 +59,7 @@ function initBartender(barId) {
     const refund = order.status === 'CANCELED' && order.refund_amount ? `<p>Refund: CHF ${order.refund_amount.toFixed(2)}</p>` : '';
     li.className = 'card card--' + order.status.toLowerCase();
     li.dataset.status = order.status;
+    li.dataset.createdAt = order.created_at;
     li.innerHTML =
       `<div class="card__body">` +
       `<h3 class="card__title">Order #${order.id} - <span class=\"status status-${order.status.toLowerCase()}\">${formatStatus(order.status)}</span></h3>` +
@@ -65,17 +81,17 @@ function initBartender(barId) {
       btn.addEventListener('click', () => updateStatus(order.id, btn.dataset.status, render));
     });
     if (order.status === 'PLACED') {
-      incoming.prepend(li);
+      insertSorted(incoming, li, true);
     } else if (order.status === 'ACCEPTED') {
-      preparing.prepend(li);
+      insertSorted(preparing, li, true);
     } else if (order.status === 'READY') {
-      ready.prepend(li);
+      insertSorted(ready, li, true);
     } else if (
       order.status === 'COMPLETED' ||
       order.status === 'CANCELED' ||
       order.status === 'REJECTED'
     ) {
-      completed.prepend(li);
+      insertSorted(completed, li, false);
     }
   }
   function load() {
