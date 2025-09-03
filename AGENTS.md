@@ -79,6 +79,7 @@
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
   - WebSocket support depends on `uvicorn[standard]` (or another backend that provides the `websockets` library).
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.
+  - Bartender dashboards fetch existing orders via `/api/bars/{bar_id}/orders` before connecting to WebSockets so orders display even if the real-time connection fails.
   - API endpoints `/api/bars/{bar_id}/orders` (GET) and `/api/orders/{id}/status` (POST) list and update orders.
   - `/api/bars/{bar_id}/orders` returns all statuses so completed orders remain visible after reloads.
   - Order status updates return the updated order; `static/js/orders.js` re-renders immediately after POST so bartenders see new states without reloading.

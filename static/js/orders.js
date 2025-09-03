@@ -125,6 +125,8 @@ function initBartender(barId) {
     };
     ws.onerror = () => ws.close();
   }
+  // load existing orders even if the WebSocket can't connect
+  load();
   connect();
 }
 
