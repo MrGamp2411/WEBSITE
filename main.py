@@ -1553,6 +1553,9 @@ async def bar_detail(request: Request, bar_id: int):
         bar=bar,
         products_by_category=sorted_products,
         opening_hours=weekly_hours_list(bar.opening_hours) if bar.opening_hours else [],
+        pause_popup_close=bar.ordering_paused,
+        cart_bar_name=bar.name,
+        cart_bar_id=bar.id,
     )
 
 
@@ -1586,6 +1589,9 @@ async def add_to_cart(request: Request, bar_id: int, product_id: int = Form(...)
             bar=bar,
             products_by_category=products_by_category,
             error="Please clear your cart before ordering from another bar.",
+            pause_popup_close=bar.ordering_paused,
+            cart_bar_name=bar.name,
+            cart_bar_id=bar.id,
         )
     if cart.bar_id is None:
         cart.bar_id = bar_id
@@ -1640,6 +1646,8 @@ async def view_cart(request: Request):
         request=request,
         cart=cart,
         bar=current_bar,
+        pause_popup_back=current_bar.ordering_paused if current_bar else False,
+        show_service_paused=current_bar.ordering_paused if current_bar else False,
     )
 
 
