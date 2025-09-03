@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const closePause = document.querySelector('.js-close-service-paused');
   function showPausePopup(){ if(pausePopup) pausePopup.hidden=false; }
   if(closePause){ closePause.addEventListener('click',()=>{ if(pausePopup) pausePopup.hidden=true; }); }
+  if(window.orderingPaused){ showPausePopup(); }
 
   if (locationSelectors.length && locationInput) {
     locationSelectors.forEach(sel => {

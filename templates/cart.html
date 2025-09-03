@@ -59,3 +59,7 @@
 <p>Your cart is empty.</p>
 {% endif %}
 {% endblock %}
+
+{% block scripts %}
+<script>window.orderingPaused = {{ 'true' if bar and bar.ordering_paused else 'false' }};</script>
+{% endblock %}
