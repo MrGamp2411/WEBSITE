@@ -36,4 +36,4 @@ def test_bartender_orders_page_contains_completed_list():
         client.post('/login', data={'email': 'b@example.com', 'password': 'pass'})
         resp = client.get(f'/dashboard/bar/{bar.id}/orders')
         assert resp.status_code == 200
-        assert '<ul id="completed-orders"' in resp.text
+        assert '<div id="completed-orders"' in resp.text

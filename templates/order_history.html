@@ -3,25 +3,32 @@
 <h1>Order History</h1>
 
 <h2>Pending Orders</h2>
-<ul id="pending-orders" class="order-list">
+<div id="pending-orders" class="order-list">
   {% for order in pending_orders %}
-  <li id="user-order-{{ order.id }}" class="card card--{{ order.status|lower }}" data-status="{{ order.status }}">
-    <div class="card__body">
-      <h3 class="card__title">Order #{{ order.id }} - <span class="status status-{{ order.status|lower }}">{{ order.status|replace('_', ' ')|title }}</span></h3>
-      <p>Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</p>
-      <p>Bar: {{ order.bar_name or '' }}</p>
-      <p>Table: {{ order.table_name or '' }}</p>
-      <p>Payment method: {{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</p>
-      {% if order.notes %}<p>Notes: {{ order.notes }}</p>{% endif %}
-      <p>Total: CHF {{ "%.2f"|format(order.total) }}</p>
-      {% if order.status == 'CANCELED' and order.refund_amount %}<p>Refunded: CHF {{ "%.2f"|format(order.refund_amount) }}</p>{% endif %}
-      <p>Ordered at: {{ order.created_at|format_time }}</p>
-      {% if order.ready_at %}
-      <p>Prep time: {{ ((order.ready_at - order.created_at).total_seconds() // 60)|int }} min</p>
-      {% endif %}
-      <ul>
+  <article id="user-order-{{ order.id }}" class="order-card card card--{{ order.status|lower }}" role="article" aria-labelledby="order-{{ order.id }}-title" data-status="{{ order.status }}">
+    <header class="order-card__header">
+      <h3 id="order-{{ order.id }}-title">Order #{{ order.id }}</h3>
+      <span class="order-status chip status status-{{ order.status|lower }}" aria-label="Order status: {{ order.status|replace('_', ' ')|title }}">{{ order.status|replace('_', ' ')|title }}</span>
+    </header>
+    <div class="order-card__divider"></div>
+    <section class="order-card__meta">
+      <dl class="order-kv">
+        <div><dt>Customer</dt><dd>{{ order.customer_name or 'Unknown' }} <span class="muted">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</span></dd></div>
+        <div><dt>Bar</dt><dd>{{ order.bar_name or '' }}</dd></div>
+        <div><dt>Table</dt><dd>{{ order.table_name or '' }}</dd></div>
+        <div><dt>Payment</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
+        {% if order.notes %}<div><dt>Notes</dt><dd>{{ order.notes }}</dd></div>{% endif %}
+        <div><dt>Total</dt><dd class="num">CHF {{ "%.2f"|format(order.total) }}</dd></div>
+        {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>Refunded</dt><dd class="num">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
+        <div><dt>Placed</dt><dd class="num">{{ order.created_at|format_time }}</dd></div>
+        {% if order.ready_at %}<div><dt>Prep time</dt><dd class="num">{{ ((order.ready_at - order.created_at).total_seconds() // 60)|int }} min</dd></div>{% endif %}
+      </dl>
+    </section>
+    <div class="order-card__divider"></div>
+    <section class="order-card__items">
+      <ul class="order-items">
         {% for item in order.items %}
-        <li>{{ item.qty }}× {{ item.menu_item_name or 'Unknown item' }}</li>
+        <li><span class="qty">{{ item.qty }}×</span><span class="name">{{ item.menu_item_name or 'Unknown item' }}</span></li>
         {% endfor %}
       </ul>
       {% if order.status == 'PLACED' %}
@@ -29,41 +36,48 @@
         <button class="cancel-order" data-order-id="{{ order.id }}" data-status="CANCELED">Cancel</button>
       </div>
       {% endif %}
-    </div>
-  </li>
+    </section>
+  </article>
   {% else %}
-  <li class="card"><div class="card__body">No pending orders.</div></li>
+  <p>No pending orders.</p>
   {% endfor %}
-</ul>
+</div>
 
 <h2>Completed Orders</h2>
-<ul id="completed-orders" class="order-list">
+<div id="completed-orders" class="order-list">
   {% for order in completed_orders %}
-  <li id="user-order-{{ order.id }}" class="card card--{{ order.status|lower }}" data-status="{{ order.status }}">
-    <div class="card__body">
-      <h3 class="card__title">Order #{{ order.id }} - <span class="status status-{{ order.status|lower }}">{{ order.status|replace('_', ' ')|title }}</span></h3>
-      <p>Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</p>
-      <p>Bar: {{ order.bar_name or '' }}</p>
-      <p>Table: {{ order.table_name or '' }}</p>
-      <p>Payment method: {{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</p>
-      {% if order.notes %}<p>Notes: {{ order.notes }}</p>{% endif %}
-      <p>Total: CHF {{ "%.2f"|format(order.total) }}</p>
-      {% if order.status == 'CANCELED' and order.refund_amount %}<p>Refunded: CHF {{ "%.2f"|format(order.refund_amount) }}</p>{% endif %}
-      <p>Ordered at: {{ order.created_at|format_time }}</p>
-      {% if order.ready_at %}
-      <p>Prep time: {{ ((order.ready_at - order.created_at).total_seconds() // 60)|int }} min</p>
-      {% endif %}
-      <ul>
+  <article id="user-order-{{ order.id }}" class="order-card card card--{{ order.status|lower }}" role="article" aria-labelledby="order-{{ order.id }}-title" data-status="{{ order.status }}">
+    <header class="order-card__header">
+      <h3 id="order-{{ order.id }}-title">Order #{{ order.id }}</h3>
+      <span class="order-status chip status status-{{ order.status|lower }}" aria-label="Order status: {{ order.status|replace('_', ' ')|title }}">{{ order.status|replace('_', ' ')|title }}</span>
+    </header>
+    <div class="order-card__divider"></div>
+    <section class="order-card__meta">
+      <dl class="order-kv">
+        <div><dt>Customer</dt><dd>{{ order.customer_name or 'Unknown' }} <span class="muted">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</span></dd></div>
+        <div><dt>Bar</dt><dd>{{ order.bar_name or '' }}</dd></div>
+        <div><dt>Table</dt><dd>{{ order.table_name or '' }}</dd></div>
+        <div><dt>Payment</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
+        {% if order.notes %}<div><dt>Notes</dt><dd>{{ order.notes }}</dd></div>{% endif %}
+        <div><dt>Total</dt><dd class="num">CHF {{ "%.2f"|format(order.total) }}</dd></div>
+        {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>Refunded</dt><dd class="num">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
+        <div><dt>Placed</dt><dd class="num">{{ order.created_at|format_time }}</dd></div>
+        {% if order.ready_at %}<div><dt>Prep time</dt><dd class="num">{{ ((order.ready_at - order.created_at).total_seconds() // 60)|int }} min</dd></div>{% endif %}
+      </dl>
+    </section>
+    <div class="order-card__divider"></div>
+    <section class="order-card__items">
+      <ul class="order-items">
         {% for item in order.items %}
-        <li>{{ item.qty }}× {{ item.menu_item_name or 'Unknown item' }}</li>
+        <li><span class="qty">{{ item.qty }}×</span><span class="name">{{ item.menu_item_name or 'Unknown item' }}</span></li>
         {% endfor %}
       </ul>
-    </div>
-  </li>
+    </section>
+  </article>
   {% else %}
-  <li class="card"><div class="card__body">No completed orders.</div></li>
+  <p>No completed orders.</p>
   {% endfor %}
-</ul>
+</div>
 <script src="/static/js/orders.js"></script>
 <script>
   initUser({{ user.id }});

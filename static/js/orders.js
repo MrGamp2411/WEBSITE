@@ -40,11 +40,10 @@ function initBartender(barId) {
   }
 
   function render(order) {
-    let li = document.getElementById('order-' + order.id);
-    if (!li) {
-      li = document.createElement('li');
-      li.id = 'order-' + order.id;
-      li.className = 'card';
+    let el = document.getElementById('order-' + order.id);
+    if (!el) {
+      el = document.createElement('article');
+      el.id = 'order-' + order.id;
     }
     let actions = '';
     if (order.status === 'PLACED') {
@@ -56,44 +55,52 @@ function initBartender(barId) {
     }
     const actionsHtml = actions ? `<div class="order-actions">${actions}</div>` : '';
     const placed = formatTime(order.created_at);
-    const prep = order.ready_at ? `<p>Prep time: ${diffMinutes(order.created_at, order.ready_at)} min</p>` : '';
-    const notes = order.notes ? `<p>Notes: ${order.notes}</p>` : '';
-    const refund = order.status === 'CANCELED' && order.refund_amount ? `<p>Refund: CHF ${order.refund_amount.toFixed(2)}</p>` : '';
-    li.className = 'card card--' + order.status.toLowerCase();
-    li.dataset.status = order.status;
-    li.dataset.createdAt = order.created_at;
-    li.innerHTML =
-      `<div class="card__body">` +
-      `<h3 class="card__title">Order #${order.id} - <span class=\"status status-${order.status.toLowerCase()}\">${formatStatus(order.status)}</span></h3>` +
-      `<p>Customer: ${order.customer_name || ''} (${order.customer_prefix || ''} ${order.customer_phone || ''})</p>` +
-      `<p>Bar: ${order.bar_name || ''}</p>` +
-      `<p>Table: ${order.table_name || ''}</p>` +
-      `<p>Payment: ${formatPayment(order.payment_method)}</p>` +
-      `<p>Total: CHF ${order.total.toFixed(2)}</p>` +
+    const refund = order.status === 'CANCELED' && order.refund_amount ? `<div><dt>Refund</dt><dd class="num">CHF ${order.refund_amount.toFixed(2)}</dd></div>` : '';
+    const notes = order.notes ? `<div><dt>Notes</dt><dd>${order.notes}</dd></div>` : '';
+    const prep = order.ready_at ? `<div><dt>Prep time</dt><dd class="num">${diffMinutes(order.created_at, order.ready_at)} min</dd></div>` : '';
+    el.className = 'order-card card card--' + order.status.toLowerCase();
+    el.setAttribute('role', 'article');
+    el.setAttribute('aria-labelledby', 'order-' + order.id + '-title');
+    el.dataset.status = order.status;
+    el.dataset.createdAt = order.created_at;
+    el.innerHTML =
+      `<header class="order-card__header">` +
+      `<h3 id="order-${order.id}-title">Order #${order.id}</h3>` +
+      `<span class="order-status chip status status-${order.status.toLowerCase()}" aria-label="Order status: ${formatStatus(order.status)}">${formatStatus(order.status)}</span>` +
+      `</header>` +
+      `<div class="order-card__divider"></div>` +
+      `<section class="order-card__meta"><dl class="order-kv">` +
+      `<div><dt>Customer</dt><dd>${order.customer_name || ''} <span class="muted">(${order.customer_prefix || ''} ${order.customer_phone || ''})</span></dd></div>` +
+      `<div><dt>Bar</dt><dd>${order.bar_name || ''}</dd></div>` +
+      `<div><dt>Table</dt><dd>${order.table_name || ''}</dd></div>` +
+      `<div><dt>Payment</dt><dd>${formatPayment(order.payment_method)}</dd></div>` +
+      `<div><dt>Total</dt><dd class="num">CHF ${order.total.toFixed(2)}</dd></div>` +
       refund +
-      `<p>Placed: ${placed}</p>` +
+      `<div><dt>Placed</dt><dd class="num">${placed}</dd></div>` +
       prep +
       notes +
-      `<ul>` +
-      order.items.map(i => `<li>${i.qty}× ${i.menu_item_name || ''}</li>`).join('') +
+      `</dl></section>` +
+      `<div class="order-card__divider"></div>` +
+      `<section class="order-card__items"><ul class="order-items">` +
+      order.items.map(i => `<li><span class="qty">${i.qty}×</span><span class="name">${i.menu_item_name || ''}</span></li>`).join('') +
       `</ul>` +
       actionsHtml +
-      `</div>`;
-    li.querySelectorAll('button').forEach(btn => {
+      `</section>`;
+    el.querySelectorAll('button').forEach(btn => {
       btn.addEventListener('click', () => updateStatus(order.id, btn.dataset.status, render));
     });
     if (order.status === 'PLACED') {
-      insertSorted(incoming, li, true);
+      insertSorted(incoming, el, true);
     } else if (order.status === 'ACCEPTED') {
-      insertSorted(preparing, li, true);
+      insertSorted(preparing, el, true);
     } else if (order.status === 'READY') {
-      insertSorted(ready, li, true);
+      insertSorted(ready, el, true);
     } else if (
       order.status === 'COMPLETED' ||
       order.status === 'CANCELED' ||
       order.status === 'REJECTED'
     ) {
-      insertSorted(completed, li, false);
+      insertSorted(completed, el, false);
     }
   }
   function load() {
@@ -132,52 +139,59 @@ function initUser(userId) {
   const pending = document.getElementById('pending-orders');
   const completed = document.getElementById('completed-orders');
   function render(order) {
-    let li = document.getElementById('user-order-' + order.id);
-    if (!li) {
-      li = document.createElement('li');
-      li.id = 'user-order-' + order.id;
-      li.className = 'card';
+    let el = document.getElementById('user-order-' + order.id);
+    if (!el) {
+      el = document.createElement('article');
+      el.id = 'user-order-' + order.id;
     }
-    li.className = 'card card--' + order.status.toLowerCase();
-    li.dataset.status = order.status;
+    el.className = 'order-card card card--' + order.status.toLowerCase();
+    el.setAttribute('role', 'article');
+    el.setAttribute('aria-labelledby', 'order-' + order.id + '-title');
+    el.dataset.status = order.status;
     const placed = formatTime(order.created_at);
-    const prep = order.ready_at ? `<p>Prep time: ${diffMinutes(order.created_at, order.ready_at)} min</p>` : '';
-    const notes = order.notes ? `<p>Notes: ${order.notes}</p>` : '';
-    const refund = order.status === 'CANCELED' && order.refund_amount ? `<p>Refunded: CHF ${order.refund_amount.toFixed(2)}</p>` : '';
+    const refund = order.status === 'CANCELED' && order.refund_amount ? `<div><dt>Refunded</dt><dd class="num">CHF ${order.refund_amount.toFixed(2)}</dd></div>` : '';
+    const notes = order.notes ? `<div><dt>Notes</dt><dd>${order.notes}</dd></div>` : '';
+    const prep = order.ready_at ? `<div><dt>Prep time</dt><dd class="num">${diffMinutes(order.created_at, order.ready_at)} min</dd></div>` : '';
     const actions = order.status === 'PLACED'
       ? `<div class="order-actions"><button data-order-id="${order.id}" data-status="CANCELED">Cancel</button></div>`
       : '';
-    li.innerHTML =
-      `<div class="card__body">` +
-      `<h3 class="card__title">Order #${order.id} - <span class=\"status status-${order.status.toLowerCase()}\">${formatStatus(order.status)}</span></h3>` +
-      `<p>Customer: ${order.customer_name || ''} (${order.customer_prefix || ''} ${order.customer_phone || ''})</p>` +
-      `<p>Bar: ${order.bar_name || ''}</p>` +
-      `<p>Table: ${order.table_name || ''}</p>` +
-      `<p>Payment: ${formatPayment(order.payment_method)}</p>` +
-      `<p>Total: CHF ${order.total.toFixed(2)}</p>` +
+    el.innerHTML =
+      `<header class="order-card__header">` +
+      `<h3 id="order-${order.id}-title">Order #${order.id}</h3>` +
+      `<span class="order-status chip status status-${order.status.toLowerCase()}" aria-label="Order status: ${formatStatus(order.status)}">${formatStatus(order.status)}</span>` +
+      `</header>` +
+      `<div class="order-card__divider"></div>` +
+      `<section class="order-card__meta"><dl class="order-kv">` +
+      `<div><dt>Customer</dt><dd>${order.customer_name || ''} <span class="muted">(${order.customer_prefix || ''} ${order.customer_phone || ''})</span></dd></div>` +
+      `<div><dt>Bar</dt><dd>${order.bar_name || ''}</dd></div>` +
+      `<div><dt>Table</dt><dd>${order.table_name || ''}</dd></div>` +
+      `<div><dt>Payment</dt><dd>${formatPayment(order.payment_method)}</dd></div>` +
+      `<div><dt>Total</dt><dd class="num">CHF ${order.total.toFixed(2)}</dd></div>` +
       refund +
-      `<p>Ordered at: ${placed}</p>` +
+      `<div><dt>Placed</dt><dd class="num">${placed}</dd></div>` +
       prep +
       notes +
-      `<ul>` +
-      order.items.map(i => `<li>${i.qty}× ${i.menu_item_name || ''}</li>`).join('') +
+      `</dl></section>` +
+      `<div class="order-card__divider"></div>` +
+      `<section class="order-card__items"><ul class="order-items">` +
+      order.items.map(i => `<li><span class="qty">${i.qty}×</span><span class="name">${i.menu_item_name || ''}</span></li>`).join('') +
       `</ul>` +
       actions +
-      `</div>`;
-    return li;
+      `</section>`;
+    return el;
   }
   const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
   const ws = new WebSocket(`${protocol}://${location.host}/ws/user/${userId}/orders`);
   ws.onmessage = ev => {
     const data = JSON.parse(ev.data);
     if (data.type === 'order') {
-      const li = render(data.order);
+      const card = render(data.order);
       if (
         ['COMPLETED', 'CANCELED', 'REJECTED'].includes(data.order.status)
       ) {
-        completed.appendChild(li);
+        completed.appendChild(card);
       } else {
-        pending.appendChild(li);
+        pending.appendChild(card);
       }
     }
   };
