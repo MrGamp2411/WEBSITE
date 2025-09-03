@@ -1082,6 +1082,7 @@ def render_template(template_name: str, **context) -> HTMLResponse:
                 if bar:
                     context.setdefault("cart_bar_id", bar.id)
                     context.setdefault("cart_bar_name", bar.name)
+                    context.setdefault("cart_bar_paused", bar.ordering_paused)
         bar_obj = context.get("bar")
         if bar_obj and hasattr(bar_obj, "id"):
             context.setdefault("current_bar_id", bar_obj.id)

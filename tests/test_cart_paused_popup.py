@@ -55,3 +55,6 @@ def test_cart_shows_pause_popup_when_bar_paused():
         resp = client.get("/cart")
         assert resp.status_code == 200
         assert "window.orderingPaused = true" in resp.text
+        home = client.get("/")
+        assert home.status_code == 200
+        assert "window.orderingPaused = true" in home.text
