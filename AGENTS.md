@@ -84,6 +84,9 @@
     into a `bar_closings` record (see `BarClosing` model). Each closing is listed on
     `/dashboard/bar/{id}/orders/history` with its total revenue and a "View" link to
     `/dashboard/bar/{id}/orders/history/{closing_id}` showing the day's orders.
+  - A background task also checks each minute and automatically closes bars at their scheduled
+    closing time based on `opening_hours`, moving completed orders into `bar_closings`. Editing a bar's
+    hours immediately updates the automatic schedule.
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
   - WebSocket support depends on `uvicorn[standard]` (or another backend that provides the `websockets` library).
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.

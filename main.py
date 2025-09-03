@@ -32,6 +32,7 @@ Limitations:
 """
 
 import os
+import asyncio
 import hashlib
 import json
 import random
@@ -619,7 +620,7 @@ def ensure_order_columns() -> None:
 
 
 @app.on_event("startup")
-def on_startup():
+async def on_startup():
     """Initialise database tables on startup."""
     Base.metadata.create_all(bind=engine)
     ensure_prefix_column()
@@ -630,6 +631,7 @@ def on_startup():
     ensure_order_columns()
     seed_super_admin()
     load_bars_from_db()
+    asyncio.create_task(auto_close_bars_worker())
 
 
 # Jinja2 environment for rendering HTML templates
@@ -735,6 +737,59 @@ def is_open_now_from_hours(hours: Dict[str, Dict[str, str]]) -> bool:
         return False
     now_t = now.time()
     return start <= now_t < end
+
+
+def auto_close_bars_once(db: Session, now: datetime) -> None:
+    """Close completed orders for bars whose closing time has passed."""
+    day = str(now.weekday())
+    bars_to_check = db.query(BarModel).all()
+    for bar in bars_to_check:
+        if not bar.opening_hours:
+            continue
+        try:
+            hours = json.loads(bar.opening_hours)
+            info = hours.get(day)
+            if not info:
+                continue
+            close_str = info.get("close")
+            if not close_str:
+                continue
+            close_time = datetime.strptime(close_str, "%H:%M").time()
+        except Exception:
+            continue
+        if now.time() < close_time:
+            continue
+        orders = (
+            db.query(Order)
+            .filter(
+                Order.bar_id == bar.id,
+                Order.status == "COMPLETED",
+                Order.closing_id.is_(None),
+            )
+            .all()
+        )
+        if not orders:
+            continue
+        total = sum(o.total for o in orders)
+        closing = BarClosing(bar_id=bar.id, total_revenue=total, closed_at=now)
+        db.add(closing)
+        db.commit()
+        for o in orders:
+            o.closing_id = closing.id
+        db.commit()
+
+
+async def auto_close_bars_worker() -> None:
+    """Periodic task to automatically close bars after their closing time."""
+    while True:
+        try:
+            tz_name = os.getenv("BAR_TIMEZONE") or os.getenv("TZ")
+            now = datetime.now(ZoneInfo(tz_name)) if tz_name else datetime.now()
+            with SessionLocal() as db:
+                auto_close_bars_once(db, now)
+        except Exception:
+            pass
+        await asyncio.sleep(60)
 
 
 def weekly_hours_list(
