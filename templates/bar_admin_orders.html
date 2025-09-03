@@ -3,9 +3,6 @@
 <h1>{{ bar.name }} Orders</h1>
 <div class="orders-controls">
   <a class="btn" href="/dashboard/bar/{{ bar.id }}/orders/history">Order History &amp; Revenue</a>
-  <form method="post" action="/dashboard/bar/{{ bar.id }}/orders/close" style="display:inline">
-    <button type="submit" class="btn">Close Day</button>
-  </form>
 </div>
 <div id="orders-section">
   <h2>Incoming Orders</h2>
