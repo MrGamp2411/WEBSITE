@@ -766,7 +766,7 @@ def weekly_hours_list(
 
 
 def format_time(dt: Optional[datetime]) -> str:
-    """Format a UTC datetime to local HH:MM string using BAR_TIMEZONE/TZ."""
+    """Format a UTC datetime to local YYYY-MM-DD HH:MM string using BAR_TIMEZONE/TZ."""
     if not dt:
         return ""
     tz_name = os.getenv("BAR_TIMEZONE") or os.getenv("TZ")
@@ -774,7 +774,7 @@ def format_time(dt: Optional[datetime]) -> str:
     dt = dt.replace(tzinfo=ZoneInfo("UTC"))
     if tz:
         dt = dt.astimezone(tz)
-    return dt.strftime("%H:%M")
+    return dt.strftime("%Y-%m-%d %H:%M")
 
 templates_env.filters["format_time"] = format_time
 

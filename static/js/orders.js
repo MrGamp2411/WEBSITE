@@ -9,7 +9,9 @@ function formatStatus(status) {
 function formatTime(dt) {
   if (!dt) return '';
   const d = new Date(dt + 'Z');
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return `${date} ${time}`;
 }
 
 function diffMinutes(start, end) {
