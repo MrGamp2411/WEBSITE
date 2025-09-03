@@ -48,6 +48,7 @@
   - Cart contents persist in the database via the `user_carts` table so they survive server restarts.
   - Cart items are limited to one bar at a time.
   - Navigating away from the active bar shows a blocking popup in `templates/layout.html` styled via `.cart-blocker` and `.cart-popup`.
+  - The cart-blocker displays whenever the cart contains items from another bar, even if that bar's ordering is paused.
   - Bartenders can pause ordering from the orders dashboard; paused bars return 409 on `/bars/{id}/add_to_cart` and `app.js` shows a "service paused" popup.
   - The layout sets `window.orderingPaused` when the cart's bar is paused; `window.showServicePausedOnLoad` controls whether the popup opens automatically.
   - Menu pages pass `pause_popup_close` so the popup can be dismissed, while the cart page sets `pause_popup_back` and shows the popup on load with a "Back to the menu" button. The message advises contacting a staff member for more info.
