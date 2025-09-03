@@ -104,7 +104,7 @@
       <p>SiplyGo © 2025 · <a href="#">About</a> · <a href="#">Help Center</a> · <a href="#">For Bars</a> · <a href="#">Legal</a></p>
     </div>
   </footer>
-  <div id="cartBlocker" class="cart-blocker" {% if cart_bar_id and current_bar_id != cart_bar_id and not cart_bar_paused %}{% else %}hidden{% endif %}>
+  <div id="cartBlocker" class="cart-blocker" {% if cart_bar_id and current_bar_id != cart_bar_id %}{% else %}hidden{% endif %}>
     <div class="cart-popup">
       <p>You still have products in your cart at <strong>{{ cart_bar_name }}</strong>.</p>
       <div class="cart-popup-actions">
