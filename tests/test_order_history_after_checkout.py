@@ -42,4 +42,4 @@ def test_order_history_page_after_checkout():
         assert f"Order #{1}" in resp.text
         assert "<dt>Bar</dt><dd>Test Bar</dd>" in resp.text
         assert "<dt>Payment</dt><dd>Card</dd>" in resp.text
-        assert "<dt>Total</dt><dd class=\"num\">CHF 5.00</dd>" in resp.text
+        assert "<dt>Total</dt><dd class=\"num nowrap\">CHF 5.00</dd>" in resp.text
