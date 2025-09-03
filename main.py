@@ -190,6 +190,7 @@ class Bar:
         rating: float = 0.0,
         is_open_now: bool = False,
         manual_closed: bool = False,
+        ordering_paused: bool = False,
         opening_hours: Optional[Dict[str, Dict[str, str]]] = None,
         promo_label: Optional[str] = None,
         tags: Optional[List[str]] = None,
@@ -207,6 +208,7 @@ class Bar:
         self.rating = rating
         self.is_open_now = is_open_now
         self.manual_closed = manual_closed
+        self.ordering_paused = ordering_paused
         self.opening_hours = opening_hours or {}
         self.promo_label = promo_label
         self.tags = tags or []
@@ -533,6 +535,7 @@ def ensure_bar_columns() -> None:
         "rating": "FLOAT",
         "is_open_now": "BOOLEAN",
         "manual_closed": "BOOLEAN",
+        "ordering_paused": "BOOLEAN DEFAULT 0",
         "promo_label": "VARCHAR(100)",
         "tags": "TEXT",
         "opening_hours": "TEXT",
@@ -877,6 +880,7 @@ def load_bars_from_db() -> None:
                 is_open_now=is_open_now_from_hours(hours)
                 and not (b.manual_closed or False),
                 manual_closed=b.manual_closed or False,
+                ordering_paused=b.ordering_paused or False,
                 opening_hours=hours,
                 promo_label=b.promo_label,
                 tags=json.loads(b.tags) if b.tags else [],
@@ -957,6 +961,7 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
             is_open_now=is_open_now_from_hours(hours)
             and not (b.manual_closed or False),
             manual_closed=b.manual_closed or False,
+            ordering_paused=b.ordering_paused or False,
             opening_hours=hours,
             promo_label=b.promo_label,
             tags=json.loads(b.tags) if b.tags else [],
@@ -980,6 +985,7 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
             hours = {}
         bar.opening_hours = hours
         bar.manual_closed = b.manual_closed or False
+        bar.ordering_paused = b.ordering_paused or False
         bar.is_open_now = is_open_now_from_hours(hours) and not bar.manual_closed
         bar.promo_label = b.promo_label
         bar.tags = json.loads(b.tags) if b.tags else []
@@ -1317,6 +1323,7 @@ class BarCreate(BaseModel):
     is_open_now: Optional[bool] = False
     opening_hours: Optional[Dict[str, Dict[str, str]]] = None
     manual_closed: Optional[bool] = False
+    ordering_paused: Optional[bool] = False
     promo_label: Optional[str] = None
     tags: Optional[str] = None
     bar_categories: Optional[str] = None
@@ -1337,6 +1344,7 @@ class BarRead(BaseModel):
     is_open_now: bool = False
     opening_hours: Optional[Dict[str, Dict[str, str]]] = None
     manual_closed: bool = False
+    ordering_paused: bool = False
     promo_label: Optional[str] = None
     tags: Optional[str] = None
     bar_categories: Optional[str] = None
@@ -1556,6 +1564,10 @@ async def add_to_cart(request: Request, bar_id: int, product_id: int = Form(...)
     bar = bars.get(bar_id)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
+    if getattr(bar, "ordering_paused", False):
+        if "application/json" in request.headers.get("accept", ""):
+            return JSONResponse({"error": "ordering_paused"}, status_code=409)
+        raise HTTPException(status_code=403, detail="Ordering is paused")
     product = bar.products.get(product_id)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -2115,6 +2127,31 @@ async def manage_orders(request: Request, bar_id: int):
         raise HTTPException(status_code=404)
     template = "bar_admin_orders.html" if user.is_bar_admin else "bartender_orders.html"
     return render_template(template, request=request, bar=bar)
+
+
+@app.post("/dashboard/bar/{bar_id}/toggle_pause")
+async def toggle_ordering_pause(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    if (
+        not user
+        or bar_id not in user.bar_ids
+        or not (user.is_bartender or user.is_bar_admin)
+    ):
+        raise HTTPException(status_code=403)
+    data = await request.json()
+    paused = bool(data.get("paused"))
+    bar_model = db.get(BarModel, bar_id)
+    if not bar_model:
+        raise HTTPException(status_code=404)
+    bar_model.ordering_paused = paused
+    db.add(bar_model)
+    db.commit()
+    mem_bar = bars.get(bar_id)
+    if mem_bar:
+        mem_bar.ordering_paused = paused
+    return {"ordering_paused": paused}
 
 
 @app.get(
