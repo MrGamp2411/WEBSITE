@@ -1743,7 +1743,7 @@ async def get_bar_orders(
         raise HTTPException(status_code=403, detail="Not authorised")
     orders = (
         db.query(Order)
-        .filter(Order.bar_id == bar_id, Order.status != "COMPLETED")
+        .filter(Order.bar_id == bar_id)
         .order_by(Order.created_at.desc())
         .all()
     )

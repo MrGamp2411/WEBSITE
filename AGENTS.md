@@ -73,11 +73,14 @@
   - Mobile hamburger menu links to order history via `bi bi-clock-history` icon.
   - Bartenders manage live orders in `bartender_orders.html` using `static/js/orders.js`,
     which loads with `defer` and initializes `initBartender(bar.id)` on `DOMContentLoaded`.
+  - `templates/bartender_orders.html` groups orders into `<ul>` lists with IDs
+    `incoming-orders`, `preparing-orders`, `ready-orders`, and `completed-orders`.
   - The bartender dashboard lists assigned bars as `.bar-card` links to `/dashboard/bar/{id}/orders`.
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
   - WebSocket support depends on `uvicorn[standard]` (or another backend that provides the `websockets` library).
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.
   - API endpoints `/api/bars/{bar_id}/orders` (GET) and `/api/orders/{id}/status` (POST) list and update orders.
+  - `/api/bars/{bar_id}/orders` returns all statuses so completed orders remain visible after reloads.
   - Order status updates return the updated order; `static/js/orders.js` re-renders immediately after POST so bartenders see new states without reloading.
   - Bartenders can accept or cancel incoming orders; after acceptance, actions progress Ready → Complete.
   - Orders are grouped into four sections: Incoming (`PLACED`), Preparing (`ACCEPTED`), Ready (`READY`), and Completed (`COMPLETED`/`CANCELED`/`REJECTED`).
