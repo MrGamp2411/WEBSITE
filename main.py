@@ -535,7 +535,7 @@ def ensure_bar_columns() -> None:
         "rating": "FLOAT",
         "is_open_now": "BOOLEAN",
         "manual_closed": "BOOLEAN",
-        "ordering_paused": "BOOLEAN DEFAULT 0",
+        "ordering_paused": "BOOLEAN DEFAULT FALSE",
         "promo_label": "VARCHAR(100)",
         "tags": "TEXT",
         "opening_hours": "TEXT",
