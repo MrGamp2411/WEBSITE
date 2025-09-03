@@ -78,6 +78,8 @@
   - The bartender dashboard lists assigned bars as `.bar-card` links to `/dashboard/bar/{id}/orders`.
   - The bar admin dashboard lists assigned bars as `.bar-card` items with edit and management links.
   - Each bar card includes buttons for editing the bar and managing orders via `/dashboard/bar/{id}/orders`.
+  - Bar admins view live orders in `bar_admin_orders.html`, which mirrors the bartender view and adds an
+    "Order History & Revenue" button linking to `/dashboard/bar/{id}/orders/history`.
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
   - WebSocket support depends on `uvicorn[standard]` (or another backend that provides the `websockets` library).
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.
