@@ -76,7 +76,8 @@
   - `templates/bartender_orders.html` groups orders into `<ul>` lists with IDs
     `incoming-orders`, `preparing-orders`, `ready-orders`, and `completed-orders`.
   - The bartender dashboard lists assigned bars as `.bar-card` links to `/dashboard/bar/{id}/orders`.
-  - The bar admin dashboard lists assigned bars as `.bar-card` items with edit and management links.
+  - The bar admin dashboard lists assigned bars as collapsible items: clicking a bar's name toggles a table of management links.
+  - Interactivity for the bar admin dashboard lives in `static/js/bar_admin_dashboard.js`.
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
   - WebSocket support depends on `uvicorn[standard]` (or another backend that provides the `websockets` library).
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.
