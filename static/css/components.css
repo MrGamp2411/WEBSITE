@@ -291,6 +291,21 @@ body.dark-mode{
 @media (max-width:768px){.order-list .card{width:300px;max-width:300px;}}
 .order-actions{margin-top:var(--space-2);display:flex;gap:var(--space-2);}
 
+.order-card{display:grid;grid-template-rows:auto auto auto;gap:12px;word-break:break-word;hyphens:auto;}
+.order-card__header{display:flex;align-items:baseline;justify-content:space-between;}
+.order-status.chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:color-mix(in srgb,currentColor 12%,transparent);border:1px solid color-mix(in srgb,currentColor 20%,transparent);text-transform:uppercase;font-weight:600;letter-spacing:.02em;}
+.order-card__divider{height:1px;background:currentColor;opacity:.08;}
+.order-kv{display:grid;grid-template-columns:max-content 1fr;column-gap:12px;row-gap:6px;}
+.order-kv dt{opacity:.7;font-weight:500;white-space:nowrap;}
+.order-kv dd{margin:0;font-weight:600;}
+.num{font-feature-settings:"tnum" 1,"lnum" 1;}
+.order-items{margin:0;padding-left:1.1rem;}
+.order-items li{display:flex;gap:8px;}
+.order-items .qty{min-width:2ch;font-weight:600;}
+.muted{opacity:.7;}
+.order-card h3{margin:0;line-height:1.2;}
+.order-card p,.order-card dd{line-height:1.35;}
+
 /* order status colors */
 .card--placed{background:#DBEAFE;}
 .card--accepted{background:#FFEDD5;}

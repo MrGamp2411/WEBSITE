@@ -150,7 +150,7 @@ def test_cancel_order_reflected_in_html():
         wallet = client.get('/wallet')
         assert f"CHF {ids['customer_initial_credit'] + ids['order_total']:.2f}" in wallet.text
         orders_page = client.get('/orders')
-        assert f"Refunded: CHF {ids['order_total']:.2f}" in orders_page.text
+        assert f"<dt>Refunded</dt><dd class=\"num\">CHF {ids['order_total']:.2f}</dd>" in orders_page.text
     user_carts.clear()
     users.clear()
     users_by_email.clear()

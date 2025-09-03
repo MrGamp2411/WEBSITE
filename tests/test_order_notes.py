@@ -43,5 +43,5 @@ def test_checkout_saves_notes():
             follow_redirects=True,
         )
         assert resp.status_code == 200
-        assert "Notes: No sugar" in resp.text
+        assert "<dt>Notes</dt><dd>No sugar</dd>" in resp.text
 

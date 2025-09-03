@@ -40,6 +40,6 @@ def test_order_history_page_after_checkout():
         resp = client.post('/cart/checkout', data={'table_id': table_id, 'payment_method': 'card'}, follow_redirects=True)
         assert resp.status_code == 200
         assert f"Order #{1}" in resp.text
-        assert "Bar: Test Bar" in resp.text
-        assert "Payment method: Card" in resp.text
-        assert "Total: CHF 5.00" in resp.text
+        assert "<dt>Bar</dt><dd>Test Bar</dd>" in resp.text
+        assert "<dt>Payment</dt><dd>Card</dd>" in resp.text
+        assert "<dt>Total</dt><dd class=\"num\">CHF 5.00</dd>" in resp.text

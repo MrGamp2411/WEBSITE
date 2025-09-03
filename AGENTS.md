@@ -111,12 +111,13 @@
   - `order_history.html` uses `order.customer_name`, `order.customer_prefix`, `order.customer_phone`, and `order.table_name` to avoid `None` errors when related records are missing.
   - `order_history.html` displays line items via `item.menu_item_name` to handle missing menu items gracefully.
   - Order cards display the bar's name via `order.bar_name`.
-    - Order views render each order inside a `.card` and group them in `.order-list` containers for consistent styling.
-    - Each order card `<li>` exposes `data-status` with the raw status for client-side updates.
+    - Order views render each order as an `<article class="order-card card">` with header, meta, and items sections. Orders are grouped in `.order-list` containers for consistent styling.
+    - Each order card exposes `data-status` with the raw status for client-side updates.
     - `.order-list` is a flex container that wraps so order cards can flow horizontally.
     - Order list cards match bar card width (400px desktop, 300px mobile) while allowing their height to expand with content.
     - Order card backgrounds reflect status via `card--placed` (blue), `card--accepted` (orange), `card--ready` (green), `card--completed` (default surface), and `card--canceled` (red).
     - `.order-list .card__body` uses `gap: var(--space-1)` and removes default margins on child `p` and `ul` elements to tighten spacing.
+    - Order card styles live in `static/css/components.css` under the `.order-card` block and dynamic rendering is handled by `static/js/orders.js`.
   - `order_history.html` displays placement date and time via the `format_time` filter so displayed values honor `BAR_TIMEZONE`.
   - `orders.js` uses `formatTime` to show `YYYY-MM-DD HH:MM` strings on bartender and user order cards for clearer chronology.
   - Status labels are title-cased for display with `status status-<status>` classes (`formatStatus` in `orders.js`; `order.status|replace('_', ' ')|title` in templates).
