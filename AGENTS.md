@@ -88,7 +88,7 @@
   - Order statuses progress `PLACED → ACCEPTED → READY → COMPLETED` (with optional `CANCELED/REJECTED`).
   - Valid transitions are enforced server-side via `ALLOWED_STATUS_TRANSITIONS` in `main.py`.
   - Order listings include customer name/phone, table, and line items for both bartender and user history.
-  - Bartender dashboards prepend newly received orders to each status list so the latest orders appear first.
+  - Bartender dashboards list orders chronologically: completed orders show newest first, while incoming, preparing, and ready orders show oldest first.
   - Orders record `accepted_at` and `ready_at` timestamps; bartender cards show placement time and preparation duration via `orders.js`.
   - User order cards show placement time and preparation duration using `order_history.html` and `orders.js`.
   - `orders.js` sends a keep-alive ping every 30s so bartender WebSocket connections stay open and receive new orders instantly.
