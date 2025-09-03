@@ -115,13 +115,21 @@
   </div>
   <div id="servicePaused" class="cart-blocker" hidden>
     <div class="cart-popup">
-      <p>Ordering is temporarily paused for <strong>{{ cart_bar_name }}</strong>.</p>
+      <p>Ordering is paused for <strong>{{ cart_bar_name }}</strong>. Please contact a staff member for more information.</p>
       <div class="cart-popup-actions">
-        <a class="btn btn--primary" href="/bars/{{ cart_bar_id }}">Go to the bar menu</a>
+        {% if pause_popup_close|default(False) %}
+        <button type="button" class="btn btn--secondary js-close-service-paused">Close</button>
+        {% endif %}
+        {% if pause_popup_back|default(False) %}
+        <a class="btn btn--primary" href="/bars/{{ cart_bar_id }}">Back to the menu</a>
+        {% endif %}
       </div>
     </div>
   </div>
-  <script>window.orderingPaused = {{ 'true' if cart_bar_paused else 'false' }};</script>
+  <script>
+    window.orderingPaused = {{ 'true' if cart_bar_paused else 'false' }};
+    window.showServicePausedOnLoad = {{ 'true' if show_service_paused|default(False) else 'false' }};
+  </script>
   <script src="/static/js/app.min.js" defer></script>
   {% block scripts %}{% endblock %}
 </body>
