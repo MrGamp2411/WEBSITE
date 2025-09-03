@@ -103,7 +103,8 @@
     - Order list cards match bar card width (400px desktop, 300px mobile) while allowing their height to expand with content.
     - Order card backgrounds reflect status via `card--placed` (blue), `card--accepted` (orange), `card--ready` (green), `card--completed` (default surface), and `card--canceled` (red).
     - `.order-list .card__body` uses `gap: var(--space-1)` and removes default margins on child `p` and `ul` elements to tighten spacing.
-  - `order_history.html` displays placement times via the `format_time` filter so displayed hours honor `BAR_TIMEZONE`.
+  - `order_history.html` displays placement date and time via the `format_time` filter so displayed values honor `BAR_TIMEZONE`.
+  - `orders.js` uses `formatTime` to show `YYYY-MM-DD HH:MM` strings on bartender and user order cards for clearer chronology.
   - Status labels are title-cased for display with `status status-<status>` classes (`formatStatus` in `orders.js`; `order.status|replace('_', ' ')|title` in templates).
   - `ensure_order_columns()` in `main.py` adds missing columns (e.g., `table_id`, `status`) to the `orders` table at startup.
 - Cancelling an order refunds the total to the customer's wallet when paid by card or wallet; pay-at-bar orders are removed without refund.
