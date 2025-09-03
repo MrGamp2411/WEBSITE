@@ -2045,14 +2045,32 @@ async def dashboard(request: Request):
 
 
 @app.get("/dashboard/bar/{bar_id}/orders", response_class=HTMLResponse)
-async def bartender_orders(request: Request, bar_id: int):
+async def manage_orders(request: Request, bar_id: int):
     user = get_current_user(request)
-    if not user or not user.is_bartender or bar_id not in user.bar_ids:
+    if (
+        not user
+        or bar_id not in user.bar_ids
+        or not (user.is_bartender or user.is_bar_admin)
+    ):
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     bar = bars.get(bar_id)
     if not bar:
         raise HTTPException(status_code=404)
-    return render_template("bartender_orders.html", request=request, bar=bar)
+    template = "bar_admin_orders.html" if user.is_bar_admin else "bartender_orders.html"
+    return render_template(template, request=request, bar=bar)
+
+
+@app.get(
+    "/dashboard/bar/{bar_id}/orders/history", response_class=HTMLResponse
+)
+async def bar_admin_order_history(request: Request, bar_id: int):
+    user = get_current_user(request)
+    if not user or not user.is_bar_admin or bar_id not in user.bar_ids:
+        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    bar = bars.get(bar_id)
+    if not bar:
+        raise HTTPException(status_code=404)
+    return render_template("bar_admin_order_history.html", request=request, bar=bar)
 
 
 # Admin management endpoints
