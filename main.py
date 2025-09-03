@@ -71,6 +71,7 @@ from models import (
     Order,
     OrderItem,
     Payout,
+    BarClosing,
     User,
     RoleEnum,
     UserBarRole,
@@ -608,6 +609,7 @@ def ensure_order_columns() -> None:
         "refund_amount": "NUMERIC(10, 2) DEFAULT 0",
         "notes": "TEXT",
         "source_channel": "VARCHAR(30)",
+        "closing_id": "INTEGER",
     }
     missing = {name: ddl for name, ddl in required.items() if name not in columns}
     if missing:
@@ -2060,17 +2062,89 @@ async def manage_orders(request: Request, bar_id: int):
     return render_template(template, request=request, bar=bar)
 
 
+@app.post("/dashboard/bar/{bar_id}/orders/close")
+async def close_bar_orders(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    if not user or not user.is_bar_admin or bar_id not in user.bar_ids:
+        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    orders = (
+        db.query(Order)
+        .filter(
+            Order.bar_id == bar_id,
+            Order.status == "COMPLETED",
+            Order.closing_id.is_(None),
+        )
+        .all()
+    )
+    if orders:
+        total = sum(o.total for o in orders)
+        closing = BarClosing(bar_id=bar_id, total_revenue=total, closed_at=datetime.utcnow())
+        db.add(closing)
+        db.commit()
+        for o in orders:
+            o.closing_id = closing.id
+        db.commit()
+    return RedirectResponse(
+        url=f"/dashboard/bar/{bar_id}/orders/history",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
 @app.get(
     "/dashboard/bar/{bar_id}/orders/history", response_class=HTMLResponse
 )
-async def bar_admin_order_history(request: Request, bar_id: int):
+async def bar_admin_order_history(request: Request, bar_id: int, db: Session = Depends(get_db)):
     user = get_current_user(request)
     if not user or not user.is_bar_admin or bar_id not in user.bar_ids:
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     bar = bars.get(bar_id)
     if not bar:
         raise HTTPException(status_code=404)
-    return render_template("bar_admin_order_history.html", request=request, bar=bar)
+    closings = (
+        db.query(BarClosing)
+        .filter(BarClosing.bar_id == bar_id)
+        .order_by(BarClosing.closed_at.desc())
+        .all()
+    )
+    return render_template(
+        "bar_admin_order_history.html", request=request, bar=bar, closings=closings
+    )
+
+
+@app.get(
+    "/dashboard/bar/{bar_id}/orders/history/{closing_id}", response_class=HTMLResponse
+)
+async def bar_admin_order_history_view(
+    request: Request, bar_id: int, closing_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    if not user or not user.is_bar_admin or bar_id not in user.bar_ids:
+        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    bar = bars.get(bar_id)
+    if not bar:
+        raise HTTPException(status_code=404)
+    closing = (
+        db.query(BarClosing)
+        .filter(BarClosing.id == closing_id, BarClosing.bar_id == bar_id)
+        .first()
+    )
+    if not closing:
+        raise HTTPException(status_code=404)
+    orders = (
+        db.query(Order)
+        .filter(Order.bar_id == bar_id, Order.closing_id == closing_id)
+        .order_by(Order.created_at.asc())
+        .all()
+    )
+    return render_template(
+        "bar_admin_order_history_view.html",
+        request=request,
+        bar=bar,
+        closing=closing,
+        orders=orders,
+    )
 
 
 # Admin management endpoints

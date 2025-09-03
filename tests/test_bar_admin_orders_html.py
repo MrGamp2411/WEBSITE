@@ -8,7 +8,7 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, engine, SessionLocal  # noqa: E402
-from models import Bar, User, UserBarRole, RoleEnum  # noqa: E402
+from models import Bar, User, UserBarRole, RoleEnum, Order, BarClosing  # noqa: E402
 from main import app, load_bars_from_db, user_carts, users, users_by_email, users_by_username  # noqa: E402
 
 
@@ -55,4 +55,31 @@ def test_bar_admin_orders_history_page():
         client.post('/login', data={'email': 'a@example.com', 'password': 'pass'})
         resp = client.get(f'/dashboard/bar/{bar.id}/orders/history')
         assert resp.status_code == 200
-        assert 'Coming soon.' in resp.text
+        assert 'No order history yet.' in resp.text
+
+
+def test_close_day_moves_orders_to_history():
+    setup_db()
+    with TestClient(app) as client:
+        db = SessionLocal()
+        bar = Bar(name="Test Bar", slug="test-bar")
+        pwd = hashlib.sha256("pass".encode("utf-8")).hexdigest()
+        admin = User(username="a", email="a@example.com", password_hash=pwd, role=RoleEnum.BARADMIN)
+        order = Order(bar=bar, status="COMPLETED", subtotal=10, vat_total=2)
+        db.add_all([bar, admin, order])
+        db.commit()
+        db.add(UserBarRole(user_id=admin.id, bar_id=bar.id, role=RoleEnum.BARADMIN))
+        db.commit(); db.refresh(bar); db.close()
+        load_bars_from_db()
+        client.post('/login', data={'email': 'a@example.com', 'password': 'pass'})
+        resp = client.post(f'/dashboard/bar/{bar.id}/orders/close', follow_redirects=False)
+        assert resp.status_code == 303
+        db = SessionLocal()
+        closings = db.query(BarClosing).filter_by(bar_id=bar.id).all()
+        assert len(closings) == 1
+        assert float(closings[0].total_revenue) == 12.0
+        order = db.query(Order).first()
+        assert order.closing_id == closings[0].id
+        db.close()
+        resp = client.get(f'/dashboard/bar/{bar.id}/orders/history')
+        assert 'CHF 12.00' in resp.text

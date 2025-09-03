@@ -1,5 +1,19 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>{{ bar.name }} - Order History &amp; Revenue</h1>
-<p>Coming soon.</p>
+{% if closings %}
+<ul class="closing-list">
+  {% for closing in closings %}
+  <li class="card">
+    <div class="card__body">
+      <h2>{{ closing.closed_at|format_time }}</h2>
+      <p>Total revenue: CHF {{ "%.2f"|format(closing.total_revenue) }}</p>
+      <a class="btn" href="/dashboard/bar/{{ bar.id }}/orders/history/{{ closing.id }}">View</a>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No order history yet.</p>
+{% endif %}
 {% endblock %}

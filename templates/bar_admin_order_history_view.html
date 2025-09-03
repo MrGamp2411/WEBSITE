@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>{{ bar.name }} - Orders for {{ closing.closed_at|format_time }}</h1>
+<p>Total revenue: CHF {{ "%.2f"|format(closing.total_revenue) }}</p>
+<ul class="order-list">
+  {% for order in orders %}
+  <li class="card card--{{ order.status|lower }}" data-status="{{ order.status }}">
+    <div class="card__body">
+      <h3 class="card__title">Order #{{ order.id }}</h3>
+      <p>Customer: {{ order.customer_name or 'Unknown' }} ({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</p>
+      <p>Table: {{ order.table_name or '' }}</p>
+      <p>Total: CHF {{ "%.2f"|format(order.total) }}</p>
+      <p>Ordered at: {{ order.created_at|format_time }}</p>
+      <ul>
+        {% for item in order.items %}
+        <li>{{ item.qty }}× {{ item.menu_item_name or 'Unknown item' }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </li>
+  {% else %}
+  <li class="card"><div class="card__body">No orders.</div></li>
+  {% endfor %}
+</ul>
+{% endblock %}

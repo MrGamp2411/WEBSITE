@@ -80,6 +80,10 @@
   - Each bar card includes buttons for editing the bar and managing orders via `/dashboard/bar/{id}/orders`.
   - Bar admins view live orders in `bar_admin_orders.html`, which mirrors the bartender view and adds an
     "Order History & Revenue" button linking to `/dashboard/bar/{id}/orders/history`.
+  - Bar admins can close the day via `/dashboard/bar/{id}/orders/close` which moves all completed orders
+    into a `bar_closings` record (see `BarClosing` model). Each closing is listed on
+    `/dashboard/bar/{id}/orders/history` with its total revenue and a "View" link to
+    `/dashboard/bar/{id}/orders/history/{closing_id}` showing the day's orders.
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
   - WebSocket support depends on `uvicorn[standard]` (or another backend that provides the `websockets` library).
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.
