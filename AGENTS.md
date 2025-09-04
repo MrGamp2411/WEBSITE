@@ -32,6 +32,7 @@
   - Open status uses `.status-open` (green) and closed status uses `.status-closed` (red)
   - Bar ordering pause state stored in `bars.ordering_paused` (BOOLEAN, defaults to FALSE)
   - Bar edit options page links to table management (`templates/admin_bar_tables.html`) where staff can add, edit, and delete tables. Add and edit forms live in `templates/admin_bar_new_table.html` and `templates/admin_bar_edit_table.html`; table descriptions are for staff only
+  - Edit Bar options UI uses `templates/admin_edit_bar_options.html` with `.bar-edit-page` and `.action-card` links in a 2-column grid (1 column on mobile)
 - Products:
   - Images stored in `menu_items.photo` and served via `/api/products/{id}/image`
   - `templates/bar_detail.html` shows products with carousels handled by `static/js/app.js`
