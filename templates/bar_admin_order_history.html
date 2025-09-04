@@ -5,7 +5,7 @@
 <ul class="closing-list">
   {% for m in monthly %}
   <li class="card">
-    <div class="card__body">
+    <div class="card__body {{ 'closing-past' if m.is_past else 'closing-current' }}">
       <h2>{{ m.label }}</h2>
       <p>Total collected: CHF {{ "%.2f"|format(m.total_revenue) }}</p>
       <p>Total earned: CHF {{ "%.2f"|format(m.total_earned) }}</p>
