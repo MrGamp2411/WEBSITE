@@ -94,10 +94,10 @@
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
   - WebSocket support depends on `uvicorn[standard]` (or another backend that provides the `websockets` library).
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.
-  - API endpoints `/api/bars/{bar_id}/orders` (GET) and `/api/orders/{id}/status` (POST) list and update orders.
+  - API endpoints `/api/bars/{bar_id}/orders` (GET) and `/api/orders/{id}/status` (POST) list and update orders for bartenders and bar admins.
   - `/api/bars/{bar_id}/orders` returns all statuses so completed orders remain visible after reloads.
-  - Order status updates return the updated order; `static/js/orders.js` re-renders immediately after POST so bartenders see new states without reloading.
-  - Bartenders can accept or cancel incoming orders; after acceptance, actions progress Ready → Complete.
+  - Order status updates return the updated order; `static/js/orders.js` re-renders immediately after POST so staff see new states without reloading.
+  - Bartenders and bar admins can accept or cancel incoming orders; after acceptance, actions progress Ready → Complete.
   - Orders are grouped into four sections: Incoming (`PLACED`), Preparing (`ACCEPTED`), Ready (`READY`), and Completed (`COMPLETED`/`CANCELED`/`REJECTED`).
   - The `/orders` route treats `CANCELED` and `REJECTED` orders as completed so they're excluded from pending.
   - Order statuses progress `PLACED → ACCEPTED → READY → COMPLETED` (with optional `CANCELED/REJECTED`).
