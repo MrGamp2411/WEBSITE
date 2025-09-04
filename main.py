@@ -2136,14 +2136,14 @@ async def manage_orders(request: Request, bar_id: int):
     user = get_current_user(request)
     if (
         not user
-        or bar_id not in user.bar_ids
-        or not (user.is_bartender or user.is_bar_admin)
+        or (bar_id not in user.bar_ids and not user.is_super_admin)
+        or not (user.is_bartender or user.is_bar_admin or user.is_super_admin)
     ):
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     bar = bars.get(bar_id)
     if not bar:
         raise HTTPException(status_code=404)
-    template = "bar_admin_orders.html" if user.is_bar_admin else "bartender_orders.html"
+    template = "bar_admin_orders.html" if user.is_bar_admin or user.is_super_admin else "bartender_orders.html"
     return render_template(template, request=request, bar=bar)
 
 
@@ -2154,8 +2154,8 @@ async def toggle_ordering_pause(
     user = get_current_user(request)
     if (
         not user
-        or bar_id not in user.bar_ids
-        or not (user.is_bartender or user.is_bar_admin)
+        or (bar_id not in user.bar_ids and not user.is_super_admin)
+        or not (user.is_bartender or user.is_bar_admin or user.is_super_admin)
     ):
         raise HTTPException(status_code=403)
     data = await request.json()
@@ -2177,7 +2177,11 @@ async def toggle_ordering_pause(
 )
 async def bar_admin_order_history(request: Request, bar_id: int, db: Session = Depends(get_db)):
     user = get_current_user(request)
-    if not user or not user.is_bar_admin or bar_id not in user.bar_ids:
+    if (
+        not user
+        or (bar_id not in user.bar_ids and not user.is_super_admin)
+        or not (user.is_bar_admin or user.is_super_admin)
+    ):
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     bar = bars.get(bar_id)
     if not bar:
@@ -2229,7 +2233,11 @@ async def bar_admin_order_history_month(
     request: Request, bar_id: int, year: int, month: int, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
-    if not user or not user.is_bar_admin or bar_id not in user.bar_ids:
+    if (
+        not user
+        or (bar_id not in user.bar_ids and not user.is_super_admin)
+        or not (user.is_bar_admin or user.is_super_admin)
+    ):
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     bar = bars.get(bar_id)
     if not bar:
@@ -2271,7 +2279,11 @@ async def bar_admin_order_history_view(
     request: Request, bar_id: int, closing_id: int, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
-    if not user or not user.is_bar_admin or bar_id not in user.bar_ids:
+    if (
+        not user
+        or (bar_id not in user.bar_ids and not user.is_super_admin)
+        or not (user.is_bar_admin or user.is_super_admin)
+    ):
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     bar = bars.get(bar_id)
     if not bar:
@@ -2953,6 +2965,15 @@ async def admin_dashboard(request: Request):
     if not user or not user.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template("admin_dashboard.html", request=request)
+
+
+@app.get("/admin/payments", response_class=HTMLResponse)
+async def admin_payments(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    if not user or not user.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    db_bars = db.query(BarModel).all()
+    return render_template("admin_payments.html", request=request, bars=db_bars)
 
 
 @app.post("/admin/orders/clear")

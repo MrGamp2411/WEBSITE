@@ -133,6 +133,7 @@
 - Order history and live order views display refund amounts for canceled orders.
 - Customers may cancel their own `PLACED` orders from the order history page using the cancel button; this posts `CANCELED` via `/api/orders/{id}/status`.
 - Admin dashboard includes a testing-only "Delete all orders" button at `/admin/orders/clear` to remove every order record.
+- Super admins can review bar revenue and orders via `/admin/payments`, listing all bars with "View" links to `/dashboard/bar/{id}/orders`.
 - Testing:
   - Run `pytest`
 - Meta:
