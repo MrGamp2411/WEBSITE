@@ -87,12 +87,12 @@
     "Order History & Revenue" button linking to `/dashboard/bar/{id}/orders/history`.
   - Bars close automatically at their scheduled closing time based on `opening_hours`, moving completed
     orders into a `bar_closings` record (see `BarClosing` model). Canceled or rejected orders are also
-    attached to the closing but do not count toward `total_revenue`. Each closing is listed on
-    `/dashboard/bar/{id}/orders/history` with its total revenue and a "View" link to
-    `/dashboard/bar/{id}/orders/history/{closing_id}` showing the day's orders. Editing a bar's hours
-    immediately updates the automatic schedule.
-  - The Order History & Revenue page shows total collected, total earned, and Siplygo commission
-    (5% of total) for each closing.
+    attached to the closing but do not count toward `total_revenue`. Editing a bar's hours immediately
+    updates the automatic schedule.
+  - The Order History & Revenue page groups closings by month, showing total collected, total earned,
+    and Siplygo commission (5% of total) for each month. Monthly "View" links point to
+    `/dashboard/bar/{id}/orders/history/{year}/{month}` with the list of that month's closings, and
+    individual daily summaries still link to `/dashboard/bar/{id}/orders/history/{closing_id}`.
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
   - WebSocket support depends on `uvicorn[standard]` (or another backend that provides the `websockets` library).
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.
