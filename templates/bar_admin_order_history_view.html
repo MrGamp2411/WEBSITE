@@ -4,6 +4,14 @@
 <p>Total collected: CHF {{ "%.2f"|format(closing.total_revenue) }}</p>
 <p>Total earned: CHF {{ "%.2f"|format(closing.total_earned) }}</p>
 <p>Siplygo commission (5%): CHF {{ "%.2f"|format(closing.siplygo_commission) }}</p>
+{% if payment_totals %}
+<p>Payment breakdown:</p>
+<ul class="payment-breakdown">
+  {% for method, amount in payment_totals.items() %}
+  <li>{{ method }}: CHF {{ '%.2f'|format(amount) }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
 <div class="order-list">
   {% for order in orders %}
   <article class="order-card card card--{{ order.status|lower }}" role="article" aria-labelledby="order-{{ order.id }}-title" data-status="{{ order.status }}">

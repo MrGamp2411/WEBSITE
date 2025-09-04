@@ -77,9 +77,22 @@ def test_auto_close_moves_orders_to_history():
         bar = Bar(name="Test Bar", slug="test-bar", opening_hours=json.dumps(hours))
         pwd = hashlib.sha256("pass".encode("utf-8")).hexdigest()
         admin = User(username="a", email="a@example.com", password_hash=pwd, role=RoleEnum.BARADMIN)
-        order = Order(bar=bar, status="COMPLETED", subtotal=10, vat_total=2)
-        canceled = Order(bar=bar, status="CANCELED", subtotal=5, vat_total=1)
-        db.add_all([bar, admin, order, canceled])
+        cc = Order(
+            bar=bar,
+            status="COMPLETED",
+            subtotal=6,
+            vat_total=0,
+            payment_method="credit_card",
+        )
+        wallet = Order(
+            bar=bar,
+            status="COMPLETED",
+            subtotal=4,
+            vat_total=2,
+            payment_method="wallet",
+        )
+        canceled = Order(bar=bar, status="CANCELED", subtotal=5, vat_total=1, payment_method="credit_card")
+        db.add_all([bar, admin, cc, wallet, canceled])
         db.commit()
         db.add(UserBarRole(user_id=admin.id, bar_id=bar.id, role=RoleEnum.BARADMIN))
         db.commit(); db.refresh(bar); db.close()
@@ -92,7 +105,7 @@ def test_auto_close_moves_orders_to_history():
             assert len(closings) == 1
             assert float(closings[0].total_revenue) == 12.0
             orders = db2.query(Order).order_by(Order.id).all()
-            assert [o.closing_id for o in orders] == [closings[0].id, closings[0].id]
+            assert [o.closing_id for o in orders] == [closings[0].id] * 3
             closing_id = closings[0].id
         client.post('/login', data={'email': 'a@example.com', 'password': 'pass'})
         resp = client.get(f'/dashboard/bar/{bar.id}/orders/history')
@@ -108,5 +121,8 @@ def test_auto_close_moves_orders_to_history():
         assert 'Total collected: CHF 12.00' in resp.text
         assert 'Total earned: CHF 11.40' in resp.text
         assert 'Siplygo commission (5%): CHF 0.60' in resp.text
+        assert 'Credit Card: CHF 6.00' in resp.text
+        assert 'Wallet: CHF 6.00' in resp.text
         assert 'Order #1' in resp.text
         assert 'Order #2' in resp.text
+        assert 'Order #3' in resp.text

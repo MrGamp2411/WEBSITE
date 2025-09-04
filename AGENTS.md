@@ -107,6 +107,7 @@
     and Siplygo commission (5% of total) for each month. Monthly "View" links point to
     `/dashboard/bar/{id}/orders/history/{year}/{month}` with the list of that month's closings, and
     individual daily summaries still link to `/dashboard/bar/{id}/orders/history/{closing_id}`.
+  - Daily closing views list a payment breakdown (credit card, wallet, etc.) for completed orders.
 - Order History & Revenue monthly cards use `card--placed` (blue) for the current month and `card--accepted` (orange) for past months; text color remains default.
 - Past months show a "Confirm Payment" button to super admins; confirmed months switch to `card--ready` (green).
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
