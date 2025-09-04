@@ -696,3 +696,33 @@ body.dark-mode{
 
 .form-actions{margin-top:var(--space-6,24px);}
 
+
+.editbar{display:block}
+.editbar h1{margin-bottom:var(--space-4,16px)}
+.editbar .card{background:var(--surface,#fff);border-radius:var(--radius-2xl,16px);box-shadow:var(--shadow-sm,0 2px 8px rgba(0,0,0,.06));padding:var(--space-5,20px)}
+.editbar .map-card{padding:0;overflow:hidden;margin-bottom:var(--space-5,20px)}
+.editbar .map-card>*{display:block}
+.editbar-form .grid-2{display:grid;gap:var(--space-5,20px)}
+@media (min-width: 980px){.editbar-form .grid-2{grid-template-columns:1.1fr .9fr}}
+.editbar .card-title{display:flex;align-items:center;gap:10px;margin:0 0 8px 0}
+.editbar .form-card .help{opacity:.75}
+.editbar .field-group{margin-top:var(--space-4,16px)}
+.editbar .field-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4,16px)}
+@media (max-width: 700px){.editbar .field-row{grid-template-columns:1fr}}
+.editbar .field-group label{display:block;font-weight:600;margin-bottom:6px}
+.editbar .field-group input[type="text"],.editbar .field-group input[type="file"],.editbar .field-group input[type="number"],.editbar .field-group textarea{width:100%;border:1px solid rgba(0,0,0,.12);border-radius:12px;padding:10px 12px;background:#fff}
+.editbar .field-group textarea{min-height:96px;resize:vertical}
+.editbar .chips-grid{display:flex;flex-wrap:wrap;gap:10px}
+.editbar .chip-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;cursor:pointer;border:1px solid rgba(0,0,0,.12);background:#fff;user-select:none;transition:transform .05s ease,box-shadow .15s ease,background .15s ease}
+.editbar .chip-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-xs,0 1px 6px rgba(0,0,0,.06))}
+.editbar .chip-btn[aria-pressed="true"]{background:rgba(91,45,238,.1);border-color:rgba(91,45,238,.25);font-weight:600}
+.editbar .hours-table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden}
+.editbar .hours-table thead th{text-align:left;font-weight:600;background:rgba(0,0,0,.03)}
+.editbar .hours-table th,.editbar .hours-table td{padding:10px 12px}
+.editbar .hours-table tbody tr:nth-child(odd){background:rgba(0,0,0,.02)}
+.editbar .hours-table input[type="time"]{border:1px solid rgba(0,0,0,.12);border-radius:999px;padding:6px 10px;background:#fff}
+.hours-disabled{opacity:.5;pointer-events:none}
+.editbar .form-actions{position:sticky;bottom:12px;margin-top:var(--space-6,24px)}
+.editbar .form-actions .btn{border-radius:999px;padding:10px 18px}
+.editbar input:focus,.editbar textarea:focus{outline:2px solid rgba(0,0,0,.12);outline-offset:2px}
+
