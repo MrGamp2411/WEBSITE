@@ -87,6 +87,7 @@ from finance import (
     calculate_platform_fee,
     calculate_payout,
     calculate_vat_from_gross,
+    PLATFORM_FEE_RATE,
 )
 from payouts import schedule_payout
 from audit import log_action
@@ -2187,6 +2188,11 @@ async def bar_admin_order_history(request: Request, bar_id: int, db: Session = D
         .order_by(BarClosing.closed_at.desc())
         .all()
     )
+    for c in closings:
+        total = Decimal(c.total_revenue or 0)
+        commission = (total * PLATFORM_FEE_RATE).quantize(Decimal("0.01"))
+        c.siplygo_commission = float(commission)
+        c.total_earned = float((total - commission).quantize(Decimal("0.01")))
     return render_template(
         "bar_admin_order_history.html", request=request, bar=bar, closings=closings
     )
@@ -2217,6 +2223,10 @@ async def bar_admin_order_history_view(
         .order_by(Order.created_at.asc())
         .all()
     )
+    total = Decimal(closing.total_revenue or 0)
+    commission = (total * PLATFORM_FEE_RATE).quantize(Decimal("0.01"))
+    closing.siplygo_commission = float(commission)
+    closing.total_earned = float((total - commission).quantize(Decimal("0.01")))
     return render_template(
         "bar_admin_order_history_view.html",
         request=request,
