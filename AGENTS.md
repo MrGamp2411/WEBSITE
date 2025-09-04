@@ -22,6 +22,9 @@
 - Edit Bar basic info page uses `.editbar` layout with `.grid-2` and `.card` sections (Map, Details, Media & Hours).
 - Categories are shown as always-visible chips synchronized with a hidden `<select id="categoriesNative" name="categories" multiple>`.
 - Manual close checkbox (`#manual_closed`) toggles the `.hours-table` inputs.
+- Category chips allow selecting up to 5 items, disable others at the limit, and show a running count.
+- Input fields on this page use a rounded "premium" style with a soft focus ring and invalid states.
+- Save button is fixed above the footer via `.save-bar` and only appears once at the end of the form.
 - `Promo Label` and `Tags` fields have been removed from the project.
   - Opening hours data is sanitized; invalid or non-dict values are treated as closed
   - Category `sort_order` defaults to `0` when missing to avoid menu sorting errors

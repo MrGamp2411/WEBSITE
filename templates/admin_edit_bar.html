@@ -45,7 +45,10 @@
         <div class="field-group">
           <label>Categories</label>
           <div id="categoriesChips" class="chips-grid" aria-describedby="catHelp"></div>
-          <small id="catHelp" class="help">Click to select/deselect. Selected items are highlighted.</small>
+          <div class="chips-meta">
+            <small id="catCount" class="count">0/5 selected</small>
+            <small id="catHelp">Click to select/deselect. Selected items are highlighted.</small>
+          </div>
           <select id="categoriesNative" name="categories" multiple hidden>
             {% for c in bar_categories %}
               <option value="{{ c }}" {% if c in selected_categories %}selected{% endif %}>{{ c }}</option>
@@ -107,8 +110,10 @@
     <input type="hidden" name="promo_label" value="">
     <input type="hidden" name="tags" value="">
 
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle"></i> Save</button>
+    <div class="form-actions save-bar">
+      <div class="save-bar-inner">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle" aria-hidden="true"></i> Save</button>
+      </div>
     </div>
   </form>
 </section>
@@ -132,33 +137,55 @@
 </script>
 <script>
 (function(){
+  // --- Categories max 5 ---
   const select = document.getElementById('categoriesNative');
   const mount  = document.getElementById('categoriesChips');
+  const countEl= document.getElementById('catCount');
   if(select && mount){
-    const all = Array.from(select.options).map(o=>({value:o.value,label:o.text,selected:o.selected}));
+    const MAX = 5;
+    const all = Array.from(select.options).map(o=>({ value:o.value, label:o.text, selected:o.selected }));
+    const selectedCount = ()=> all.filter(i=>i.selected).length;
+
+    function syncSelect(){
+      all.forEach(i=>{
+        const opt = Array.from(select.options).find(o=>o.value===i.value);
+        if(opt) opt.selected = i.selected;
+      });
+    }
     function render(){
       mount.innerHTML = '';
+      const cnt = selectedCount();
+      if(countEl) countEl.textContent = `${cnt}/${MAX} selected`;
+      const limitReached = cnt >= MAX;
+
       all.forEach(item=>{
         const b = document.createElement('button');
         b.type='button';
         b.className='chip-btn';
-        b.setAttribute('aria-pressed', item.selected ? 'true':'false');
+        b.setAttribute('aria-pressed', item.selected ? 'true' : 'false');
         b.textContent = item.label;
+
+        // disabilita i NON selezionati quando raggiunto il limite
+        if(limitReached && !item.selected){ b.disabled = true; }
+
         b.addEventListener('click', ()=>{
+          if(!item.selected && selectedCount() >= MAX) return; // hard stop
           item.selected = !item.selected;
-          const opt = Array.from(select.options).find(o=>o.value===item.value);
-          if(opt) opt.selected = item.selected;
+          syncSelect();
           render();
         });
+
         b.addEventListener('keydown', (e)=>{
           if(e.key==='Enter' || e.key===' '){ e.preventDefault(); b.click(); }
         });
+
         mount.appendChild(b);
       });
     }
     render();
   }
 
+  // --- Close bar manually: dis/abilita gli input time ---
   const closeCb = document.getElementById('manual_closed');
   const hoursWrap = document.querySelector('.hours-table');
   function applyHoursDisabled(){
