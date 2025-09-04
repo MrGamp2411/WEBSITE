@@ -91,6 +91,8 @@
     `/dashboard/bar/{id}/orders/history` with its total revenue and a "View" link to
     `/dashboard/bar/{id}/orders/history/{closing_id}` showing the day's orders. Editing a bar's hours
     immediately updates the automatic schedule.
+  - The Order History & Revenue page shows total collected, total earned, and Siplygo commission
+    (5% of total) for each closing.
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
   - WebSocket support depends on `uvicorn[standard]` (or another backend that provides the `websockets` library).
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.

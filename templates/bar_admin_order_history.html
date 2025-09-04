@@ -7,7 +7,9 @@
   <li class="card">
     <div class="card__body">
       <h2>{{ closing.closed_at|format_time }}</h2>
-      <p>Total revenue: CHF {{ "%.2f"|format(closing.total_revenue) }}</p>
+      <p>Total collected: CHF {{ "%.2f"|format(closing.total_revenue) }}</p>
+      <p>Total earned: CHF {{ "%.2f"|format(closing.total_earned) }}</p>
+      <p>Siplygo commission (5%): CHF {{ "%.2f"|format(closing.siplygo_commission) }}</p>
       <a class="btn" href="/dashboard/bar/{{ bar.id }}/orders/history/{{ closing.id }}">View</a>
     </div>
   </li>

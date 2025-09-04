@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>{{ bar.name }} - Orders for {{ closing.closed_at|format_time }}</h1>
-<p>Total revenue: CHF {{ "%.2f"|format(closing.total_revenue) }}</p>
+<p>Total collected: CHF {{ "%.2f"|format(closing.total_revenue) }}</p>
+<p>Total earned: CHF {{ "%.2f"|format(closing.total_earned) }}</p>
+<p>Siplygo commission (5%): CHF {{ "%.2f"|format(closing.siplygo_commission) }}</p>
 <div class="order-list">
   {% for order in orders %}
   <article class="order-card card card--{{ order.status|lower }}" role="article" aria-labelledby="order-{{ order.id }}-title" data-status="{{ order.status }}">
