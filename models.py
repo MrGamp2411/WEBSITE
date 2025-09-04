@@ -77,8 +77,6 @@ class Bar(Base):
     is_open_now = Column(Boolean, default=False)
     manual_closed = Column(Boolean, default=False)
     ordering_paused = Column(Boolean, default=False)
-    promo_label = Column(String(100))
-    tags = Column(Text)
     bar_categories = Column(Text)
 
     categories = relationship("Category", back_populates="bar")
