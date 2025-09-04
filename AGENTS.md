@@ -86,7 +86,8 @@
   - Bar admins view live orders in `bar_admin_orders.html`, which mirrors the bartender view and adds an
     "Order History & Revenue" button linking to `/dashboard/bar/{id}/orders/history`.
   - Bars close automatically at their scheduled closing time based on `opening_hours`, moving completed
-    orders into a `bar_closings` record (see `BarClosing` model). Each closing is listed on
+    orders into a `bar_closings` record (see `BarClosing` model). Canceled or rejected orders are also
+    attached to the closing but do not count toward `total_revenue`. Each closing is listed on
     `/dashboard/bar/{id}/orders/history` with its total revenue and a "View" link to
     `/dashboard/bar/{id}/orders/history/{closing_id}` showing the day's orders. Editing a bar's hours
     immediately updates the automatic schedule.
