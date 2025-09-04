@@ -17,22 +17,22 @@
 
         <div class="field-group">
           <label for="name">Name</label>
-          <input id="name" name="name" value="{{ bar.name }}">
+          <input id="name" name="name" class="input-pill" value="{{ bar.name }}">
         </div>
 
         <div class="field-group">
           <label for="address">Address</label>
-          <input id="address" name="address" value="{{ bar.address }}">
+          <input id="address" name="address" class="input-pill" value="{{ bar.address }}">
         </div>
 
         <div class="field-row">
           <div class="field-group">
-            <label for="city">City</label>
-            <input id="city" name="city" value="{{ bar.city }}">
+              <label for="city">City</label>
+              <input id="city" name="city" class="input-pill" value="{{ bar.city }}">
           </div>
           <div class="field-group">
-            <label for="state">Canton</label>
-            <input id="state" name="state" value="{{ bar.state }}">
+              <label for="state">Canton</label>
+              <input id="state" name="state" class="input-pill" value="{{ bar.state }}">
           </div>
         </div>
 
@@ -73,7 +73,7 @@
 
         <div class="field-group">
           <label for="rating">Rating</label>
-          <input id="rating" name="rating" type="number" min="0" max="5" step="0.1" value="{{ bar.rating or 0 }}">
+          <input id="rating" name="rating" class="input-pill" type="number" min="0" max="5" step="0.1" value="{{ bar.rating or 0 }}">
         </div>
 
         <div class="field-group">
@@ -110,10 +110,8 @@
     <input type="hidden" name="promo_label" value="">
     <input type="hidden" name="tags" value="">
 
-    <div class="form-actions save-bar">
-      <div class="save-bar-inner">
-        <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle" aria-hidden="true"></i> Save</button>
-      </div>
+    <div class="form-actions save-inline">
+      <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle" aria-hidden="true"></i> Save</button>
     </div>
   </form>
 </section>
