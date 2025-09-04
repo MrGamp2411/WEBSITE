@@ -19,8 +19,9 @@
 - Admin Manage Bars page includes a client-side name search via `#barsSearch`
 - `BAR_CATEGORIES` defined in `main.py`; reused in `search.js` and `view-all.js`
 - Categories stored in `bars.bar_categories`
-- Edit Bar basic info page uses `.bar-form` layout with `.form-grid` and `.form-card` containers.
-- Categories are edited via a chip-based selector synchronized with a hidden `<select id="categoriesNative" name="categories" multiple>`.
+- Edit Bar basic info page uses `.editbar` layout with `.grid-2` and `.card` sections (Map, Details, Media & Hours).
+- Categories are shown as always-visible chips synchronized with a hidden `<select id="categoriesNative" name="categories" multiple>`.
+- Manual close checkbox (`#manual_closed`) toggles the `.hours-table` inputs.
 - `Promo Label` and `Tags` fields have been removed from the project.
   - Opening hours data is sanitized; invalid or non-dict values are treated as closed
   - Category `sort_order` defaults to `0` when missing to avoid menu sorting errors
