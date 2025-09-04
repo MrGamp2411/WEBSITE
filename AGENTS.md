@@ -114,7 +114,7 @@
     - Order views render each order as an `<article class="order-card card">` with header, meta, and items sections. Orders are grouped in `.order-list` containers for consistent styling.
     - Each order card exposes `data-status` with the raw status for client-side updates.
     - `.order-list` is a flex container that wraps so order cards can flow horizontally.
-    - Order list cards match bar card width (400px desktop, 300px mobile) while allowing their height to expand with content.
+    - Order list cards match bar card width (405px desktop, 305px mobile) and add 5px internal padding while allowing their height to expand with content.
     - Order card backgrounds reflect status via `card--placed` (blue), `card--accepted` (orange), `card--ready` (green), `card--completed` (default surface), and `card--canceled` (red).
     - `.order-list .card__body` uses `gap: var(--space-1)` and removes default margins on child `p` and `ul` elements to tighten spacing.
     - Order card styles live in `static/css/components.css` under the `.order-card` block and dynamic rendering is handled by `static/js/orders.js`.
