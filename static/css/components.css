@@ -755,3 +755,50 @@ body.dark-mode{
 .save-inline .btn{border-radius:999px;padding:12px 20px;box-shadow:var(--shadow-sm,0 2px 8px rgba(0,0,0,.06))}
 .editbar+.site-footer,.editbar+footer{margin-top:var(--space-6,24px)}
 
+.menu-page{display:block}
+.menu-toolbar{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-4,16px);margin-block:var(--space-6,24px)}
+.menu-toolbar .subtitle{margin-top:var(--space-1,4px);opacity:.85}
+.toolbar-actions{display:flex;align-items:center;gap:var(--space-3,12px);flex-wrap:wrap}
+
+.menu-search{position:relative;display:flex;align-items:center}
+.menu-search input{
+  height:40px;padding:0 36px 0 36px;background:#fff;
+  border:1px solid rgba(0,0,0,.08);border-radius:999px;min-width:260px;width:min(36vw,420px);
+  box-shadow:var(--shadow-xs,0 1px 3px rgba(0,0,0,.04))
+}
+.menu-search .bi-search{position:absolute;left:12px;font-size:16px;opacity:.6}
+.menu-search .clear{
+  position:absolute;right:8px;height:28px;width:28px;border:0;background:transparent;cursor:pointer;
+  display:inline-grid;place-items:center;opacity:.65
+}
+.menu-search .clear:hover{opacity:.95}
+.menu-search input:focus{outline:2px solid rgba(0,0,0,.12);outline-offset:2px}
+
+.menu-page .table-card{
+  background:#fff;border-radius:var(--radius-2xl,16px);box-shadow:var(--shadow-sm,0 2px 8px rgba(0,0,0,.06));
+  overflow:hidden;overflow-x:auto;margin-top:var(--space-4,16px)
+}
+.menu-table{width:100%;border-collapse:separate;border-spacing:0;min-width:820px}
+.menu-table th,.menu-table td{padding:var(--space-3,12px) var(--space-4,16px);vertical-align:middle}
+.menu-table thead th{
+  position:sticky;top:0;z-index:1;background:var(--surface-raise,#fafafa);
+  backdrop-filter:saturate(180%) blur(6px);text-align:left;font-weight:600
+}
+.menu-table tbody tr:nth-child(odd){background:rgba(0,0,0,.02)}
+.menu-table tbody tr:hover{background:rgba(0,0,0,.04)}
+.menu-table th.actions,.menu-table td.actions{text-align:right;white-space:nowrap}
+.menu-table td.actions a{ text-decoration:none; }
+.menu-table td.actions a + a, .menu-table td.actions a + button, .menu-table td.actions button + a { margin-left:12px }
+
+.btn-danger-soft{
+  border:0;border-radius:999px;padding:6px 12px;background:rgba(220,53,69,.12);
+  cursor:pointer
+}
+.btn-danger-soft:hover{background:rgba(220,53,69,.2)}
+
+@media (max-width:767px){
+  .menu-toolbar{flex-direction:column;align-items:stretch}
+  .toolbar-actions{justify-content:space-between}
+  .menu-search{flex:1}
+  .menu-search input{width:100%;min-width:0}
+}
