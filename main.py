@@ -2194,12 +2194,17 @@ async def bar_admin_order_history(request: Request, bar_id: int, db: Session = D
         monthly_map[key].append(c)
 
     monthly = []
+    now = datetime.now()
+    current_year, current_month = now.year, now.month
     for key, clist in monthly_map.items():
         total = sum(Decimal(c.total_revenue or 0) for c in clist)
         commission = (total * PLATFORM_FEE_RATE).quantize(Decimal("0.01"))
         total_earned = (total - commission).quantize(Decimal("0.01"))
         year, month = key.split("-")
         label = datetime(int(year), int(month), 1).strftime("%B %Y")
+        is_past = int(year) < current_year or (
+            int(year) == current_year and int(month) < current_month
+        )
         monthly.append({
             "year": int(year),
             "month": int(month),
@@ -2207,6 +2212,7 @@ async def bar_admin_order_history(request: Request, bar_id: int, db: Session = D
             "total_revenue": float(total.quantize(Decimal("0.01"))),
             "siplygo_commission": float(commission),
             "total_earned": float(total_earned),
+            "is_past": is_past,
         })
 
     monthly.sort(key=lambda m: (m["year"], m["month"]), reverse=True)

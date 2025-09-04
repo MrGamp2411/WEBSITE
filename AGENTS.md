@@ -93,6 +93,7 @@
     and Siplygo commission (5% of total) for each month. Monthly "View" links point to
     `/dashboard/bar/{id}/orders/history/{year}/{month}` with the list of that month's closings, and
     individual daily summaries still link to `/dashboard/bar/{id}/orders/history/{closing_id}`.
+  - Current month's summary text is blue; past months switch to orange via `.closing-current` and `.closing-past`.
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
   - WebSocket support depends on `uvicorn[standard]` (or another backend that provides the `websockets` library).
   - `static/js/orders.js` selects `ws` or `wss` based on the page protocol for secure deployments.
