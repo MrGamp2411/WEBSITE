@@ -1817,7 +1817,11 @@ async def get_bar_orders(
     bar_id: int, request: Request, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
-    if not user or not user.is_bartender or bar_id not in user.bar_ids:
+    if (
+        not user
+        or bar_id not in user.bar_ids
+        or not (user.is_bartender or user.is_bar_admin)
+    ):
         raise HTTPException(status_code=403, detail="Not authorised")
     orders = (
         db.query(Order)
@@ -1843,7 +1847,11 @@ async def update_order_status(
     new_status = data.status.upper()
     allowed = ALLOWED_STATUS_TRANSITIONS.get(order.status, [])
 
-    is_bartender = bool(user and user.is_bartender and order.bar_id in user.bar_ids)
+    is_staff = bool(
+        user
+        and order.bar_id in user.bar_ids
+        and (user.is_bartender or user.is_bar_admin)
+    )
     is_customer_cancel = (
         user
         and order.customer_id == user.id
@@ -1851,7 +1859,7 @@ async def update_order_status(
         and new_status == "CANCELED"
     )
 
-    if not is_bartender and not is_customer_cancel:
+    if not is_staff and not is_customer_cancel:
         raise HTTPException(status_code=403, detail="Not authorised")
 
     if new_status not in allowed:
