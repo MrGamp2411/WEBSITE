@@ -78,7 +78,8 @@ def test_auto_close_moves_orders_to_history():
         pwd = hashlib.sha256("pass".encode("utf-8")).hexdigest()
         admin = User(username="a", email="a@example.com", password_hash=pwd, role=RoleEnum.BARADMIN)
         order = Order(bar=bar, status="COMPLETED", subtotal=10, vat_total=2)
-        db.add_all([bar, admin, order])
+        canceled = Order(bar=bar, status="CANCELED", subtotal=5, vat_total=1)
+        db.add_all([bar, admin, order, canceled])
         db.commit()
         db.add(UserBarRole(user_id=admin.id, bar_id=bar.id, role=RoleEnum.BARADMIN))
         db.commit(); db.refresh(bar); db.close()
@@ -90,8 +91,12 @@ def test_auto_close_moves_orders_to_history():
             closings = db2.query(BarClosing).filter_by(bar_id=bar.id).all()
             assert len(closings) == 1
             assert float(closings[0].total_revenue) == 12.0
-            order = db2.query(Order).first()
-            assert order.closing_id == closings[0].id
+            orders = db2.query(Order).order_by(Order.id).all()
+            assert [o.closing_id for o in orders] == [closings[0].id, closings[0].id]
+            closing_id = closings[0].id
         client.post('/login', data={'email': 'a@example.com', 'password': 'pass'})
         resp = client.get(f'/dashboard/bar/{bar.id}/orders/history')
         assert 'CHF 12.00' in resp.text
+        resp = client.get(f'/dashboard/bar/{bar.id}/orders/history/{closing_id}')
+        assert 'Order #1' in resp.text
+        assert 'Order #2' in resp.text

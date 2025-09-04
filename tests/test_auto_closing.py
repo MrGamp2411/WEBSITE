@@ -24,12 +24,13 @@ def test_auto_close_bars_once():
     hours = {str(now.weekday()): {"open": "00:00", "close": "00:01"}}
     bar = Bar(name="Test Bar", slug="test-bar", opening_hours=json.dumps(hours))
     order = Order(bar=bar, status="COMPLETED", subtotal=10, vat_total=2)
-    db.add_all([bar, order])
+    canceled = Order(bar=bar, status="CANCELED", subtotal=5, vat_total=1)
+    db.add_all([bar, order, canceled])
     db.commit()
     auto_close_bars_once(db, now)
     closings = db.query(BarClosing).filter_by(bar_id=bar.id).all()
     assert len(closings) == 1
     assert float(closings[0].total_revenue) == 12.0
-    order = db.query(Order).first()
-    assert order.closing_id == closings[0].id
+    orders = db.query(Order).order_by(Order.id).all()
+    assert [o.closing_id for o in orders] == [closings[0].id, closings[0].id]
     db.close()

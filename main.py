@@ -766,14 +766,14 @@ def auto_close_bars_once(db: Session, now: datetime) -> None:
             db.query(Order)
             .filter(
                 Order.bar_id == bar.id,
-                Order.status == "COMPLETED",
+                Order.status.in_(["COMPLETED", "CANCELED", "REJECTED"]),
                 Order.closing_id.is_(None),
             )
             .all()
         )
         if not orders:
             continue
-        total = sum(o.total for o in orders)
+        total = sum(o.total for o in orders if o.status == "COMPLETED")
         closing = BarClosing(bar_id=bar.id, total_revenue=total, closed_at=now)
         db.add(closing)
         db.commit()
