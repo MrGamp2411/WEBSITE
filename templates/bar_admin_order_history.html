@@ -4,13 +4,18 @@
 {% if monthly %}
 <ul class="closing-list">
   {% for m in monthly %}
-  <li class="card {{ 'card--accepted' if m.is_past else 'card--placed' }}">
+  <li class="card {{ 'card--ready' if m.confirmed else ('card--accepted' if m.is_past else 'card--placed') }}">
     <div class="card__body">
       <h2>{{ m.label }}</h2>
       <p>Total collected: CHF {{ "%.2f"|format(m.total_revenue) }}</p>
       <p>Total earned: CHF {{ "%.2f"|format(m.total_earned) }}</p>
       <p>Siplygo commission (5%): CHF {{ "%.2f"|format(m.siplygo_commission) }}</p>
       <a class="btn" href="/dashboard/bar/{{ bar.id }}/orders/history/{{ m.year }}/{{ m.month }}">View</a>
+      {% if m.is_past and not m.confirmed and user.is_super_admin %}
+      <form method="post" action="/dashboard/bar/{{ bar.id }}/orders/history/{{ m.year }}/{{ m.month }}/confirm">
+        <button class="btn btn--primary" type="submit">Confirm Payment</button>
+      </form>
+      {% endif %}
     </div>
   </li>
   {% endfor %}

@@ -177,6 +177,7 @@ class BarClosing(Base):
     bar_id = Column(Integer, ForeignKey("bars.id"), nullable=False)
     closed_at = Column(DateTime, default=datetime.utcnow)
     total_revenue = Column(Numeric(10, 2), default=0)
+    payment_confirmed = Column(Boolean, default=False)
 
     bar = relationship("Bar")
     orders = relationship("Order", back_populates="closing")

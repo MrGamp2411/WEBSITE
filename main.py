@@ -623,6 +623,19 @@ def ensure_order_columns() -> None:
                 conn.execute(text(f"ALTER TABLE orders ADD COLUMN {name} {ddl}"))
 
 
+def ensure_bar_closing_columns() -> None:
+    """Ensure expected columns exist on the bar_closings table."""
+    inspector = inspect(engine)
+    columns = {col["name"] for col in inspector.get_columns("bar_closings")}
+    if "payment_confirmed" not in columns:
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE bar_closings ADD COLUMN IF NOT EXISTS payment_confirmed BOOLEAN DEFAULT FALSE"
+                )
+            )
+
+
 @app.on_event("startup")
 async def on_startup():
     """Initialise database tables on startup."""
@@ -633,6 +646,7 @@ async def on_startup():
     ensure_category_columns()
     ensure_menu_item_columns()
     ensure_order_columns()
+    ensure_bar_closing_columns()
     seed_super_admin()
     load_bars_from_db()
     asyncio.create_task(auto_close_bars_worker())
@@ -2209,6 +2223,7 @@ async def bar_admin_order_history(request: Request, bar_id: int, db: Session = D
         is_past = int(year) < current_year or (
             int(year) == current_year and int(month) < current_month
         )
+        confirmed = all(c.payment_confirmed for c in clist)
         monthly.append({
             "year": int(year),
             "month": int(month),
@@ -2217,6 +2232,7 @@ async def bar_admin_order_history(request: Request, bar_id: int, db: Session = D
             "siplygo_commission": float(commission),
             "total_earned": float(total_earned),
             "is_past": is_past,
+            "confirmed": confirmed,
         })
 
     monthly.sort(key=lambda m: (m["year"], m["month"]), reverse=True)
@@ -2269,6 +2285,37 @@ async def bar_admin_order_history_month(
         bar=bar,
         closings=closings,
         month_label=month_label,
+    )
+
+
+@app.post("/dashboard/bar/{bar_id}/orders/history/{year}/{month}/confirm")
+async def confirm_monthly_payment(
+    request: Request,
+    bar_id: int,
+    year: int,
+    month: int,
+    db: Session = Depends(get_db),
+):
+    user = get_current_user(request)
+    if not user or not user.is_super_admin:
+        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    start = datetime(year, month, 1)
+    if month == 12:
+        end = datetime(year + 1, 1, 1)
+    else:
+        end = datetime(year, month + 1, 1)
+    (
+        db.query(BarClosing)
+        .filter(
+            BarClosing.bar_id == bar_id,
+            BarClosing.closed_at >= start,
+            BarClosing.closed_at < end,
+        )
+        .update({"payment_confirmed": True}, synchronize_session=False)
+    )
+    db.commit()
+    return RedirectResponse(
+        url=f"/dashboard/bar/{bar_id}/orders/history", status_code=status.HTTP_303_SEE_OTHER
     )
 
 
