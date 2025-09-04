@@ -1834,8 +1834,8 @@ async def get_bar_orders(
     user = get_current_user(request)
     if (
         not user
-        or bar_id not in user.bar_ids
-        or not (user.is_bartender or user.is_bar_admin)
+        or (bar_id not in user.bar_ids and not user.is_super_admin)
+        or not (user.is_bartender or user.is_bar_admin or user.is_super_admin)
     ):
         raise HTTPException(status_code=403, detail="Not authorised")
     orders = (
@@ -1864,8 +1864,13 @@ async def update_order_status(
 
     is_staff = bool(
         user
-        and order.bar_id in user.bar_ids
-        and (user.is_bartender or user.is_bar_admin)
+        and (
+            user.is_super_admin
+            or (
+                order.bar_id in user.bar_ids
+                and (user.is_bartender or user.is_bar_admin)
+            )
+        )
     )
     is_customer_cancel = (
         user
