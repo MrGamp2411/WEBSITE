@@ -39,7 +39,7 @@
           <td>{{ bar.state }}</td>
           <td class="actions">
             <a href="/admin/bars/edit/{{ bar.id }}">Edit</a> |
-            <a href="#" onclick="if(confirm('Are you sure you want to delete this bar?')){document.getElementById('delete-bar-{{ bar.id }}').submit();} return false;">Delete</a>
+            <a href="#" class="js-delete-bar" data-bar-id="{{ bar.id }}">Delete</a>
             <form
               id="delete-bar-{{ bar.id }}"
               method="post"
@@ -53,6 +53,15 @@
     </table>
   </div>
 </section>
+<div id="deleteBlocker" class="cart-blocker" hidden>
+  <div class="cart-popup">
+    <p>Are you sure you want to delete this bar?</p>
+    <div class="cart-popup-actions">
+      <button type="button" class="btn btn--secondary js-cancel-delete">Cancel</button>
+      <button type="button" class="btn btn--primary js-confirm-delete">Delete</button>
+    </div>
+  </div>
+</div>
 <script>
 (function(){
   const input = document.getElementById('barsSearch');
@@ -83,6 +92,29 @@
   const qs = new URLSearchParams(location.search);
   const q = qs.get('q');
   if(q){ input.value = q; applyFilter(); }
+
+  const blocker = document.getElementById('deleteBlocker');
+  const cancelBtn = document.querySelector('.js-cancel-delete');
+  const confirmBtn = document.querySelector('.js-confirm-delete');
+  let targetForm = null;
+
+  document.querySelectorAll('.js-delete-bar').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const barId = link.dataset.barId;
+      targetForm = document.getElementById('delete-bar-' + barId);
+      if(blocker) blocker.hidden = false;
+    });
+  });
+
+  cancelBtn?.addEventListener('click', () => {
+    if(blocker) blocker.hidden = true;
+    targetForm = null;
+  });
+
+  confirmBtn?.addEventListener('click', () => {
+    if(targetForm) targetForm.submit();
+  });
 })();
 </script>
 {% endblock %}

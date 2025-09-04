@@ -50,6 +50,7 @@ def test_admin_bars_delete_form_and_delete():
     resp = client.get("/admin/bars")
     assert resp.status_code == 200
     assert f'id="delete-bar-{bar.id}"' in resp.text
+    assert 'id="deleteBlocker"' in resp.text
 
     resp = client.post(f"/admin/bars/{bar.id}/delete", follow_redirects=False)
     assert resp.status_code == 303

@@ -15,8 +15,9 @@
   - Global footer: `templates/layout.html` uses `.site-footer` styled in `static/css/components.css`
 - Bars:
   - `/bars` page uses `templates/all_bars.html` and `static/js/view-all.js`
-  - Admin Manage Bars page uses `templates/admin_bars.html` with `.bars-page` styles in `static/css/components.css`
+- Admin Manage Bars page uses `templates/admin_bars.html` with `.bars-page` styles in `static/css/components.css`
 - Admin Manage Bars page includes a client-side name search via `#barsSearch`
+- Admin Manage Bars delete links open a popup confirmation using `.cart-blocker` and `.cart-popup`
 - `BAR_CATEGORIES` defined in `main.py`; reused in `search.js` and `view-all.js`
 - Categories stored in `bars.bar_categories`
 - Edit Bar basic info page uses `.editbar` layout with `.grid-2` and `.card` sections (Map, Details, Media & Hours).
