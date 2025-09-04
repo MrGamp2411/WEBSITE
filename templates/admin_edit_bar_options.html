@@ -1,10 +1,69 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Edit {{ bar.name }}</h1>
-<ul class="list">
-  <li><a href="/admin/bars/edit/{{ bar.id }}/info">Edit Basic Info</a></li>
-  <li><a href="/bar/{{ bar.id }}/categories">Manage Menu & Categories</a></li>
-  <li><a href="/admin/bars/{{ bar.id }}/users">Manage Users</a></li>
-  <li><a href="/admin/bars/{{ bar.id }}/tables">Manage Tables</a></li>
-</ul>
+<section class="bar-edit-page">
+  <header class="bar-edit-header">
+    <a href="/admin/bars" class="back-link"><i class="bi bi-chevron-left" aria-hidden="true"></i> Back to Bars</a>
+    <h1>Edit {{ bar.name }}</h1>
+    <p class="subtitle">Select a section to manage for this venue.</p>
+  </header>
+  <div class="action-grid">
+    <a href="/admin/bars/edit/{{ bar.id }}/info" class="action-card">
+      <i class="bi bi-pencil-square" aria-hidden="true"></i>
+      <h3>Basic Info</h3>
+      <p>Edit name, address, contact and opening hours.</p>
+      <span class="cta">Edit</span>
+    </a>
+    <a href="/bar/{{ bar.id }}/categories" class="action-card">
+      <i class="bi bi-ui-checks-grid" aria-hidden="true"></i>
+      <h3>Menu &amp; Categories</h3>
+      <p>Organize categories and manage menu items.</p>
+      <span class="cta">Manage</span>
+    </a>
+    <a href="/admin/bars/{{ bar.id }}/users" class="action-card">
+      <i class="bi bi-people" aria-hidden="true"></i>
+      <h3>Users</h3>
+      <p>Invite or remove staff and set roles.</p>
+      <span class="cta">Manage</span>
+    </a>
+    <a href="/admin/bars/{{ bar.id }}/tables" class="action-card">
+      <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
+      <h3>Tables</h3>
+      <p>Create, rename and arrange table numbers.</p>
+      <span class="cta">Manage</span>
+    </a>
+  </div>
+</section>
+
+<style>
+.bar-edit-page{display:block}
+.bar-edit-header{margin-block:var(--space-6,24px)}
+.bar-edit-header .subtitle{margin-top:var(--space-1,4px);opacity:.85}
+.back-link{display:inline-flex;gap:8px;align-items:center;text-decoration:none;opacity:.8;margin-bottom:8px}
+.back-link:hover{opacity:1}
+
+.action-grid{
+  display:grid; gap:var(--space-4,16px);
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  margin-top:var(--space-4,16px)
+}
+@media (max-width:767px){ .action-grid{grid-template-columns:1fr} }
+
+.action-card{
+  position:relative; display:flex; flex-direction:column; gap:8px;
+  padding:var(--space-5,20px);
+  border-radius:var(--radius-2xl,16px);
+  background:var(--surface,#fff);
+  box-shadow:var(--shadow-sm,0 2px 8px rgba(0,0,0,.06));
+  text-decoration:none;
+}
+.action-card i{font-size:22px; opacity:.7}
+.action-card h3{margin:0}
+.action-card p{margin:0; line-height:1.45; opacity:.9}
+.action-card .cta{
+  margin-top:auto; font-weight:600;
+  color:var(--brand-600,#5b2dee);
+}
+.action-card:hover{transform:translateY(-1px); box-shadow:var(--shadow-md,0 6px 18px rgba(0,0,0,.08))}
+.action-card:focus-visible{outline:2px solid rgba(0,0,0,.15); outline-offset:2px}
+</style>
 {% endblock %}
