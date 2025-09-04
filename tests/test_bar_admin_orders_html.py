@@ -96,6 +96,11 @@ def test_auto_close_moves_orders_to_history():
             closing_id = closings[0].id
         client.post('/login', data={'email': 'a@example.com', 'password': 'pass'})
         resp = client.get(f'/dashboard/bar/{bar.id}/orders/history')
+        assert 'January 2024' in resp.text
+        assert 'Total collected: CHF 12.00' in resp.text
+        assert 'Total earned: CHF 11.40' in resp.text
+        assert 'Siplygo commission (5%): CHF 0.60' in resp.text
+        resp = client.get(f'/dashboard/bar/{bar.id}/orders/history/2024/1')
         assert 'Total collected: CHF 12.00' in resp.text
         assert 'Total earned: CHF 11.40' in resp.text
         assert 'Siplygo commission (5%): CHF 0.60' in resp.text

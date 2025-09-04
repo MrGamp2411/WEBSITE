@@ -2188,13 +2188,73 @@ async def bar_admin_order_history(request: Request, bar_id: int, db: Session = D
         .order_by(BarClosing.closed_at.desc())
         .all()
     )
+    monthly_map: Dict[str, List[BarClosing]] = defaultdict(list)
+    for c in closings:
+        key = c.closed_at.strftime("%Y-%m")
+        monthly_map[key].append(c)
+
+    monthly = []
+    for key, clist in monthly_map.items():
+        total = sum(Decimal(c.total_revenue or 0) for c in clist)
+        commission = (total * PLATFORM_FEE_RATE).quantize(Decimal("0.01"))
+        total_earned = (total - commission).quantize(Decimal("0.01"))
+        year, month = key.split("-")
+        label = datetime(int(year), int(month), 1).strftime("%B %Y")
+        monthly.append({
+            "year": int(year),
+            "month": int(month),
+            "label": label,
+            "total_revenue": float(total.quantize(Decimal("0.01"))),
+            "siplygo_commission": float(commission),
+            "total_earned": float(total_earned),
+        })
+
+    monthly.sort(key=lambda m: (m["year"], m["month"]), reverse=True)
+
+    return render_template(
+        "bar_admin_order_history.html", request=request, bar=bar, monthly=monthly
+    )
+
+
+@app.get(
+    "/dashboard/bar/{bar_id}/orders/history/{year}/{month}", response_class=HTMLResponse
+)
+async def bar_admin_order_history_month(
+    request: Request, bar_id: int, year: int, month: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    if not user or not user.is_bar_admin or bar_id not in user.bar_ids:
+        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    bar = bars.get(bar_id)
+    if not bar:
+        raise HTTPException(status_code=404)
+    start = datetime(year, month, 1)
+    if month == 12:
+        end = datetime(year + 1, 1, 1)
+    else:
+        end = datetime(year, month + 1, 1)
+    closings = (
+        db.query(BarClosing)
+        .filter(
+            BarClosing.bar_id == bar_id,
+            BarClosing.closed_at >= start,
+            BarClosing.closed_at < end,
+        )
+        .order_by(BarClosing.closed_at.desc())
+        .all()
+    )
     for c in closings:
         total = Decimal(c.total_revenue or 0)
         commission = (total * PLATFORM_FEE_RATE).quantize(Decimal("0.01"))
         c.siplygo_commission = float(commission)
         c.total_earned = float((total - commission).quantize(Decimal("0.01")))
+    month_label = start.strftime("%B %Y")
     return render_template(
-        "bar_admin_order_history.html", request=request, bar=bar, closings=closings
+        "bar_admin_month_history.html",
+        request=request,
+        bar=bar,
+        closings=closings,
+        month_label=month_label,
     )
 
 
