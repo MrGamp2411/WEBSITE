@@ -134,6 +134,7 @@
 - Order history and live order views display refund amounts for canceled orders.
 - Customers may cancel their own `PLACED` orders from the order history page using the cancel button; this posts `CANCELED` via `/api/orders/{id}/status`.
 - Admin dashboard includes a testing-only "Delete all orders" button at `/admin/orders/clear` to remove every order record.
+- Admin dashboard groups actions into `.admin-section` grids using `.quick-card` links for Bars, Users, Payments, Analytics, Profile, and a Danger Zone.
 - Super admins can review bar revenue and orders via `/admin/payments`, listing all bars with "View" links to `/dashboard/bar/{id}/orders`.
 - Super admins can view and update live orders for any bar using the same dashboards and APIs as bar admins and bartenders.
 - `/admin/payments` offers testing helpers:
