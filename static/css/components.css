@@ -699,7 +699,7 @@ body.dark-mode{
 
 .editbar{display:block;padding-bottom:0}
 .editbar h1{margin-bottom:var(--space-4,16px)}
-.editbar .card{background:var(--surface,#fff);border-radius:var(--radius-2xl,16px);box-shadow:var(--shadow-sm,0 2px 8px rgba(0,0,0,.06));padding:var(--space-5,20px)}
+.editbar .card{background:var(--surface,#fff);border-radius:var(--radius-2xl,16px);box-shadow:var(--shadow-sm,0 2px 8px rgba(0,0,0,.06));padding:var(--space-5,20px);max-height:none}
 .editbar .map-card{padding:0;overflow:hidden;margin-bottom:var(--space-5,20px)}
 .editbar .map-card>*{display:block}
 .editbar-form .grid-2{display:grid;gap:var(--space-5,20px)}

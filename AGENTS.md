@@ -20,6 +20,7 @@
 - `BAR_CATEGORIES` defined in `main.py`; reused in `search.js` and `view-all.js`
 - Categories stored in `bars.bar_categories`
 - Edit Bar basic info page uses `.editbar` layout with `.grid-2` and `.card` sections (Map, Details, Media & Hours).
+- Edit Bar cards remove the base mobile `max-height` so all content is visible on small screens.
 - Categories are shown as always-visible chips synchronized with a hidden `<select id="categoriesNative" name="categories" multiple>`.
 - Manual close checkbox (`#manual_closed`) toggles the `.hours-table` inputs.
 - Category chips allow selecting up to 5 items, disable others at the limit, and show a running count.
