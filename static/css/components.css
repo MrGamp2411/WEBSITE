@@ -778,7 +778,7 @@ body.dark-mode{
   background:#fff;border-radius:var(--radius-2xl,16px);box-shadow:var(--shadow-sm,0 2px 8px rgba(0,0,0,.06));
   overflow:hidden;overflow-x:auto;margin-top:var(--space-4,16px)
 }
-.menu-table{width:100%;border-collapse:separate;border-spacing:0;min-width:820px}
+.menu-table{width:100%;border-collapse:separate;border-spacing:0;min-width:860px}
 .menu-table th,.menu-table td{padding:var(--space-3,12px) var(--space-4,16px);vertical-align:middle}
 .menu-table thead th{
   position:sticky;top:0;z-index:1;background:var(--surface-raise,#fafafa);
@@ -787,14 +787,21 @@ body.dark-mode{
 .menu-table tbody tr:nth-child(odd){background:rgba(0,0,0,.02)}
 .menu-table tbody tr:hover{background:rgba(0,0,0,.04)}
 .menu-table th.actions,.menu-table td.actions{text-align:right;white-space:nowrap}
-.menu-table td.actions a{ text-decoration:none; }
-.menu-table td.actions a + a, .menu-table td.actions a + button, .menu-table td.actions button + a { margin-left:12px }
 
+/* pill-bar azioni */
+.actions-group{display:inline-flex;align-items:center;gap:10px}
+.btn-ghost{
+  background:transparent;border:0;border-radius:999px;padding:6px 10px;text-decoration:none;cursor:pointer;
+}
+.btn-outline{
+  background:#fff;border:1px solid rgba(0,0,0,.15);border-radius:999px;padding:6px 12px;text-decoration:none;cursor:pointer;
+}
+.btn-outline:hover{box-shadow:var(--shadow-xs,0 1px 6px rgba(0,0,0,.06))}
 .btn-danger-soft{
-  border:0;border-radius:999px;padding:6px 12px;background:rgba(220,53,69,.12);
-  cursor:pointer
+  border:0;border-radius:999px;padding:6px 12px;background:rgba(220,53,69,.12);cursor:pointer
 }
 .btn-danger-soft:hover{background:rgba(220,53,69,.2)}
+.actions-group .bi{margin-right:6px;opacity:.75}
 
 @media (max-width:767px){
   .menu-toolbar{flex-direction:column;align-items:stretch}
