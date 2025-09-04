@@ -3023,6 +3023,66 @@ async def admin_payments(request: Request, db: Session = Depends(get_db)):
     return render_template("admin_payments.html", request=request, bars=db_bars)
 
 
+@app.post("/admin/payments/{bar_id}/test_closing")
+async def admin_create_test_closing(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    if not user or not user.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    now = datetime.now()
+    if now.month == 1:
+        year = now.year - 1
+        month = 12
+    else:
+        year = now.year
+        month = now.month - 1
+    start = datetime(year, month, 1)
+    closing = BarClosing(bar_id=bar_id, closed_at=start, total_revenue=0)
+    db.add(closing)
+    db.commit()
+    return RedirectResponse(
+        url=f"/dashboard/bar/{bar_id}/orders/history",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@app.post("/admin/payments/{bar_id}/test_closing/delete")
+async def admin_delete_test_closing(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    if not user or not user.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    now = datetime.now()
+    if now.month == 1:
+        year = now.year - 1
+        month = 12
+    else:
+        year = now.year
+        month = now.month - 1
+    start = datetime(year, month, 1)
+    if month == 12:
+        end = datetime(year + 1, 1, 1)
+    else:
+        end = datetime(year, month + 1, 1)
+    (
+        db.query(BarClosing)
+        .filter(
+            BarClosing.bar_id == bar_id,
+            BarClosing.closed_at >= start,
+            BarClosing.closed_at < end,
+            BarClosing.total_revenue == 0,
+        )
+        .delete(synchronize_session=False)
+    )
+    db.commit()
+    return RedirectResponse(
+        url=f"/dashboard/bar/{bar_id}/orders/history",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
 @app.post("/admin/orders/clear")
 async def admin_clear_orders(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request)
