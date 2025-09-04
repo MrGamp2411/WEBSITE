@@ -616,6 +616,3 @@ body.dark-mode{
 .qty-controls{display:inline-flex;align-items:center;gap:var(--space-1);}
 .qty-display{min-width:1.5em;text-align:center;}
 
-.closing-current{color:blue;}
-.closing-past{color:orange;}
-
