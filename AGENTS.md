@@ -15,6 +15,7 @@
   - Global footer: `templates/layout.html` uses `.site-footer` styled in `static/css/components.css`
 - Bars:
   - `/bars` page uses `templates/all_bars.html` and `static/js/view-all.js`
+  - Admin Manage Bars page uses `templates/admin_bars.html` with `.bars-page` styles in `static/css/components.css`
   - `BAR_CATEGORIES` defined in `main.py`; reused in `search.js` and `view-all.js`
   - Categories stored in `bars.bar_categories`
   - Opening hours data is sanitized; invalid or non-dict values are treated as closed

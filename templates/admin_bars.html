@@ -1,37 +1,48 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Manage Bars</h1>
-<div class="dashboard-info">
-  <div class="card">
-    <h2>{{ user.username }}</h2>
-    <p>{{ user.email }}</p>
-    <p>{{ user.prefix }} {{ user.phone }}</p>
+<section class="bars-page"> <!-- CHANGED -->
+  <header class="bars-toolbar"> <!-- CHANGED -->
+    <div class="title-wrap">
+      <h1>Bars</h1> <!-- CHANGED -->
+      <p class="subtitle">Create, edit and manage venues on the platform.</p> <!-- CHANGED -->
+    </div>
+    <div class="toolbar-actions">
+      <a class="btn btn--primary" href="/admin/bars/new">Add Bar</a> <!-- CHANGED -->
+    </div>
+  </header>
+
+  <div class="table-card"> <!-- CHANGED -->
+    <table class="bars-table table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Address</th>
+          <th>City</th>
+          <th>Canton</th> <!-- CHANGED -->
+          <th class="actions">Actions</th> <!-- CHANGED -->
+        </tr>
+      </thead>
+      <tbody>
+        {% for bar in bars %}
+        <tr>
+          <td>{{ bar.name }}</td>
+          <td>{{ bar.address }}</td>
+          <td>{{ bar.city }}</td>
+          <td>{{ bar.state }}</td>
+          <td class="actions">
+            <a href="/admin/bars/edit/{{ bar.id }}">Edit</a> |
+            <a href="#" onclick="if(confirm('Are you sure you want to delete this bar?')){document.getElementById('delete-bar-{{ bar.id }}').submit();} return false;">Delete</a>
+            <form
+              id="delete-bar-{{ bar.id }}"
+              method="post"
+              action="{{ request.url_for('delete_bar', bar_id=bar.id) }}"
+              style="display:none;"
+            ></form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
-</div>
-<a class="btn btn--success" href="/admin/bars/new">Add Bar</a>
-<table class="table">
-  <thead>
-    <tr><th>Name</th><th>Address</th><th>City</th><th>State</th><th>Actions</th></tr>
-  </thead>
-  <tbody>
-    {% for bar in bars %}
-    <tr>
-      <td>{{ bar.name }}</td>
-      <td>{{ bar.address }}</td>
-      <td>{{ bar.city }}</td>
-      <td>{{ bar.state }}</td>
-      <td>
-        <a href="/admin/bars/edit/{{ bar.id }}">Edit</a> |
-        <a href="#" onclick="if(confirm('Are you sure you want to delete this bar?')){document.getElementById('delete-bar-{{ bar.id }}').submit();} return false;">Delete</a>
-        <form
-          id="delete-bar-{{ bar.id }}"
-          method="post"
-          action="{{ request.url_for('delete_bar', bar_id=bar.id) }}"
-          style="display:none;"
-        ></form>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+</section>
 {% endblock %}
