@@ -96,7 +96,5 @@ Bars now support additional optional metadata:
 
 - `rating` – float 0–5 displayed with a star icon.
 - `is_open_now` – flag shown as an "OPEN NOW" badge.
-- `promo_label` – short badge text like "2×1 Happy Hour".
-- `tags` – comma separated list of chips.
 These fields are editable in **Admin → BarEdit Info**. Image URLs must be
 absolute HTTPS links.

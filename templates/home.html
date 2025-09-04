@@ -42,7 +42,7 @@
     <ul class="bars scroller">
       {% for bar in recent_bars %}
       <li>
-        <a class="bar-card{% if bar.promo_label %} featured{% endif %}{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="Open {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
+        <a class="bar-card{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="Open {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
         <div class="thumb-wrapper">
         {% if bar.photo_url %}
         <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
@@ -55,7 +55,6 @@
         {% else %}
         <span class="status status-closed">Closed now</span>
         {% endif %}
-        {% if bar.promo_label %}<span class="badge badge-promo">{{ bar.promo_label }}</span>{% endif %}
         <h3 class="title" itemprop="name">{{ bar.name }}</h3>
         <div class="bar-meta">
           {% if bar.rating %}<span class="bar-rating"><i class="bi bi-star-fill" aria-hidden="true"></i> {{ '%.1f'|format(bar.rating) }}</span>{% endif %}
@@ -84,7 +83,7 @@
     <ul class="bars scroller" id="barList">
       {% for bar in bars %}
       <li>
-          <a class="bar-card{% if bar.promo_label %} featured{% endif %}{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="Open {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
+          <a class="bar-card{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="Open {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
         <div class="thumb-wrapper">
         {% if bar.photo_url %}
         <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" {% if not recent_bars and loop.first %}fetchpriority="high"{% endif %} onerror="this.src='{{ fallback_img }}';this.onerror=null;">
@@ -97,7 +96,6 @@
         {% else %}
         <span class="status status-closed">Closed now</span>
         {% endif %}
-        {% if bar.promo_label %}<span class="badge badge-promo">{{ bar.promo_label }}</span>{% endif %}
         <h3 class="title" itemprop="name">{{ bar.name }}</h3>
         <div class="bar-meta">
           {% if bar.rating %}<span class="bar-rating"><i class="bi bi-star-fill" aria-hidden="true"></i> {{ '%.1f'|format(bar.rating) }}</span>{% endif %}

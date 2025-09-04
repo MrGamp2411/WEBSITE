@@ -3,96 +3,187 @@
 <h1>Edit Bar</h1>
 {% if error %}<p class="error">{{ error }}</p>{% endif %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<div id="map" style="height:400px;"></div>
+<section class="bar-form">
+  <div id="map" style="height:400px;"></div>
 
-<form class="form" method="post" action="/admin/bars/edit/{{ bar.id }}/info" enctype="multipart/form-data">
-  <label for="name">Name
-    <input id="name" name="name" value="{{ bar.name }}">
-  </label>
-  <label for="address">Address
-    <input id="address" name="address" value="{{ bar.address }}">
-  </label>
-  <label for="city">City
-    <input id="city" name="city" value="{{ bar.city }}">
-  </label>
-  <label for="state">State
-    <input id="state" name="state" value="{{ bar.state }}">
-  </label>
-  <label for="description">Description
-    <textarea id="description" name="description" maxlength="120">{{ bar.description }}</textarea>
-  </label>
-  {% if bar.photo_url %}
-  <img src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" style="max-width:200px;"/>
-  {% endif %}
-  <label for="photo">Photo
-    <input id="photo" name="photo" type="file">
-  </label>
-  <label for="rating">Rating
-    <input id="rating" name="rating" type="number" min="0" max="5" step="0.1" value="{{ bar.rating or 0 }}">
-  </label>
-  <label for="categories">Categories
-    <select id="categories" name="categories" multiple>
-      {% for c in bar_categories %}
-      <option value="{{ c }}"{% if c in selected_categories %} selected{% endif %}>{{ c }}</option>
-      {% endfor %}
-    </select>
-  </label>
-  <label for="manual_closed">
-    <input id="manual_closed" name="manual_closed" type="checkbox" {% if bar.manual_closed %}checked{% endif %}> Close bar manually
-  </label>
-  {% set days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] %}
-  <table class="opening-hours">
-    <thead>
-      <tr><th>Day</th><th>Open</th><th>Close</th></tr>
-    </thead>
-    <tbody>
-    {% for day in days %}
-      {% set idx = loop.index0 %}
-      {% set h = hours.get(idx|string) if hours else None %}
-      <tr>
-        <td>{{ day }}</td>
-        <td><input type="time" name="open_{{ idx }}" value="{{ h.open if h }}"></td>
-        <td><input type="time" name="close_{{ idx }}" value="{{ h.close if h }}"></td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-  <label for="promo_label">Promo Label
-    <input id="promo_label" name="promo_label" value="{{ bar.promo_label or '' }}">
-  </label>
-  <label for="tags">Tags
-    <input id="tags" name="tags" value="{{ tags_csv }}">
-  </label>
-  <input id="latitude" name="latitude" type="hidden" value="{{ bar.latitude }}">
-  <input id="longitude" name="longitude" type="hidden" value="{{ bar.longitude }}">
-  <button class="btn btn--primary" type="submit">Save</button>
-</form>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    const initialLat = {{ bar.latitude }};
-    const initialLng = {{ bar.longitude }};
-    const map = L.map('map').setView([initialLat, initialLng], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-    const marker = L.marker([initialLat, initialLng], {draggable:true}).addTo(map);
-    function updateInputs(e) {
-      const pos = e.target.getLatLng();
-      document.getElementById('latitude').value = pos.lat.toFixed(6);
-      document.getElementById('longitude').value = pos.lng.toFixed(6);
-    }
-    marker.on('dragend', updateInputs);
-    updateInputs({target: marker});
+  <form method="post" action="/admin/bars/edit/{{ bar.id }}/info" enctype="multipart/form-data">
+    <div class="form-grid">
+      <div class="form-card">
+        <div class="field-group">
+          <label for="name">Name</label>
+          <input id="name" name="name" value="{{ bar.name }}">
+        </div>
+        <div class="field-group">
+          <label for="address">Address</label>
+          <input id="address" name="address" value="{{ bar.address }}">
+        </div>
+        <div class="field-group">
+          <label for="city">City</label>
+          <input id="city" name="city" value="{{ bar.city }}">
+        </div>
+        <div class="field-group">
+          <label for="state">State</label>
+          <input id="state" name="state" value="{{ bar.state }}">
+        </div>
+        <div class="field-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" maxlength="120">{{ bar.description }}</textarea>
+        </div>
+        <div class="field-group">
+          <label for="categoryInput">Categories</label>
+          <div class="chip-select" id="categorySelect" aria-describedby="categoriesHelp">
+            <div class="chips" aria-live="polite"></div>
+            <input id="categoryInput" type="text" placeholder="Search categories…" aria-autocomplete="list" aria-expanded="false" autocomplete="off">
+            <ul class="options" id="categoryOptions" role="listbox" aria-label="Available categories"></ul>
+            <select id="categoriesNative" name="categories" multiple hidden>
+              {% for c in bar_categories %}
+                <option value="{{ c }}" {% if c in selected_categories %}selected{% endif %}>{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <small id="categoriesHelp">Type to search, press Enter to add. Click a chip to remove.</small>
+        </div>
+      </div>
 
-    const catSelect = document.getElementById('categories');
-    catSelect.addEventListener('change', () => {
-      const selected = Array.from(catSelect.selectedOptions);
-      if (selected.length > 5) {
-        selected[selected.length - 1].selected = false;
-        alert('Select up to 5 categories');
-      }
+      <div class="form-card">
+        {% if bar.photo_url %}
+        <div class="field-group">
+          <img src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" style="max-width:200px;"/>
+        </div>
+        {% endif %}
+        <div class="field-group">
+          <label for="photo">Photo</label>
+          <input id="photo" name="photo" type="file">
+        </div>
+        <div class="field-group">
+          <label for="rating">Rating</label>
+          <input id="rating" name="rating" type="number" min="0" max="5" step="0.1" value="{{ bar.rating or 0 }}">
+        </div>
+        <div class="field-group">
+          <label for="manual_closed">
+            <input id="manual_closed" name="manual_closed" type="checkbox" {% if bar.manual_closed %}checked{% endif %}> Close bar manually
+          </label>
+        </div>
+        <div class="field-group">
+          {% set days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] %}
+          <table class="opening-hours">
+            <thead>
+              <tr><th>Day</th><th>Open</th><th>Close</th></tr>
+            </thead>
+            <tbody>
+            {% for day in days %}
+              {% set idx = loop.index0 %}
+              {% set h = hours.get(idx|string) if hours else None %}
+              <tr>
+                <td>{{ day }}</td>
+                <td><input type="time" name="open_{{ idx }}" value="{{ h.open if h }}"></td>
+                <td><input type="time" name="close_{{ idx }}" value="{{ h.close if h }}"></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <input id="latitude" name="latitude" type="hidden" value="{{ bar.latitude }}">
+    <input id="longitude" name="longitude" type="hidden" value="{{ bar.longitude }}">
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+  </form>
+</section>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const initialLat = {{ bar.latitude }};
+  const initialLng = {{ bar.longitude }};
+  const map = L.map('map').setView([initialLat, initialLng], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+  const marker = L.marker([initialLat, initialLng], {draggable:true}).addTo(map);
+  function updateInputs(e) {
+    const pos = e.target.getLatLng();
+    document.getElementById('latitude').value = pos.lat.toFixed(6);
+    document.getElementById('longitude').value = pos.lng.toFixed(6);
+  }
+  marker.on('dragend', updateInputs);
+  updateInputs({target: marker});
+</script>
+<script>
+(function(){
+  const wrap = document.getElementById('categorySelect');
+  if(!wrap) return;
+  const select = document.getElementById('categoriesNative');
+  const input  = document.getElementById('categoryInput');
+  const list   = document.getElementById('categoryOptions');
+  const chipsC = wrap.querySelector('.chips');
+
+  let all = Array.from(select.options).map(o => ({value:o.value, label:o.text}));
+  all = all.map(o => ({value:o.value, label:o.label || o.value}));
+
+  const norm = s => (s||'').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+
+  function isSelected(val){
+    return Array.from(select.selectedOptions).some(o => o.value === val);
+  }
+
+  function renderChips(){
+    chipsC.innerHTML = '';
+    Array.from(select.selectedOptions).forEach(o=>{
+      const chip = document.createElement('button');
+      chip.type='button';
+      chip.className='chip';
+      chip.setAttribute('aria-label', `Remove ${o.text}`);
+      chip.innerHTML = `<span>${o.text}</span><i class="bi bi-x"></i>`;
+      chip.addEventListener('click', ()=>{
+        o.selected = false; renderChips();
+      });
+      chipsC.appendChild(chip);
     });
-  </script>
-  {% endblock %}
+  }
 
+  function renderOptions(q=''){
+    list.innerHTML = '';
+    const query = norm(q);
+    const candidates = all.filter(o => !isSelected(o.value) && norm(o.label).includes(query)).slice(0,30);
+    candidates.forEach(o=>{
+      const li = document.createElement('li');
+      li.role = 'option';
+      li.textContent = o.label;
+      li.dataset.value = o.value;
+      li.addEventListener('click', ()=>{ selectValue(o.value); });
+      list.appendChild(li);
+    });
+    list.classList.toggle('show', candidates.length > 0 && q.length > 0);
+    input.setAttribute('aria-expanded', list.classList.contains('show'));
+  }
+
+  function selectValue(val){
+    const opt = Array.from(select.options).find(o=>o.value===val);
+    if(opt){ opt.selected = true; renderChips(); }
+    input.value = ''; renderOptions('');
+    input.focus();
+  }
+
+  input.addEventListener('input', (e)=>{ renderOptions(e.target.value); });
+  input.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter' && input.value.trim()){
+      const match = all.find(o => norm(o.label) === norm(input.value));
+      if(match){ e.preventDefault(); selectValue(match.value); }
+    } else if(e.key==='Backspace' && !input.value && select.selectedOptions.length){
+      const last = Array.from(select.selectedOptions).pop();
+      if(last){ last.selected=false; renderChips(); }
+    }
+  });
+  document.addEventListener('click', (e)=>{
+    if(!wrap.contains(e.target)){ list.classList.remove('show'); input.setAttribute('aria-expanded','false'); }
+  });
+
+  renderChips();
+})();
+</script>
+{% endblock %}

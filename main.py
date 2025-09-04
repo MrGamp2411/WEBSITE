@@ -193,8 +193,6 @@ class Bar:
         manual_closed: bool = False,
         ordering_paused: bool = False,
         opening_hours: Optional[Dict[str, Dict[str, str]]] = None,
-        promo_label: Optional[str] = None,
-        tags: Optional[List[str]] = None,
         bar_categories: Optional[List[str]] = None,
     ):
         self.id = id
@@ -211,8 +209,6 @@ class Bar:
         self.manual_closed = manual_closed
         self.ordering_paused = ordering_paused
         self.opening_hours = opening_hours or {}
-        self.promo_label = promo_label
-        self.tags = tags or []
         self.bar_categories = bar_categories or []
         self.categories: Dict[int, Category] = {}
         self.products: Dict[int, Product] = {}
@@ -537,8 +533,6 @@ def ensure_bar_columns() -> None:
         "is_open_now": "BOOLEAN",
         "manual_closed": "BOOLEAN",
         "ordering_paused": "BOOLEAN DEFAULT FALSE",
-        "promo_label": "VARCHAR(100)",
-        "tags": "TEXT",
         "opening_hours": "TEXT",
         "bar_categories": "TEXT",
     }
@@ -897,8 +891,6 @@ def load_bars_from_db() -> None:
                 manual_closed=b.manual_closed or False,
                 ordering_paused=b.ordering_paused or False,
                 opening_hours=hours,
-                promo_label=b.promo_label,
-                tags=json.loads(b.tags) if b.tags else [],
                 bar_categories=b.bar_categories.split(",") if b.bar_categories else [],
             )
             # Load categories for the bar
@@ -978,8 +970,6 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
             manual_closed=b.manual_closed or False,
             ordering_paused=b.ordering_paused or False,
             opening_hours=hours,
-            promo_label=b.promo_label,
-            tags=json.loads(b.tags) if b.tags else [],
         )
         bars[bar_id] = bar
     else:
@@ -1002,8 +992,6 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
         bar.manual_closed = b.manual_closed or False
         bar.ordering_paused = b.ordering_paused or False
         bar.is_open_now = is_open_now_from_hours(hours) and not bar.manual_closed
-        bar.promo_label = b.promo_label
-        bar.tags = json.loads(b.tags) if b.tags else []
         bar.categories.clear()
         bar.products.clear()
         bar.tables.clear()
@@ -1340,8 +1328,6 @@ class BarCreate(BaseModel):
     opening_hours: Optional[Dict[str, Dict[str, str]]] = None
     manual_closed: Optional[bool] = False
     ordering_paused: Optional[bool] = False
-    promo_label: Optional[str] = None
-    tags: Optional[str] = None
     bar_categories: Optional[str] = None
 
 
@@ -1361,8 +1347,6 @@ class BarRead(BaseModel):
     opening_hours: Optional[Dict[str, Dict[str, str]]] = None
     manual_closed: bool = False
     ordering_paused: bool = False
-    promo_label: Optional[str] = None
-    tags: Optional[str] = None
     bar_categories: Optional[str] = None
 
     class Config:
@@ -2409,11 +2393,6 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
         description = description[:120]
     rating = form.get("rating")
     manual_closed = form.get("manual_closed") == "on"
-    promo_label = form.get("promo_label")
-    tags = form.get("tags")
-    tags_json = (
-        json.dumps([t.strip() for t in tags.split(",") if t.strip()]) if tags else None
-    )
     hours = {}
     for i in range(7):
         o = form.get(f"open_{i}")
@@ -2469,8 +2448,6 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
         is_open_now=is_open_now_from_hours(hours) and not manual_closed,
         opening_hours=opening_hours,
         manual_closed=manual_closed,
-        promo_label=promo_label,
-        tags=tags_json,
         bar_categories=categories_csv,
     )
     db.add(db_bar)
@@ -2490,8 +2467,6 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
         is_open_now=is_open_now_from_hours(hours) and not manual_closed,
         manual_closed=manual_closed,
         opening_hours=hours,
-        promo_label=promo_label,
-        tags=[t.strip() for t in tags.split(",") if t.strip()] if tags else [],
         bar_categories=categories,
     )
     return RedirectResponse(url="/admin/bars", status_code=status.HTTP_303_SEE_OTHER)
@@ -2523,7 +2498,6 @@ async def edit_bar_form(request: Request, bar_id: int, db: Session = Depends(get
         user.is_super_admin or (user.is_bar_admin and bar_id in user.bar_ids)
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    tags_csv = ", ".join(json.loads(bar.tags)) if bar.tags else ""
     selected_categories = bar.bar_categories.split(",") if bar.bar_categories else []
     try:
         hours = json.loads(bar.opening_hours) if bar.opening_hours else {}
@@ -2535,7 +2509,6 @@ async def edit_bar_form(request: Request, bar_id: int, db: Session = Depends(get
         "admin_edit_bar.html",
         request=request,
         bar=bar,
-        tags_csv=tags_csv,
         hours=hours,
         bar_categories=BAR_CATEGORIES,
         selected_categories=selected_categories,
@@ -2564,11 +2537,6 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
         description = description[:120]
     rating = form.get("rating")
     manual_closed = form.get("manual_closed") == "on"
-    promo_label = form.get("promo_label")
-    tags = form.get("tags")
-    tags_json = (
-        json.dumps([t.strip() for t in tags.split(",") if t.strip()]) if tags else None
-    )
     hours = {}
     for i in range(7):
         o = form.get(f"open_{i}")
@@ -2617,8 +2585,6 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
         bar.opening_hours = opening_hours
         bar.manual_closed = manual_closed
         bar.is_open_now = is_open_now_from_hours(hours) and not manual_closed
-        bar.promo_label = promo_label
-        bar.tags = tags_json
         bar.bar_categories = categories_csv
         db.commit()
         mem_bar = bars.get(bar_id)
@@ -2635,10 +2601,6 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
             mem_bar.opening_hours = hours
             mem_bar.manual_closed = manual_closed
             mem_bar.is_open_now = is_open_now_from_hours(hours) and not manual_closed
-            mem_bar.promo_label = promo_label
-            mem_bar.tags = (
-                [t.strip() for t in tags.split(",") if t.strip()] if tags else []
-            )
             mem_bar.bar_categories = categories
         if user.is_super_admin:
             return RedirectResponse(
