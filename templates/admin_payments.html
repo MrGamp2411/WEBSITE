@@ -16,7 +16,25 @@
     {% for bar in bars %}
     <tr>
       <td>{{ bar.name }}</td>
-      <td><a class="btn" href="/dashboard/bar/{{ bar.id }}/orders">View</a></td>
+      <td>
+        <a class="btn" href="/dashboard/bar/{{ bar.id }}/orders">View</a>
+        <form
+          method="post"
+          action="/admin/payments/{{ bar.id }}/test_closing"
+          style="display:inline"
+        >
+          <button class="btn btn--small" type="submit">Add Test Closing</button>
+        </form>
+        <form
+          method="post"
+          action="/admin/payments/{{ bar.id }}/test_closing/delete"
+          style="display:inline"
+        >
+          <button class="btn btn--danger btn--small" type="submit">
+            Delete Test Closing
+          </button>
+        </form>
+      </td>
     </tr>
     {% endfor %}
   </tbody>
