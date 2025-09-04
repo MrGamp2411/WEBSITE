@@ -6,7 +6,15 @@
       <h1>Bars</h1> <!-- CHANGED -->
       <p class="subtitle">Create, edit and manage venues on the platform.</p> <!-- CHANGED -->
     </div>
-    <div class="toolbar-actions">
+    <div class="toolbar-actions"> <!-- CHANGED -->
+      <form class="bars-search" role="search" aria-label="Search bars" onsubmit="return false"> <!-- CHANGED -->
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input id="barsSearch" type="search" inputmode="search" autocomplete="off"
+               placeholder="Search bars by name…" aria-label="Search bars by name">
+        <button class="clear" type="button" aria-label="Clear search">
+          <i class="bi bi-x-circle" aria-hidden="true"></i>
+        </button>
+      </form>
       <a class="btn btn--primary" href="/admin/bars/new">Add Bar</a> <!-- CHANGED -->
     </div>
   </header>
@@ -45,4 +53,36 @@
     </table>
   </div>
 </section>
+<script>
+(function(){
+  const input = document.getElementById('barsSearch');
+  if(!input) return;
+  const tbody = document.querySelector('.bars-table tbody');
+  if(!tbody) return;
+
+  const rows = Array.from(tbody.rows);
+  const norm = s => (s||'').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+
+  function applyFilter(){
+    const q = norm(input.value);
+    rows.forEach(tr=>{
+      const nameCell = tr.cells && tr.cells[0] ? tr.cells[0].textContent : '';
+      const match = q === '' || norm(nameCell).includes(q);
+      tr.style.display = match ? '' : 'none';
+    });
+  }
+  function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}}
+  const run = debounce(applyFilter,120);
+
+  input.addEventListener('input', run);
+  document.querySelector('.bars-search .clear')?.addEventListener('click',()=>{
+    input.value=''; applyFilter(); input.focus();
+  });
+
+  const qs = new URLSearchParams(location.search);
+  const q = qs.get('q');
+  if(q){ input.value = q; applyFilter(); }
+})();
+</script>
 {% endblock %}
