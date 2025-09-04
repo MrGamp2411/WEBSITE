@@ -258,6 +258,26 @@ body.dark-mode{
 .dashboard-actions .card{padding:var(--space-3);text-align:center;gap:var(--space-2);}
 .dashboard-actions .card h3{margin-top:0;}
 
+/* admin dashboard */
+.admin-dashboard{display:block;}
+.admin-header{margin-block:var(--space-4);}
+.admin-subtitle{margin-top:var(--space-1);opacity:.9;}
+.admin-identity{padding:var(--space-3);border-radius:var(--radius);}
+.identity-row{display:flex;flex-wrap:wrap;gap:var(--space-2);align-items:center;}
+.identity-name{font-weight:600;}
+.identity-email,.identity-phone{opacity:.8;}
+.admin-section{margin-block:var(--space-4);}
+.section-title{margin-bottom:var(--space-2);}
+.admin-grid{display:grid;gap:var(--space-3);grid-template-columns:repeat(3,minmax(0,1fr));}
+@media (max-width:1199px){.admin-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media (max-width:767px){.admin-grid{grid-template-columns:1fr;}}
+.quick-card{display:flex;flex-direction:column;min-height:180px;padding:var(--space-3);gap:var(--space-2);}
+.quick-card p{margin:0;line-height:1.4;overflow-wrap:anywhere;}
+.quick-card .btn{margin-top:auto;align-self:start;}
+.admin-section.danger .section-title{color:#dc2626;}
+.quick-card.danger{border:1px solid #fee2e2;}
+.quick-card:focus-within{outline:2px solid rgba(0,0,0,.15);outline-offset:2px;}
+
 /* generic form styles */
 .form{max-width:400px;margin:var(--space-4) auto;display:flex;flex-direction:column;gap:var(--space-2);}
 .form label{display:flex;flex-direction:column;font-weight:600;gap:var(--space-1);}
