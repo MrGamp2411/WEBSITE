@@ -2341,12 +2341,23 @@ async def bar_admin_order_history_view(
     commission = (total * PLATFORM_FEE_RATE).quantize(Decimal("0.01"))
     closing.siplygo_commission = float(commission)
     closing.total_earned = float((total - commission).quantize(Decimal("0.01")))
+    payment_totals: Dict[str, Decimal] = {}
+    for o in orders:
+        if o.status != "COMPLETED":
+            continue
+        method = (o.payment_method or "Unknown").replace("_", " ").title()
+        amount = Decimal(o.subtotal or 0) + Decimal(o.vat_total or 0)
+        payment_totals[method] = payment_totals.get(method, Decimal("0")) + amount
+    payment_totals = {
+        k: float(v.quantize(Decimal("0.01"))) for k, v in payment_totals.items()
+    }
     return render_template(
         "bar_admin_order_history_view.html",
         request=request,
         bar=bar,
         closing=closing,
         orders=orders,
+        payment_totals=payment_totals,
     )
 
 
