@@ -2207,6 +2207,25 @@ async def bar_admin_order_history(request: Request, bar_id: int, db: Session = D
         total = sum(Decimal(c.total_revenue or 0) for c in clist)
         commission = (total * PLATFORM_FEE_RATE).quantize(Decimal("0.01"))
         total_earned = (total - commission).quantize(Decimal("0.01"))
+        payment_rows = (
+            db.query(
+                Order.payment_method,
+                func.sum(Order.subtotal + Order.vat_total).label("amount"),
+            )
+            .filter(
+                Order.bar_id == bar_id,
+                Order.closing_id.in_([c.id for c in clist]),
+                Order.status == "COMPLETED",
+            )
+            .group_by(Order.payment_method)
+            .all()
+        )
+        payment_totals = {
+            (pm or "Unknown").replace("_", " ").title(): float(
+                Decimal(amount or 0).quantize(Decimal("0.01"))
+            )
+            for pm, amount in payment_rows
+        }
         year, month = key.split("-")
         label = datetime(int(year), int(month), 1).strftime("%B %Y")
         is_past = int(year) < current_year or (
@@ -2222,6 +2241,7 @@ async def bar_admin_order_history(request: Request, bar_id: int, db: Session = D
             "total_earned": float(total_earned),
             "is_past": is_past,
             "confirmed": confirmed,
+            "payment_totals": payment_totals,
         })
 
     monthly.sort(key=lambda m: (m["year"], m["month"]), reverse=True)
@@ -2267,6 +2287,25 @@ async def bar_admin_order_history_month(
         commission = (total * PLATFORM_FEE_RATE).quantize(Decimal("0.01"))
         c.siplygo_commission = float(commission)
         c.total_earned = float((total - commission).quantize(Decimal("0.01")))
+        payment_rows = (
+            db.query(
+                Order.payment_method,
+                func.sum(Order.subtotal + Order.vat_total).label("amount"),
+            )
+            .filter(
+                Order.bar_id == bar_id,
+                Order.closing_id == c.id,
+                Order.status == "COMPLETED",
+            )
+            .group_by(Order.payment_method)
+            .all()
+        )
+        c.payment_totals = {
+            (pm or "Unknown").replace("_", " ").title(): float(
+                Decimal(amount or 0).quantize(Decimal("0.01"))
+            )
+            for pm, amount in payment_rows
+        }
     month_label = start.strftime("%B %Y")
     return render_template(
         "bar_admin_month_history.html",

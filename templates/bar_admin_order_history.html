@@ -10,6 +10,14 @@
       <p>Total collected: CHF {{ "%.2f"|format(m.total_revenue) }}</p>
       <p>Total earned: CHF {{ "%.2f"|format(m.total_earned) }}</p>
       <p>Siplygo commission (5%): CHF {{ "%.2f"|format(m.siplygo_commission) }}</p>
+      {% if m.payment_totals %}
+      <p>Payment breakdown:</p>
+      <ul class="payment-breakdown">
+        {% for method, amount in m.payment_totals.items() %}
+        <li>{{ method }}: CHF {{ '%.2f'|format(amount) }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
       <a class="btn" href="/dashboard/bar/{{ bar.id }}/orders/history/{{ m.year }}/{{ m.month }}">View</a>
       {% if m.is_past and not m.confirmed and user.is_super_admin %}
       <form method="post" action="/dashboard/bar/{{ bar.id }}/orders/history/{{ m.year }}/{{ m.month }}/confirm">
