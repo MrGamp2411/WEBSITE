@@ -104,12 +104,12 @@
     attached to the closing but do not count toward `total_revenue`. Editing a bar's hours immediately
     updates the automatic schedule.
   - The Order History & Revenue page groups closings by month, showing total collected, total earned,
-    and Siplygo commission (5% of total) for each month. Monthly "View" links point to
+    and Siplygo commission (5% of card and wallet totals) for each month. Monthly "View" links point to
     `/dashboard/bar/{id}/orders/history/{year}/{month}` with the list of that month's closings, and
     individual daily summaries still link to `/dashboard/bar/{id}/orders/history/{closing_id}`.
   - Daily closing views list a payment breakdown (credit card, wallet, etc.) for completed orders.
   - Monthly and daily summary cards now also show payment breakdowns on their revenue cards.
-  - Monthly and daily revenue cards display "Amount to pay to bar" calculated as credit card plus wallet totals minus the Siplygo commission.
+  - Monthly and daily revenue cards display "Amount to pay to bar" calculated as credit card plus wallet totals minus the Siplygo commission. Commission is calculated only on credit card and wallet totals.
 - Order History & Revenue monthly cards use `card--placed` (blue) for the current month and `card--accepted` (orange) for past months; text color remains default.
 - Past months show a "Confirm Payment" button to super admins; confirmed months switch to `card--ready` (green).
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
