@@ -22,6 +22,7 @@
 - Admin Manage Menu Items page uses `templates/bar_category_products.html` with a `.table-card`-wrapped `menu-table`; actions use text-only pill buttons (`.btn-outline`, `.btn-danger-soft`) with a prominent Delete
 - Admin Manage Users page uses `templates/admin_bar_users.html` with `.users-page` styles in `static/css/components.css`, a client-side username/email search via `#userSearch`, and grouped action pills. The page header stacks the title above an Add Existing User form and the search controls; new user creation has been removed
 - Manage Bar Users list now includes a red `Remove` button beside `Edit` to unassign staff from the current bar
+- Removing a user triggers a popup confirmation using `.cart-blocker` and `.cart-popup`
 - Admin Manage Bars delete links open a popup confirmation using `.cart-blocker` and `.cart-popup`
 - `BAR_CATEGORIES` defined in `main.py`; reused in `search.js` and `view-all.js`
 - Categories stored in `bars.bar_categories`

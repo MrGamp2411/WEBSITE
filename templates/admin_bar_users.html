@@ -58,7 +58,7 @@
           <td class="actions">
             <div class="actions-group">
               <a href="/admin/users/edit/{{ u.id }}" class="btn-outline">Edit</a>
-              <button type="submit" form="remove_{{ u.id }}" class="btn-danger-soft">Remove</button>
+              <button type="button" class="btn-danger-soft js-remove-user" data-user-id="{{ u.id }}">Remove</button>
             </div>
             <form id="remove_{{ u.id }}" method="post" action="/admin/bars/{{ bar.id }}/users" style="display:none">
               <input type="hidden" name="action" value="remove">
@@ -72,34 +72,67 @@
   </div>
 </section>
 
+<div id="removeBlocker" class="cart-blocker" hidden>
+  <div class="cart-popup">
+    <p>Are you sure you want to remove this user?</p>
+    <div class="cart-popup-actions">
+      <button type="button" class="btn btn--secondary js-cancel-remove">Cancel</button>
+      <button type="button" class="btn btn--primary js-confirm-remove">Remove</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   const input = document.getElementById('userSearch');
   const tbody = document.querySelector('.users-table tbody');
-  if(!input || !tbody) return;
+  if(input && tbody){
+    const rows = Array.from(tbody.rows);
+    const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
 
-  const rows = Array.from(tbody.rows);
-  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+    function applyFilter(){
+      const q = norm(input.value);
+      rows.forEach(tr=>{
+        const name = tr.cells && tr.cells[0] ? tr.cells[0].textContent : '';
+        const email = tr.cells && tr.cells[1] ? tr.cells[1].textContent : '';
+        const match = !q || norm(name).includes(q) || norm(email).includes(q);
+        tr.style.display = match ? '' : 'none';
+      });
+    }
+    function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}}
+    const run = debounce(applyFilter,120);
 
-  function applyFilter(){
-    const q = norm(input.value);
-    rows.forEach(tr=>{
-      const name = tr.cells && tr.cells[0] ? tr.cells[0].textContent : '';
-      const email = tr.cells && tr.cells[1] ? tr.cells[1].textContent : '';
-      const match = !q || norm(name).includes(q) || norm(email).includes(q);
-      tr.style.display = match ? '' : 'none';
+    input.addEventListener('input', run);
+    document.querySelector('.users-search .clear')?.addEventListener('click',()=>{
+      input.value=''; applyFilter(); input.focus();
     });
-  }
-  function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}}
-  const run = debounce(applyFilter,120);
 
-  input.addEventListener('input', run);
-  document.querySelector('.users-search .clear')?.addEventListener('click',()=>{
-    input.value=''; applyFilter(); input.focus();
+    const qs = new URLSearchParams(location.search);
+    const q = qs.get('q'); if(q){ input.value=q; applyFilter(); }
+  }
+
+  const blocker = document.getElementById('removeBlocker');
+  const cancelBtn = document.querySelector('.js-cancel-remove');
+  const confirmBtn = document.querySelector('.js-confirm-remove');
+  let targetForm = null;
+
+  document.querySelectorAll('.js-remove-user').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      const userId = btn.dataset.userId;
+      targetForm = document.getElementById('remove_' + userId);
+      if(blocker) blocker.hidden = false;
+    });
   });
 
-  const qs = new URLSearchParams(location.search);
-  const q = qs.get('q'); if(q){ input.value=q; applyFilter(); }
+  cancelBtn?.addEventListener('click', () => {
+    if(blocker) blocker.hidden = true;
+    targetForm = null;
+  });
+
+  confirmBtn?.addEventListener('click', () => {
+    targetForm?.submit();
+  });
 })();
 </script>
 {% endblock %}
