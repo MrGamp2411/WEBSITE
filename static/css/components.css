@@ -637,7 +637,7 @@ body.dark-mode{
 
 /* Bars admin page */ /* CHANGED */
 .bars-page{display:block;}
-.bars-toolbar{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-4,16px);margin-block:var(--space-6,24px)}
+.bars-toolbar{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-4,16px);margin-block:var(--space-6,24px)}
 .bars-toolbar .subtitle{margin-top:var(--space-1);opacity:.85;}
 .toolbar-actions{display:flex;align-items:center;gap:var(--space-3,12px);flex-wrap:wrap}
 .toolbar-actions .btn,.toolbar-actions button,.toolbar-actions a.button{white-space:nowrap;}
@@ -668,7 +668,7 @@ body.dark-mode{
 .bars-table td a{text-decoration:none;}
 .bars-table td a+a{margin-left:var(--space-2);}
 @media (max-width: 767px){
-  .bars-toolbar{flex-direction:column;align-items:stretch}
+  .bars-toolbar{align-items:stretch}
   .toolbar-actions{justify-content:space-between}
   .bars-search{flex:1}
   .bars-search input{width:100%;min-width:0}
