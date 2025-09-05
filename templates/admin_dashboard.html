@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<section class="admin-dashboard"><!-- CHANGED -->
+<section class="admin-dashboard editbar"><!-- CHANGED -->
   <header class="admin-header"><!-- CHANGED -->
     <h1>Admin Dashboard</h1>
     <p class="admin-subtitle">Your control center to manage venues, users, payments and analytics.</p><!-- CHANGED -->
@@ -14,20 +14,20 @@
   </header>
 
   <section class="admin-section" aria-label="Management"><!-- CHANGED -->
-    <h2 class="section-title">Management</h2><!-- CHANGED -->
+    <h2 class="section-title"><i class="bi bi-gear-fill"></i> Management</h2><!-- CHANGED -->
     <div class="admin-grid"><!-- CHANGED -->
       <article class="card quick-card"><!-- CHANGED -->
-        <h3>Bars</h3>
+        <h3 class="card-title"><i class="bi bi-shop"></i> Bars</h3>
         <p>Create and manage venues.</p><!-- CHANGED -->
         <a class="btn btn--primary" href="/admin/bars">Manage Bars</a><!-- CHANGED -->
       </article>
       <article class="card quick-card"><!-- CHANGED -->
-        <h3>Users</h3>
+        <h3 class="card-title"><i class="bi bi-people"></i> Users</h3>
         <p>Manage platform users and roles.</p><!-- CHANGED -->
         <a class="btn btn--primary" href="/admin/users">Manage Users</a><!-- CHANGED -->
       </article>
       <article class="card quick-card"><!-- CHANGED -->
-        <h3>Payments</h3><!-- CHANGED -->
+        <h3 class="card-title"><i class="bi bi-credit-card"></i> Payments</h3><!-- CHANGED -->
         <p>Review payouts, invoices, and order revenue.</p><!-- CHANGED -->
         <a class="btn btn--primary" href="/admin/payments">Manage Payments</a><!-- CHANGED -->
       </article>
@@ -35,10 +35,10 @@
   </section>
 
   <section class="admin-section" aria-label="Insights"><!-- CHANGED -->
-    <h2 class="section-title">Insights</h2><!-- CHANGED -->
+    <h2 class="section-title"><i class="bi bi-bar-chart"></i> Insights</h2><!-- CHANGED -->
     <div class="admin-grid"><!-- CHANGED -->
       <article class="card quick-card"><!-- CHANGED -->
-        <h3>Analytics</h3>
+        <h3 class="card-title"><i class="bi bi-graph-up"></i> Analytics</h3>
         <p>Track orders, revenue and activity.</p><!-- CHANGED -->
         <a class="btn btn--primary" href="/admin/analytics">View Analytics</a><!-- CHANGED -->
       </article>
@@ -46,10 +46,10 @@
   </section>
 
   <section class="admin-section" aria-label="Account"><!-- CHANGED -->
-    <h2 class="section-title">Account</h2><!-- CHANGED -->
+    <h2 class="section-title"><i class="bi bi-person-circle"></i> Account</h2><!-- CHANGED -->
     <div class="admin-grid"><!-- CHANGED -->
       <article class="card quick-card"><!-- CHANGED -->
-        <h3>Profile</h3>
+        <h3 class="card-title"><i class="bi bi-person"></i> Profile</h3>
         <p>Update your admin profile and security settings.</p><!-- CHANGED -->
         <a class="btn btn--primary" href="/admin/profile">View Profile</a><!-- CHANGED -->
       </article>
@@ -57,10 +57,10 @@
   </section>
 
   <section class="admin-section danger" aria-label="Danger Zone"><!-- CHANGED -->
-    <h2 class="section-title">Danger Zone</h2><!-- CHANGED -->
+    <h2 class="section-title"><i class="bi bi-exclamation-triangle"></i> Danger Zone</h2><!-- CHANGED -->
     <div class="admin-grid"><!-- CHANGED -->
       <article class="card quick-card danger"><!-- CHANGED -->
-        <h3>Danger Zone</h3>
+        <h3 class="card-title"><i class="bi bi-exclamation-octagon"></i> Danger Zone</h3>
         <p>Delete all orders for a clean slate.</p><!-- CHANGED -->
         <form method="post" action="/admin/orders/clear" onsubmit="return confirm('Delete all orders?');">
           <button class="btn btn--danger" type="submit">Delete All Orders</button>
