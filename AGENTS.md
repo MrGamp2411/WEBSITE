@@ -110,7 +110,6 @@
   - Daily closing views list a payment breakdown (credit card, wallet, etc.) for completed orders.
   - Monthly and daily summary cards now also show payment breakdowns on their revenue cards.
   - Monthly and daily revenue cards display "Amount to pay to bar" calculated as credit card plus wallet totals minus the Siplygo commission.
-  - Commission is applied only to credit card and wallet totals; pay-at-bar orders incur no commission and are excluded from payouts.
 - Order History & Revenue monthly cards use `card--placed` (blue) for the current month and `card--accepted` (orange) for past months; text color remains default.
 - Past months show a "Confirm Payment" button to super admins; confirmed months switch to `card--ready` (green).
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
@@ -162,3 +161,4 @@
   - Run `pytest`
 - Meta:
   - Reverted merge commit 9bc986e (PR #315) in commit 11e13a9 to restore the bar admin dashboard to its previous state; `static/js/bar_admin_dashboard.js` was removed.
+  - Reverted merge commit a169f9f (PR #359) and its fix commit 2617f16 to restore payout calculations to their previous logic.
