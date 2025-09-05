@@ -118,19 +118,19 @@ def test_auto_close_moves_orders_to_history():
         resp = client.get(f'/dashboard/bar/{bar.id}/orders/history')
         assert 'January 2024' in resp.text
         assert 'Total collected: CHF 18.00' in resp.text
-        assert 'Total earned: CHF 17.40' in resp.text
-        assert 'Siplygo commission (5%): CHF 0.60' in resp.text
-        assert 'Amount to pay to bar: CHF 11.40' in resp.text
+        assert 'Total earned: CHF 17.10' in resp.text
+        assert 'Siplygo commission (5%): CHF 0.90' in resp.text
+        assert 'Amount to pay to bar: CHF 11.10' in resp.text
         resp = client.get(f'/dashboard/bar/{bar.id}/orders/history/2024/1')
         assert 'Total collected: CHF 18.00' in resp.text
-        assert 'Total earned: CHF 17.40' in resp.text
-        assert 'Siplygo commission (5%): CHF 0.60' in resp.text
-        assert 'Amount to pay to bar: CHF 11.40' in resp.text
+        assert 'Total earned: CHF 17.10' in resp.text
+        assert 'Siplygo commission (5%): CHF 0.90' in resp.text
+        assert 'Amount to pay to bar: CHF 11.10' in resp.text
         resp = client.get(f'/dashboard/bar/{bar.id}/orders/history/{closing_id}')
         assert 'Total collected: CHF 18.00' in resp.text
-        assert 'Total earned: CHF 17.40' in resp.text
-        assert 'Siplygo commission (5%): CHF 0.60' in resp.text
-        assert 'Amount to pay to bar: CHF 11.40' in resp.text
+        assert 'Total earned: CHF 17.10' in resp.text
+        assert 'Siplygo commission (5%): CHF 0.90' in resp.text
+        assert 'Amount to pay to bar: CHF 11.10' in resp.text
         assert 'Credit Card: CHF 6.00' in resp.text
         assert 'Wallet: CHF 6.00' in resp.text
         assert 'Bar: CHF 6.00' in resp.text
