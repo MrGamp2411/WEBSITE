@@ -57,7 +57,6 @@
           <td>{{ u.role }}</td>
           <td class="actions">
             <div class="actions-group">
-              <a href="/admin/users/edit/{{ u.id }}" class="btn-outline">Edit</a>
               <button type="button" class="btn-danger-soft js-remove-user" data-user-id="{{ u.id }}">Remove</button>
             </div>
             <form id="remove_{{ u.id }}" method="post" action="/admin/bars/{{ bar.id }}/users" style="display:none">
