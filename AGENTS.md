@@ -15,7 +15,7 @@
   - Global footer: `templates/layout.html` uses `.site-footer` styled in `static/css/components.css`
 - Bars:
   - `/bars` page uses `templates/all_bars.html` and `static/js/view-all.js`
-- Admin Manage Bars page uses `templates/admin_bars.html` with `.bars-page` styles in `static/css/components.css`
+- Admin Manage Bars page uses `templates/admin_bars.html` with `.bars-page` styles in `static/css/components.css`. The page header stacks the title above the search and Add Bar controls
 - Admin Manage Bars page includes a client-side name search via `#barsSearch`
 - Admin Manage Categories page uses `templates/bar_manage_categories.html` with `.menu-page` styles in `static/css/components.css`, a client-side category search via `#categorySearch`, and grouped action pills (`.btn-ghost`, `.btn-outline`, `.btn-danger-soft`). The page header stacks the title above the search and Add Category controls
 - Admin Manage Bars delete links open a popup confirmation using `.cart-blocker` and `.cart-popup`
