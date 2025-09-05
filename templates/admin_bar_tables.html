@@ -1,33 +1,85 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Manage Tables for {{ bar.name }}</h1>
+<section class="menu-page">
+  <header class="menu-toolbar">
+    <div class="title-wrap">
+      <h1>Manage Tables for {{ bar.name }}</h1>
+      <p class="subtitle">Add, edit and organize tables for this venue.</p>
+    </div>
+    <div class="toolbar-actions">
+      <form class="menu-search" role="search" aria-label="Search tables" onsubmit="return false">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input id="tableSearch" type="search" inputmode="search" autocomplete="off"
+               placeholder="Search tables…" aria-label="Search tables by name or description">
+        <button class="clear" type="button" aria-label="Clear search">
+          <i class="bi bi-x-circle" aria-hidden="true"></i>
+        </button>
+      </form>
+      <a class="btn btn--primary" href="/admin/bars/{{ bar.id }}/tables/new">Add Table</a>
+    </div>
+  </header>
 
-<div class="toolbar" style="margin-bottom:1rem;">
-  <a class="btn btn--primary" href="/admin/bars/{{ bar.id }}/tables/new">Add Table</a>
-</div>
+  {% if tables %}
+  <div class="table-card">
+    <table class="menu-table">
+      <thead>
+        <tr>
+          <th style="width:56px">#</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th class="actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in tables %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ t.name }}</td>
+          <td>{{ t.description }}</td>
+          <td class="actions">
+            <div class="actions-group">
+              <a class="btn-outline" href="/admin/bars/{{ bar.id }}/tables/{{ t.id }}/edit">Edit</a>
+              <button type="submit" form="delete_{{ t.id }}" class="btn-danger-soft">Delete</button>
+            </div>
+            <form id="delete_{{ t.id }}" method="post" action="/admin/bars/{{ bar.id }}/tables/{{ t.id }}/delete" style="display:none" onsubmit="return confirm('Delete table?');"></form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p>No tables yet.</p>
+  {% endif %}
+</section>
 
-{% if tables %}
-<table class="table">
-  <thead>
-    <tr><th>#</th><th>Name</th><th>Description</th><th>Actions</th></tr>
-  </thead>
-  <tbody>
-    {% for t in tables %}
-    <tr>
-      <td>{{ loop.index }}</td>
-      <td>{{ t.name }}</td>
-      <td>{{ t.description }}</td>
-      <td>
-        <a class="btn" href="/admin/bars/{{ bar.id }}/tables/{{ t.id }}/edit">Edit</a>
-        <form method="post" action="/admin/bars/{{ bar.id }}/tables/{{ t.id }}/delete" style="display:inline" onsubmit="return confirm('Delete table?');">
-          <button class="btn" type="submit">Delete</button>
-        </form>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p>No tables yet.</p>
-{% endif %}
+<script>
+(function(){
+  const input = document.getElementById('tableSearch');
+  const clearBtn = document.querySelector('.menu-search .clear');
+  const tbody = document.querySelector('.menu-table tbody');
+  if(!input || !tbody) return;
+
+  const rows = Array.from(tbody.rows);
+  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+
+  function applyFilter(){
+    const q = norm(input.value);
+    rows.forEach(tr=>{
+      const name = tr.cells && tr.cells[1] ? tr.cells[1].textContent : '';
+      const desc = tr.cells && tr.cells[2] ? tr.cells[2].textContent : '';
+      const match = !q || norm(name).includes(q) || norm(desc).includes(q);
+      tr.style.display = match ? '' : 'none';
+    });
+  }
+  function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}}
+  const run = debounce(applyFilter,120);
+
+  input.addEventListener('input', run);
+  clearBtn?.addEventListener('click', ()=>{ input.value=''; applyFilter(); input.focus(); });
+
+  const qs = new URLSearchParams(location.search);
+  const q = qs.get('q'); if(q){ input.value=q; applyFilter(); }
+})();
+</script>
 {% endblock %}
