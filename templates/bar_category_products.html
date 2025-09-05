@@ -1,50 +1,56 @@
 {% extends "layout.html" %}
 {% block content %}
 {% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
-<h1>Products in {{ category.name }} for {{ bar.name }}</h1>
+<section class="menu-page">
+  <header class="menu-toolbar">
+    <div class="title-wrap">
+      <h1>Products in {{ category.name }} for {{ bar.name }}</h1>
+      <p class="subtitle">Add, edit and organize products for this category.</p>
+    </div>
+    <div class="toolbar-actions">
+      <a class="btn btn--primary" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products/new">Add Product</a>
+    </div>
+  </header>
 
-<div class="toolbar" style="margin-bottom:1rem;">
-  <a class="btn btn--primary" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products/new">Add Product</a>
-</div>
-
-{% if products %}
-<div class="table-card">
-  <table class="menu-table">
-    <thead>
-      <tr>
-        <th>Order</th>
-        <th>Photo</th>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Price (CHF)</th>
-        <th class="actions">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for product in products %}
-      <tr>
-        <td>{{ product.display_order }}</td>
-        <td>
-          <img src="{{ product.photo_url }}" alt="{{ product.name }} photo" width="50" height="28" loading="lazy" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
-        </td>
-        <td>{{ product.name }}</td>
-        <td>{{ product.description }}</td>
-        <td>{{ "%.2f"|format(product.price) }}</td>
-        <td class="actions">
-          <div class="actions-group">
-            <a class="btn-outline" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/edit">Edit</a>
-            <button type="submit" form="delete_{{ product.id }}" class="btn-danger-soft">Delete</button>
-          </div>
-          <form id="delete_{{ product.id }}" method="post" action="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/delete" style="display:none" onsubmit="return confirm('Are you sure you want to delete this product?');"></form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-{% else %}
-<p>No products in this category.</p>
-{% endif %}
+  {% if products %}
+  <div class="table-card">
+    <table class="menu-table">
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Photo</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Price (CHF)</th>
+          <th class="actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+        <tr>
+          <td>{{ product.display_order }}</td>
+          <td>
+            <img src="{{ product.photo_url }}" alt="{{ product.name }} photo" width="50" height="28" loading="lazy" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
+          </td>
+          <td>{{ product.name }}</td>
+          <td>{{ product.description }}</td>
+          <td>{{ "%.2f"|format(product.price) }}</td>
+          <td class="actions">
+            <div class="actions-group">
+              <a class="btn-outline" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/edit">Edit</a>
+              <button type="submit" form="delete_{{ product.id }}" class="btn-danger-soft">Delete</button>
+            </div>
+            <form id="delete_{{ product.id }}" method="post" action="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/delete" style="display:none" onsubmit="return confirm('Are you sure you want to delete this product?');"></form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p>No products in this category.</p>
+  {% endif %}
+</section>
 
 {% endblock %}
 
