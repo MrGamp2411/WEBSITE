@@ -1,73 +1,135 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Manage Users for {{ bar.name }}</h1>
-{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-{% if message %}<div class="alert alert-success">{{ message }}</div>{% endif %}
+<section class="users-page">
+  <header class="users-toolbar">
+    <div class="title-wrap">
+      <h1>Manage Users for {{ bar.name }}</h1>
+      <p class="subtitle">Add or assign staff to this venue.</p>
+    </div>
+    <div class="toolbar-actions">
+      <form class="users-search" role="search" aria-label="Search users" onsubmit="return false">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input id="userSearch" type="search" inputmode="search" autocomplete="off"
+               placeholder="Search users by name or email…" aria-label="Search users by name or email">
+        <button class="clear" type="button" aria-label="Clear search">
+          <i class="bi bi-x-circle" aria-hidden="true"></i>
+        </button>
+      </form>
+    </div>
+  </header>
 
-<details>
-  <summary>Add Existing User</summary>
-  <form class="form" method="post">
-    <input type="hidden" name="action" value="existing">
-    <label for="existing_email">Email
-      <input id="existing_email" name="email" type="email" required>
-    </label>
-    <label for="existing_role">Role
-      <select id="existing_role" name="role">
-        <option value="bar_admin">Bar Admin</option>
-        <option value="bartender">Bartender</option>
-      </select>
-    </label>
-    <p>Assigning to {{ bar.name }}</p>
-    <button class="btn btn--primary" type="submit">Add</button>
-  </form>
-</details>
+  {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+  {% if message %}<div class="alert alert-success">{{ message }}</div>{% endif %}
 
-<details>
-  <summary>Add New User</summary>
-  <form class="form" method="post">
-    <input type="hidden" name="action" value="new">
-    <label for="username">Username
-      <input id="username" name="username" required>
-    </label>
-    <label for="email">Email
-      <input id="email" name="email" type="email" required>
-    </label>
-    <label for="password">Password
-      <input id="password" name="password" type="password" required>
-    </label>
-    <label for="prefix">Phone Prefix
-      <select id="prefix" name="prefix" required autocomplete="tel-country-code">
-        <option value="+41">+41 (Switzerland)</option>
-        <option value="+1">+1 (USA)</option>
-        <option value="+44">+44 (UK)</option>
-      </select>
-    </label>
-    <label for="phone">Phone Number
-      <input id="phone" name="phone" type="tel" required autocomplete="tel-national">
-    </label>
-    <label for="role">Role
-      <select id="role" name="role">
-        <option value="bar_admin">Bar Admin</option>
-        <option value="bartender">Bartender</option>
-      </select>
-    </label>
-    <p>Assigning to {{ bar.name }}</p>
-    <button class="btn btn--primary" type="submit">Create</button>
-  </form>
-</details>
+  <details>
+    <summary>Add Existing User</summary>
+    <form class="form" method="post">
+      <input type="hidden" name="action" value="existing">
+      <label for="existing_email">Email
+        <input id="existing_email" name="email" type="email" required>
+      </label>
+      <label for="existing_role">Role
+        <select id="existing_role" name="role">
+          <option value="bar_admin">Bar Admin</option>
+          <option value="bartender">Bartender</option>
+        </select>
+      </label>
+      <p>Assigning to {{ bar.name }}</p>
+      <button class="btn btn--primary" type="submit">Add</button>
+    </form>
+  </details>
 
-<h2>Current Staff</h2>
-<table class="table">
-  <thead><tr><th>Username</th><th>Email</th><th>Role</th><th></th></tr></thead>
-  <tbody>
-    {% for u in staff %}
-    <tr>
-      <td>{{ u.username }}</td>
-      <td>{{ u.email }}</td>
-      <td>{{ u.role }}</td>
-      <td><a href="/admin/users/edit/{{ u.id }}">Edit</a></td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <details>
+    <summary>Add New User</summary>
+    <form class="form" method="post">
+      <input type="hidden" name="action" value="new">
+      <label for="username">Username
+        <input id="username" name="username" required>
+      </label>
+      <label for="email">Email
+        <input id="email" name="email" type="email" required>
+      </label>
+      <label for="password">Password
+        <input id="password" name="password" type="password" required>
+      </label>
+      <label for="prefix">Phone Prefix
+        <select id="prefix" name="prefix" required autocomplete="tel-country-code">
+          <option value="+41">+41 (Switzerland)</option>
+          <option value="+1">+1 (USA)</option>
+          <option value="+44">+44 (UK)</option>
+        </select>
+      </label>
+      <label for="phone">Phone Number
+        <input id="phone" name="phone" type="tel" required autocomplete="tel-national">
+      </label>
+      <label for="role">Role
+        <select id="role" name="role">
+          <option value="bar_admin">Bar Admin</option>
+          <option value="bartender">Bartender</option>
+        </select>
+      </label>
+      <p>Assigning to {{ bar.name }}</p>
+      <button class="btn btn--primary" type="submit">Create</button>
+    </form>
+  </details>
+
+  <h2>Current Staff</h2>
+  <div class="table-card">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th class="actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in staff %}
+        <tr>
+          <td>{{ u.username }}</td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.role }}</td>
+          <td class="actions">
+            <div class="actions-group">
+              <a href="/admin/users/edit/{{ u.id }}" class="btn-outline">Edit</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+(function(){
+  const input = document.getElementById('userSearch');
+  const tbody = document.querySelector('.users-table tbody');
+  if(!input || !tbody) return;
+
+  const rows = Array.from(tbody.rows);
+  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+
+  function applyFilter(){
+    const q = norm(input.value);
+    rows.forEach(tr=>{
+      const name = tr.cells && tr.cells[0] ? tr.cells[0].textContent : '';
+      const email = tr.cells && tr.cells[1] ? tr.cells[1].textContent : '';
+      const match = !q || norm(name).includes(q) || norm(email).includes(q);
+      tr.style.display = match ? '' : 'none';
+    });
+  }
+  function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}}
+  const run = debounce(applyFilter,120);
+
+  input.addEventListener('input', run);
+  document.querySelector('.users-search .clear')?.addEventListener('click',()=>{
+    input.value=''; applyFilter(); input.focus();
+  });
+
+  const qs = new URLSearchParams(location.search);
+  const q = qs.get('q'); if(q){ input.value=q; applyFilter(); }
+})();
+</script>
 {% endblock %}

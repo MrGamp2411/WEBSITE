@@ -20,6 +20,7 @@
 - Admin Manage Bars actions use uppercase text-only pill buttons that expand to fit text; links and buttons inherit the base font so Delete matches Edit sizing while employing a brighter `.btn-danger-soft` red to deter accidental clicks
 - Admin Manage Categories page uses `templates/bar_manage_categories.html` with `.menu-page` styles in `static/css/components.css`, a client-side category search via `#categorySearch`, and grouped uppercase action pills (`.btn-outline` for Products and Edit, `.btn-danger-soft` for Delete). The page header stacks the title above the search and Add Category controls
 - Admin Manage Menu Items page uses `templates/bar_category_products.html` with a `.table-card`-wrapped `menu-table`; actions use text-only pill buttons (`.btn-outline`, `.btn-danger-soft`) with a prominent Delete
+- Admin Manage Users page uses `templates/admin_bar_users.html` with `.users-page` styles in `static/css/components.css`, a client-side username/email search via `#userSearch`, and grouped action pills. The page header stacks the title above the search controls
 - Admin Manage Bars delete links open a popup confirmation using `.cart-blocker` and `.cart-popup`
 - `BAR_CATEGORIES` defined in `main.py`; reused in `search.js` and `view-all.js`
 - Categories stored in `bars.bar_categories`
