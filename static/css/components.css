@@ -798,9 +798,9 @@ body.dark-mode{
 }
 .btn-outline:hover{box-shadow:var(--shadow-xs,0 1px 6px rgba(0,0,0,.06))}
 .btn-danger-soft{
-  border:0;border-radius:999px;padding:6px 12px;background:rgba(220,53,69,.12);cursor:pointer
+  border:0;border-radius:999px;padding:6px 12px;background:rgba(220,53,69,.4);cursor:pointer
 }
-.btn-danger-soft:hover{background:rgba(220,53,69,.2)}
+.btn-danger-soft:hover{background:rgba(220,53,69,.5)}
 .actions-group .bi{margin-right:6px;opacity:.75}
 
 @media (max-width:767px){
