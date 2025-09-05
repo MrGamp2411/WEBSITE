@@ -110,6 +110,7 @@
   - Daily closing views list a payment breakdown (credit card, wallet, etc.) for completed orders.
   - Monthly and daily summary cards now also show payment breakdowns on their revenue cards.
   - Monthly and daily revenue cards display "Amount to pay to bar" calculated as credit card plus wallet totals minus the Siplygo commission.
+  - Commission is applied only to credit card and wallet totals; pay-at-bar orders incur no commission and are excluded from payouts.
 - Order History & Revenue monthly cards use `card--placed` (blue) for the current month and `card--accepted` (orange) for past months; text color remains default.
 - Past months show a "Confirm Payment" button to super admins; confirmed months switch to `card--ready` (green).
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
