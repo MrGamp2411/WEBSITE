@@ -6,7 +6,7 @@
     <input id="name" name="name" value="{{ table.name }}" required>
   </label>
   <label for="description">Description
-    <input id="description" name="description" value="{{ table.description }}">
+    <textarea id="description" name="description" maxlength="190">{{ table.description }}</textarea>
   </label>
   <button class="btn btn--primary" type="submit">Save</button>
 </form>
