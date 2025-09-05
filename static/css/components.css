@@ -756,7 +756,7 @@ body.dark-mode{
 .editbar+.site-footer,.editbar+footer{margin-top:var(--space-6,24px)}
 
 .menu-page{display:block}
-.menu-toolbar{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-4,16px);margin-block:var(--space-6,24px)}
+.menu-toolbar{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-4,16px);margin-block:var(--space-6,24px)}
 .menu-toolbar .subtitle{margin-top:var(--space-1,4px);opacity:.85}
 .toolbar-actions{display:flex;align-items:center;gap:var(--space-3,12px);flex-wrap:wrap}
 
@@ -804,7 +804,7 @@ body.dark-mode{
 .actions-group .bi{margin-right:6px;opacity:.75}
 
 @media (max-width:767px){
-  .menu-toolbar{flex-direction:column;align-items:stretch}
+  .menu-toolbar{align-items:stretch}
   .toolbar-actions{justify-content:space-between}
   .menu-search{flex:1}
   .menu-search input{width:100%;min-width:0}
