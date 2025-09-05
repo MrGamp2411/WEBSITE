@@ -10,6 +10,7 @@
       <p>Total collected: CHF {{ "%.2f"|format(m.total_revenue) }}</p>
       <p>Total earned: CHF {{ "%.2f"|format(m.total_earned) }}</p>
       <p>Siplygo commission (5%): CHF {{ "%.2f"|format(m.siplygo_commission) }}</p>
+      <p>Amount to pay to bar: CHF {{ "%.2f"|format(m.bar_payout) }}</p>
       {% if m.payment_totals %}
       <p>Payment breakdown:</p>
       <ul class="payment-breakdown">

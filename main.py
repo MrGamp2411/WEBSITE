@@ -2226,6 +2226,11 @@ async def bar_admin_order_history(request: Request, bar_id: int, db: Session = D
             )
             for pm, amount in payment_rows
         }
+        card_total = Decimal(str(payment_totals.get("Credit Card", 0)))
+        wallet_total = Decimal(str(payment_totals.get("Wallet", 0)))
+        bar_payout = float(
+            (card_total + wallet_total - commission).quantize(Decimal("0.01"))
+        )
         year, month = key.split("-")
         label = datetime(int(year), int(month), 1).strftime("%B %Y")
         is_past = int(year) < current_year or (
@@ -2242,6 +2247,7 @@ async def bar_admin_order_history(request: Request, bar_id: int, db: Session = D
             "is_past": is_past,
             "confirmed": confirmed,
             "payment_totals": payment_totals,
+            "bar_payout": bar_payout,
         })
 
     monthly.sort(key=lambda m: (m["year"], m["month"]), reverse=True)
@@ -2306,6 +2312,11 @@ async def bar_admin_order_history_month(
             )
             for pm, amount in payment_rows
         }
+        card_total = Decimal(str(c.payment_totals.get("Credit Card", 0)))
+        wallet_total = Decimal(str(c.payment_totals.get("Wallet", 0)))
+        c.bar_payout = float(
+            (card_total + wallet_total - commission).quantize(Decimal("0.01"))
+        )
     month_label = start.strftime("%B %Y")
     return render_template(
         "bar_admin_month_history.html",
@@ -2390,6 +2401,11 @@ async def bar_admin_order_history_view(
     payment_totals = {
         k: float(v.quantize(Decimal("0.01"))) for k, v in payment_totals.items()
     }
+    card_total = Decimal(str(payment_totals.get("Credit Card", 0)))
+    wallet_total = Decimal(str(payment_totals.get("Wallet", 0)))
+    bar_payout = float(
+        (card_total + wallet_total - commission).quantize(Decimal("0.01"))
+    )
     return render_template(
         "bar_admin_order_history_view.html",
         request=request,
@@ -2397,6 +2413,7 @@ async def bar_admin_order_history_view(
         closing=closing,
         orders=orders,
         payment_totals=payment_totals,
+        bar_payout=bar_payout,
     )
 
 
