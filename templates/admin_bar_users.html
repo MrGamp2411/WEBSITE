@@ -58,7 +58,12 @@
           <td class="actions">
             <div class="actions-group">
               <a href="/admin/users/edit/{{ u.id }}" class="btn-outline">Edit</a>
+              <button type="submit" form="remove_{{ u.id }}" class="btn-danger-soft">Remove</button>
             </div>
+            <form id="remove_{{ u.id }}" method="post" action="/admin/bars/{{ bar.id }}/users" style="display:none">
+              <input type="hidden" name="action" value="remove">
+              <input type="hidden" name="user_id" value="{{ u.id }}">
+            </form>
           </td>
         </tr>
         {% endfor %}

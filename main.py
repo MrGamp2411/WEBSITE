@@ -2810,6 +2810,36 @@ async def manage_bar_users_post(
                     if demo.id in bar.bar_admin_ids:
                         bar.bar_admin_ids.remove(demo.id)
                 message = "User assigned"
+    elif action == "remove":
+        uid = form.get("user_id")
+        try:
+            uid_int = int(uid) if uid is not None else None
+        except ValueError:
+            uid_int = None
+        if not uid_int:
+            error = "Invalid user"
+        else:
+            rel = (
+                db.query(UserBarRole)
+                .filter(
+                    UserBarRole.user_id == uid_int,
+                    UserBarRole.bar_id == bar_id,
+                )
+                .first()
+            )
+            if not rel:
+                error = "User not assigned"
+            else:
+                db.delete(rel)
+                db.commit()
+                demo = _load_demo_user(uid_int, db)
+                if uid_int in bar.bar_admin_ids:
+                    bar.bar_admin_ids.remove(uid_int)
+                if uid_int in bar.bartender_ids:
+                    bar.bartender_ids.remove(uid_int)
+                if bar_id in demo.bar_ids:
+                    demo.bar_ids.remove(bar_id)
+                message = "User removed"
     else:
         error = "Invalid action"
     staff = [_load_demo_user(uid, db) for uid in bar.bar_admin_ids + bar.bartender_ids]

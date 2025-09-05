@@ -77,3 +77,44 @@ def test_add_existing_user_to_bar():
     new_db_user = db.query(User).filter(User.email == "fresh@example.com").first()
     assert new_db_user is None
     db.close()
+
+
+def test_remove_user_from_bar():
+    db = SessionLocal()
+    bar = Bar(name="Remove Bar", slug="remove-bar")
+    db.add(bar)
+    staff = User(
+        username="staffer",
+        email="staffer@example.com",
+        password_hash=hashlib.sha256("pass".encode("utf-8")).hexdigest(),
+        role=RoleEnum.BARADMIN,
+    )
+    db.add(staff)
+    db.commit()
+    db.refresh(bar)
+    db.refresh(staff)
+    db.add(UserBarRole(user_id=staff.id, bar_id=bar.id, role=RoleEnum.BARADMIN))
+    db.commit()
+    bar_id = bar.id
+    staff_id = staff.id
+    db.close()
+
+    with TestClient(app) as client:
+        _login_super_admin(client)
+        form = {
+            "action": "remove",
+            "user_id": str(staff_id),
+        }
+        resp = client.post(f"/admin/bars/{bar_id}/users", data=form)
+        assert resp.status_code == 200
+        assert "User removed" in resp.text
+        assert "staffer@example.com" not in resp.text
+
+    db = SessionLocal()
+    rel = (
+        db.query(UserBarRole)
+        .filter_by(user_id=staff_id, bar_id=bar_id)
+        .first()
+    )
+    assert rel is None
+    db.close()
