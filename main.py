@@ -2226,12 +2226,11 @@ async def bar_admin_order_history(request: Request, bar_id: int, db: Session = D
         }
         card_total = Decimal(str(payment_totals.get("Credit Card", 0)))
         wallet_total = Decimal(str(payment_totals.get("Wallet", 0)))
-        commission = (
-            (card_total + wallet_total) * PLATFORM_FEE_RATE
-        ).quantize(Decimal("0.01"))
+        pay_at_bar_total = Decimal(str(payment_totals.get("Bar", 0)))
+        commission = (total * PLATFORM_FEE_RATE).quantize(Decimal("0.01"))
         total_earned = (total - commission).quantize(Decimal("0.01"))
         bar_payout = float(
-            (card_total + wallet_total - commission).quantize(Decimal("0.01"))
+            (total - pay_at_bar_total - commission).quantize(Decimal("0.01"))
         )
         year, month = key.split("-")
         label = datetime(int(year), int(month), 1).strftime("%B %Y")
@@ -2313,13 +2312,12 @@ async def bar_admin_order_history_month(
         }
         card_total = Decimal(str(c.payment_totals.get("Credit Card", 0)))
         wallet_total = Decimal(str(c.payment_totals.get("Wallet", 0)))
-        commission = (
-            (card_total + wallet_total) * PLATFORM_FEE_RATE
-        ).quantize(Decimal("0.01"))
+        pay_at_bar_total = Decimal(str(c.payment_totals.get("Bar", 0)))
+        commission = (total * PLATFORM_FEE_RATE).quantize(Decimal("0.01"))
         c.siplygo_commission = float(commission)
         c.total_earned = float((total - commission).quantize(Decimal("0.01")))
         c.bar_payout = float(
-            (card_total + wallet_total - commission).quantize(Decimal("0.01"))
+            (total - pay_at_bar_total - commission).quantize(Decimal("0.01"))
         )
     month_label = start.strftime("%B %Y")
     return render_template(
@@ -2404,13 +2402,12 @@ async def bar_admin_order_history_view(
     }
     card_total = Decimal(str(payment_totals.get("Credit Card", 0)))
     wallet_total = Decimal(str(payment_totals.get("Wallet", 0)))
-    commission = (
-        (card_total + wallet_total) * PLATFORM_FEE_RATE
-    ).quantize(Decimal("0.01"))
+    pay_at_bar_total = Decimal(str(payment_totals.get("Bar", 0)))
+    commission = (total * PLATFORM_FEE_RATE).quantize(Decimal("0.01"))
     closing.siplygo_commission = float(commission)
     closing.total_earned = float((total - commission).quantize(Decimal("0.01")))
     bar_payout = float(
-        (card_total + wallet_total - commission).quantize(Decimal("0.01"))
+        (total - pay_at_bar_total - commission).quantize(Decimal("0.01"))
     )
     return render_template(
         "bar_admin_order_history_view.html",
