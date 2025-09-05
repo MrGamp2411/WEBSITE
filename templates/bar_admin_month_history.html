@@ -10,6 +10,14 @@
       <p>Total collected: CHF {{ "%.2f"|format(closing.total_revenue) }}</p>
       <p>Total earned: CHF {{ "%.2f"|format(closing.total_earned) }}</p>
       <p>Siplygo commission (5%): CHF {{ "%.2f"|format(closing.siplygo_commission) }}</p>
+      {% if closing.payment_totals %}
+      <p>Payment breakdown:</p>
+      <ul class="payment-breakdown">
+        {% for method, amount in closing.payment_totals.items() %}
+        <li>{{ method }}: CHF {{ '%.2f'|format(amount) }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
       <a class="btn" href="/dashboard/bar/{{ bar.id }}/orders/history/{{ closing.id }}">View</a>
     </div>
   </li>
