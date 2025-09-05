@@ -2810,60 +2810,8 @@ async def manage_bar_users_post(
                     if demo.id in bar.bar_admin_ids:
                         bar.bar_admin_ids.remove(demo.id)
                 message = "User assigned"
-    elif action == "new":
-        username = form.get("username")
-        email = form.get("email")
-        password = form.get("password")
-        phone = form.get("phone")
-        prefix = form.get("prefix")
-        if not all([username, email, password, phone, prefix]) or role not in role_map:
-            error = "All fields are required"
-        elif (
-            username in users_by_username
-            or db.query(User).filter(User.username == username).first()
-        ):
-            error = "Username already taken"
-        elif (
-            email in users_by_email
-            or db.query(User).filter(User.email == email).first()
-        ):
-            error = "Email already taken"
-        else:
-            password_hash = hashlib.sha256(password.encode("utf-8")).hexdigest()
-            db_user = User(
-                username=username,
-                email=email,
-                password_hash=password_hash,
-                phone=phone,
-                prefix=prefix,
-                role=role_map[role],
-            )
-            db.add(db_user)
-            db.commit()
-            db.refresh(db_user)
-            db_role = UserBarRole(
-                user_id=db_user.id, bar_id=bar_id, role=role_map[role]
-            )
-            db.add(db_role)
-            db.commit()
-            demo = DemoUser(
-                id=db_user.id,
-                username=username,
-                password=password,
-                email=email,
-                phone=phone,
-                prefix=prefix,
-                role=role,
-                bar_ids=[bar_id],
-            )
-            users[demo.id] = demo
-            users_by_username[demo.username] = demo
-            users_by_email[demo.email] = demo
-            if role == "bar_admin":
-                bar.bar_admin_ids.append(demo.id)
-            else:
-                bar.bartender_ids.append(demo.id)
-            message = "User created"
+    else:
+        error = "Invalid action"
     staff = [_load_demo_user(uid, db) for uid in bar.bar_admin_ids + bar.bartender_ids]
     return render_template(
         "admin_bar_users.html",

@@ -27,7 +27,7 @@ def _login_super_admin(client: TestClient) -> None:
     assert resp.status_code == 303
 
 
-def test_add_existing_and_new_user_to_bar():
+def test_add_existing_user_to_bar():
     db = SessionLocal()
     bar = Bar(name="My Bar", slug="my-bar")
     db.add(bar)
@@ -65,7 +65,7 @@ def test_add_existing_and_new_user_to_bar():
         }
         resp = client.post(f"/admin/bars/{bar.id}/users", data=form)
         assert resp.status_code == 200
-        assert "brandnew" in resp.text
+        assert "Invalid action" in resp.text
 
     db = SessionLocal()
     rel_existing = (
@@ -75,11 +75,5 @@ def test_add_existing_and_new_user_to_bar():
     )
     assert rel_existing is not None and rel_existing.role == RoleEnum.BARADMIN
     new_db_user = db.query(User).filter(User.email == "fresh@example.com").first()
-    assert new_db_user is not None and new_db_user.role == RoleEnum.BARTENDER
-    rel_new = (
-        db.query(UserBarRole)
-        .filter_by(user_id=new_db_user.id, bar_id=bar.id)
-        .first()
-    )
-    assert rel_new is not None and rel_new.role == RoleEnum.BARTENDER
+    assert new_db_user is None
     db.close()
