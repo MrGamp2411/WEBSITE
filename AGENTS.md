@@ -49,6 +49,7 @@
   - Bar ordering pause state stored in `bars.ordering_paused` (BOOLEAN, defaults to FALSE)
   - Bar edit options page links to table management (`templates/admin_bar_tables.html`) where staff can add, edit, and delete tables. Add and edit forms live in `templates/admin_bar_new_table.html` and `templates/admin_bar_edit_table.html`; table descriptions are for staff only
   - Admin Manage Tables page uses `templates/admin_bar_tables.html` with `.menu-page` styles, a client-side table search via `#tableSearch`, and grouped action pills (`.btn-outline` for Edit, `.btn-danger-soft` for Delete)
+  - Deleting a table triggers a confirmation popup using `.cart-blocker` and `.cart-popup` like other admin pages
   - Edit Bar options UI uses `templates/admin_edit_bar_options.html` with `.bar-edit-page` and `.action-card` links in a 2-column grid (1 column on mobile)
 - Products:
   - Images stored in `menu_items.photo` and served via `/api/products/{id}/image`
