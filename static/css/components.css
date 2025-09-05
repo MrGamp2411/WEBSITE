@@ -281,7 +281,8 @@ body.dark-mode{
 /* generic form styles */
 .form{max-width:400px;margin:var(--space-4) auto;display:flex;flex-direction:column;gap:var(--space-2);}
 .form label{display:flex;flex-direction:column;font-weight:600;gap:var(--space-1);}
-.form input,.form select{padding:var(--space-2);border:1px solid #d1d5db;border-radius:var(--radius);min-height:44px;}
+.form input,.form select,.form textarea{padding:var(--space-2);border:1px solid #d1d5db;border-radius:var(--radius);min-height:44px;}
+.form textarea{resize:none;}
 .form .btn{align-self:center;margin-top:var(--space-1);}
 .form--inline{flex-direction:row;align-items:center;gap:var(--space-1);max-width:none;margin:0;}
 .form--inline input{width:4rem;}
