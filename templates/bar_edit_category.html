@@ -6,7 +6,7 @@
     <input id="name" name="name" value="{{ category.name }}" required>
   </label>
   <label for="description">Description
-    <input id="description" name="description" value="{{ category.description }}" required>
+    <textarea id="description" name="description" required>{{ category.description }}</textarea>
   </label>
   <label for="display_order">Display Order
     <input id="display_order" type="number" name="display_order" value="{{ category.display_order }}">
