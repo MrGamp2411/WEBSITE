@@ -106,6 +106,7 @@
     `incoming-orders`, `preparing-orders`, `ready-orders`, and `completed-orders`.
   - The bartender dashboard lists assigned bars as `.bar-card` links to `/dashboard/bar/{id}/orders`.
   - The bar admin dashboard lists assigned bars as `.bar-card` items with edit and management links.
+  - The bar admin dashboard uses `admin-dashboard` `editbar` styling with an `admin-identity` card mirroring the admin dashboard.
   - Each bar card includes buttons for editing the bar and managing orders via `/dashboard/bar/{id}/orders`.
   - Bar admins view live orders in `bar_admin_orders.html`, which mirrors the bartender view and adds an
     "Order History & Revenue" button linking to `/dashboard/bar/{id}/orders/history`.
