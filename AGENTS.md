@@ -36,6 +36,7 @@
 - Input fields on this page use a rounded "premium" style with a soft focus ring and invalid states.
 - Name, Address, City, Canton, and Rating inputs share the pill-shaped `input-pill` style; `#description` textarea retains the focus ring.
 - Save button sits at the bottom of the form in a `.save-inline` wrapper (non-sticky) and only appears once.
+- Save button uses `.btn--primary` styling consistent with product and category forms.
 - `Promo Label` and `Tags` fields have been removed from the project.
   - Opening hours data is sanitized; invalid or non-dict values are treated as closed
   - Category `sort_order` defaults to `0` when missing to avoid menu sorting errors
