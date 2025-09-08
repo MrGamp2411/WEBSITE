@@ -109,6 +109,8 @@
     updates `payments.state` from webhook events.
   - Card orders are only broadcast after the webhook reports a successful
     state; failed payments automatically cancel the order.
+  - Failed card payments redirect users back to `/cart` via Wallee's
+    `failed_url` so the cart remains available for retrying.
   - Checkout form includes an optional "notes" textarea for special requests;
     notes are saved on orders and shown on bartender and user order cards.
   - The popup offers "Remove products" (clears cart via `POST /cart/clear`) or "Go to the bar menu".

@@ -1816,7 +1816,7 @@ async def checkout(
                 ],
                 currency="CHF",
                 success_url=f"{base_url}/orders",
-                failed_url=f"{base_url}/orders",
+                failed_url=f"{base_url}/cart",
             )
             tx = wallee_client.tx_service.create(
                 space_id=wallee_client.space_id, transaction=tx_create
