@@ -5,6 +5,7 @@ import hashlib
 from types import SimpleNamespace
 from unittest.mock import patch
 from uuid import uuid4
+from urllib.parse import urlencode
 
 os.environ["DATABASE_URL"] = "sqlite:///./test.db"
 os.environ["BASE_URL"] = "http://localhost"
@@ -61,6 +62,7 @@ def test_topup_init_creates_record():
             MockTx.return_value.create.return_value = SimpleNamespace(id=123)
             MockPage.return_value.payment_page_url.return_value = "https://pay.example/123"
             resp = client.post("/api/topup/init", json={"amount": 10})
+            create_args = MockTx.return_value.create.call_args
         assert resp.status_code == 200
         assert resp.json()["paymentPageUrl"] == "https://pay.example/123"
     db = SessionLocal()
@@ -68,6 +70,12 @@ def test_topup_init_creates_record():
     assert float(topup.amount_decimal) == 10.0
     assert topup.status == "PENDING"
     assert topup.wallee_transaction_id == 123
+    base_url = os.environ["BASE_URL"].rstrip("/")
+    expected_success = f"{base_url}/wallet/topup/success?" + urlencode({"topup": topup.id})
+    expected_failed = f"{base_url}/wallet/topup/failed?" + urlencode({"topup": topup.id})
+    _, tx_create = create_args[0]
+    assert tx_create.success_url == expected_success
+    assert tx_create.failed_url == expected_failed
     updated = db.query(User).filter(User.id == user.id).first()
     assert float(updated.credit or 0) == 0.0
     db.close()
