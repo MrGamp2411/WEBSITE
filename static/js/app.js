@@ -18,6 +18,23 @@ document.addEventListener('DOMContentLoaded', function() {
   if(closePause){ closePause.addEventListener('click',()=>{ if(pausePopup) pausePopup.hidden=true; }); }
   if(window.orderingPaused && window.showServicePausedOnLoad){ showPausePopup(); }
 
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('notice') === 'topup_failed') {
+    const title = params.get('noticeTitle') || 'Payment failed';
+    const body = params.get('noticeBody') || 'Payment was not successful. Please try again or contact our staff if the problem persists.';
+    const blocker = document.createElement('div');
+    blocker.className = 'cart-blocker';
+    const popup = document.createElement('div');
+    popup.className = 'cart-popup';
+    popup.innerHTML = `<p><strong>${title}</strong></p><p>${body}</p><div class="cart-popup-actions"><button type="button" class="btn btn--primary notice-close">Close</button></div>`;
+    blocker.appendChild(popup);
+    document.body.appendChild(blocker);
+    blocker.querySelector('.notice-close').addEventListener('click', () => blocker.remove());
+    const url = new URL(window.location.href);
+    ['notice','noticeTitle','noticeBody','noticeType'].forEach(k => url.searchParams.delete(k));
+    window.history.replaceState({}, document.title, url.toString());
+  }
+
   if (locationSelectors.length && locationInput) {
     locationSelectors.forEach(sel => {
       sel.addEventListener('click', () => {
