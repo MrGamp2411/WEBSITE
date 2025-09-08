@@ -10,6 +10,7 @@
   - `app/webhooks/wallee.py` – webhook endpoint for Wallee payments
 - Wallet top-ups use Wallee: `/api/topup/init` creates `wallet_topups` records and credits the user when the webhook reports a completed transaction
     - Initialize Wallee services with a `Configuration` instance (e.g., `TransactionServiceApi(config)`) rather than passing an `ApiClient` directly.
+    - Webhook signature verification should also pass the `Configuration` directly to `WebhookEncryptionServiceApi`; wrapping it in `ApiClient` raises `AttributeError: ApiClient object has no attribute verify_ssl`.
     - Amounts for `LineItemCreate` must be floats; passing `Decimal` values causes Wallee's SDK to raise an `AttributeError` during serialization.
   - `node-topup/` contains a TypeScript example service for initiating top-ups
   - Top-up flow:
