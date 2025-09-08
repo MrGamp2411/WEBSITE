@@ -651,6 +651,10 @@ async def on_startup():
     ensure_menu_item_columns()
     ensure_order_columns()
     ensure_bar_closing_columns()
+    users.clear()
+    users_by_username.clear()
+    users_by_email.clear()
+    user_carts.clear()
     seed_super_admin()
     load_bars_from_db()
     asyncio.create_task(auto_close_bars_worker())
@@ -2005,7 +2009,6 @@ async def init_topup(
         config = Configuration()
         config.user_id = int(os.environ["WALLEE_USER_ID"])
         config.api_secret = os.environ["WALLEE_API_SECRET"]
-        client = ApiClient(config)
         space_id = int(os.environ["WALLEE_SPACE_ID"])
     except (KeyError, ValueError):
         raise HTTPException(status_code=503, detail="Top-up service unavailable")
@@ -2023,12 +2026,12 @@ async def init_topup(
         success_url=f"{os.getenv('BASE_URL', '')}/wallet/topup/success?tid={{id}}",
         failed_url=f"{os.getenv('BASE_URL', '')}/wallet/topup/failed?tid={{id}}",
     )
-    tx_service = TransactionServiceApi(ApiClient(config))
+    tx_service = TransactionServiceApi(config)
     tx = tx_service.create(space_id, tx_create)
     topup.wallee_transaction_id = tx.id
     db.commit()
 
-    payment_service = TransactionPaymentPageServiceApi(ApiClient(config))
+    payment_service = TransactionPaymentPageServiceApi(config)
     url = payment_service.payment_page_url(space_id, tx.id)
     return {"paymentPageUrl": url}
 
