@@ -24,6 +24,7 @@
     - Wallee integration uses `WALLEE_SPACE_ID`, `WALLEE_USER_ID`, and `WALLEE_API_SECRET`; misconfiguration results in an error.
     - If any of these variables are missing or invalid, `/api/topup/init` returns 503 "Top-up service unavailable".
     - `tests/test_topup_init.py` demonstrates record creation with patched Wallee services.
+    - `/wallet/topup/failed` and `/wallet/topup/success` redirect to `/wallet` with `notice*` query parameters consumed by `static/js/app.js` to show cart-style popups.
 - Front-end mapping:
   - Styles in `static/css/components.css` (`components.min.css` for minified)
   - Templates live under `templates/`

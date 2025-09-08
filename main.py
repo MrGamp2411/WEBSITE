@@ -2010,12 +2010,26 @@ async def topup(request: Request):
 
 @app.get("/wallet/topup/success")
 async def topup_success(topup: str):
-    return HTMLResponse(f"<h1>Top-up riuscito</h1><p>ID: {topup}</p>")
+    params = {
+        "notice": "topup_success",
+        "noticeTitle": "Payment successful",
+        "noticeBody": "Your wallet has been credited.",
+        "noticeType": "success",
+    }
+    url = "/wallet?" + urlencode(params)
+    return RedirectResponse(url, status_code=303)
 
 
 @app.get("/wallet/topup/failed")
 async def topup_failed(topup: str):
-    return HTMLResponse(f"<h1>Pagamento annullato/fallito</h1><p>ID: {topup}</p>")
+    params = {
+        "notice": "topup_failed",
+        "noticeTitle": "Payment failed",
+        "noticeBody": "Payment was not successful. Please try again or contact our staff if the problem persists.",
+        "noticeType": "error",
+    }
+    url = "/wallet?" + urlencode(params)
+    return RedirectResponse(url, status_code=303)
 
 
 class TopupRequest(BaseModel):
