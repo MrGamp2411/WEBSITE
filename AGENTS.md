@@ -104,6 +104,8 @@
     `/cart/checkout` records a `payments` row with `wallee_tx_id` and
     redirects to Wallee's payment page. The `/webhooks/wallee` endpoint
     updates `payments.state` from webhook events.
+  - Card orders are only broadcast after the webhook reports a successful
+    state; failed payments automatically cancel the order.
   - Checkout form includes an optional "notes" textarea for special requests;
     notes are saved on orders and shown on bartender and user order cards.
   - The popup offers "Remove products" (clears cart via `POST /cart/clear`) or "Go to the bar menu".
