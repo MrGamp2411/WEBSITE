@@ -2054,7 +2054,8 @@ async def init_topup(
         db.commit()
         raise HTTPException(status_code=502, detail=f"Wallee create error: {e}")
 
-    topup.wallee_tx_id = tx.id
+    topup.wallee_tx_id = int(tx.id)
+    db.add(topup)
     db.commit()
 
     try:
