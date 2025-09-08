@@ -81,7 +81,16 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
                 order.paid_at = datetime.utcnow()
                 db.add(order)
             db.commit()
-            from main import send_order_update
+            from main import (
+                send_order_update,
+                user_carts,
+                save_cart_for_user,
+                Cart,
+            )
+            customer_id = order.customer_id if order else None
+            if customer_id:
+                user_carts.pop(customer_id, None)
+                save_cart_for_user(customer_id, Cart())
             await send_order_update(order)
         elif state in ("FAILED", "DECLINE", "DECLINED", "VOIDED"):
             if order:
