@@ -3,6 +3,7 @@ import sys
 import pathlib
 import hashlib
 from types import SimpleNamespace
+from urllib.parse import urlparse, parse_qs
 from unittest.mock import patch
 
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
@@ -125,7 +126,10 @@ def test_card_checkout_without_wallee_cancels_order():
                 follow_redirects=False,
             )
             assert resp.status_code == 303
-            assert resp.headers["location"] == "/cart"
+            parsed = urlparse(resp.headers["location"])
+            assert parsed.path == "/cart"
+            qs = parse_qs(parsed.query)
+            assert qs.get("notice") == ["payment_failed"]
 
         db = SessionLocal()
         order_count = db.query(Order).count()

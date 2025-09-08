@@ -3,6 +3,7 @@ import sys
 import pathlib
 import hashlib
 from types import SimpleNamespace
+from urllib.parse import urlparse, parse_qs
 from unittest.mock import patch
 
 os.environ['DATABASE_URL'] = 'sqlite:///:memory:'
@@ -60,4 +61,7 @@ def test_checkout_failed_redirects_to_cart():
         assert resp.status_code == 303
         tx_create = create_kwargs['transaction']
         assert tx_create.success_url == 'http://testserver/orders'
-        assert tx_create.failed_url == 'http://testserver/cart'
+        parsed = urlparse(tx_create.failed_url)
+        assert parsed.path == '/cart'
+        qs = parse_qs(parsed.query)
+        assert qs.get('notice') == ['payment_failed']
