@@ -8,8 +8,9 @@
   - `finance.py` – VAT and payout calculations
   - `payouts.py` – schedule periodic payouts for bars
   - `app/webhooks/wallee.py` – webhook endpoint for Wallee payments
-  - Wallet top-ups use Wallee: `/api/topup/init` creates `wallet_topups` records and credits the user when the webhook reports a completed transaction
+- Wallet top-ups use Wallee: `/api/topup/init` creates `wallet_topups` records and credits the user when the webhook reports a completed transaction
     - Initialize Wallee services with a `Configuration` instance (e.g., `TransactionServiceApi(config)`) rather than passing an `ApiClient` directly.
+    - Amounts for `LineItemCreate` must be floats; passing `Decimal` values causes Wallee's SDK to raise an `AttributeError` during serialization.
   - `node-topup/` contains a TypeScript example service for initiating top-ups
   - Top-up flow:
     - `templates/topup.html` posts to `/api/topup/init`; non-2xx responses trigger a client alert "Unable to start top-up".

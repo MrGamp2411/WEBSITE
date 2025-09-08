@@ -2015,7 +2015,10 @@ async def init_topup(
     line = LineItemCreate(
         name=f"Wallet Top-up CHF {amount:.2f}",
         unique_id=f"topup-{topup.id}",
-        amount_including_tax=Decimal(str(amount)),
+        # Wallee's Python SDK cannot serialize Decimal instances properly
+        # when constructing the Transaction request. Providing a float avoids
+        # an AttributeError during JSON serialization.
+        amount_including_tax=float(amount),
         quantity=1,
         type="PRODUCT",
     )
