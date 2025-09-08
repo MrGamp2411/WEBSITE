@@ -42,7 +42,7 @@ def test_webhook_credits_user():
         amount_decimal=10,
         currency="CHF",
         status="PENDING",
-        wallee_transaction_id=123,
+        wallee_tx_id=123,
     )
     db.add(topup)
     db.commit()

@@ -73,7 +73,6 @@ from models import (
     OrderItem,
     Payout,
     BarClosing,
-    Payment,
     User,
     RoleEnum,
     UserBarRole,
@@ -2055,7 +2054,7 @@ async def init_topup(
         db.commit()
         raise HTTPException(status_code=502, detail=f"Wallee create error: {e}")
 
-    topup.wallee_transaction_id = tx.id
+    topup.wallee_tx_id = tx.id
     db.commit()
 
     try:
