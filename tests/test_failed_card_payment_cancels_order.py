@@ -125,10 +125,13 @@ def test_card_checkout_without_wallee_cancels_order():
                 follow_redirects=False,
             )
             assert resp.status_code == 303
+            assert resp.headers["location"] == "/cart"
 
         db = SessionLocal()
-        order = db.query(Order).first()
+        order_count = db.query(Order).count()
         db.close()
-        assert order.status == "CANCELED"
-        assert order.cancelled_at is not None
+        assert order_count == 0
+
+        cart_state = client.get("/cart", headers={"accept": "application/json"})
+        assert cart_state.json()["count"] == 1
 

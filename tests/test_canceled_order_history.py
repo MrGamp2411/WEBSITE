@@ -2,6 +2,8 @@ import os
 import sys
 import pathlib
 import hashlib
+from types import SimpleNamespace
+from unittest.mock import patch
 
 os.environ['DATABASE_URL'] = 'sqlite:///:memory:'
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
@@ -48,7 +50,20 @@ def test_canceled_order_moves_to_completed_history():
 
         client.post('/login', data={'email': user_email, 'password': 'pass'})
         client.post(f'/bars/{bar_id}/add_to_cart', data={'product_id': item_id})
-        client.post('/cart/checkout', data={'table_id': table_id, 'payment_method': 'card'})
+        with patch("app.wallee_client.space_id", 1), patch(
+            "app.wallee_client.cfg"
+        ) as MockCfg, patch("app.wallee_client.tx_service") as MockTx, patch(
+            "app.wallee_client.pp_service"
+        ) as MockPage:
+            MockCfg.user_id = 1
+            MockCfg.api_secret = "secret"
+            MockTx.create.return_value = SimpleNamespace(id=123)
+            MockPage.payment_page_url.return_value = "https://pay.example/123"
+            client.post(
+                '/cart/checkout',
+                data={'table_id': table_id, 'payment_method': 'card'},
+                follow_redirects=False,
+            )
         client.post('/api/orders/1/status', json={'status': 'CANCELED'})
         resp = client.get('/orders')
         pending = resp.text.split('<h2>Pending Orders</h2>')[1].split('<h2>Completed Orders</h2>')[0]
