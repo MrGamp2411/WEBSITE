@@ -80,5 +80,55 @@ def test_failed_card_payment_cancels_order():
         payment = db.get(Payment, payment.id)
         db.close()
         assert order.status == "CANCELED"
+        assert order.cancelled_at is not None
         assert payment.state == "FAILED"
+
+
+def test_card_checkout_without_wallee_cancels_order():
+    setup_db()
+    with TestClient(app) as client:
+        db = SessionLocal()
+        bar = Bar(name="Test Bar", slug="test-bar")
+        db.add(bar)
+        db.commit()
+        db.refresh(bar)
+        cat = Category(bar_id=bar.id, name="Drinks")
+        db.add(cat)
+        db.commit()
+        db.refresh(cat)
+        item = MenuItem(bar_id=bar.id, category_id=cat.id, name="Water", price_chf=5)
+        db.add(item)
+        table = Table(bar_id=bar.id, name="T1")
+        db.add(table)
+        pwd = hashlib.sha256("pass".encode("utf-8")).hexdigest()
+        user = User(username="u", email="u@example.com", password_hash=pwd)
+        db.add(user)
+        db.commit()
+        db.refresh(item)
+        db.refresh(table)
+        item_id, bar_id, table_id, user_email = item.id, bar.id, table.id, user.email
+        db.close()
+        load_bars_from_db()
+
+        client.post("/login", data={"email": user_email, "password": "pass"})
+        client.post(f"/bars/{bar_id}/add_to_cart", data={"product_id": item_id})
+
+        with patch("app.wallee_client.space_id", None), patch(
+            "app.wallee_client.cfg"
+        ) as MockCfg, patch("app.wallee_client.tx_service") as MockTx:
+            MockCfg.user_id = None
+            MockCfg.api_secret = None
+            MockTx.create.side_effect = Exception("unavailable")
+            resp = client.post(
+                "/cart/checkout",
+                data={"table_id": table_id, "payment_method": "card"},
+                follow_redirects=False,
+            )
+            assert resp.status_code == 303
+
+        db = SessionLocal()
+        order = db.query(Order).first()
+        db.close()
+        assert order.status == "CANCELED"
+        assert order.cancelled_at is not None
 
