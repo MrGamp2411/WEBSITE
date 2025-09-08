@@ -1849,7 +1849,6 @@ async def checkout(
             page_url = wallee_client.pp_service.payment_page_url(
                 space_id=wallee_client.space_id, id=int(tx.id)
             )
-            cart.clear()
             save_cart_for_user(user.id, cart)
             return RedirectResponse(url=page_url, status_code=status.HTTP_303_SEE_OTHER)
         except ApiException:

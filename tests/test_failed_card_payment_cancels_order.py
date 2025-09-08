@@ -80,6 +80,8 @@ def test_failed_card_payment_cancels_order():
         db.close()
         assert order_count == 0
         assert payment.state == "FAILED"
+        cart_state = client.get("/cart", headers={"accept": "application/json"})
+        assert cart_state.json()["count"] == 1
 
 
 def test_card_checkout_without_wallee_cancels_order():
