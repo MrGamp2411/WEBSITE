@@ -24,8 +24,9 @@ app.post('/api/topup/init', async (req, res) => {
     txCreate.lineItems = [lineItem];
     txCreate.currency = 'CHF';
     txCreate.autoConfirmationEnabled = true;
-    txCreate.successUrl = `${process.env.BASE_URL}/wallet/topup/success?tid={id}`;
-    txCreate.failedUrl = `${process.env.BASE_URL}/wallet/topup/failed?tid={id}`;
+    const placeholder = encodeURIComponent('{id}');
+    txCreate.successUrl = `${process.env.BASE_URL}/wallet/topup/success?tid=${placeholder}`;
+    txCreate.failedUrl = `${process.env.BASE_URL}/wallet/topup/failed?tid=${placeholder}`;
 
     const tx = await transactionService.create(spaceId, txCreate);
     const url = await paymentPageService.paymentPageUrl(spaceId, tx.body.id);

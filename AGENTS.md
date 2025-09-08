@@ -17,6 +17,7 @@
     - The endpoint requires authentication and accepts amounts between 1 and 1000 CHF.
     - Wallee integration uses `WALLEE_SPACE_ID`, `WALLEE_USER_ID`, and `WALLEE_API_SECRET`; misconfiguration results in an error.
     - If any of these variables are missing or invalid, `/api/topup/init` returns 503 "Top-up service unavailable".
+    - Wallee requires redirect URLs to be valid RFC 3986 URIs. Encode the `{id}` placeholder as `%7Bid%7D` when building `success_url` and `failed_url`.
     - `tests/test_topup_init.py` demonstrates record creation with patched Wallee services.
 - Front-end mapping:
   - Styles in `static/css/components.css` (`components.min.css` for minified)

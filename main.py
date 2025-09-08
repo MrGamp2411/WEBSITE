@@ -95,7 +95,7 @@ from finance import (
 )
 from payouts import schedule_payout
 from audit import log_action
-from urllib.parse import urljoin
+from urllib.parse import urljoin, quote
 from app.webhooks.wallee import router as wallee_webhook_router
 from wallee import ApiClient, Configuration
 from wallee.api.transaction_service_api import TransactionServiceApi
@@ -2022,12 +2022,13 @@ async def init_topup(
         quantity=1,
         type="PRODUCT",
     )
+    placeholder = quote("{id}")
     tx_create = TransactionCreate(
         currency=os.getenv("CURRENCY", "CHF"),
         line_items=[line],
         auto_confirmation_enabled=True,
-        success_url=f"{os.getenv('BASE_URL', '')}/wallet/topup/success?tid={{id}}",
-        failed_url=f"{os.getenv('BASE_URL', '')}/wallet/topup/failed?tid={{id}}",
+        success_url=f"{os.getenv('BASE_URL', '')}/wallet/topup/success?tid={placeholder}",
+        failed_url=f"{os.getenv('BASE_URL', '')}/wallet/topup/failed?tid={placeholder}",
     )
     tx_service = TransactionServiceApi(config)
     tx = tx_service.create(space_id, tx_create)
