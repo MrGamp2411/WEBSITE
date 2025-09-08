@@ -11,7 +11,7 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, SessionLocal, engine  # noqa: E402
-from models import Bar, Category, MenuItem, Table, User, Order  # noqa: E402
+from models import Bar, Category, MenuItem, Table, User, Order, Payment  # noqa: E402
 from main import app, load_bars_from_db  # noqa: E402
 
 
@@ -87,6 +87,13 @@ def test_checkout_succeeds_when_order_columns_missing():
                 follow_redirects=False,
             )
         assert resp.status_code == 303
+        db = SessionLocal()
+        payment = db.query(Payment).first()
+        db.close()
+        client.post(
+            "/webhooks/wallee",
+            json={"entityId": int(payment.wallee_tx_id), "state": "COMPLETED"},
+        )
         db = SessionLocal()
         assert db.query(Order).count() == 1
         db.close()

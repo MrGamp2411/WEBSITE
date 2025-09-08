@@ -10,7 +10,7 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, engine, SessionLocal  # noqa: E402
-from models import Bar, Category, MenuItem, Table, User  # noqa: E402
+from models import Bar, Category, MenuItem, Table, User, Payment  # noqa: E402
 from main import app, load_bars_from_db  # noqa: E402
 
 
@@ -54,6 +54,13 @@ def test_order_history_page_after_checkout():
                 follow_redirects=False,
             )
         assert resp.status_code == 303
+        db = SessionLocal()
+        payment = db.query(Payment).first()
+        db.close()
+        client.post(
+            '/webhooks/wallee',
+            json={'entityId': int(payment.wallee_tx_id), 'state': 'COMPLETED'},
+        )
         orders_page = client.get('/orders')
         assert f"Order #{1}" in orders_page.text
         assert "<dt>Bar</dt><dd>Test Bar</dd>" in orders_page.text

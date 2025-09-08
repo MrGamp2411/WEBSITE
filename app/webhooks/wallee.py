@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from decimal import Decimal
 
-from models import User, WalletTopup, Payment, Order
+from models import User, WalletTopup, Payment, Order, OrderItem
 from .wallee_verify import verify_signature_bytes
 
 router = APIRouter()
@@ -50,14 +50,41 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
         payment.state = state
         db.add(payment)
         order = db.get(Order, payment.order_id) if payment.order_id else None
-        if order:
-            if state in ("FULFILL", "COMPLETED"):
-                order.paid_at = datetime.utcnow()
+        if state in ("FULFILL", "COMPLETED"):
+            if not order:
+                data = payment.raw_payload or {}
+                items = [
+                    OrderItem(
+                        menu_item_id=i["menu_item_id"],
+                        qty=i["qty"],
+                        unit_price=Decimal(str(i["unit_price"])),
+                        line_total=Decimal(str(i["line_total"])),
+                    )
+                    for i in data.get("items", [])
+                ]
+                order = Order(
+                    bar_id=data.get("bar_id"),
+                    customer_id=data.get("customer_id"),
+                    table_id=data.get("table_id"),
+                    subtotal=Decimal(str(data.get("subtotal", 0))),
+                    status="PLACED",
+                    payment_method=data.get("payment_method", "card"),
+                    paid_at=datetime.utcnow(),
+                    items=items,
+                    notes=data.get("notes"),
+                )
                 db.add(order)
                 db.commit()
-                from main import send_order_update
-                await send_order_update(order)
-            elif state in ("FAILED", "DECLINE", "DECLINED", "VOIDED"):
+                payment.order_id = order.id
+                db.add(payment)
+            else:
+                order.paid_at = datetime.utcnow()
+                db.add(order)
+            db.commit()
+            from main import send_order_update
+            await send_order_update(order)
+        elif state in ("FAILED", "DECLINE", "DECLINED", "VOIDED"):
+            if order:
                 order.status = "CANCELED"
                 if not order.cancelled_at:
                     order.cancelled_at = datetime.utcnow()
