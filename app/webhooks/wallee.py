@@ -23,7 +23,7 @@ from wallee import ApiClient, Configuration
 from wallee.api import WebhookEncryptionServiceApi
 
 from database import get_db
-from models import Order, Payment
+from models import Order, Payment, User
 
 
 router = APIRouter()
@@ -129,7 +129,11 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
         order = db.get(Order, payment.order_id)
         if order:
             order.status = mapped
-    elif not payment.order_id:
+    elif mapped == "paid" and payment.user_id:
+        user = db.get(User, payment.user_id)
+        if user and payment.amount:
+            user.credit = (user.credit or 0) + payment.amount
+    elif not payment.order_id and not payment.user_id:
         logger.warning("Payment %s received without order_id", tx_id)
 
     db.commit()

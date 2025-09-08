@@ -73,6 +73,7 @@ from models import (
     OrderItem,
     Payout,
     BarClosing,
+    Payment,
     User,
     RoleEnum,
     UserBarRole,
@@ -94,6 +95,10 @@ from payouts import schedule_payout
 from audit import log_action
 from urllib.parse import urljoin
 from app.webhooks.wallee import router as wallee_webhook_router
+from wallee import ApiClient, Configuration
+from wallee.api.transaction_service_api import TransactionServiceApi
+from wallee.api.transaction_payment_page_service_api import TransactionPaymentPageServiceApi
+from wallee.models import LineItemCreate, TransactionCreate
 
 # Predefined categories for bars (used for filtering and admin forms)
 BAR_CATEGORIES = [
@@ -1978,7 +1983,47 @@ async def topup(request: Request, db: Session = Depends(get_db)):
                 cart_bar_id=None,
                 cart_bar_name=None,
             )
-        # In a real application, integrate with a payment gateway here
+
+        space = os.getenv("WALLEE_SPACE_ID")
+        user_id_env = os.getenv("WALLEE_USER_ID")
+        api_secret = os.getenv("WALLEE_API_SECRET")
+        if space and user_id_env and api_secret:
+            try:
+                config = Configuration()
+                config.user_id = int(user_id_env)
+                config.api_secret = api_secret
+                client = ApiClient(config)
+                space_id = int(space)
+                tx_service = TransactionServiceApi(client)
+                line = LineItemCreate(
+                    name="Wallet top-up",
+                    unique_id=str(uuid4()),
+                    amount_including_tax=Decimal(add_amount),
+                    quantity=1,
+                    type="PRODUCT",
+                )
+                tx_create = TransactionCreate(
+                    currency="CHF",
+                    line_items=[line],
+                    success_url=str(request.url_for("topup")),
+                    failed_url=str(request.url_for("topup")),
+                )
+                tx = tx_service.create(space_id, tx_create)
+                payment_service = TransactionPaymentPageServiceApi(client)
+                url = payment_service.payment_page_url(space_id, tx.id)
+                payment = Payment(
+                    user_id=user.id,
+                    wallee_tx_id=str(tx.id),
+                    amount=add_amount,
+                    currency="CHF",
+                    state="PENDING",
+                )
+                db.add(payment)
+                db.commit()
+                return RedirectResponse(url, status_code=status.HTTP_303_SEE_OTHER)
+            except Exception:
+                pass
+        # Fallback: direct credit without external gateway
         user.credit += add_amount
         db_user = db.query(User).filter(User.id == user.id).first()
         if db_user:

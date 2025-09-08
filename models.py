@@ -308,6 +308,7 @@ class Payment(Base):
 
     id = Column(Integer, primary_key=True)
     order_id = Column(Integer, ForeignKey("orders.id"), nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     wallee_tx_id = Column(String, unique=True, nullable=False)
     amount = Column(Numeric(12, 2))
     currency = Column(String(3), default="CHF")
