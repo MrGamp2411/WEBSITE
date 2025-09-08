@@ -12,6 +12,7 @@ os.environ["BASE_URL"] = "http://localhost"
 os.environ["WALLEE_SPACE_ID"] = "1"
 os.environ["WALLEE_USER_ID"] = "1"
 os.environ["WALLEE_API_SECRET"] = "secret"
+os.environ["WALLEE_VERIFY_SIGNATURE"] = "false"
 
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
@@ -56,13 +57,13 @@ def test_topup_init_creates_record():
     user = _register_user()
     with TestClient(app) as client:
         _login_user(client, user.email, "testpass")
-        with patch("main.TransactionServiceApi") as MockTx, patch(
-            "main.TransactionPaymentPageServiceApi"
+        with patch("app.wallee_client.tx_service") as MockTx, patch(
+            "app.wallee_client.pp_service"
         ) as MockPage:
-            MockTx.return_value.create.return_value = SimpleNamespace(id=123)
-            MockPage.return_value.payment_page_url.return_value = "https://pay.example/123"
+            MockTx.create.return_value = SimpleNamespace(id=123)
+            MockPage.payment_page_url.return_value = "https://pay.example/123"
             resp = client.post("/api/topup/init", json={"amount": 10})
-            create_args = MockTx.return_value.create.call_args
+            create_kwargs = MockTx.create.call_args.kwargs
         assert resp.status_code == 200
         assert resp.json()["paymentPageUrl"] == "https://pay.example/123"
     db = SessionLocal()
@@ -73,7 +74,7 @@ def test_topup_init_creates_record():
     base_url = os.environ["BASE_URL"].rstrip("/")
     expected_success = f"{base_url}/wallet/topup/success?" + urlencode({"topup": topup.id})
     expected_failed = f"{base_url}/wallet/topup/failed?" + urlencode({"topup": topup.id})
-    _, tx_create = create_args[0]
+    tx_create = create_kwargs["transaction"]
     assert tx_create.success_url == expected_success
     assert tx_create.failed_url == expected_failed
     updated = db.query(User).filter(User.id == user.id).first()
