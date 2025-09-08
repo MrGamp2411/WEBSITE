@@ -43,6 +43,7 @@
 <form class="form" method="post" action="/cart/checkout">
   <label for="table_id">Table
     <select id="table_id" name="table_id" required>
+      <option value="" disabled {% if cart.table_id is none %}selected{% endif %}>Select table</option>
       {% for table in bar.tables.values() %}
         <option value="{{ table.id }}" {% if cart.table_id == table.id %}selected{% endif %}>{{ table.name }}</option>
       {% endfor %}
