@@ -101,6 +101,7 @@
   - The layout sets `window.orderingPaused` when the cart's bar is paused; `window.showServicePausedOnLoad` controls whether the popup opens automatically.
   - Menu pages pass `pause_popup_close` so the popup can be dismissed, while the cart page sets `pause_popup_back` and shows the popup on load with a "Back to the menu" button. The message advises contacting a staff member for more info.
   - `cart.html` displays the current bar's name, lists its tables for selection, and shows a wallet link for adding funds.
+  - The cart product list is rendered inside a `.table-card` with a `.menu-table` for consistent styling with other lists.
   - Checkout form asks for payment method (credit card, wallet credit, or pay at bar);
     selection is handled by `/cart/checkout` and stored in `Transaction.payment_method`.
   - Credit card payments use Wallee; when credentials are present,
