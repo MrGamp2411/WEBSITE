@@ -1833,7 +1833,7 @@ async def checkout(
                             unique_id=f"order-{db_order.id}",
                             sku="order",
                             quantity=1,
-                            amount=float(order_total),
+                            amount_including_tax=float(order_total),
                             type="PRODUCT",
                         )
                     ],

@@ -17,6 +17,7 @@
     - Wallee API clients live in `app/wallee_client.py`; reuse the module's `tx_service`, `pp_service`, and `whenc_srv` instead of creating new clients.
     - Public keys returned by Wallee are base64‑encoded DER; signature checks should call `load_der_public_key` via `app/webhooks/wallee_verify.py`.
     - Amounts for `LineItemCreate` must be floats; passing `Decimal` values causes Wallee's SDK to raise an `AttributeError` during serialization.
+    - Provide `amount_including_tax` for each `LineItemCreate`; the field is required by Wallee and replaces the deprecated `amount`.
   - `node-topup/` contains a TypeScript example service for initiating top-ups
   - Top-up flow:
     - `templates/topup.html` posts to `/api/topup/init`; non-2xx responses trigger a client alert "Unable to start top-up".
