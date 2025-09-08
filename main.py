@@ -95,12 +95,13 @@ from finance import (
 )
 from payouts import schedule_payout
 from audit import log_action
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlencode
 from app.webhooks.wallee import router as wallee_webhook_router
-from wallee import ApiClient, Configuration
+from wallee import Configuration
 from wallee.api.transaction_service_api import TransactionServiceApi
 from wallee.api.transaction_payment_page_service_api import TransactionPaymentPageServiceApi
 from wallee.models import LineItemCreate, TransactionCreate
+from wallee.rest import ApiException
 
 # Predefined categories for bars (used for filtering and admin forms)
 BAR_CATEGORIES = [
@@ -1990,31 +1991,39 @@ async def init_topup(
     user = get_current_user(request)
     if not user:
         raise HTTPException(status_code=401)
+
     amount = topup_req.amount
     if not math.isfinite(amount) or amount < 1 or amount > 1000:
         raise HTTPException(status_code=400, detail="Invalid amount")
-    amount = round(amount + 1e-8, 2)
+    amount = round(amount + 1e-9, 2)
 
     topup = WalletTopup(
         id=str(uuid4()),
         user_id=user.id,
         amount_decimal=Decimal(str(amount)),
-        currency=os.getenv("CURRENCY", "CHF"),
+        currency="CHF",
         status="PENDING",
     )
     db.add(topup)
     db.commit()
     db.refresh(topup)
+
     try:
+        base_url = os.environ["BASE_URL"].rstrip("/")
         config = Configuration()
         config.user_id = int(os.environ["WALLEE_USER_ID"])
         config.api_secret = os.environ["WALLEE_API_SECRET"]
         space_id = int(os.environ["WALLEE_SPACE_ID"])
     except (KeyError, ValueError):
         raise HTTPException(status_code=503, detail="Top-up service unavailable")
+
+    success_url = f"{base_url}/wallet/topup/success?" + urlencode({"topup": topup.id})
+    failed_url = f"{base_url}/wallet/topup/failed?" + urlencode({"topup": topup.id})
+
     line = LineItemCreate(
         name=f"Wallet Top-up CHF {amount:.2f}",
         unique_id=f"topup-{topup.id}",
+        sku="wallet-topup",
         # Wallee's Python SDK cannot serialize Decimal instances properly
         # when constructing the Transaction request. Providing a float avoids
         # an AttributeError during JSON serialization.
@@ -2023,14 +2032,24 @@ async def init_topup(
         type="PRODUCT",
     )
     tx_create = TransactionCreate(
-        currency=os.getenv("CURRENCY", "CHF"),
+        currency="CHF",
         line_items=[line],
         auto_confirmation_enabled=True,
-        success_url=f"{os.getenv('BASE_URL', '')}/wallet/topup/success?tid={{id}}",
-        failed_url=f"{os.getenv('BASE_URL', '')}/wallet/topup/failed?tid={{id}}",
+        success_url=success_url,
+        failed_url=failed_url,
     )
+
     tx_service = TransactionServiceApi(config)
-    tx = tx_service.create(space_id, tx_create)
+    print(
+        f"Creating Wallee transaction success_url={success_url} failed_url={failed_url}"
+    )
+    try:
+        tx = tx_service.create(space_id, tx_create)
+    except ApiException as e:
+        topup.status = "FAILED"
+        db.commit()
+        raise HTTPException(status_code=502, detail=f"Wallee error {e.status}: {e.body}")
+
     topup.wallee_transaction_id = tx.id
     db.commit()
 
