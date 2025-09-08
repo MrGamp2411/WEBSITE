@@ -2606,7 +2606,7 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
     description = form.get("description")
     if description:
         description = description[:120]
-    rating = form.get("rating")
+    rating = form.get("rating") if user.is_super_admin else None
     manual_closed = form.get("manual_closed") == "on"
     hours = {}
     for i in range(7):
@@ -2652,7 +2652,8 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
         bar.longitude = lon
         bar.description = description
         bar.photo_url = photo_url
-        bar.rating = float(rating) if rating else 0.0
+        if user.is_super_admin:
+            bar.rating = float(rating) if rating else 0.0
         bar.opening_hours = opening_hours
         bar.manual_closed = manual_closed
         bar.is_open_now = is_open_now_from_hours(hours) and not manual_closed
@@ -2668,7 +2669,8 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
             mem_bar.longitude = lon
             mem_bar.description = description
             mem_bar.photo_url = photo_url
-            mem_bar.rating = float(rating) if rating else 0.0
+            if user.is_super_admin:
+                mem_bar.rating = float(rating) if rating else 0.0
             mem_bar.opening_hours = hours
             mem_bar.manual_closed = manual_closed
             mem_bar.is_open_now = is_open_now_from_hours(hours) and not manual_closed
