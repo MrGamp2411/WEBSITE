@@ -10,3 +10,5 @@ alembic
 psycopg2-binary
 pytest
 httpx
+wallee
+cryptography

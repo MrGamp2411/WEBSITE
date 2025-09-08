@@ -9,12 +9,12 @@ from sqlalchemy import (
     Enum,
     ForeignKey,
     Integer,
-    BigInteger,
     Numeric,
     String,
     Text,
     Float,
     LargeBinary,
+    JSON,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB
@@ -308,11 +308,11 @@ class Payment(Base):
 
     id = Column(Integer, primary_key=True)
     order_id = Column(Integer, ForeignKey("orders.id"), nullable=True)
-    wallee_tx_id = Column(BigInteger, unique=True, nullable=False)
+    wallee_tx_id = Column(String, unique=True, nullable=False)
     amount = Column(Numeric(12, 2))
     currency = Column(String(3), default="CHF")
     state = Column(String(32), nullable=False)
-    raw_payload = Column(JSONB)
+    raw_payload = Column(JSON().with_variant(JSONB, "postgresql"))
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
