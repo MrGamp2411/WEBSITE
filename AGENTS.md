@@ -126,6 +126,7 @@
 - Monthly and daily summary cards now also show payment breakdowns on their revenue cards.
 - Monthly and daily revenue cards display "Amount to pay to bar" calculated as total collected minus pay-at-bar totals minus the Siplygo commission. Commission is calculated on the total collected.
 - Revenue cards use `.revenue-card.rc` markup with `.rc-*` utility classes for layout and spacing. The header pairs the month label with a right-aligned "View" link, followed by four KPI rows and a payment breakdown list.
+- Revenue cards remove the base mobile `max-height` so all KPI rows and payment details are visible on small screens.
 - Order History & Revenue monthly cards use `card--placed` (blue) for the current month and `card--accepted` (orange) for past months; text color remains default.
 - Past months show a "Confirm Payment" button to super admins; confirmed months switch to `card--ready` (green).
   - WebSocket endpoints `/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders` push real-time status updates.
