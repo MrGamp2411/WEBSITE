@@ -86,6 +86,7 @@
     and returns JSON `{count, totalFormatted, items[]}` when `Accept: application/json`
   - `/cart/update` and `/cart/checkout` also expect POST form data
   - `/cart/update` returns JSON when `Accept: application/json`
+  - Cart quantity "Update" button uses `.btn-outline` with black text for contrast
   - `static/js/app.js` uses a delegated submit listener on `.add-to-cart-form`
     to prevent page reloads. Rebuild `app.min.js` after changes.
   - After adding a product, the "Add to Cart" button becomes quantity controls
