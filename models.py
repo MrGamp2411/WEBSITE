@@ -9,7 +9,6 @@ from sqlalchemy import (
     Enum,
     ForeignKey,
     Integer,
-    BigInteger,
     Numeric,
     String,
     Text,
@@ -18,7 +17,7 @@ from sqlalchemy import (
     JSON,
 )
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB, BIGINT
 
 from database import Base
 
@@ -324,7 +323,7 @@ class WalletTopup(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     amount_decimal = Column(Numeric(12, 2), nullable=False)
     currency = Column(String, nullable=False, default="CHF")
-    wallee_tx_id = Column(BigInteger, unique=True, nullable=True)
+    wallee_tx_id = Column(BIGINT, unique=True, nullable=True)
     status = Column(String, nullable=False, default="PENDING")
     processed_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
