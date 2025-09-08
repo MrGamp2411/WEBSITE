@@ -4,8 +4,9 @@ import pathlib
 import hashlib
 from types import SimpleNamespace
 from unittest.mock import patch
+from uuid import uuid4
 
-os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+os.environ["DATABASE_URL"] = "sqlite:///./test.db"
 os.environ["BASE_URL"] = "http://localhost"
 os.environ["WALLEE_SPACE_ID"] = "1"
 os.environ["WALLEE_USER_ID"] = "1"
@@ -27,9 +28,10 @@ def setup_module(module):
 def _register_user():
     db = SessionLocal()
     password_hash = hashlib.sha256("testpass".encode("utf-8")).hexdigest()
+    unique = uuid4().hex
     user = User(
-        username="testuser",
-        email="test@example.com",
+        username=f"testuser_{unique}",
+        email=f"test_{unique}@example.com",
         password_hash=password_hash,
         role=RoleEnum.CUSTOMER,
     )
@@ -69,3 +71,21 @@ def test_topup_init_creates_record():
     updated = db.query(User).filter(User.id == user.id).first()
     assert float(updated.credit or 0) == 0.0
     db.close()
+
+
+def test_topup_init_missing_wallee_config_returns_503():
+    user = _register_user()
+    with TestClient(app) as client:
+        _login_user(client, user.email, "testpass")
+        with patch.dict(
+            os.environ,
+            {
+                "WALLEE_SPACE_ID": "",
+                "WALLEE_USER_ID": "",
+                "WALLEE_API_SECRET": "",
+            },
+            clear=False,
+        ):
+            resp = client.post("/api/topup/init", json={"amount": 10})
+        assert resp.status_code == 503
+        assert resp.json()["detail"] == "Top-up service unavailable"
