@@ -109,6 +109,7 @@
   - `templates/bartender_orders.html` groups orders into `<ul>` lists with IDs
     `incoming-orders`, `preparing-orders`, `ready-orders`, and `completed-orders`.
   - The bartender dashboard lists assigned bars as `.bar-card` links to `/dashboard/bar/{id}/orders`.
+  - The bartender dashboard uses `admin-dashboard` `editbar` styling with an `admin-header`, `admin-identity` card, and `admin-section` to match other dashboards.
   - The bar admin dashboard lists assigned bars as `.bar-card` items with edit and management links.
   - The bar admin dashboard uses `admin-dashboard` `editbar` styling with an `admin-identity` card mirroring the admin dashboard.
   - Each bar card includes buttons for editing the bar and managing orders via `/dashboard/bar/{id}/orders`.
