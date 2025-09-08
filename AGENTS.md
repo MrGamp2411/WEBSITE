@@ -2,12 +2,14 @@
 
 - Core modules:
   - `main.py` – routes and helpers
+    - `/cart/checkout` cancels card orders if a payment transaction cannot be created
   - `models.py` – data models
   - `database.py` – database utilities
   - `audit.py` – records user actions to `AuditLog`
   - `finance.py` – VAT and payout calculations
   - `payouts.py` – schedule periodic payouts for bars
   - `app/webhooks/wallee.py` – webhook endpoint for Wallee payments
+    - Failed payment webhooks mark orders as `CANCELED` and set `cancelled_at`
 - Wallet top-ups use Wallee: `/api/topup/init` creates `wallet_topups` records and credits the user when the webhook reports a completed transaction
     - Webhook `/webhooks/wallee` updates `wallet_topups` by `wallee_tx_id` with a row-level lock; processed records are skipped so repeated calls stay idempotent.
     - `wallet_topups` columns include `id`, `user_id`, `amount_decimal`, `currency`, `wallee_tx_id` (unique BIGINT), `status`, `processed_at`, `created_at`, and `updated_at`.

@@ -3,6 +3,8 @@ import sys
 import pathlib
 import hashlib
 from decimal import Decimal
+from types import SimpleNamespace
+from unittest.mock import patch
 
 os.environ['DATABASE_URL'] = 'sqlite:///:memory:'
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
@@ -67,7 +69,26 @@ def create_order(client, payment_method):
 
     client.post('/login', data={'email': ids['customer_email'], 'password': 'pass'})
     client.post(f"/bars/{ids['bar_id']}/add_to_cart", data={'product_id': ids['item_id']})
-    client.post('/cart/checkout', data={'table_id': ids['table_id'], 'payment_method': payment_method})
+    if payment_method == 'card':
+        with patch("app.wallee_client.space_id", 1), patch(
+            "app.wallee_client.cfg"
+        ) as MockCfg, patch("app.wallee_client.tx_service") as MockTx, patch(
+            "app.wallee_client.pp_service"
+        ) as MockPage:
+            MockCfg.user_id = 1
+            MockCfg.api_secret = "secret"
+            MockTx.create.return_value = SimpleNamespace(id=123)
+            MockPage.payment_page_url.return_value = "https://pay.example/123"
+            client.post(
+                '/cart/checkout',
+                data={'table_id': ids['table_id'], 'payment_method': payment_method},
+                follow_redirects=False,
+            )
+    else:
+        client.post(
+            '/cart/checkout',
+            data={'table_id': ids['table_id'], 'payment_method': payment_method},
+        )
     client.get('/logout')
     db = SessionLocal()
     order = db.query(Order).first()

@@ -59,6 +59,8 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
                 await send_order_update(order)
             elif state in ("FAILED", "DECLINE", "DECLINED", "VOIDED"):
                 order.status = "CANCELED"
+                if not order.cancelled_at:
+                    order.cancelled_at = datetime.utcnow()
                 db.add(order)
                 db.commit()
                 from main import send_order_update

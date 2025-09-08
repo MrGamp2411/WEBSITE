@@ -69,7 +69,7 @@ def test_super_admin_can_view_and_update_orders():
 
         client.post('/login', data={'email': 'u@example.com', 'password': 'pass'})
         client.post(f'/bars/{bar_id}/add_to_cart', data={'product_id': item_id})
-        client.post('/cart/checkout', data={'table_id': table_id, 'payment_method': 'card'})
+        client.post('/cart/checkout', data={'table_id': table_id, 'payment_method': 'bar'})
         client.get('/logout')
 
         db = SessionLocal()

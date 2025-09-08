@@ -1862,6 +1862,11 @@ async def checkout(
                 return RedirectResponse(url=page_url, status_code=status.HTTP_303_SEE_OTHER)
         except ApiException:
             pass
+        db_order.status = "CANCELED"
+        db_order.cancelled_at = datetime.utcnow()
+        db.add(db_order)
+        db.commit()
+        await send_order_update(db_order)
     cart.clear()
     save_cart_for_user(user.id, cart)
     return RedirectResponse(url="/orders", status_code=status.HTTP_303_SEE_OTHER)
