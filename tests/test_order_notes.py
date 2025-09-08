@@ -2,6 +2,8 @@ import os
 import sys
 import pathlib
 import hashlib
+from types import SimpleNamespace
+from unittest.mock import patch
 
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
@@ -37,11 +39,21 @@ def test_checkout_saves_notes():
 
         client.post("/login", data={"email": user_email, "password": "pass"})
         client.post(f"/bars/{bar_id}/add_to_cart", data={"product_id": item_id})
-        resp = client.post(
-            "/cart/checkout",
-            data={"table_id": table_id, "payment_method": "card", "notes": "No sugar"},
-            follow_redirects=True,
-        )
-        assert resp.status_code == 200
-        assert "<dt>Notes</dt><dd>No sugar</dd>" in resp.text
+        with patch("app.wallee_client.space_id", 1), patch(
+            "app.wallee_client.cfg"
+        ) as MockCfg, patch("app.wallee_client.tx_service") as MockTx, patch(
+            "app.wallee_client.pp_service"
+        ) as MockPage:
+            MockCfg.user_id = 1
+            MockCfg.api_secret = "secret"
+            MockTx.create.return_value = SimpleNamespace(id=123)
+            MockPage.payment_page_url.return_value = "https://pay.example/123"
+            resp = client.post(
+                "/cart/checkout",
+                data={"table_id": table_id, "payment_method": "card", "notes": "No sugar"},
+                follow_redirects=False,
+            )
+        assert resp.status_code == 303
+        orders = client.get("/orders")
+        assert "<dt>Notes</dt><dd>No sugar</dd>" in orders.text
 

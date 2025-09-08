@@ -2,6 +2,8 @@ import os
 import sys
 import pathlib
 import hashlib
+from types import SimpleNamespace
+from unittest.mock import patch
 from sqlalchemy import text, inspect
 
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
@@ -70,11 +72,20 @@ def test_checkout_succeeds_when_order_columns_missing():
 
         client.post("/login", data={"email": user_email, "password": "pass"})
         client.post(f"/bars/{bar_id}/add_to_cart", data={"product_id": item_id})
-        resp = client.post(
-            "/cart/checkout",
-            data={"table_id": table_id, "payment_method": "card"},
-            follow_redirects=False,
-        )
+        with patch("app.wallee_client.space_id", 1), patch(
+            "app.wallee_client.cfg"
+        ) as MockCfg, patch("app.wallee_client.tx_service") as MockTx, patch(
+            "app.wallee_client.pp_service"
+        ) as MockPage:
+            MockCfg.user_id = 1
+            MockCfg.api_secret = "secret"
+            MockTx.create.return_value = SimpleNamespace(id=123)
+            MockPage.payment_page_url.return_value = "https://pay.example/123"
+            resp = client.post(
+                "/cart/checkout",
+                data={"table_id": table_id, "payment_method": "card"},
+                follow_redirects=False,
+            )
         assert resp.status_code == 303
         db = SessionLocal()
         assert db.query(Order).count() == 1

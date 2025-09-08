@@ -2,7 +2,7 @@
 
 - Core modules:
   - `main.py` – routes and helpers
-    - `/cart/checkout` cancels card orders if a payment transaction cannot be created
+  - `/cart/checkout` attempts to create a payment transaction before persisting the order; card payment failures leave the cart intact and skip order creation
   - `models.py` – data models
   - `database.py` – database utilities
   - `audit.py` – records user actions to `AuditLog`

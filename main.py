@@ -1792,6 +1792,75 @@ async def checkout(
         )
         for item in cart.items.values()
     ]
+    if payment_method == "card":
+        try:
+            from app import wallee_client
+
+            if not (
+                wallee_client.space_id
+                and wallee_client.cfg.user_id
+                and wallee_client.cfg.api_secret
+            ):
+                raise ApiException()
+            base_url = str(request.base_url).rstrip("/")
+            tx_create = TransactionCreate(
+                line_items=[
+                    LineItemCreate(
+                        name="Order",
+                        unique_id="order-temp",
+                        sku="order",
+                        quantity=1,
+                        amount_including_tax=float(order_total),
+                        type="PRODUCT",
+                    )
+                ],
+                currency="CHF",
+                success_url=f"{base_url}/orders",
+                failed_url=f"{base_url}/orders",
+            )
+            tx = wallee_client.tx_service.create(
+                space_id=wallee_client.space_id, transaction=tx_create
+            )
+            db_order = Order(
+                bar_id=cart.bar_id,
+                customer_id=user.id,
+                table_id=cart.table_id,
+                subtotal=order_total,
+                status="PLACED",
+                payment_method=payment_method,
+                paid_at=None,
+                items=order_items,
+                notes=notes,
+            )
+            db.add(db_order)
+            db.commit()
+            payment = Payment(
+                order_id=db_order.id,
+                wallee_tx_id=str(tx.id),
+                amount=order_total,
+                currency="CHF",
+                state="PENDING",
+            )
+            db.add(payment)
+            db.commit()
+            if bar:
+                user.transactions.append(
+                    Transaction(
+                        bar.id,
+                        bar.name,
+                        list(cart.items.values()),
+                        order_total,
+                        payment_method,
+                    )
+                )
+            page_url = wallee_client.pp_service.payment_page_url(
+                space_id=wallee_client.space_id, id=int(tx.id)
+            )
+            cart.clear()
+            save_cart_for_user(user.id, cart)
+            return RedirectResponse(url=page_url, status_code=status.HTTP_303_SEE_OTHER)
+        except ApiException:
+            return RedirectResponse(url="/cart", status_code=status.HTTP_303_SEE_OTHER)
     db_order = Order(
         bar_id=cart.bar_id,
         customer_id=user.id,
@@ -1799,14 +1868,13 @@ async def checkout(
         subtotal=order_total,
         status="PLACED",
         payment_method=payment_method,
-        paid_at=datetime.utcnow() if payment_method != "card" else None,
+        paid_at=datetime.utcnow(),
         items=order_items,
         notes=notes,
     )
     db.add(db_order)
     db.commit()
-    if payment_method != "card":
-        await send_order_update(db_order)
+    await send_order_update(db_order)
     if bar:
         user.transactions.append(
             Transaction(
@@ -1817,56 +1885,6 @@ async def checkout(
                 payment_method,
             )
         )
-    if payment_method == "card":
-        try:
-            from app import wallee_client
-
-            if (
-                wallee_client.space_id
-                and wallee_client.cfg.user_id
-                and wallee_client.cfg.api_secret
-            ):
-                base_url = str(request.base_url).rstrip("/")
-                tx_create = TransactionCreate(
-                    line_items=[
-                        LineItemCreate(
-                            name=f"Order {db_order.id}",
-                            unique_id=f"order-{db_order.id}",
-                            sku="order",
-                            quantity=1,
-                            amount_including_tax=float(order_total),
-                            type="PRODUCT",
-                        )
-                    ],
-                    currency="CHF",
-                    success_url=f"{base_url}/orders",
-                    failed_url=f"{base_url}/orders",
-                )
-                tx = wallee_client.tx_service.create(
-                    space_id=wallee_client.space_id, transaction=tx_create
-                )
-                payment = Payment(
-                    order_id=db_order.id,
-                    wallee_tx_id=str(tx.id),
-                    amount=order_total,
-                    currency="CHF",
-                    state="PENDING",
-                )
-                db.add(payment)
-                db.commit()
-                page_url = wallee_client.pp_service.payment_page_url(
-                    space_id=wallee_client.space_id, id=int(tx.id)
-                )
-                cart.clear()
-                save_cart_for_user(user.id, cart)
-                return RedirectResponse(url=page_url, status_code=status.HTTP_303_SEE_OTHER)
-        except ApiException:
-            pass
-        db_order.status = "CANCELED"
-        db_order.cancelled_at = datetime.utcnow()
-        db.add(db_order)
-        db.commit()
-        await send_order_update(db_order)
     cart.clear()
     save_cart_for_user(user.id, cart)
     return RedirectResponse(url="/orders", status_code=status.HTTP_303_SEE_OTHER)
