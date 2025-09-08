@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from decimal import Decimal
 
-from models import User, WalletTopup, Payment
+from models import User, WalletTopup, Payment, Order
 from .wallee_verify import verify_signature_bytes
 
 router = APIRouter()
@@ -49,7 +49,24 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
         state = (payload.get("state") or "").upper()
         payment.state = state
         db.add(payment)
-        db.commit()
+        order = db.get(Order, payment.order_id) if payment.order_id else None
+        if order:
+            if state in ("FULFILL", "COMPLETED"):
+                order.paid_at = datetime.utcnow()
+                db.add(order)
+                db.commit()
+                from main import send_order_update
+                await send_order_update(order)
+            elif state in ("FAILED", "DECLINE", "DECLINED", "VOIDED"):
+                order.status = "CANCELED"
+                db.add(order)
+                db.commit()
+                from main import send_order_update
+                await send_order_update(order)
+            else:
+                db.commit()
+        else:
+            db.commit()
         return {"ok": True}
 
     topup = (

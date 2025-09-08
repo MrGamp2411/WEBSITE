@@ -1799,13 +1799,14 @@ async def checkout(
         subtotal=order_total,
         status="PLACED",
         payment_method=payment_method,
-        paid_at=datetime.utcnow(),
+        paid_at=datetime.utcnow() if payment_method != "card" else None,
         items=order_items,
         notes=notes,
     )
     db.add(db_order)
     db.commit()
-    await send_order_update(db_order)
+    if payment_method != "card":
+        await send_order_update(db_order)
     if bar:
         user.transactions.append(
             Transaction(
