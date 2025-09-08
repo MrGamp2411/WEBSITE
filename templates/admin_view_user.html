@@ -29,6 +29,7 @@
           <th>Total</th>
           <th>Status</th>
           <th>Placed</th>
+          <th class="actions">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -39,10 +40,15 @@
           <td>CHF {{ "%.2f"|format(o.total) }}</td>
           <td>{{ o.status }}</td>
           <td>{{ o.created_at|format_time }}</td>
+          <td class="actions">
+            <div class="actions-group">
+              <a href="/admin/orders/{{ o.id }}" class="btn-outline">View</a>
+            </div>
+          </td>
         </tr>
         {% endfor %}
         {% if orders|length == 0 %}
-        <tr><td colspan="5">No orders found.</td></tr>
+        <tr><td colspan="6">No orders found.</td></tr>
         {% endif %}
       </tbody>
     </table>

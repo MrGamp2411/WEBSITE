@@ -3436,6 +3436,24 @@ async def view_user(request: Request, user_id: int, db: Session = Depends(get_db
     )
 
 
+@app.get("/admin/orders/{order_id}", response_class=HTMLResponse)
+async def admin_order_detail(
+    request: Request, order_id: int, db: Session = Depends(get_db)
+):
+    current = get_current_user(request)
+    if not current or not current.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    order = db.query(Order).filter(Order.id == order_id).first()
+    if not order:
+        return RedirectResponse(url="/admin/users", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template(
+        "admin_order_detail.html",
+        request=request,
+        current=current,
+        order=order,
+    )
+
+
 @app.get("/admin/users/edit/{user_id}", response_class=HTMLResponse)
 async def edit_user(request: Request, user_id: int, db: Session = Depends(get_db)):
     current = get_current_user(request)
