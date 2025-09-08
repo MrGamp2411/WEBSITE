@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from decimal import Decimal
 
-from models import User, WalletTopup
+from models import User, WalletTopup, Payment
 from .wallee_verify import verify_signature_bytes
 
 router = APIRouter()
@@ -37,6 +37,19 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
         raise HTTPException(status_code=400, detail=str(e))
     except Exception:
         logger.warning("Malformed Wallee webhook payload")
+        return {"ok": True}
+
+    payment = (
+        db.query(Payment)
+        .with_for_update()
+        .filter(Payment.wallee_tx_id == str(tx_id))
+        .one_or_none()
+    )
+    if payment:
+        state = (payload.get("state") or "").upper()
+        payment.state = state
+        db.add(payment)
+        db.commit()
         return {"ok": True}
 
     topup = (

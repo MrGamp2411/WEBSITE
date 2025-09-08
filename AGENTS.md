@@ -99,6 +99,10 @@
   - `cart.html` displays the current bar's name, lists its tables for selection, and shows a wallet link for adding funds.
   - Checkout form asks for payment method (credit card, wallet credit, or pay at bar);
     selection is handled by `/cart/checkout` and stored in `Transaction.payment_method`.
+  - Credit card payments use Wallee; when credentials are present,
+    `/cart/checkout` records a `payments` row with `wallee_tx_id` and
+    redirects to Wallee's payment page. The `/webhooks/wallee` endpoint
+    updates `payments.state` from webhook events.
   - Checkout form includes an optional "notes" textarea for special requests;
     notes are saved on orders and shown on bartender and user order cards.
   - The popup offers "Remove products" (clears cart via `POST /cart/clear`) or "Go to the bar menu".

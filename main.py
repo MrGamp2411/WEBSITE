@@ -82,6 +82,7 @@ from models import (
     UserCart,
     AuditLog,
     WalletTopup,
+    Payment,
 )
 from pydantic import BaseModel, constr, ConfigDict
 from decimal import Decimal
@@ -1815,6 +1816,51 @@ async def checkout(
                 payment_method,
             )
         )
+    if payment_method == "card":
+        try:
+            from app import wallee_client
+
+            if (
+                wallee_client.space_id
+                and wallee_client.cfg.user_id
+                and wallee_client.cfg.api_secret
+            ):
+                base_url = str(request.base_url).rstrip("/")
+                tx_create = TransactionCreate(
+                    line_items=[
+                        LineItemCreate(
+                            name=f"Order {db_order.id}",
+                            unique_id=f"order-{db_order.id}",
+                            sku="order",
+                            quantity=1,
+                            amount=float(order_total),
+                            type="PRODUCT",
+                        )
+                    ],
+                    currency="CHF",
+                    success_url=f"{base_url}/orders",
+                    failed_url=f"{base_url}/orders",
+                )
+                tx = wallee_client.tx_service.create(
+                    space_id=wallee_client.space_id, transaction=tx_create
+                )
+                payment = Payment(
+                    order_id=db_order.id,
+                    wallee_tx_id=str(tx.id),
+                    amount=order_total,
+                    currency="CHF",
+                    state="PENDING",
+                )
+                db.add(payment)
+                db.commit()
+                page_url = wallee_client.pp_service.payment_page_url(
+                    space_id=wallee_client.space_id, id=int(tx.id)
+                )
+                cart.clear()
+                save_cart_for_user(user.id, cart)
+                return RedirectResponse(url=page_url, status_code=status.HTTP_303_SEE_OTHER)
+        except ApiException:
+            pass
     cart.clear()
     save_cart_for_user(user.id, cart)
     return RedirectResponse(url="/orders", status_code=status.HTTP_303_SEE_OTHER)
