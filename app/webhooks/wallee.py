@@ -19,7 +19,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
-from wallee import ApiClient, Configuration
+from wallee import Configuration
 from wallee.api import WebhookEncryptionServiceApi
 
 from database import get_db
@@ -47,7 +47,7 @@ def get_public_key_pem(key_id: str) -> bytes:
     config = Configuration()
     config.user_id = int(os.getenv("WALLEE_USER_ID", "0"))
     config.api_secret = os.getenv("WALLEE_API_SECRET", "")
-    service = WebhookEncryptionServiceApi(ApiClient(config))
+    service = WebhookEncryptionServiceApi(config)
     key = service.read(id=key_id)
     pem = key.public_key.encode()
     _public_key_cache[key_id] = (pem, now + _CACHE_TTL)
