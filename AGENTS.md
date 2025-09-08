@@ -33,6 +33,7 @@
 - Edit Bar cards remove the base mobile `max-height` so all content is visible on small screens.
 - Categories are shown as always-visible chips synchronized with a hidden `<select id="categoriesNative" name="categories" multiple>`.
 - Manual close checkbox (`#manual_closed`) toggles the `.hours-table` inputs.
+- Manually closing a bar preserves its opening hours so they restore when reopened.
 - Category chips allow selecting up to 5 items, disable others at the limit, and show a running count.
 - Input fields on this page use a rounded "premium" style with a soft focus ring and invalid states.
 - Name, Address, City, Canton, and Rating inputs share the pill-shaped `input-pill` style; `#description` textarea retains the focus ring.
