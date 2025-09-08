@@ -2608,13 +2608,26 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
         description = description[:120]
     rating = form.get("rating") if user.is_super_admin else None
     manual_closed = form.get("manual_closed") == "on"
+    try:
+        existing_hours = json.loads(bar.opening_hours) if bar.opening_hours else {}
+        if not isinstance(existing_hours, dict):
+            existing_hours = {}
+    except Exception:
+        existing_hours = {}
+
     hours = {}
     for i in range(7):
         o = form.get(f"open_{i}")
         c = form.get(f"close_{i}")
         if o and c:
             hours[str(i)] = {"open": o, "close": c}
-    opening_hours = json.dumps(hours) if hours else None
+    if hours:
+        opening_hours = json.dumps(hours)
+    elif manual_closed and bar.opening_hours:
+        opening_hours = bar.opening_hours
+        hours = existing_hours
+    else:
+        opening_hours = None
     categories = form.getlist("categories")
     if len(categories) > 5:
         return render_template(
