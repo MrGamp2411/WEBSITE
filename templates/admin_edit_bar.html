@@ -71,10 +71,12 @@
           <input id="photo" name="photo" type="file">
         </div>
 
+        {% if user.is_super_admin %}
         <div class="field-group">
           <label for="rating">Rating</label>
           <input id="rating" name="rating" class="input-pill" type="number" min="0" max="5" step="0.1" value="{{ bar.rating or 0 }}">
         </div>
+        {% endif %}
 
         <div class="field-group">
           <label class="switch-label">
