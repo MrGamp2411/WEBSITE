@@ -79,6 +79,10 @@ Optional variables:
 - `FRONTEND_ORIGINS` – comma-separated list of allowed frontend URLs for CORS
   (defaults to `http://localhost:5173`).
 - `GOOGLE_MAPS_API_KEY` – required if map widgets are used.
+- `WALLEE_SPACE_ID`, `WALLEE_USER_ID`, `WALLEE_API_SECRET` – credentials for
+  Wallee transactions.
+- `BASE_URL` – public base URL of the app used for payment callbacks.
+- `CURRENCY` – currency code for payments (defaults to `CHF`).
 
 ## Frontend redesign
 

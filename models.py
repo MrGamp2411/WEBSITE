@@ -9,6 +9,7 @@ from sqlalchemy import (
     Enum,
     ForeignKey,
     Integer,
+    BigInteger,
     Numeric,
     String,
     Text,
@@ -314,6 +315,20 @@ class Payment(Base):
     currency = Column(String(3), default="CHF")
     state = Column(String(32), nullable=False)
     raw_payload = Column(JSON().with_variant(JSONB, "postgresql"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class WalletTopup(Base):
+    __tablename__ = "wallet_topups"
+
+    id = Column(String, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    amount_decimal = Column(Numeric(12, 2), nullable=False)
+    currency = Column(String, default="CHF")
+    wallee_transaction_id = Column(BigInteger, unique=True, nullable=True)
+    status = Column(String, nullable=False, default="PENDING")
+    processed_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
