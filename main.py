@@ -59,7 +59,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from sqlalchemy import inspect, text, func, extract
+from sqlalchemy import inspect, text, func, extract, or_, and_
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -80,6 +80,7 @@ from models import (
     ProductImage,
     Table as TableModel,
     UserCart,
+    AuditLog,
 )
 from pydantic import BaseModel, constr
 from decimal import Decimal
@@ -3399,6 +3400,40 @@ def _load_demo_user(user_id: int, db: Session) -> DemoUser:
     users_by_username[user.username] = user
     users_by_email[user.email] = user
     return user
+
+
+@app.get("/admin/users/view/{user_id}", response_class=HTMLResponse)
+async def view_user(request: Request, user_id: int, db: Session = Depends(get_db)):
+    current = get_current_user(request)
+    if not current or not current.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    user = _load_demo_user(user_id, db)
+    orders = (
+        db.query(Order)
+        .filter(Order.customer_id == user.id)
+        .order_by(Order.created_at.desc())
+        .all()
+    )
+    logs = (
+        db.query(AuditLog)
+        .filter(
+            or_(
+                AuditLog.actor_user_id == user.id,
+                and_(AuditLog.entity_type == "User", AuditLog.entity_id == user.id),
+            )
+        )
+        .order_by(AuditLog.created_at.desc())
+        .all()
+    )
+    return render_template(
+        "admin_view_user.html",
+        request=request,
+        current=current,
+        user=user,
+        orders=orders,
+        logs=logs,
+        bars=bars,
+    )
 
 
 @app.get("/admin/users/edit/{user_id}", response_class=HTMLResponse)

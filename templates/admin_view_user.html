@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="users-page">
+  <header class="users-toolbar">
+    <div class="title-wrap">
+      <h1>User: {{ user.username }}</h1>
+      <p class="subtitle">Account details and activity.</p>
+    </div>
+  </header>
+
+  <div class="card">
+    <h2>Profile</h2>
+    <ul>
+      <li>Email: {{ user.email }}</li>
+      <li>Phone: {{ user.prefix }} {{ user.phone }}</li>
+      <li>Role: {{ user.role }}</li>
+      <li>Credit: CHF {{ "%.2f"|format(user.credit) }}</li>
+      <li>Bars: {% if user.bar_ids %}{% for bid in user.bar_ids %}{{ bars[bid].name }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}-{% endif %}</li>
+    </ul>
+  </div>
+
+  <h2>Orders</h2>
+  <div class="table-card">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Bar</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Placed</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in orders %}
+        <tr>
+          <td>{{ o.id }}</td>
+          <td>{{ o.bar_name }}</td>
+          <td>CHF {{ "%.2f"|format(o.total) }}</td>
+          <td>{{ o.status }}</td>
+          <td>{{ o.created_at|format_time }}</td>
+        </tr>
+        {% endfor %}
+        {% if orders|length == 0 %}
+        <tr><td colspan="5">No orders found.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Audit Logs</h2>
+  <div class="table-card">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in logs %}
+        <tr>
+          <td>{{ l.action }}</td>
+          <td>{{ l.created_at|format_time }}</td>
+        </tr>
+        {% endfor %}
+        {% if logs|length == 0 %}
+        <tr><td colspan="2">No activity found.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+

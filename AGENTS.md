@@ -88,10 +88,12 @@
   - Credit stored in `users.credit`; ensured by `ensure_credit_column()` on startup
   - Admin user edits clear old bar roles before saving new assignments
   - Admin user edits persist credit and current bar assignment; `_load_demo_user` hydrates both from the database
-  - Admin users list loads each user's `bar_id` and `credit` directly from the database so assignments survive restarts
-  - Admin user edits update passwords and refresh user caches so new assignments replace old data
-  - Login fetches the user's bar assignment from the database so the bar is available immediately after authentication
-  - Admin user edit form: `templates/admin_edit_user.html` posts fields
+- Admin users list loads each user's `bar_id` and `credit` directly from the database so assignments survive restarts
+- Admin user edits update passwords and refresh user caches so new assignments replace old data
+- Admin Manage Users page uses `templates/admin_users.html` with `.users-page` styles, a client-side username/email search via `#userSearch`, and grouped action pills (`View`, `Edit`) in each row
+- Super admins can open `/admin/users/view/{id}` rendered by `templates/admin_view_user.html` to review a user's profile, orders, and audit logs
+- Login fetches the user's bar assignment from the database so the bar is available immediately after authentication
+- Admin user edit form: `templates/admin_edit_user.html` posts fields
     (`username`, `password`, `email`, `prefix`, `phone`, `role`, `bar_ids`, `credit`)
     to `/admin/users/edit/{id}`. Bar selection uses checkboxes for easier multi-bar assignment.
   - Bar admins and bartenders may be assigned to multiple bars. `bar_ids` lists are used

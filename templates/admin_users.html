@@ -1,35 +1,91 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Manage Users</h1>
-<div class="dashboard-info">
-  <div class="card">
-    <h2>{{ user.username }}</h2>
-    <p>{{ user.email }}</p>
-    <p>{{ user.prefix }} {{ user.phone }}</p>
+<section class="users-page">
+  <header class="users-toolbar">
+    <div class="title-wrap">
+      <h1>Users</h1>
+      <p class="subtitle">Manage platform accounts.</p>
+    </div>
+    <div class="toolbar-actions">
+      <form class="users-search" role="search" aria-label="Search users" onsubmit="return false">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input id="userSearch" type="search" inputmode="search" autocomplete="off"
+               placeholder="Search users by name or email…" aria-label="Search users by name or email">
+        <button class="clear" type="button" aria-label="Clear search">
+          <i class="bi bi-x-circle" aria-hidden="true"></i>
+        </button>
+      </form>
+    </div>
+  </header>
+
+  <div class="table-card">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Role</th>
+          <th>Bar</th>
+          <th>Credit</th>
+          <th class="actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.username }}</td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.prefix }} {{ u.phone }}</td>
+          <td>{{ u.role }}</td>
+          <td>
+            {% if u.bar_ids %}
+              {% for bid in u.bar_ids %}
+                {{ bars[bid].name }}{% if not loop.last %}, {% endif %}
+              {% endfor %}
+            {% else %}-{% endif %}
+          </td>
+          <td>CHF {{ "%.2f"|format(u.credit) }}</td>
+          <td class="actions">
+            <div class="actions-group">
+              <a href="/admin/users/view/{{ u.id }}" class="btn-outline">View</a>
+              <a href="/admin/users/edit/{{ u.id }}" class="btn-outline">Edit</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
-</div>
-<table class="table">
-  <thead>
-    <tr><th>Username</th><th>Email</th><th>Phone</th><th>Role</th><th>Bar</th><th>Credit</th><th></th></tr>
-  </thead>
-  <tbody>
-    {% for u in users %}
-    <tr>
-      <td>{{ u.username }}</td>
-      <td>{{ u.email }}</td>
-      <td>{{ u.prefix }} {{ u.phone }}</td>
-      <td>{{ u.role }}</td>
-      <td>
-        {% if u.bar_ids %}
-          {% for bid in u.bar_ids %}
-            {{ bars[bid].name }}{% if not loop.last %}, {% endif %}
-          {% endfor %}
-        {% else %}-{% endif %}
-      </td>
-      <td>CHF {{ "%.2f"|format(u.credit) }}</td>
-      <td><a href="/admin/users/edit/{{ u.id }}">Edit</a></td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+</section>
+
+<script>
+(function(){
+  const input = document.getElementById('userSearch');
+  const tbody = document.querySelector('.users-table tbody');
+  if(input && tbody){
+    const rows = Array.from(tbody.rows);
+    const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+    function applyFilter(){
+      const q = norm(input.value);
+      rows.forEach(tr=>{
+        const name = tr.cells && tr.cells[0] ? tr.cells[0].textContent : '';
+        const email = tr.cells && tr.cells[1] ? tr.cells[1].textContent : '';
+        const match = !q || norm(name).includes(q) || norm(email).includes(q);
+        tr.style.display = match ? '' : 'none';
+      });
+    }
+    function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}}
+    const run = debounce(applyFilter,120);
+    input.addEventListener('input', run);
+    document.querySelector('.users-search .clear')?.addEventListener('click',()=>{
+      input.value=''; applyFilter(); input.focus();
+    });
+    const qs = new URLSearchParams(location.search);
+    const q = qs.get('q');
+    if(q){ input.value = q; applyFilter(); }
+  }
+})();
+</script>
 {% endblock %}
+
