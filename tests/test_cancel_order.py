@@ -20,6 +20,7 @@ from models import (  # noqa: E402
     UserBarRole,
     RoleEnum,
     Order,
+    Payment,
 )
 from main import (  # noqa: E402
     app,
@@ -83,6 +84,13 @@ def create_order(client, payment_method):
                 '/cart/checkout',
                 data={'table_id': ids['table_id'], 'payment_method': payment_method},
                 follow_redirects=False,
+            )
+            db = SessionLocal()
+            payment = db.query(Payment).first()
+            db.close()
+            client.post(
+                '/webhooks/wallee',
+                json={'entityId': int(payment.wallee_tx_id), 'state': 'COMPLETED'},
             )
     else:
         client.post(

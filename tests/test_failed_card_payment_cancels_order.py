@@ -68,7 +68,6 @@ def test_failed_card_payment_cancels_order():
 
         db = SessionLocal()
         payment = db.query(Payment).first()
-        order = db.query(Order).first()
         db.close()
 
         payload = {"entityId": int(payment.wallee_tx_id), "state": "FAILED"}
@@ -76,11 +75,10 @@ def test_failed_card_payment_cancels_order():
         assert resp2.status_code == 200
 
         db = SessionLocal()
-        order = db.get(Order, order.id)
+        order_count = db.query(Order).count()
         payment = db.get(Payment, payment.id)
         db.close()
-        assert order.status == "CANCELED"
-        assert order.cancelled_at is not None
+        assert order_count == 0
         assert payment.state == "FAILED"
 
 

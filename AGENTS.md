@@ -2,7 +2,7 @@
 
 - Core modules:
   - `main.py` – routes and helpers
-  - `/cart/checkout` attempts to create a payment transaction before persisting the order; card payment failures leave the cart intact and skip order creation
+  - `/cart/checkout` stores card order details in `Payment.raw_payload` and only creates the order when the Wallee webhook reports a successful payment; card payment failures leave the cart intact and skip order creation
   - `models.py` – data models
   - `database.py` – database utilities
   - `audit.py` – records user actions to `AuditLog`

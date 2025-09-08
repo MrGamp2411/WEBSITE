@@ -10,7 +10,7 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, engine, SessionLocal  # noqa: E402
-from models import Bar, Category, MenuItem, Table, User  # noqa: E402
+from models import Bar, Category, MenuItem, Table, User, Payment  # noqa: E402
 from main import (
     app,
     load_bars_from_db,
@@ -64,6 +64,13 @@ def test_canceled_order_moves_to_completed_history():
                 data={'table_id': table_id, 'payment_method': 'card'},
                 follow_redirects=False,
             )
+        db = SessionLocal()
+        payment = db.query(Payment).first()
+        db.close()
+        client.post(
+            '/webhooks/wallee',
+            json={'entityId': int(payment.wallee_tx_id), 'state': 'COMPLETED'},
+        )
         client.post('/api/orders/1/status', json={'status': 'CANCELED'})
         resp = client.get('/orders')
         pending = resp.text.split('<h2>Pending Orders</h2>')[1].split('<h2>Completed Orders</h2>')[0]

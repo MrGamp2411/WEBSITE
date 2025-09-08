@@ -10,7 +10,7 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, engine, SessionLocal  # noqa: E402
-from models import Bar, Category, MenuItem, Table, User  # noqa: E402
+from models import Bar, Category, MenuItem, Table, User, Payment  # noqa: E402
 from main import app, load_bars_from_db  # noqa: E402
 
 
@@ -54,6 +54,13 @@ def test_checkout_saves_notes():
                 follow_redirects=False,
             )
         assert resp.status_code == 303
+        db = SessionLocal()
+        payment = db.query(Payment).first()
+        db.close()
+        client.post(
+            "/webhooks/wallee",
+            json={"entityId": int(payment.wallee_tx_id), "state": "COMPLETED"},
+        )
         orders = client.get("/orders")
         assert "<dt>Notes</dt><dd>No sugar</dd>" in orders.text
 

@@ -1821,38 +1821,31 @@ async def checkout(
             tx = wallee_client.tx_service.create(
                 space_id=wallee_client.space_id, transaction=tx_create
             )
-            db_order = Order(
-                bar_id=cart.bar_id,
-                customer_id=user.id,
-                table_id=cart.table_id,
-                subtotal=order_total,
-                status="PLACED",
-                payment_method=payment_method,
-                paid_at=None,
-                items=order_items,
-                notes=notes,
-            )
-            db.add(db_order)
-            db.commit()
             payment = Payment(
-                order_id=db_order.id,
                 wallee_tx_id=str(tx.id),
                 amount=order_total,
                 currency="CHF",
                 state="PENDING",
+                raw_payload={
+                    "bar_id": cart.bar_id,
+                    "customer_id": user.id,
+                    "table_id": cart.table_id,
+                    "subtotal": float(order_total),
+                    "payment_method": payment_method,
+                    "notes": notes,
+                    "items": [
+                        {
+                            "menu_item_id": item.product.id,
+                            "qty": item.quantity,
+                            "unit_price": float(item.product.price),
+                            "line_total": float(item.product.price * item.quantity),
+                        }
+                        for item in cart.items.values()
+                    ],
+                },
             )
             db.add(payment)
             db.commit()
-            if bar:
-                user.transactions.append(
-                    Transaction(
-                        bar.id,
-                        bar.name,
-                        list(cart.items.values()),
-                        order_total,
-                        payment_method,
-                    )
-                )
             page_url = wallee_client.pp_service.payment_page_url(
                 space_id=wallee_client.space_id, id=int(tx.id)
             )
