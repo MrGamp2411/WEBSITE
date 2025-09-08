@@ -93,6 +93,7 @@ from finance import (
 from payouts import schedule_payout
 from audit import log_action
 from urllib.parse import urljoin
+from app.webhooks.wallee import router as wallee_webhook_router
 
 # Predefined categories for bars (used for filtering and admin forms)
 BAR_CATEGORIES = [
@@ -372,6 +373,7 @@ class Cart:
 # -----------------------------------------------------------------------------
 
 app = FastAPI()
+app.include_router(wallee_webhook_router)
 
 # Mount a static files directory for CSS/JS/image assets if needed
 app.mount("/static", StaticFiles(directory="static"), name="static")

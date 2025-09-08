@@ -9,6 +9,7 @@ from sqlalchemy import (
     Enum,
     ForeignKey,
     Integer,
+    BigInteger,
     Numeric,
     String,
     Text,
@@ -16,6 +17,7 @@ from sqlalchemy import (
     LargeBinary,
 )
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import JSONB
 
 from database import Base
 
@@ -299,6 +301,20 @@ class Event(Base):
     target_scope = Column(String(20), default="all")
     target_id = Column(Integer)
     active = Column(Boolean, default=True)
+
+
+class Payment(Base):
+    __tablename__ = "payments"
+
+    id = Column(Integer, primary_key=True)
+    order_id = Column(Integer, ForeignKey("orders.id"), nullable=True)
+    wallee_tx_id = Column(BigInteger, unique=True, nullable=False)
+    amount = Column(Numeric(12, 2))
+    currency = Column(String(3), default="CHF")
+    state = Column(String(32), nullable=False)
+    raw_payload = Column(JSONB)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 class AuditLog(Base):
