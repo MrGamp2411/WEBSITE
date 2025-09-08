@@ -1,34 +1,38 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Bartender Dashboard</h1>
-<div class="dashboard-info">
-  <div class="card">
-    <h2>{{ user.username }}</h2>
-    <p>{{ user.email }}</p>
-    <p>{{ user.prefix }} {{ user.phone }}</p>
-  </div>
-</div>
-{% if bars %}
-<div class="dashboard-actions">
-  <ul class="bars">
-    {% for bar in bars %}
-    <li>
-      <a class="bar-card" href="/dashboard/bar/{{ bar.id }}/orders">
-        <div class="thumb-wrapper">
-          {% if bar.photo_url %}
-          <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" width="400" height="225">
-          {% endif %}
-        </div>
-        <h3 class="title">{{ bar.name }}</h3>
-        <address>{{ bar.city }}{% if bar.state %}, {{ bar.state }}{% endif %}</address>
-        <p class="desc">{{ bar.description }}</p>
-      </a>
-    </li>
-    {% endfor %}
-  </ul>
-</div>
-{% else %}
-<p>No bar assigned.</p>
-{% endif %}
+<section class="admin-dashboard editbar">
+  <header class="admin-header">
+    <h1>Bartender Dashboard</h1>
+    <div class="admin-identity card">
+      <div class="identity-row">
+        <span class="identity-name">{{ user.username }}</span>
+        <span class="identity-email">{{ user.email }}</span>
+        <span class="identity-phone">{{ user.prefix }} {{ user.phone }}</span>
+      </div>
+    </div>
+  </header>
+  {% if bars %}
+  <section class="admin-section" aria-label="Bars">
+    <h2 class="section-title"><i class="bi bi-shop"></i> Your Bars</h2>
+    <ul class="bars">
+      {% for bar in bars %}
+      <li>
+        <a class="bar-card" href="/dashboard/bar/{{ bar.id }}/orders">
+          <div class="thumb-wrapper">
+            {% if bar.photo_url %}
+            <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" width="400" height="225">
+            {% endif %}
+          </div>
+          <h3 class="title">{{ bar.name }}</h3>
+          <address>{{ bar.city }}{% if bar.state %}, {{ bar.state }}{% endif %}</address>
+          <p class="desc">{{ bar.description }}</p>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% else %}
+  <p>No bar assigned.</p>
+  {% endif %}
+</section>
 {% endblock %}
-
