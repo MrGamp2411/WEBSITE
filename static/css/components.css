@@ -843,5 +843,31 @@ body.dark-mode{
   .users-toolbar{align-items:stretch;}
   .toolbar-actions{justify-content:space-between;}
   .users-search{flex:1;}
-  .users-search input{width:100%;min-width:0;}
+.users-search input{width:100%;min-width:0;}
+}
+
+/* Payments page */
+.payments-page{display:block;}
+.payments-toolbar{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-4,16px);margin-block:var(--space-6,24px);}
+.payments-toolbar .subtitle{margin-top:var(--space-1,4px);opacity:.85;}
+.payments-search{position:relative;display:flex;align-items:center;}
+.payments-search input{
+  height:40px;padding:0 36px 0 36px;background:#fff;
+  border:1px solid rgba(0,0,0,.08);border-radius:999px;min-width:260px;width:min(36vw,420px);
+  box-shadow:var(--shadow-xs,0 1px 3px rgba(0,0,0,.04));
+}
+.payments-search .bi-search{position:absolute;left:12px;font-size:16px;opacity:.6;}
+.payments-search .clear{
+  position:absolute;right:8px;height:28px;width:28px;border:0;background:transparent;cursor:pointer;
+  display:inline-grid;place-items:center;opacity:.65;
+}
+.payments-search .clear:hover{opacity:.95;}
+.payments-search input:focus{outline:2px solid rgba(0,0,0,.12);outline-offset:2px;}
+.payments-page .admin-identity{display:none!important;}
+
+@media (max-width:767px){
+  .payments-toolbar{align-items:stretch;}
+  .toolbar-actions{justify-content:space-between;}
+  .payments-search{flex:1;}
+  .payments-search input{width:100%;min-width:0;}
 }
