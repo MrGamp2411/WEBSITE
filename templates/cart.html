@@ -38,7 +38,6 @@
     </tbody>
   </table>
 </div>
-<p><strong>Total: CHF {{ "%.2f"|format(cart.total_price()) }}</strong></p>
 <h2>Select Table</h2>
 <form class="form" method="post" action="/cart/checkout">
   <label for="table_id">Table
@@ -49,6 +48,7 @@
       {% endfor %}
     </select>
   </label>
+  <p><strong>Total: CHF {{ "%.2f"|format(cart.total_price()) }}</strong></p>
   <fieldset>
     <legend>Payment Method</legend>
     <label><input type="radio" name="payment_method" value="card" required> Credit Card</label>
