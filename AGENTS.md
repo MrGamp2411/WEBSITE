@@ -8,7 +8,8 @@
   - `finance.py` – VAT and payout calculations
   - `payouts.py` – schedule periodic payouts for bars
   - `app/webhooks/wallee.py` – webhook endpoint for Wallee payments
-  - Wallet top-ups use Wallee: `/topup` creates `Payment` records with `user_id` and credits the user when the webhook reports a completed transaction
+  - Wallet top-ups use Wallee: `/api/topup/init` creates `wallet_topups` records and credits the user when the webhook reports a completed transaction
+  - `node-topup/` contains a TypeScript example service for initiating top-ups
 - Front-end mapping:
   - Styles in `static/css/components.css` (`components.min.css` for minified)
   - Templates live under `templates/`

@@ -2,22 +2,45 @@
 {% block content %}
 <div class="auth-card">
   <h1>Top Up Credit</h1>
-  {% if error %}<p class="alert">{{ error }}</p>{% endif %}
-  {% if success %}<p class="alert">Added CHF {{ "%.2f"|format(amount) }} to your credit.</p>{% endif %}
-  <form method="post" action="/topup">
+  <form id="topupForm">
     <label for="amount">Amount
-      <input id="amount" name="amount" type="number" step="0.01" required inputmode="decimal" enterkeyhint="next">
+      <input id="amount" name="amount" type="number" min="1" step="0.05" required inputmode="decimal">
     </label>
-    <label for="card">Card Number
-      <input id="card" name="card" required inputmode="numeric" autocomplete="cc-number" enterkeyhint="next">
-    </label>
-    <label for="expiry">Expiry
-      <input id="expiry" name="expiry" required inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" enterkeyhint="next">
-    </label>
-    <label for="cvc">CVC
-      <input id="cvc" name="cvc" required inputmode="numeric" autocomplete="cc-csc" enterkeyhint="done">
-    </label>
-    <button class="btn btn--primary" type="submit">Top Up</button>
+    <div class="preset-buttons">
+      <button type="button" class="btn" data-amount="10">10 CHF</button>
+      <button type="button" class="btn" data-amount="20">20 CHF</button>
+      <button type="button" class="btn" data-amount="50">50 CHF</button>
+    </div>
+    <button class="btn btn--primary" type="submit">Ricarica con carta</button>
   </form>
 </div>
+<script>
+  const amountInput = document.getElementById('amount');
+  document.querySelectorAll('button[data-amount]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      amountInput.value = btn.dataset.amount;
+    });
+  });
+  document.getElementById('topupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const amount = parseFloat(amountInput.value);
+    if (!Number.isFinite(amount) || amount < 1) {
+      alert('Invalid amount');
+      return;
+    }
+    const resp = await fetch('/api/topup/init', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount })
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data.paymentPageUrl) {
+        window.location.replace(data.paymentPageUrl);
+      }
+    } else {
+      alert('Unable to start top-up');
+    }
+  });
+</script>
 {% endblock %}

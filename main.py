@@ -82,9 +82,11 @@ from models import (
     Table as TableModel,
     UserCart,
     AuditLog,
+    WalletTopup,
 )
 from pydantic import BaseModel, constr
 from decimal import Decimal
+import math
 from finance import (
     calculate_platform_fee,
     calculate_payout,
@@ -1962,84 +1964,71 @@ async def wallet_transaction(request: Request, tx_id: int):
 
 
 @app.get("/topup", response_class=HTMLResponse)
-async def topup(request: Request, db: Session = Depends(get_db)):
+async def topup(request: Request):
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
-    amount = request.query_params.get("amount")
-    card = request.query_params.get("card")
-    expiry = request.query_params.get("expiry")
-    cvc = request.query_params.get("cvc")
-    if amount and card and expiry and cvc:
-        try:
-            add_amount = float(amount)
-            if add_amount <= 0:
-                raise ValueError
-        except ValueError:
-            return render_template(
-                "topup.html",
-                request=request,
-                error="Invalid amount",
-                cart_bar_id=None,
-                cart_bar_name=None,
-            )
-
-        space = os.getenv("WALLEE_SPACE_ID")
-        user_id_env = os.getenv("WALLEE_USER_ID")
-        api_secret = os.getenv("WALLEE_API_SECRET")
-        if space and user_id_env and api_secret:
-            try:
-                config = Configuration()
-                config.user_id = int(user_id_env)
-                config.api_secret = api_secret
-                client = ApiClient(config)
-                space_id = int(space)
-                tx_service = TransactionServiceApi(client)
-                line = LineItemCreate(
-                    name="Wallet top-up",
-                    unique_id=str(uuid4()),
-                    amount_including_tax=Decimal(add_amount),
-                    quantity=1,
-                    type="PRODUCT",
-                )
-                tx_create = TransactionCreate(
-                    currency="CHF",
-                    line_items=[line],
-                    success_url=str(request.url_for("topup")),
-                    failed_url=str(request.url_for("topup")),
-                )
-                tx = tx_service.create(space_id, tx_create)
-                payment_service = TransactionPaymentPageServiceApi(client)
-                url = payment_service.payment_page_url(space_id, tx.id)
-                payment = Payment(
-                    user_id=user.id,
-                    wallee_tx_id=str(tx.id),
-                    amount=add_amount,
-                    currency="CHF",
-                    state="PENDING",
-                )
-                db.add(payment)
-                db.commit()
-                return RedirectResponse(url, status_code=status.HTTP_303_SEE_OTHER)
-            except Exception:
-                pass
-        # Fallback: direct credit without external gateway
-        user.credit += add_amount
-        db_user = db.query(User).filter(User.id == user.id).first()
-        if db_user:
-            db_user.credit = user.credit
-            db.commit()
-        return render_template(
-            "topup.html",
-            request=request,
-            success=True,
-            amount=add_amount,
-            cart_bar_id=None,
-            cart_bar_name=None,
-        )
     return render_template(
         "topup.html", request=request, cart_bar_id=None, cart_bar_name=None
     )
+
+
+class TopupRequest(BaseModel):
+    amount: float
+
+
+@app.post("/api/topup/init")
+async def init_topup(
+    topup_req: TopupRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=401)
+    amount = topup_req.amount
+    if not math.isfinite(amount) or amount < 1 or amount > 1000:
+        raise HTTPException(status_code=400, detail="Invalid amount")
+    amount = round(amount + 1e-8, 2)
+
+    topup = WalletTopup(
+        id=str(uuid4()),
+        user_id=user.id,
+        amount_decimal=Decimal(str(amount)),
+        currency=os.getenv("CURRENCY", "CHF"),
+        status="PENDING",
+    )
+    db.add(topup)
+    db.commit()
+    db.refresh(topup)
+
+    config = Configuration()
+    config.user_id = int(os.getenv("WALLEE_USER_ID", "0"))
+    config.api_secret = os.getenv("WALLEE_API_SECRET", "")
+    client = ApiClient(config)
+    space_id = int(os.getenv("WALLEE_SPACE_ID", "0"))
+    line = LineItemCreate(
+        name=f"Wallet Top-up CHF {amount:.2f}",
+        unique_id=f"topup-{topup.id}",
+        amount_including_tax=Decimal(str(amount)),
+        quantity=1,
+        type="PRODUCT",
+    )
+    tx_create = TransactionCreate(
+        currency=os.getenv("CURRENCY", "CHF"),
+        line_items=[line],
+        auto_confirmation_enabled=True,
+        success_url=f"{os.getenv('BASE_URL', '')}/wallet/topup/success?tid={{id}}",
+        failed_url=f"{os.getenv('BASE_URL', '')}/wallet/topup/failed?tid={{id}}",
+    )
+    tx_service = TransactionServiceApi(ApiClient(config))
+    tx = tx_service.create(space_id, tx_create)
+    topup.wallee_transaction_id = tx.id
+    db.commit()
+
+    payment_service = TransactionPaymentPageServiceApi(ApiClient(config))
+    url = payment_service.payment_page_url(space_id, tx.id)
+    return {"paymentPageUrl": url}
 
 
 # -----------------------------------------------------------------------------

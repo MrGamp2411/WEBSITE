@@ -1,0 +1,20 @@
+{
+  "name": "topup-service",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "echo 'No tests'"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "wallee": "^5.0.0",
+    "uuid": "^9.0.0",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "ts-node": "^10.9.2"
+  }
+}

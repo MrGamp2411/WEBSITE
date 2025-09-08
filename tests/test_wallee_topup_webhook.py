@@ -10,7 +10,7 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, SessionLocal, engine  # noqa: E402
-from models import User, RoleEnum, Payment  # noqa: E402
+from models import User, RoleEnum, WalletTopup  # noqa: E402
 from main import app  # noqa: E402
 
 
@@ -33,14 +33,15 @@ def test_webhook_credits_user():
     db.commit()
     db.refresh(user)
     user_id = user.id
-    payment = Payment(
+    topup = WalletTopup(
+        id="abc",
         user_id=user.id,
-        wallee_tx_id="123",
-        amount=10,
+        amount_decimal=10,
         currency="CHF",
-        state="PENDING",
+        status="PENDING",
+        wallee_transaction_id=123,
     )
-    db.add(payment)
+    db.add(topup)
     db.commit()
     db.close()
 
@@ -54,4 +55,7 @@ def test_webhook_credits_user():
     db = SessionLocal()
     updated = db.query(User).filter(User.id == user_id).first()
     assert float(updated.credit) == 10.0
+    topup = db.query(WalletTopup).filter(WalletTopup.id == "abc").one()
+    assert topup.status == "COMPLETED"
+    assert topup.processed_at is not None
     db.close()

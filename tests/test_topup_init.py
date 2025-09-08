@@ -2,14 +2,20 @@ import os
 import sys
 import pathlib
 import hashlib
+from types import SimpleNamespace
+from unittest.mock import patch
 
-# Use shared in-memory SQLite database
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+os.environ["BASE_URL"] = "http://localhost"
+os.environ["WALLEE_SPACE_ID"] = "1"
+os.environ["WALLEE_USER_ID"] = "1"
+os.environ["WALLEE_API_SECRET"] = "secret"
+
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, SessionLocal, engine  # noqa: E402
-from models import User, RoleEnum  # noqa: E402
+from models import User, RoleEnum, WalletTopup  # noqa: E402
 from main import app  # noqa: E402
 
 
@@ -43,16 +49,23 @@ def _login_user(client: TestClient, email: str, password: str) -> None:
     assert resp.status_code == 303
 
 
-def test_topup_adds_credit():
+def test_topup_init_creates_record():
     user = _register_user()
     with TestClient(app) as client:
         _login_user(client, user.email, "testpass")
-        resp = client.get(
-            "/topup",
-            params={"amount": "10", "card": "4111111111111111", "expiry": "12/24", "cvc": "123"},
-        )
+        with patch("main.TransactionServiceApi") as MockTx, patch(
+            "main.TransactionPaymentPageServiceApi"
+        ) as MockPage:
+            MockTx.return_value.create.return_value = SimpleNamespace(id=123)
+            MockPage.return_value.payment_page_url.return_value = "https://pay.example/123"
+            resp = client.post("/api/topup/init", json={"amount": 10})
         assert resp.status_code == 200
+        assert resp.json()["paymentPageUrl"] == "https://pay.example/123"
     db = SessionLocal()
+    topup = db.query(WalletTopup).filter(WalletTopup.user_id == user.id).one()
+    assert float(topup.amount_decimal) == 10.0
+    assert topup.status == "PENDING"
+    assert topup.wallee_transaction_id == 123
     updated = db.query(User).filter(User.id == user.id).first()
-    assert float(updated.credit) == 10.0
+    assert float(updated.credit or 0) == 0.0
     db.close()
