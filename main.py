@@ -1793,6 +1793,14 @@ async def checkout(
         for item in cart.items.values()
     ]
     if payment_method == "card":
+        base_url = str(request.base_url).rstrip("/")
+        failed_params = {
+            "notice": "payment_failed",
+            "noticeTitle": "Payment failed",
+            "noticeBody": "Payment was not successful. Please try again or contact our staff if the problem persists.",
+            "noticeType": "error",
+        }
+        failed_url = f"{base_url}/cart?" + urlencode(failed_params)
         try:
             from app import wallee_client
 
@@ -1802,7 +1810,6 @@ async def checkout(
                 and wallee_client.cfg.api_secret
             ):
                 raise ApiException()
-            base_url = str(request.base_url).rstrip("/")
             tx_create = TransactionCreate(
                 line_items=[
                     LineItemCreate(
@@ -1816,7 +1823,7 @@ async def checkout(
                 ],
                 currency="CHF",
                 success_url=f"{base_url}/orders",
-                failed_url=f"{base_url}/cart",
+                failed_url=failed_url,
             )
             tx = wallee_client.tx_service.create(
                 space_id=wallee_client.space_id, transaction=tx_create
@@ -1852,7 +1859,7 @@ async def checkout(
             save_cart_for_user(user.id, cart)
             return RedirectResponse(url=page_url, status_code=status.HTTP_303_SEE_OTHER)
         except ApiException:
-            return RedirectResponse(url="/cart", status_code=status.HTTP_303_SEE_OTHER)
+            return RedirectResponse(url=failed_url, status_code=status.HTTP_303_SEE_OTHER)
     db_order = Order(
         bar_id=cart.bar_id,
         customer_id=user.id,

@@ -19,7 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
   if(window.orderingPaused && window.showServicePausedOnLoad){ showPausePopup(); }
 
   const params = new URLSearchParams(window.location.search);
-  if (params.get('notice') === 'topup_failed') {
+  const notice = params.get('notice');
+  if (['topup_failed', 'payment_failed'].includes(notice)) {
     const title = params.get('noticeTitle') || 'Payment failed';
     const body = params.get('noticeBody') || 'Payment was not successful. Please try again or contact our staff if the problem persists.';
     const blocker = document.createElement('div');
