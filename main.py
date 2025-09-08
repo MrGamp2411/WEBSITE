@@ -84,7 +84,7 @@ from models import (
     AuditLog,
     WalletTopup,
 )
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, constr, ConfigDict
 from decimal import Decimal
 import math
 from finance import (
@@ -97,9 +97,6 @@ from payouts import schedule_payout
 from audit import log_action
 from urllib.parse import urljoin, urlencode
 from app.webhooks.wallee import router as wallee_webhook_router
-from wallee import Configuration
-from wallee.api.transaction_service_api import TransactionServiceApi
-from wallee.api.transaction_payment_page_service_api import TransactionPaymentPageServiceApi
 from wallee.models import LineItemCreate, TransactionCreate
 from wallee.rest import ApiException
 
@@ -1364,8 +1361,7 @@ class BarRead(BaseModel):
     ordering_paused: bool = False
     bar_categories: Optional[str] = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class OrderItemInput(BaseModel):
@@ -1398,8 +1394,7 @@ class OrderRead(BaseModel):
     table_name: Optional[str] = None
     bar_name: Optional[str] = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class OrderItemRead(BaseModel):
@@ -1408,8 +1403,7 @@ class OrderItemRead(BaseModel):
     qty: int
     menu_item_name: Optional[str] = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class OrderWithItemsRead(OrderRead):
@@ -1435,8 +1429,7 @@ class PayoutRead(BaseModel):
     period_end: datetime
     status: str
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 @app.get("/api/bars", response_model=List[BarRead])
@@ -1978,6 +1971,16 @@ async def topup(request: Request):
     )
 
 
+@app.get("/wallet/topup/success")
+async def topup_success(topup: str):
+    return HTMLResponse(f"<h1>Top-up riuscito</h1><p>ID: {topup}</p>")
+
+
+@app.get("/wallet/topup/failed")
+async def topup_failed(topup: str):
+    return HTMLResponse(f"<h1>Pagamento annullato/fallito</h1><p>ID: {topup}</p>")
+
+
 class TopupRequest(BaseModel):
     amount: float
 
@@ -1997,11 +2000,12 @@ async def init_topup(
         raise HTTPException(status_code=400, detail="Invalid amount")
     amount = round(amount + 1e-9, 2)
 
+    CURRENCY = os.getenv("CURRENCY", "CHF")
     topup = WalletTopup(
         id=str(uuid4()),
         user_id=user.id,
         amount_decimal=Decimal(str(amount)),
-        currency="CHF",
+        currency=CURRENCY,
         status="PENDING",
     )
     db.add(topup)
@@ -2010,52 +2014,60 @@ async def init_topup(
 
     try:
         base_url = os.environ["BASE_URL"].rstrip("/")
-        config = Configuration()
-        config.user_id = int(os.environ["WALLEE_USER_ID"])
-        config.api_secret = os.environ["WALLEE_API_SECRET"]
-        space_id = int(os.environ["WALLEE_SPACE_ID"])
-    except (KeyError, ValueError):
+        if not (
+            os.environ["WALLEE_SPACE_ID"]
+            and os.environ["WALLEE_USER_ID"]
+            and os.environ["WALLEE_API_SECRET"]
+        ):
+            raise KeyError
+        from app import wallee_client
+    except (KeyError, ValueError, Exception):
         raise HTTPException(status_code=503, detail="Top-up service unavailable")
 
     success_url = f"{base_url}/wallet/topup/success?" + urlencode({"topup": topup.id})
     failed_url = f"{base_url}/wallet/topup/failed?" + urlencode({"topup": topup.id})
 
     line = LineItemCreate(
-        name=f"Wallet Top-up CHF {amount:.2f}",
+        name=f"Wallet Top-up {CURRENCY} {amount:.2f}",
         unique_id=f"topup-{topup.id}",
         sku="wallet-topup",
-        # Wallee's Python SDK cannot serialize Decimal instances properly
-        # when constructing the Transaction request. Providing a float avoids
-        # an AttributeError during JSON serialization.
         amount_including_tax=float(amount),
         quantity=1,
         type="PRODUCT",
     )
     tx_create = TransactionCreate(
-        currency="CHF",
         line_items=[line],
+        currency=CURRENCY,
         auto_confirmation_enabled=True,
         success_url=success_url,
         failed_url=failed_url,
     )
 
-    tx_service = TransactionServiceApi(config)
     print(
         f"Creating Wallee transaction success_url={success_url} failed_url={failed_url}"
     )
     try:
-        tx = tx_service.create(space_id, tx_create)
-    except ApiException as e:
+        tx = wallee_client.tx_service.create(
+            space_id=wallee_client.space_id, transaction=tx_create
+        )
+    except Exception as e:
         topup.status = "FAILED"
         db.commit()
-        raise HTTPException(status_code=502, detail=f"Wallee error {e.status}: {e.body}")
+        raise HTTPException(status_code=502, detail=f"Wallee create error: {e}")
 
     topup.wallee_transaction_id = tx.id
     db.commit()
 
-    payment_service = TransactionPaymentPageServiceApi(config)
-    url = payment_service.payment_page_url(space_id, tx.id)
-    return {"paymentPageUrl": url}
+    try:
+        page_url = wallee_client.pp_service.payment_page_url(
+            space_id=wallee_client.space_id, id=int(tx.id)
+        )
+    except Exception as e:
+        topup.status = "FAILED"
+        db.commit()
+        raise HTTPException(status_code=502, detail=f"Wallee payment page error: {e}")
+
+    return {"paymentPageUrl": page_url}
 
 
 # -----------------------------------------------------------------------------

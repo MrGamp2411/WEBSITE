@@ -4,7 +4,10 @@ import pathlib
 import hashlib
 
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
-os.environ["WALLEE_SIGNATURE_REQUIRED"] = "false"
+os.environ["WALLEE_VERIFY_SIGNATURE"] = "false"
+os.environ["WALLEE_SPACE_ID"] = "1"
+os.environ["WALLEE_USER_ID"] = "1"
+os.environ["WALLEE_API_SECRET"] = "secret"
 
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
@@ -48,7 +51,7 @@ def test_webhook_credits_user():
     with TestClient(app) as client:
         resp = client.post(
             "/webhooks/wallee",
-            json={"entity": {"id": "123", "state": "COMPLETED", "amount": 10, "currency": "CHF"}},
+            json={"entityId": "123", "state": "COMPLETED", "amount": 10, "currency": "CHF"},
         )
         assert resp.status_code == 200
 
