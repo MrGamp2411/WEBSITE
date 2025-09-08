@@ -117,23 +117,23 @@ def test_auto_close_moves_orders_to_history():
         client.post('/login', data={'email': 'a@example.com', 'password': 'pass'})
         resp = client.get(f'/dashboard/bar/{bar.id}/orders/history')
         assert 'January 2024' in resp.text
-        assert 'Total collected: CHF 18.00' in resp.text
-        assert 'Total earned: CHF 17.10' in resp.text
-        assert 'Siplygo commission (5%): CHF 0.90' in resp.text
-        assert 'Amount to pay to bar: CHF 11.10' in resp.text
+        assert 'Total collected' in resp.text and 'CHF 18.00' in resp.text
+        assert 'Total earned' in resp.text and 'CHF 17.10' in resp.text
+        assert 'Siplygo commission (5%)' in resp.text and 'CHF 0.90' in resp.text
+        assert 'Amount to pay to bar' in resp.text and 'CHF 11.10' in resp.text
         resp = client.get(f'/dashboard/bar/{bar.id}/orders/history/2024/1')
-        assert 'Total collected: CHF 18.00' in resp.text
-        assert 'Total earned: CHF 17.10' in resp.text
-        assert 'Siplygo commission (5%): CHF 0.90' in resp.text
-        assert 'Amount to pay to bar: CHF 11.10' in resp.text
+        assert 'Total collected' in resp.text and 'CHF 18.00' in resp.text
+        assert 'Total earned' in resp.text and 'CHF 17.10' in resp.text
+        assert 'Siplygo commission (5%)' in resp.text and 'CHF 0.90' in resp.text
+        assert 'Amount to pay to bar' in resp.text and 'CHF 11.10' in resp.text
         resp = client.get(f'/dashboard/bar/{bar.id}/orders/history/{closing_id}')
-        assert 'Total collected: CHF 18.00' in resp.text
-        assert 'Total earned: CHF 17.10' in resp.text
-        assert 'Siplygo commission (5%): CHF 0.90' in resp.text
-        assert 'Amount to pay to bar: CHF 11.10' in resp.text
-        assert 'Credit Card: CHF 6.00' in resp.text
-        assert 'Wallet: CHF 6.00' in resp.text
-        assert 'Bar: CHF 6.00' in resp.text
+        assert 'Total collected' in resp.text and 'CHF 18.00' in resp.text
+        assert 'Total earned' in resp.text and 'CHF 17.10' in resp.text
+        assert 'Siplygo commission (5%)' in resp.text and 'CHF 0.90' in resp.text
+        assert 'Amount to pay to bar' in resp.text and 'CHF 11.10' in resp.text
+        assert 'Credit Card</span><span class="amount">CHF 6.00' in resp.text
+        assert 'Wallet</span><span class="amount">CHF 6.00' in resp.text
+        assert 'Bar</span><span class="amount">CHF 6.00' in resp.text
         assert 'Order #1' in resp.text
         assert 'Order #2' in resp.text
         assert 'Order #3' in resp.text
