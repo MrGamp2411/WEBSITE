@@ -70,7 +70,7 @@ def test_topup_init_creates_record():
     topup = db.query(WalletTopup).filter(WalletTopup.user_id == user.id).one()
     assert float(topup.amount_decimal) == 10.0
     assert topup.status == "PENDING"
-    assert topup.wallee_transaction_id == 123
+    assert topup.wallee_tx_id == 123
     base_url = os.environ["BASE_URL"].rstrip("/")
     expected_success = f"{base_url}/wallet/topup/success?" + urlencode({"topup": topup.id})
     expected_failed = f"{base_url}/wallet/topup/failed?" + urlencode({"topup": topup.id})

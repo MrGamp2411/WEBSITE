@@ -309,7 +309,6 @@ class Payment(Base):
 
     id = Column(Integer, primary_key=True)
     order_id = Column(Integer, ForeignKey("orders.id"), nullable=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     wallee_tx_id = Column(String, unique=True, nullable=False)
     amount = Column(Numeric(12, 2))
     currency = Column(String(3), default="CHF")
@@ -321,12 +320,11 @@ class Payment(Base):
 
 class WalletTopup(Base):
     __tablename__ = "wallet_topups"
-
-    id = Column(String, primary_key=True)
+    id = Column(String, primary_key=True, default=lambda: str(uuid4()))
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     amount_decimal = Column(Numeric(12, 2), nullable=False)
-    currency = Column(String, default="CHF")
-    wallee_transaction_id = Column(BigInteger, unique=True, nullable=True)
+    currency = Column(String, nullable=False, default="CHF")
+    wallee_tx_id = Column(BigInteger, unique=True, nullable=True)
     status = Column(String, nullable=False, default="PENDING")
     processed_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
