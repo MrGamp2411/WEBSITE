@@ -7,6 +7,7 @@
   - `audit.py` – records user actions to `AuditLog`
   - `finance.py` – VAT and payout calculations
   - `payouts.py` – schedule periodic payouts for bars
+  - `app/webhooks/wallee.py` – webhook endpoint for Wallee payments
 - Front-end mapping:
   - Styles in `static/css/components.css` (`components.min.css` for minified)
   - Templates live under `templates/`
