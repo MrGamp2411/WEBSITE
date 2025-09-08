@@ -10,6 +10,12 @@
   - `app/webhooks/wallee.py` – webhook endpoint for Wallee payments
   - Wallet top-ups use Wallee: `/api/topup/init` creates `wallet_topups` records and credits the user when the webhook reports a completed transaction
   - `node-topup/` contains a TypeScript example service for initiating top-ups
+  - Top-up flow:
+    - `templates/topup.html` posts to `/api/topup/init`; non-2xx responses trigger a client alert "Unable to start top-up".
+    - The endpoint requires authentication and accepts amounts between 1 and 1000 CHF.
+    - Wallee integration uses `WALLEE_SPACE_ID`, `WALLEE_USER_ID`, and `WALLEE_API_SECRET`; misconfiguration results in an error.
+    - If any of these variables are missing or invalid, `/api/topup/init` returns 503 "Top-up service unavailable".
+    - `tests/test_topup_init.py` demonstrates record creation with patched Wallee services.
 - Front-end mapping:
   - Styles in `static/css/components.css` (`components.min.css` for minified)
   - Templates live under `templates/`

@@ -2001,12 +2001,14 @@ async def init_topup(
     db.add(topup)
     db.commit()
     db.refresh(topup)
-
-    config = Configuration()
-    config.user_id = int(os.getenv("WALLEE_USER_ID", "0"))
-    config.api_secret = os.getenv("WALLEE_API_SECRET", "")
-    client = ApiClient(config)
-    space_id = int(os.getenv("WALLEE_SPACE_ID", "0"))
+    try:
+        config = Configuration()
+        config.user_id = int(os.environ["WALLEE_USER_ID"])
+        config.api_secret = os.environ["WALLEE_API_SECRET"]
+        client = ApiClient(config)
+        space_id = int(os.environ["WALLEE_SPACE_ID"])
+    except (KeyError, ValueError):
+        raise HTTPException(status_code=503, detail="Top-up service unavailable")
     line = LineItemCreate(
         name=f"Wallet Top-up CHF {amount:.2f}",
         unique_id=f"topup-{topup.id}",
