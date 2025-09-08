@@ -12,6 +12,7 @@
     - Webhook `/webhooks/wallee` updates `wallet_topups` by `wallee_tx_id` with a row-level lock; processed records are skipped so repeated calls stay idempotent.
     - `wallet_topups` columns include `id`, `user_id`, `amount_decimal`, `currency`, `wallee_tx_id` (unique BIGINT), `status`, `processed_at`, `created_at`, and `updated_at`.
     - Save `int(tx.id)` to `wallet_topups.wallee_tx_id` and query by this field in the webhook.
+    - Startup ensures these fields via `ensure_wallet_topup_columns()` which renames any legacy `wallee_transaction_id` column and sets the `status` default to `PENDING`.
     - The `payments` table tracks order payments only and no longer defines a `user_id` column.
     - Wallee API clients live in `app/wallee_client.py`; reuse the module's `tx_service`, `pp_service`, and `whenc_srv` instead of creating new clients.
     - Public keys returned by Wallee are base64‑encoded DER; signature checks should call `load_der_public_key` via `app/webhooks/wallee_verify.py`.
