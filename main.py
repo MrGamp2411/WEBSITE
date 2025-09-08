@@ -624,6 +624,43 @@ def ensure_order_columns() -> None:
                 conn.execute(text(f"ALTER TABLE orders ADD COLUMN {name} {ddl}"))
 
 
+def ensure_wallet_topup_columns() -> None:
+    """Ensure expected columns exist on the wallet_topups table."""
+    inspector = inspect(engine)
+    columns = {col["name"] for col in inspector.get_columns("wallet_topups")}
+    if "wallee_tx_id" not in columns:
+        with engine.begin() as conn:
+            if "wallee_transaction_id" in columns:
+                conn.execute(
+                    text(
+                        "ALTER TABLE wallet_topups RENAME COLUMN wallee_transaction_id TO wallee_tx_id"
+                    )
+                )
+            else:
+                conn.execute(
+                    text(
+                        "ALTER TABLE wallet_topups ADD COLUMN wallee_tx_id BIGINT UNIQUE"
+                    )
+                )
+    if "status" not in columns:
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE wallet_topups ADD COLUMN status VARCHAR DEFAULT 'PENDING' NOT NULL"
+                )
+            )
+    elif engine.dialect.name != "sqlite":
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE wallet_topups ALTER COLUMN status SET DEFAULT 'PENDING'"
+                )
+            )
+            conn.execute(
+                text("ALTER TABLE wallet_topups ALTER COLUMN status SET NOT NULL")
+            )
+
+
 def ensure_bar_closing_columns() -> None:
     """Ensure expected columns exist on the bar_closings table."""
     inspector = inspect(engine)
@@ -647,6 +684,7 @@ async def on_startup():
     ensure_category_columns()
     ensure_menu_item_columns()
     ensure_order_columns()
+    ensure_wallet_topup_columns()
     ensure_bar_closing_columns()
     users.clear()
     users_by_username.clear()
