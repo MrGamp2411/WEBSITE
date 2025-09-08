@@ -6,20 +6,42 @@
   {% for closing in closings %}
   <li class="card">
     <div class="card__body">
-      <h2>{{ closing.closed_at|format_time }}</h2>
-      <p>Total collected: CHF {{ "%.2f"|format(closing.total_revenue) }}</p>
-      <p>Total earned: CHF {{ "%.2f"|format(closing.total_earned) }}</p>
-      <p>Siplygo commission (5%): CHF {{ "%.2f"|format(closing.siplygo_commission) }}</p>
-      <p>Amount to pay to bar: CHF {{ "%.2f"|format(closing.bar_payout) }}</p>
-      {% if closing.payment_totals %}
-      <p>Payment breakdown:</p>
-      <ul class="payment-breakdown">
-        {% for method, amount in closing.payment_totals.items() %}
-        <li>{{ method }}: CHF {{ '%.2f'|format(amount) }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-      <a class="btn" href="/dashboard/bar/{{ bar.id }}/orders/history/{{ closing.id }}">View</a>
+      <div class="revenue-card rc">
+        <div class="rc-header">
+          <h3 class="rc-title">{{ closing.closed_at|format_time }}</h3>
+          <a class="rc-view" href="/dashboard/bar/{{ bar.id }}/orders/history/{{ closing.id }}">View</a>
+        </div>
+
+        <div class="rc-kpis">
+          <div class="rc-kpi">
+            <span class="label">Total collected</span>
+            <span class="value">CHF {{ "%.2f"|format(closing.total_revenue) }}</span>
+          </div>
+          <div class="rc-kpi">
+            <span class="label">Total earned</span>
+            <span class="value">CHF {{ "%.2f"|format(closing.total_earned) }}</span>
+          </div>
+          <div class="rc-kpi">
+            <span class="label">Siplygo commission (5%)</span>
+            <span class="value rc-negative">CHF {{ "%.2f"|format(closing.siplygo_commission) }}</span>
+          </div>
+          <div class="rc-kpi rc-emph">
+            <span class="label">Amount to pay to bar</span>
+            <span class="value">CHF {{ "%.2f"|format(closing.bar_payout) }}</span>
+          </div>
+        </div>
+
+        {% if closing.payment_totals %}
+        <div class="rc-breakdown">
+          <h4 class="rc-subtitle">Payment breakdown:</h4>
+          <ul class="rc-list">
+            {% for method, amount in closing.payment_totals.items() %}
+            <li><span class="item">{{ method }}</span><span class="amount">CHF {{ '%.2f'|format(amount) }}</span></li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </div>
     </div>
   </li>
   {% endfor %}
