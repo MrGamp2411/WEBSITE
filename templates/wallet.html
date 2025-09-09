@@ -12,10 +12,9 @@
       <div class="amount">CHF {{ "%.2f"|format(user.credit) }}</div>
       <div class="meta"><span class="badge success">Available</span> <span class="dot">•</span> Updated just now</div>
     </div>
-    <div class="balance-right wallet-actions">
+  <div class="balance-right wallet-actions">
       <a href="/topup" class="btn-primary">Top Up</a>
-      <a href="/account/payment-methods" class="btn-ghost">Manage payment methods</a>
-    </div>
+  </div>
   </div>
 
   <div class="filters">
@@ -41,7 +40,6 @@
         <span>Search</span>
         <input type="text" placeholder="Bar, order ID, note…" />
       </label>
-      <button class="btn-outline" type="button" id="exportCsv">Export CSV</button>
     </div>
   </div>
 
@@ -98,10 +96,6 @@
     </div>
     {% endif %}
 
-    <div class="tx-actions">
-      <button type="button" class="btn-outline" id="loadMoreTx">Load more</button>
-      <button type="button" class="btn-outline" id="exportCsvBottom">Export CSV</button>
-    </div>
   </div>
 </section>
 
@@ -110,10 +104,8 @@
 
 /* Cards & buttons */
 .wallet-page .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:0 6px 16px rgba(0,0,0,.06); }
-.wallet-page .btn-primary{ background:var(--accent); color:#fff; border:1px solid transparent; border-radius:12px; padding:10px 14px; font-weight:700; }
+.wallet-page .btn-primary{ background:var(--accent); color:#fff; border:1px solid transparent; border-radius:12px; padding:10px 14px; font-weight:700; text-decoration:none; }
 .wallet-page .btn-primary:hover{ filter:brightness(.96); }
-.wallet-page .btn-outline{ background:transparent; color:var(--text); border:1px solid var(--border); border-radius:12px; padding:10px 14px; font-weight:600; }
-.wallet-page .btn-ghost{ background:transparent; color:var(--accent); border:1px solid transparent; border-radius:12px; padding:10px 12px; font-weight:600; }
 
 /* Header */
 .wallet-page .wallet-head{ margin:8px 0 12px; }
@@ -169,7 +161,6 @@
 .empty{ display:none; text-align:center; padding:28px 18px 24px; }
 .empty h3{ margin:0 0 6px; font-size:1.05rem; }
 .empty p{ margin:0 0 12px; color:var(--muted); }
-.tx-actions{ display:flex; gap:10px; padding:0 16px 16px; }
 
 /* Mobile */
 @media (max-width: 768px){
