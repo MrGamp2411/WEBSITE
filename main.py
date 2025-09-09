@@ -40,6 +40,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from datetime import datetime
+from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
 from fastapi import (
@@ -2152,6 +2153,18 @@ async def init_topup(
     db.add(topup)
     db.commit()
     db.refresh(topup)
+
+    user.transactions.append(
+        SimpleNamespace(
+            type="topup",
+            total=float(amount),
+            method="Card",
+            status="PROCESSING",
+            created_at=datetime.utcnow(),
+            topup_id=topup.id,
+            items=[],
+        )
+    )
 
     try:
         base_url = os.environ["BASE_URL"].rstrip("/")

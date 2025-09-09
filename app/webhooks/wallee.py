@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from decimal import Decimal
 
-from models import User, WalletTopup, Payment, Order, OrderItem
+from models import User, WalletTopup, Payment, Order, OrderItem, Bar
 from .wallee_verify import verify_signature_bytes
 
 router = APIRouter()
@@ -92,6 +92,35 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
                 user_carts.pop(customer_id, None)
                 save_cart_for_user(customer_id, Cart())
             await send_order_update(order)
+            from main import users, Transaction, TransactionItem
+            if order and order.customer_id:
+                cached = users.get(order.customer_id)
+                if cached:
+                    exists = any(
+                        getattr(t, "order_id", None) == order.id
+                        for t in cached.transactions
+                    )
+                    if not exists:
+                        bar = order.bar or db.get(Bar, order.bar_id)
+                        tx = Transaction(
+                            bar.id if bar else order.bar_id,
+                            bar.name if bar else "",
+                            [],
+                            float(order.total),
+                            order.payment_method,
+                            order_id=order.id,
+                            status="PROCESSING",
+                            created_at=order.created_at,
+                        )
+                        tx.items = [
+                            TransactionItem(
+                                i.menu_item_name or "",
+                                i.qty,
+                                float(i.unit_price),
+                            )
+                            for i in order.items
+                        ]
+                        cached.transactions.append(tx)
         elif state in ("FAILED", "DECLINE", "DECLINED", "VOIDED"):
             if order:
                 order.status = "CANCELED"
@@ -123,6 +152,14 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
         if user:
             user.credit = (user.credit or Decimal("0")) + topup.amount_decimal
             db.add(user)
+            from main import users
+            cached = users.get(user.id)
+            if cached:
+                cached.credit = float(user.credit)
+                for tx in cached.transactions:
+                    if getattr(tx, "topup_id", None) == topup.id:
+                        tx.status = "COMPLETED"
+                        break
         topup.status = state
         topup.processed_at = datetime.utcnow()
         db.add(topup)
@@ -132,5 +169,12 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
         topup.status = "FAILED"
         db.add(topup)
         db.commit()
+        from main import users
+        cached = users.get(topup.user_id)
+        if cached:
+            for tx in cached.transactions:
+                if getattr(tx, "topup_id", None) == topup.id:
+                    tx.status = "FAILED"
+                    break
 
     return {"ok": True}
