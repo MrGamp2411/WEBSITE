@@ -32,6 +32,7 @@
       return;
     }
     submitBtn.disabled = true;
+    submitBtn.style.display = 'none';
     try {
       const resp = await fetch('/api/topup/init', {
         method: 'POST',
@@ -42,14 +43,16 @@
         const data = await resp.json();
         if (data.paymentPageUrl) {
           window.location.replace(data.paymentPageUrl);
+          return;
         }
-      } else {
-        alert('Unable to start top-up');
       }
+      alert('Unable to start top-up');
+      submitBtn.disabled = false;
+      submitBtn.style.display = '';
     } catch {
       alert('Unable to start top-up');
-    } finally {
       submitBtn.disabled = false;
+      submitBtn.style.display = '';
     }
   });
 </script>
