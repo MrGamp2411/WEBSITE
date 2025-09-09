@@ -55,7 +55,7 @@
                 {% if ttype == 'payment' %}-{% else %}+{% endif %} CHF {{ "%.2f"|format(tx.total) }}
               </div>
               {% set status = tx.status if tx.status is defined else 'COMPLETED' %}
-              <span class="pill {% if status|lower == 'pending' %}pending{% elif status|lower == 'refunded' %}refunded{% else %}success{% endif %}">{{ status|replace('_',' ')|title }}</span>
+              <span class="pill {% if status|lower in ['processing','pending'] %}pending{% elif status|lower == 'refunded' %}refunded{% elif status|lower in ['canceled','cancelled'] %}canceled{% else %}success{% endif %}">{{ status|replace('_',' ')|title }}</span>
             </div>
           </a>
         </li>
@@ -120,6 +120,7 @@
 .pill.success{ background:#f0fdf4; border-color:#bbf7d0; color:#166534; }
 .pill.pending{ background:#fff7ed; border-color:#fed7aa; color:#9a3412; }
 .pill.refunded{ background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8; }
+.pill.canceled{ background:#fef2f2; border-color:#fecaca; color:#991b1b; }
 
 /* Empty & actions */
 .empty{ display:none; text-align:center; padding:28px 18px 24px; }

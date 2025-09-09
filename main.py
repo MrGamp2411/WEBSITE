@@ -303,6 +303,9 @@ class Transaction:
         items: List[CartItem],
         total: float,
         payment_method: str,
+        order_id: Optional[int] = None,
+        status: str = "PROCESSING",
+        created_at: Optional[datetime] = None,
     ):
         self.bar_id = bar_id
         self.bar_name = bar_name
@@ -312,6 +315,9 @@ class Transaction:
         ]
         self.total = total
         self.payment_method = payment_method
+        self.order_id = order_id
+        self.status = status
+        self.created_at = created_at or datetime.utcnow()
 
 
 class Cart:
@@ -1885,6 +1891,8 @@ async def checkout(
                 list(cart.items.values()),
                 order_total,
                 payment_method,
+                order_id=db_order.id,
+                status="PROCESSING",
             )
         )
     cart.clear()
@@ -2010,6 +2018,16 @@ async def update_order_status(
         else:
             order.refund_amount = Decimal("0")
     db.commit()
+    cached_user = users.get(order.customer_id) if order.customer_id else None
+    if cached_user:
+        for tx in cached_user.transactions:
+            if getattr(tx, "order_id", None) == order.id:
+                if new_status in ("ACCEPTED", "READY", "COMPLETED"):
+                    tx.status = "COMPLETED"
+                elif new_status in ("CANCELED", "REJECTED"):
+                    tx.status = "CANCELED"
+                    tx.total = 0.0
+                break
     order_data = await send_order_update(order)
     return {"status": order.status, "order": order_data}
 
