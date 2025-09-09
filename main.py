@@ -2284,6 +2284,12 @@ async def register(request: Request, db: Session = Depends(get_db)):
     phone = form.get("phone")
     prefix = form.get("prefix")
     if all([username, password, email, phone, prefix]):
+        if not phone.isdigit() or not (9 <= len(phone) <= 10):
+            return render_template(
+                "register.html",
+                request=request,
+                error="Phone number must be 9-10 digits",
+            )
         if (
             username in users_by_username
             or db.query(User).filter(User.username == username).first()
