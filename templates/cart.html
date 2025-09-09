@@ -196,24 +196,6 @@
     border-color: color-mix(in srgb, var(--accent) 60%, #c7c7ff);
     box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
   }
-
-  /* CTA sticky in basso */
-  .cart-page .btn-primary.place-order{
-    position: fixed;
-    left: 16px; right: 16px;
-    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-    z-index: 20;
-    border-radius:14px;
-    padding:14px 18px;
-    font-weight:700;
-    width: auto; display:block;
-  }
-  .cart-page .btn-primary.place-order.stop{
-    position:absolute;
-  }
-  /* spazio di respiro per lo sticky */
-  .cart-page{ padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
-
   /* carte e ombre più leggere su mobile */
   .cart-page .card{ box-shadow:0 4px 12px rgba(0,0,0,.05); padding:14px; }
   .cart-page .summary-card .sum-rows{ gap:6px; }
@@ -227,7 +209,5 @@
 </style>
 {% endblock %}
 
-{% block scripts %}
-<script src="/static/js/cart.js"></script>
-{% endblock %}
+{% block scripts %}{% endblock %}
 
