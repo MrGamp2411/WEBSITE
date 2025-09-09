@@ -6,13 +6,13 @@
     <p class="cart-subtitle">Rivedi l’ordine, scegli il tavolo e conferma il pagamento con un’interfaccia chiara, veloce e in linea con lo stile SiplyGo.</p>
   </div>
   {% if cart.items %}
-  <div class="wallet-banner">
-    <span class="label">Wallet:</span>
-    <strong class="amount">CHF {{ "%.2f"|format(user.credit) }}</strong>
-    <a href="/wallet" class="link-add">Add funds</a>
-  </div>
   <div class="cart-layout">
     <div class="cart-main">
+      <div class="wallet-banner">
+        <span class="label">Wallet:</span>
+        <strong class="amount">CHF {{ "%.2f"|format(user.credit) }}</strong>
+        <a href="/wallet" class="link-add">Add funds</a>
+      </div>
       <div class="card cart-table">
         <div class="table-scroll">
         <table class="menu-table">
