@@ -167,6 +167,7 @@
   - Order history lists all orders with no "Load more" button or "Back to top" link; the `.orders-actions` block was removed.
   - Checkout persists orders to the database and redirects to `/orders`.
   - Mobile hamburger menu links to order history via `bi bi-clock-history` icon.
+  - Mobile menu drops the "How it works" entry and adds a `bi bi-person` Profile link for logged-in users.
   - Bartenders manage live orders in `bartender_orders.html` using `static/js/orders.js`,
     which loads with `defer` and initializes `initBartender(bar.id)` on `DOMContentLoaded`.
   - `templates/bartender_orders.html` groups orders into `<ul>` lists with IDs
