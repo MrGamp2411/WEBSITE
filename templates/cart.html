@@ -1,68 +1,171 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Your Cart</h1>
-{% if cart.items %}
-{% if bar %}
-<p>Ordering from {{ bar.name }}</p>
-{% endif %}
-<p>Wallet: CHF {{ "%.2f"|format(user.credit) }} (<a href="/wallet">Add funds</a>)</p>
-<div class="table-card">
-  <table class="menu-table">
-    <thead>
-      <tr><th>Item</th><th>Quantity</th><th>Price</th><th>Total</th><th class="actions">Actions</th></tr>
-    </thead>
-    <tbody>
-      {% for item in cart.items.values() %}
-      <tr>
-        <td>{{ item.product.name }}</td>
-        <td>
-          <form class="form form--inline" method="post" action="/cart/update">
-            <input type="hidden" name="product_id" value="{{ item.product.id }}">
-            <input type="number" name="quantity" min="0" value="{{ item.quantity }}" inputmode="numeric" enterkeyhint="done">
-            <button class="btn-outline btn--small" type="submit">Update</button>
-          </form>
-        </td>
-        <td>CHF {{ "%.2f"|format(item.product.price) }}</td>
-        <td>CHF {{ "%.2f"|format(item.total) }}</td>
-        <td class="actions">
-          <div class="actions-group">
-            <form method="post" action="/cart/update" class="form form--inline">
-              <input type="hidden" name="product_id" value="{{ item.product.id }}">
-              <input type="hidden" name="quantity" value="0">
-              <button class="btn-danger-soft btn--small" type="submit">Remove</button>
-            </form>
+<section class="cart-page">
+  <div class="cart-head">
+    <h1 class="cart-title">Your Cart</h1>
+    <p class="cart-subtitle">Rivedi l’ordine, scegli il tavolo e conferma il pagamento con un’interfaccia chiara, veloce e in linea con lo stile SiplyGo.</p>
+  </div>
+  {% if cart.items %}
+  <div class="wallet-banner">
+    <span class="label">Wallet:</span>
+    <strong class="amount">CHF {{ "%.2f"|format(user.credit) }}</strong>
+    <a href="/wallet" class="link-add">Add funds</a>
+  </div>
+  <div class="cart-layout">
+    <div class="cart-main">
+      <div class="card cart-table">
+        <table class="menu-table">
+          <thead>
+            <tr><th>Item</th><th>Quantity</th><th>Price</th><th>Total</th><th class="actions">Actions</th></tr>
+          </thead>
+          <tbody>
+            {% for item in cart.items.values() %}
+            <tr>
+              <td>{{ item.product.name }}</td>
+              <td>
+                <form class="form form--inline" method="post" action="/cart/update">
+                  <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                  <div class="qty-group">
+                    <input type="number" name="quantity" min="0" value="{{ item.quantity }}" inputmode="numeric" enterkeyhint="done">
+                    <button class="btn-outline btn--small" type="submit">Update</button>
+                  </div>
+                </form>
+              </td>
+              <td>CHF {{ "%.2f"|format(item.product.price) }}</td>
+              <td>CHF {{ "%.2f"|format(item.total) }}</td>
+              <td class="actions">
+                <div class="actions-group">
+                  <form method="post" action="/cart/update" class="form form--inline">
+                    <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                    <input type="hidden" name="quantity" value="0">
+                    <button class="btn-danger-soft btn--small" type="submit">Remove</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <form id="checkoutForm" method="post" action="/cart/checkout">
+        <div class="card form-card">
+          <div class="field">
+            <label for="table_id">Table</label>
+            <select id="table_id" name="table_id" required>
+              <option value="" disabled {% if cart.table_id is none %}selected{% endif %}>Select table</option>
+              {% for table in bar.tables.values() %}
+                <option value="{{ table.id }}" {% if cart.table_id == table.id %}selected{% endif %}>{{ table.name }}</option>
+              {% endfor %}
+            </select>
           </div>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-<p><strong>Total: CHF {{ "%.2f"|format(cart.total_price()) }}</strong></p>
-<h2>Select Table</h2>
-<form class="form" method="post" action="/cart/checkout">
-  <label for="table_id">Table
-    <select id="table_id" name="table_id" required>
-      <option value="" disabled {% if cart.table_id is none %}selected{% endif %}>Select table</option>
-      {% for table in bar.tables.values() %}
-        <option value="{{ table.id }}" {% if cart.table_id == table.id %}selected{% endif %}>{{ table.name }}</option>
-      {% endfor %}
-    </select>
-  </label>
-  <label for="notes">Message to bartender
-    <textarea id="notes" name="notes" rows="3" placeholder="Add a note for the bartender"></textarea>
-  </label>
-  <fieldset>
-    <legend>Payment Method</legend>
-    <label><input type="radio" name="payment_method" value="card" required> Credit Card</label>
-    <label><input type="radio" name="payment_method" value="wallet"> Wallet Credit</label>
-    <label><input type="radio" name="payment_method" value="bar"> Pay at Bar</label>
-  </fieldset>
-  <button class="btn btn--success" type="submit">Place Order</button>
-</form>
-{% else %}
-<p>Your cart is empty.</p>
-{% endif %}
+        </div>
+
+        <div class="card form-card">
+          <div class="field">
+            <label for="notes">Message to bartender</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="Add a note for the bartender"></textarea>
+          </div>
+        </div>
+
+        <div class="card pay-card" id="paymentMethods">
+          <h3 class="section-title">Payment Method</h3>
+          <label class="pay-option">
+            <input type="radio" name="payment_method" value="card" required>
+            <span class="pay-content">
+              <span class="pay-title">Credit Card</span>
+              <span class="pay-note">Paga ora con carta</span>
+            </span>
+          </label>
+          <label class="pay-option">
+            <input type="radio" name="payment_method" value="wallet">
+            <span class="pay-content">
+              <span class="pay-title">Wallet Credit</span>
+              <span class="pay-note">Usa il tuo credito</span>
+            </span>
+          </label>
+          <label class="pay-option">
+            <input type="radio" name="payment_method" value="bar">
+            <span class="pay-content">
+              <span class="pay-title">Pay at Bar</span>
+              <span class="pay-note">Paga al bancone</span>
+            </span>
+          </label>
+        </div>
+      </form>
+    </div>
+
+    <aside class="summary">
+      <div class="card summary-card">
+        <h3 class="section-title">Order Summary</h3>
+        <dl class="sum-rows">
+          <div class="row"><dt>Subtotal</dt><dd>CHF {{ "%.2f"|format(cart.total_price()) }}</dd></div>
+          <div class="row"><dt>Fees</dt><dd>—</dd></div>
+          <div class="row total"><dt>Total</dt><dd>CHF {{ "%.2f"|format(cart.total_price()) }}</dd></div>
+        </dl>
+        <button type="submit" class="btn-primary place-order" form="checkoutForm">Place Order</button>
+        <p class="sum-note">Il pagamento sarà processato in modo sicuro.</p>
+      </div>
+    </aside>
+  </div>
+  {% else %}
+  <p>Your cart is empty.</p>
+  {% endif %}
+</section>
+<style>
+.cart-page{ --surface:#fff; --border:#e5e7eb; --bg-subtle:#f6f8fb; --text:#0f172a; --muted:#475569; --accent: var(--brand, #7c3aed); --radius:16px; }
+.cart-page .cart-head{ margin:8px 0 16px; }
+.cart-page .cart-title{ font-weight:700; font-size:1.6rem; margin:0 0 4px; color:var(--text); }
+.cart-page .cart-subtitle{ margin:0; color:var(--muted); font-size:.95rem; }
+
+.cart-page .wallet-banner{ display:flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:linear-gradient(180deg,#ffffff, #fafafa); margin:12px 0 16px; }
+.cart-page .wallet-banner .label{ color:var(--muted); }
+.cart-page .wallet-banner .amount{ font-weight:700; }
+.cart-page .wallet-banner .link-add{ font-weight:600; color:var(--accent); text-decoration:underline; }
+
+.cart-page .cart-layout{ display:grid; grid-template-columns: 1fr 320px; gap:20px; }
+@media (max-width: 900px){ .cart-page .cart-layout{ grid-template-columns: 1fr; } .cart-page .summary{ position:sticky; bottom:0; } }
+
+.cart-page .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:0 6px 16px rgba(0,0,0,.06); padding:16px; }
+.cart-page .cart-table{ padding:0; overflow:hidden; }
+.cart-page .cart-table table{ width:100%; border-collapse:separate; border-spacing:0; }
+.cart-page .cart-table thead th{ background:#f8fafc; color:#0f172a; font-weight:600; }
+.cart-page .cart-table th, .cart-page .cart-table td{ padding:14px 16px; border-bottom:1px solid var(--border); }
+.cart-page .cart-table tbody tr:hover{ background:#fafafa; }
+
+.cart-page .qty-group{ display:inline-flex; align-items:center; border:1px solid var(--border); border-radius:999px; overflow:hidden; }
+.cart-page .qty-group input[type="number"]{ width:56px; height:36px; border:none; text-align:center; }
+.cart-page .qty-group button{ height:36px; padding:0 12px; border:none; background:transparent; cursor:pointer; }
+.cart-page .qty-group button:hover{ background:#f3f4f6; }
+
+.cart-page .btn-danger{ background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; border-radius:999px; padding:8px 12px; font-weight:600; }
+.cart-page .btn-danger:hover{ background:#fee2e2; }
+
+.cart-page .form-card .field{ display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+.cart-page select, .cart-page textarea{ border:1px solid var(--border); border-radius:12px; padding:12px; }
+.cart-page select{ height:44px; }
+.cart-page textarea{ min-height:110px; }
+
+.cart-page .pay-card{ padding:16px; }
+.cart-page .pay-option{ display:flex; align-items:center; gap:12px; border:1px solid var(--border); border-radius:14px; padding:12px; cursor:pointer; user-select:none; }
+.cart-page .pay-option + .pay-option{ margin-top:10px; }
+.cart-page .pay-option input{ position:absolute; opacity:0; pointer-events:none; }
+.cart-page .pay-option .pay-title{ font-weight:600; color:var(--text); }
+.cart-page .pay-option .pay-note{ color:var(--muted); font-size:.85rem; }
+.cart-page .pay-option:has(input:checked){ border-color: color-mix(in srgb, var(--accent) 60%, #c7c7ff); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+
+.cart-page .summary{ position:sticky; top:84px; height:fit-content; }
+.cart-page .summary-card .sum-rows{ display:grid; gap:8px; margin:8px 0 14px; }
+.cart-page .summary-card .row{ display:flex; justify-content:space-between; color:var(--muted); }
+.cart-page .summary-card .row.total{ color:var(--text); font-weight:700; border-top:1px dashed var(--border); padding-top:8px; }
+.cart-page .btn-primary.place-order{ width:100%; border-radius:12px; padding:12px 16px; font-weight:700; background:var(--accent); color:#fff; border:1px solid transparent; }
+.cart-page .btn-primary.place-order:hover{ filter:brightness(0.96); }
+.cart-page .sum-note{ margin-top:8px; color:var(--muted); font-size:.85rem; }
+
+/* Focus visibile */
+.cart-page :is(select, textarea, .btn-primary, .btn-danger):focus{ outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+</style>
 {% endblock %}
 
 {% block scripts %}{% endblock %}
+

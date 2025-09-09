@@ -101,13 +101,15 @@
   - Bartenders can pause ordering from the orders dashboard; paused bars return 409 on `/bars/{id}/add_to_cart` and `app.js` shows a "service paused" popup.
   - The layout sets `window.orderingPaused` when the cart's bar is paused; `window.showServicePausedOnLoad` controls whether the popup opens automatically.
   - Menu pages pass `pause_popup_close` so the popup can be dismissed, while the cart page sets `pause_popup_back` and shows the popup on load with a "Back to the menu" button. The message advises contacting a staff member for more info.
-  - `cart.html` displays the current bar's name, lists its tables for selection, and shows a wallet link for adding funds.
+  - `cart.html` lists available tables for selection and shows a wallet link for adding funds.
   - `cart.html` includes a disabled "Select table" placeholder so no table is chosen by default; checkout fails until a table is selected.
   - The order total appears below the cart item list for quick review before selecting a table.
   - The checkout form places the "Message to bartender" textarea immediately after the table dropdown.
   - The cart product list is rendered inside a `.table-card` with a `.menu-table` for consistent styling with other lists.
   - Checkout form asks for payment method (credit card, wallet credit, or pay at bar);
     selection is handled by `/cart/checkout` and stored in `Transaction.payment_method`.
+  - The cart page uses a premium `.cart-page` wrapper with a wallet banner, summary sidebar, and scoped styles defined inline.
+    Quantity update forms wrap inputs and buttons in `.qty-group` for compact stepper styling.
   - Credit card payments use Wallee; when credentials are present,
     `/cart/checkout` records a `payments` row with `wallee_tx_id` and
     redirects to Wallee's payment page. The `/webhooks/wallee` endpoint
