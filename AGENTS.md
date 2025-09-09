@@ -102,6 +102,7 @@
   - The layout sets `window.orderingPaused` when the cart's bar is paused; `window.showServicePausedOnLoad` controls whether the popup opens automatically.
   - Menu pages pass `pause_popup_close` so the popup can be dismissed, while the cart page sets `pause_popup_back` and shows the popup on load with a "Back to the menu" button. The message advises contacting a staff member for more info.
   - `cart.html` lists available tables for selection and shows a wallet link for adding funds.
+  - `cart.html` text is fully in English, including subtitle "Review your order, choose your table, and confirm payment with a clear, quick interface in the SiplyGo style" and payment method notes.
   - `cart.html` includes a disabled "Select table" placeholder so no table is chosen by default; checkout fails until a table is selected.
   - The order total appears below the cart item list for quick review before selecting a table.
   - The checkout form places the "Message to bartender" textarea immediately after the table dropdown.

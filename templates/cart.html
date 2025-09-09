@@ -3,7 +3,7 @@
 <section class="cart-page">
   <div class="cart-head">
     <h1 class="cart-title">Your Cart</h1>
-    <p class="cart-subtitle">Rivedi l’ordine, scegli il tavolo e conferma il pagamento con un’interfaccia chiara, veloce e in linea con lo stile SiplyGo.</p>
+    <p class="cart-subtitle">Review your order, choose your table, and confirm payment with a clear, quick interface in the SiplyGo style.</p>
   </div>
   {% if cart.items %}
   <div class="cart-layout">
@@ -76,21 +76,21 @@
             <input type="radio" name="payment_method" value="card" required>
             <span class="pay-content">
               <span class="pay-title">Credit Card</span>
-              <span class="pay-note">Paga ora con carta</span>
+              <span class="pay-note">Pay now with card</span>
             </span>
           </label>
           <label class="pay-option">
             <input type="radio" name="payment_method" value="wallet">
             <span class="pay-content">
               <span class="pay-title">Wallet Credit</span>
-              <span class="pay-note">Usa il tuo credito</span>
+              <span class="pay-note">Use your credit</span>
             </span>
           </label>
           <label class="pay-option">
             <input type="radio" name="payment_method" value="bar">
             <span class="pay-content">
               <span class="pay-title">Pay at Bar</span>
-              <span class="pay-note">Paga al bancone</span>
+              <span class="pay-note">Pay at the counter</span>
             </span>
           </label>
         </div>
@@ -106,7 +106,7 @@
           <div class="row total"><dt>Total</dt><dd>CHF {{ "%.2f"|format(cart.total_price()) }}</dd></div>
         </dl>
         <button type="submit" class="btn-primary place-order" form="checkoutForm">Place Order</button>
-        <p class="sum-note">Il pagamento sarà processato in modo sicuro.</p>
+        <p class="sum-note">Your payment will be processed securely.</p>
       </div>
     </aside>
   </div>
@@ -164,26 +164,26 @@
 .cart-page .btn-primary.place-order:hover{ filter:brightness(0.96); }
 .cart-page .sum-note{ margin-top:8px; color:var(--muted); font-size:.85rem; }
 @media (max-width: 768px){
-  /* spazi e titoli */
+    /* spacing and headings */
   .cart-page .cart-head{ margin:6px 0 10px; }
   .cart-page .cart-title{ font-size:1.35rem; margin-bottom:2px; }
   .cart-page .cart-subtitle{ font-size:.9rem; color:var(--muted); }
 
-  /* layout a colonna */
+    /* column layout */
   .cart-page .cart-layout{ display:block; }
   .cart-page .summary{ position:static; margin-top:14px; }
 
-  /* tabella carrello: scroll orizzontale */
+    /* cart table: horizontal scroll */
   .cart-page .cart-table{ border-radius:16px; overflow:hidden; }
   .cart-page .cart-table > *{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
   .cart-page .cart-table table{ min-width: 600px; }
   .cart-page .cart-table tbody tr:hover{ background:transparent; }
 
-  /* input & textarea */
+    /* inputs & textarea */
   .cart-page select{ height:44px; }
   .cart-page textarea{ min-height:96px; }
 
-  /* metodi di pagamento come card cliccabili */
+    /* payment methods as clickable cards */
   .cart-page .pay-option{
     display:flex; align-items:center; gap:12px;
     border:1px solid var(--border); border-radius:14px; padding:12px;
@@ -196,12 +196,12 @@
     border-color: color-mix(in srgb, var(--accent) 60%, #c7c7ff);
     box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
   }
-  /* carte e ombre più leggere su mobile */
+    /* lighter cards and shadows on mobile */
   .cart-page .card{ box-shadow:0 4px 12px rgba(0,0,0,.05); padding:14px; }
   .cart-page .summary-card .sum-rows{ gap:6px; }
 }
 
-/* focus ring coerente */
+  /* consistent focus ring */
 .cart-page :is(select, textarea, .btn-primary, .btn-danger, .pay-option){ outline:none; }
 .cart-page :is(select, textarea, .btn-primary, .btn-danger):focus{
   box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
