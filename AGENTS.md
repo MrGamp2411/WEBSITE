@@ -1,6 +1,6 @@
 # AGENT Notes
 
-- Wallet page UI lives in `templates/wallet.html` using a `.wallet-page` wrapper and inline scoped styles. Transaction rows render inside `<ul id="txList">` and link to `/wallet/tx/{index}`. "Load more," "Export CSV," "Manage payment methods," and date-range filters have been removed; the "Top Up" button uses `text-decoration:none` to avoid an underline.
+- Wallet page UI lives in `templates/wallet.html` using a `.wallet-page` wrapper and inline scoped styles. Transaction rows render inside `<ul id="txList">` and link to `/wallet/tx/{index}`. "Load more," "Export CSV," "Manage payment methods," and all filters have been removed; the "Top Up" button uses `text-decoration:none` to avoid an underline.
 
 - Core modules:
   - `main.py` – routes and helpers
