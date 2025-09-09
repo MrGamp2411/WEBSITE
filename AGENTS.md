@@ -30,6 +30,7 @@
   - `node-topup/` contains a TypeScript example service for initiating top-ups
   - Top-up flow:
     - `templates/topup.html` posts to `/api/topup/init`; non-2xx responses trigger a client alert "Unable to start top-up".
+    - The submit button disables after submission to prevent duplicate requests.
     - The endpoint requires authentication and accepts amounts between 1 and 1000 CHF.
     - Wallee integration uses `WALLEE_SPACE_ID`, `WALLEE_USER_ID`, and `WALLEE_API_SECRET`; misconfiguration results in an error.
     - If any of these variables are missing or invalid, `/api/topup/init` returns 503 "Top-up service unavailable".

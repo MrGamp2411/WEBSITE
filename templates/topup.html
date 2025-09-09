@@ -21,25 +21,35 @@
       amountInput.value = btn.dataset.amount;
     });
   });
-  document.getElementById('topupForm').addEventListener('submit', async (e) => {
+  const form = document.getElementById('topupForm');
+  const submitBtn = form.querySelector('button[type="submit"]');
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (submitBtn.disabled) return;
     const amount = parseFloat(amountInput.value);
     if (!Number.isFinite(amount) || amount < 1) {
       alert('Invalid amount');
       return;
     }
-    const resp = await fetch('/api/topup/init', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount })
-    });
-    if (resp.ok) {
-      const data = await resp.json();
-      if (data.paymentPageUrl) {
-        window.location.replace(data.paymentPageUrl);
+    submitBtn.disabled = true;
+    try {
+      const resp = await fetch('/api/topup/init', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.paymentPageUrl) {
+          window.location.replace(data.paymentPageUrl);
+        }
+      } else {
+        alert('Unable to start top-up');
       }
-    } else {
+    } catch {
       alert('Unable to start top-up');
+    } finally {
+      submitBtn.disabled = false;
     }
   });
 </script>
