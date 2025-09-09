@@ -88,7 +88,33 @@ def test_register_password_length_validation():
             },
         )
         assert resp.status_code == 200
-        assert "Password must be at least 8 characters" in resp.text
+        assert "Password must be between 8 and 128 characters" in resp.text
+
+        resp_long = client.post(
+            "/register",
+            data={
+                "username": "validuserlong",
+                "password": "p" * 129,
+                "email": "userlong@example.com",
+                "prefix": "+41",
+                "phone": "123456783",
+            },
+        )
+        assert resp_long.status_code == 200
+        assert "Password must be between 8 and 128 characters" in resp_long.text
+
+        resp_weak = client.post(
+            "/register",
+            data={
+                "username": "validuser4",
+                "password": "12345678",
+                "email": "userweak@example.com",
+                "prefix": "+41",
+                "phone": "123456784",
+            },
+        )
+        assert resp_weak.status_code == 200
+        assert "Password is too common" in resp_weak.text
 
         resp_ok = client.post(
             "/register",

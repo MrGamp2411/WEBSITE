@@ -37,6 +37,8 @@ import hashlib
 import json
 import random
 import re
+import secrets
+import time
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -64,6 +66,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from sqlalchemy import inspect, text, func, extract, or_, and_
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
+from argon2 import PasswordHasher, exceptions as argon2_exceptions
 
 from database import Base, SessionLocal, engine, get_db
 from uuid import uuid4
@@ -235,7 +238,8 @@ class DemoUser:
         self,
         id: int,
         username: str,
-        password: str,
+        password_hash: Optional[str] = None,
+        password: str = "",
         email: str = "",
         phone: str = "",
         prefix: str = "",
@@ -246,6 +250,9 @@ class DemoUser:
     ):
         self.id = id
         self.username = username
+        if password_hash is None:
+            password_hash = hash_password(password)
+        self.password_hash = password_hash
         self.password = password
         self.email = email
         self.phone = phone
@@ -505,7 +512,7 @@ def seed_super_admin():
     try:
         existing = db.query(User).filter(User.email == admin_email).first()
         if not existing:
-            password_hash = hashlib.sha256(admin_password.encode("utf-8")).hexdigest()
+            password_hash = hash_password(admin_password)
             user = User(
                 username=admin_email,
                 email=admin_email,
@@ -742,6 +749,40 @@ USERNAME_MESSAGE = (
 
 # Cart storage per user
 user_carts: Dict[int, Cart] = {}
+
+# Password hashing
+PASSWORD_PEPPER = os.getenv("PASSWORD_PEPPER", "")
+ph = PasswordHasher(time_cost=3, memory_cost=65536, parallelism=2, hash_len=32, salt_len=16)
+WEAK_PASSWORDS = {
+    "12345678",
+    "password",
+    "qwerty",
+    "11111111",
+    "123456789",
+    "1234567890",
+    "iloveyou",
+    "admin",
+    "welcome",
+    "monkey",
+}
+
+
+def hash_password(password: str) -> str:
+    return ph.hash(password + PASSWORD_PEPPER)
+
+
+def verify_password(stored: str, password: str) -> bool:
+    if stored.startswith("$argon2"):
+        try:
+            return ph.verify(stored, password + PASSWORD_PEPPER)
+        except argon2_exceptions.VerifyMismatchError:
+            return False
+    expected = hashlib.sha256((password + PASSWORD_PEPPER).encode("utf-8")).hexdigest()
+    return stored == expected
+
+
+# Simple login attempt tracking
+login_attempts: Dict[str, Dict[str, float]] = defaultdict(lambda: {"count": 0, "last": 0.0})
 
 
 def load_cart_from_db(user_id: int) -> Cart:
@@ -2315,11 +2356,17 @@ async def register(request: Request, db: Session = Depends(get_db)):
                 request=request,
                 error=USERNAME_MESSAGE,
             )
-        if len(password) < 8:
+        if len(password) < 8 or len(password) > 128:
             return render_template(
                 "register.html",
                 request=request,
-                error="Password must be at least 8 characters",
+                error="Password must be between 8 and 128 characters",
+            )
+        if password.lower() in WEAK_PASSWORDS:
+            return render_template(
+                "register.html",
+                request=request,
+                error="Password is too common",
             )
         if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email or ""):
             return render_template(
@@ -2349,7 +2396,7 @@ async def register(request: Request, db: Session = Depends(get_db)):
             return render_template(
                 "register.html", request=request, error="Email already taken"
             )
-        password_hash = hashlib.sha256(password.encode("utf-8")).hexdigest()
+        password_hash = hash_password(password)
         db_user = User(
             username=username_lower,
             email=email,
@@ -2363,7 +2410,7 @@ async def register(request: Request, db: Session = Depends(get_db)):
         user = DemoUser(
             id=db_user.id,
             username=username_lower,
-            password=password,
+            password_hash=password_hash,
             email=email,
             phone=phone,
             prefix=prefix,
@@ -2390,79 +2437,81 @@ async def login(request: Request, db: Session = Depends(get_db)):
     email = form.get("email")
     password = form.get("password")
     if email and password:
+        record = login_attempts[email]
+        if record["count"] >= 5:
+            await asyncio.sleep(2 ** (record["count"] - 4))
         user = users_by_email.get(email)
         if not user:
             db_user = db.query(User).filter(User.email == email).first()
-            if db_user:
-                expected = hashlib.sha256(password.encode("utf-8")).hexdigest()
-                if db_user.password_hash == expected:
-                    role_map = {
-                        RoleEnum.SUPERADMIN: "super_admin",
-                        RoleEnum.BARADMIN: "bar_admin",
-                        RoleEnum.BARTENDER: "bartender",
-                        RoleEnum.CUSTOMER: "customer",
-                    }
-                    bar_ids = [r.bar_id for r in db_user.bar_roles]
-                    user = DemoUser(
-                        id=db_user.id,
-                        username=db_user.username,
-                        password=password,
-                        email=db_user.email,
-                        phone=db_user.phone or "",
-                        prefix=db_user.prefix or "",
-                        role=role_map.get(db_user.role, "customer"),
-                        bar_ids=bar_ids,
-                        credit=float(db_user.credit or 0),
-                    )
-                    tx_rows = (
-                        db.query(WalletTransaction)
-                        .filter(WalletTransaction.user_id == db_user.id)
-                        .order_by(WalletTransaction.created_at.desc())
-                        .all()
-                    )
-                    for row in tx_rows:
-                        if row.type == "topup":
-                            user.transactions.append(
-                                SimpleNamespace(
-                                    type="topup",
-                                    total=float(row.total or 0),
-                                    payment_method=row.payment_method,
-                                    status=row.status,
-                                    created_at=row.created_at,
-                                    topup_id=row.topup_id,
-                                    items=[],
-                                )
-                            )
-                        else:
-                            tx = Transaction(
-                                row.bar_id or 0,
-                                row.bar_name or "",
-                                [],
-                                float(row.total or 0),
-                                row.payment_method or "",
-                                order_id=row.order_id,
+            if db_user and verify_password(db_user.password_hash, password):
+                role_map = {
+                    RoleEnum.SUPERADMIN: "super_admin",
+                    RoleEnum.BARADMIN: "bar_admin",
+                    RoleEnum.BARTENDER: "bartender",
+                    RoleEnum.CUSTOMER: "customer",
+                }
+                bar_ids = [r.bar_id for r in db_user.bar_roles]
+                user = DemoUser(
+                    id=db_user.id,
+                    username=db_user.username,
+                    password_hash=db_user.password_hash,
+                    email=db_user.email,
+                    phone=db_user.phone or "",
+                    prefix=db_user.prefix or "",
+                    role=role_map.get(db_user.role, "customer"),
+                    bar_ids=bar_ids,
+                    credit=float(db_user.credit or 0),
+                )
+                tx_rows = (
+                    db.query(WalletTransaction)
+                    .filter(WalletTransaction.user_id == db_user.id)
+                    .order_by(WalletTransaction.created_at.desc())
+                    .all()
+                )
+                for row in tx_rows:
+                    if row.type == "topup":
+                        user.transactions.append(
+                            SimpleNamespace(
+                                type="topup",
+                                total=float(row.total or 0),
+                                payment_method=row.payment_method,
                                 status=row.status,
                                 created_at=row.created_at,
+                                topup_id=row.topup_id,
+                                items=[],
                             )
-                            tx.items = [
-                                TransactionItem(i["name"], i["quantity"], i["price"])
-                                for i in (row.items_json or [])
-                            ]
-                            user.transactions.append(tx)
-                    users[user.id] = user
-                    users_by_email[user.email] = user
-                    users_by_username[user.username.lower()] = user
-        if not user or user.password != password:
+                        )
+                    else:
+                        tx = Transaction(
+                            row.bar_id or 0,
+                            row.bar_name or "",
+                            [],
+                            float(row.total or 0),
+                            row.payment_method or "",
+                            order_id=row.order_id,
+                            status=row.status,
+                            created_at=row.created_at,
+                        )
+                        tx.items = [
+                            TransactionItem(i["name"], i["quantity"], i["price"])
+                            for i in (row.items_json or [])
+                        ]
+                        user.transactions.append(tx)
+                users[user.id] = user
+                users_by_email[user.email] = user
+                users_by_username[user.username.lower()] = user
+        if not user or not verify_password(user.password_hash, password):
+            record["count"] += 1
+            record["last"] = time.time()
             return render_template(
                 "login.html", request=request, error="Invalid credentials"
             )
+        login_attempts.pop(email, None)
         request.session["user_id"] = user.id
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(
         "login.html", request=request, error="Email and password required"
     )
-
-
 @app.get("/logout")
 async def logout(request: Request):
     request.session.clear()
@@ -3715,12 +3764,13 @@ async def admin_users_view(request: Request, db: Session = Depends(get_db)):
             existing.role = role_map.get(db_user.role, "customer")
             existing.bar_ids = bar_ids
             existing.credit = credit
+            existing.password_hash = db_user.password_hash
             users_by_username[existing.username.lower()] = existing
         else:
             demo = DemoUser(
                 id=db_user.id,
                 username=db_user.username,
-                password="",
+                password_hash=db_user.password_hash,
                 email=db_user.email,
                 phone=db_user.phone or "",
                 prefix=db_user.prefix or "",
@@ -3758,7 +3808,7 @@ def _load_demo_user(user_id: int, db: Session) -> DemoUser:
     user = DemoUser(
         id=db_user.id,
         username=db_user.username,
-        password="",
+        password_hash=db_user.password_hash,
         email=db_user.email,
         phone=db_user.phone or "",
         prefix=db_user.prefix or "",
@@ -3967,7 +4017,10 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     else:
         user.email = email
     if password:
-        user.password = password
+        user.password_hash = hash_password(password)
+        login_attempts.pop(user.email, None)
+        if request.session.get("user_id") == user.id:
+            request.session.clear()
     user.prefix = prefix or ""
     user.phone = phone or ""
     if not current.is_super_admin:
@@ -3995,7 +4048,7 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     db_user.prefix = prefix or None
     db_user.phone = phone or None
     if password:
-        db_user.password_hash = hashlib.sha256(password.encode("utf-8")).hexdigest()
+        db_user.password_hash = user.password_hash
     role_enum_map = {
         "super_admin": RoleEnum.SUPERADMIN,
         "bar_admin": RoleEnum.BARADMIN,
