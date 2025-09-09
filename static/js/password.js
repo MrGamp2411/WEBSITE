@@ -17,4 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   });
+  const password = document.getElementById('password');
+  const confirm = document.getElementById('confirm_password');
+  if (password && confirm) {
+    const validate = () => {
+      confirm.setCustomValidity(confirm.value !== password.value ? 'Passwords must match' : '');
+    };
+    password.addEventListener('input', validate);
+    confirm.addEventListener('input', validate);
+  }
 });

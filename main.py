@@ -2339,10 +2339,11 @@ async def register(request: Request, db: Session = Depends(get_db)):
     form = await request.form()
     username = form.get("username")
     password = form.get("password")
+    confirm_password = form.get("confirm_password")
     email = form.get("email")
     phone = form.get("phone")
     prefix = form.get("prefix")
-    if all([username, password, email, phone, prefix]):
+    if all([username, password, confirm_password, email, phone, prefix]):
         username_lower = username.lower()
         if (
             username != username_lower
@@ -2367,6 +2368,12 @@ async def register(request: Request, db: Session = Depends(get_db)):
                 "register.html",
                 request=request,
                 error="Password is too common",
+            )
+        if password != confirm_password:
+            return render_template(
+                "register.html",
+                request=request,
+                error="Passwords do not match",
             )
         if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email or ""):
             return render_template(

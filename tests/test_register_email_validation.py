@@ -25,6 +25,7 @@ def test_register_email_format_validation():
             data={
                 "username": "validuser",
                 "password": "pass1234",
+                "confirm_password": "pass1234",
                 "email": "invalid",
                 "prefix": "+41",
                 "phone": "123456789",
@@ -38,6 +39,7 @@ def test_register_email_format_validation():
             data={
                 "username": "validuser2",
                 "password": "pass1234",
+                "confirm_password": "pass1234",
                 "email": "valid@example.com",
                 "prefix": "+41",
                 "phone": "123456789",
