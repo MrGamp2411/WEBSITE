@@ -43,3 +43,19 @@ def test_wallet_transaction_status_updates():
     users.clear()
     users_by_email.clear()
     users_by_username.clear()
+
+
+def test_bar_payments_hidden_from_wallet():
+    setup_db()
+    with TestClient(app) as client:
+        ids = create_order(client, 'bar')
+
+        client.post('/login', data={'email': ids['customer_email'], 'password': 'pass'})
+        wallet = client.get('/wallet')
+        assert 'Test Bar' not in wallet.text
+        assert 'No transactions yet' in wallet.text
+
+    user_carts.clear()
+    users.clear()
+    users_by_email.clear()
+    users_by_username.clear()
