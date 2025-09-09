@@ -1670,6 +1670,9 @@ async def view_cart(request: Request):
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     cart = get_cart_for_user(user)
     current_bar: Optional[Bar] = bars.get(cart.bar_id) if cart.bar_id else None
+    if current_bar and cart.table_id not in current_bar.tables:
+        cart.table_id = None
+        save_cart_for_user(user.id, cart)
     if "application/json" in request.headers.get("accept", ""):
         count = sum(item.quantity for item in cart.items.values())
         total = cart.total_price()

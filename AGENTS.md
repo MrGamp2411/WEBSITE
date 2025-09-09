@@ -104,6 +104,7 @@
   - `cart.html` lists available tables for selection and shows a wallet link for adding funds.
   - `cart.html` text is fully in English, including subtitle "Review your order, choose your table, and confirm payment." and payment method notes.
   - `cart.html` includes a disabled "Select table" placeholder so no table is chosen by default; checkout fails until a table is selected.
+  - The `/cart` route clears `cart.table_id` when it doesn't match an available table so the placeholder remains the default.
   - The order total appears below the cart item list for quick review before selecting a table.
   - The checkout form places the "Message to bartender" textarea immediately after the table dropdown.
   - The cart product list is rendered inside a `.table-card` with a `.menu-table` for consistent styling with other lists.
