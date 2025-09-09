@@ -28,7 +28,7 @@
         {% for tx in transactions %}
         {% set ttype = tx.type if tx.type is defined else 'payment' %}
         <li>
-          <a href="/wallet/tx/{{ loop.index0 }}" class="tx {% if ttype == 'topup' %}is-topup{% elif ttype == 'refund' %}is-refund{% else %}is-payment{% endif %}">
+          <div class="tx {% if ttype == 'topup' %}is-topup{% elif ttype == 'refund' %}is-refund{% else %}is-payment{% endif %}">
             <div class="tx-main">
               <div class="tx-title">
                 {% if ttype == 'topup' %}
@@ -57,7 +57,7 @@
               {% set status = tx.status if tx.status is defined else 'COMPLETED' %}
               <span class="pill {% if status|lower in ['processing','pending'] %}pending{% elif status|lower == 'refunded' %}refunded{% elif status|lower in ['canceled','cancelled','failed'] %}canceled{% else %}success{% endif %}">{{ status|replace('_',' ')|title }}</span>
             </div>
-          </a>
+          </div>
         </li>
         {% endfor %}
       </ul>
