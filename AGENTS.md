@@ -149,7 +149,7 @@
 - Admin Manage Users page uses `templates/admin_users.html` with `.users-page` styles, a client-side username/email search via `#userSearch`, and grouped action pills (`View`, `Edit`) in each row
 - Super admins can open `/admin/users/view/{id}` rendered by `templates/admin_view_user.html` to review a user's profile, orders, and audit logs
 - Login fetches the user's bar assignment from the database so the bar is available immediately after authentication
-- Login and Register pages link to each other via `btn-outline` buttons with English labels
+- Login and Register pages show text prompts linking to each other: "Already registered? Log in" and "Not registered yet? Register"
 - Admin user edit form: `templates/admin_edit_user.html` posts fields
     (`username`, `password`, `email`, `prefix`, `phone`, `role`, `bar_ids`, `credit`)
     to `/admin/users/edit/{id}`. Bar selection uses checkboxes for easier multi-bar assignment.
