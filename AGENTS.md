@@ -1,5 +1,7 @@
 # AGENT Notes
 
+- Wallet page UI lives in `templates/wallet.html` using a `.wallet-page` wrapper and inline scoped styles. Transaction rows render inside `<ul id="txList">` and link to `/wallet/tx/{index}`. Top-level export buttons use IDs `exportCsv` and `exportCsvBottom`.
+
 - Core modules:
   - `main.py` – routes and helpers
   - `/cart/checkout` stores card order details in `Payment.raw_payload` and only creates the order when the Wallee webhook reports a successful payment; card payment failures leave the cart intact and skip order creation

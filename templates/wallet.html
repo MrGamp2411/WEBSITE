@@ -1,14 +1,191 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Wallet</h1>
-<p>Your current credit: CHF {{ "%.2f"|format(user.credit) }}</p>
-<a class="btn" href="/topup">Top Up</a>
-<h2>Recent Expenses</h2>
-<ul>
-  {% for tx in transactions %}
-  <li><a href="/wallet/tx/{{ loop.index0 }}">{{ tx.bar_name }} - CHF {{ "%.2f"|format(tx.total) }}</a></li>
-  {% else %}
-  <li>No transactions yet.</li>
-  {% endfor %}
-</ul>
+<section class="wallet-page">
+  <div class="wallet-head">
+    <h1 class="wallet-title">Wallet</h1>
+    <p class="wallet-subtitle">Manage your balance, top up instantly, and review your recent activity.</p>
+  </div>
+
+  <div class="balance-card card">
+    <div class="balance-left">
+      <span class="label">Current balance</span>
+      <div class="amount">CHF {{ "%.2f"|format(user.credit) }}</div>
+      <div class="meta"><span class="badge success">Available</span> <span class="dot">•</span> Updated just now</div>
+    </div>
+    <div class="balance-right wallet-actions">
+      <a href="/topup" class="btn-primary">Top Up</a>
+      <a href="/account/payment-methods" class="btn-ghost">Manage payment methods</a>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="row">
+      <label class="filter">
+        <span>Type</span>
+        <select aria-label="Filter by type">
+          <option value="">All</option>
+          <option>Top up</option>
+          <option>Payment</option>
+          <option>Refund</option>
+        </select>
+      </label>
+      <label class="filter">
+        <span>Date</span>
+        <input type="date" aria-label="From" />
+      </label>
+      <label class="filter">
+        <span>&nbsp;</span>
+        <input type="date" aria-label="To" />
+      </label>
+      <label class="filter grow">
+        <span>Search</span>
+        <input type="text" placeholder="Bar, order ID, note…" />
+      </label>
+      <button class="btn-outline" type="button" id="exportCsv">Export CSV</button>
+    </div>
+  </div>
+
+  <div class="card tx-feed">
+    <div class="tx-head">
+      <h2 class="section-title">Recent Activity</h2>
+    </div>
+
+    {% if transactions %}
+    <div class="tx-group">
+      <ul class="tx-list" id="txList">
+        {% for tx in transactions %}
+        {% set ttype = tx.type if tx.type is defined else 'payment' %}
+        <li>
+          <a href="/wallet/tx/{{ loop.index0 }}" class="tx {% if ttype == 'topup' %}is-topup{% elif ttype == 'refund' %}is-refund{% else %}is-payment{% endif %}">
+            <div class="tx-main">
+              <div class="tx-title">
+                {% if ttype == 'topup' %}
+                  Top up
+                {% elif ttype == 'refund' %}
+                  Refund{% if tx.order_id is defined %} · Order #{{ tx.order_id }}{% endif %}
+                {% else %}
+                  Order placed{% if tx.bar_name is defined %} · {{ tx.bar_name }}{% endif %}
+                {% endif %}
+              </div>
+              <div class="tx-sub">
+                {% if tx.payment_method is defined %}
+                  {{ tx.payment_method.replace('_', ' ')|title }}
+                {% elif tx.method is defined %}
+                  {{ tx.method }}
+                {% endif %}
+              </div>
+              {% if tx.created_at is defined %}
+              <time class="tx-time" datetime="{{ tx.created_at.isoformat() }}">{{ tx.created_at.strftime('%b %-d, %H:%M') }}</time>
+              {% endif %}
+            </div>
+            <div class="tx-meta">
+              <div class="tx-amount {% if ttype == 'payment' %}negative{% else %}positive{% endif %}">
+                {% if ttype == 'payment' %}-{% else %}+{% endif %} CHF {{ "%.2f"|format(tx.total) }}
+              </div>
+              {% set status = tx.status if tx.status is defined else 'COMPLETED' %}
+              <span class="pill {% if status|lower == 'pending' %}pending{% elif status|lower == 'refunded' %}refunded{% else %}success{% endif %}">{{ status|replace('_',' ')|title }}</span>
+            </div>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% else %}
+    <div class="empty" aria-live="polite">
+      <h3>No transactions yet</h3>
+      <p>Your top ups and payments will appear here.</p>
+      <a class="btn-primary" href="/topup">Make your first top up</a>
+    </div>
+    {% endif %}
+
+    <div class="tx-actions">
+      <button type="button" class="btn-outline" id="loadMoreTx">Load more</button>
+      <button type="button" class="btn-outline" id="exportCsvBottom">Export CSV</button>
+    </div>
+  </div>
+</section>
+
+<style>
+.wallet-page{ --surface:#fff; --bg-subtle:#f6f8fb; --border:#e5e7eb; --text:#0f172a; --muted:#475569; --accent: var(--brand, #7c3aed); --radius:16px; }
+
+/* Cards & buttons */
+.wallet-page .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:0 6px 16px rgba(0,0,0,.06); }
+.wallet-page .btn-primary{ background:var(--accent); color:#fff; border:1px solid transparent; border-radius:12px; padding:10px 14px; font-weight:700; }
+.wallet-page .btn-primary:hover{ filter:brightness(.96); }
+.wallet-page .btn-outline{ background:transparent; color:var(--text); border:1px solid var(--border); border-radius:12px; padding:10px 14px; font-weight:600; }
+.wallet-page .btn-ghost{ background:transparent; color:var(--accent); border:1px solid transparent; border-radius:12px; padding:10px 12px; font-weight:600; }
+
+/* Header */
+.wallet-page .wallet-head{ margin:8px 0 12px; }
+.wallet-page .wallet-title{ font-weight:800; font-size:1.6rem; margin:0 0 4px; color:var(--text); }
+.wallet-page .wallet-subtitle{ margin:0; color:var(--muted); font-size:.95rem; }
+
+/* Balance */
+.balance-card{ display:flex; align-items:center; justify-content:space-between; padding:16px; gap:16px; }
+.balance-card .label{ color:var(--muted); font-size:.85rem; }
+.balance-card .amount{ font-size:2rem; font-weight:800; letter-spacing:-0.02em; }
+.balance-card .meta{ color:var(--muted); font-size:.85rem; display:flex; align-items:center; gap:8px; }
+.balance-card .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; font-size:.75rem; border:1px solid var(--border); }
+.balance-card .badge.success{ background:#f0fdf4; border-color:#bbf7d0; color:#166534; }
+.balance-card .dot{ opacity:.5; }
+.wallet-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
+/* Filters */
+.filters{ margin:14px 0; }
+.filters .row{ display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
+.filters .filter{ display:flex; flex-direction:column; gap:6px; }
+.filters .filter.grow{ flex:1; }
+.filters select, .filters input[type="text"], .filters input[type="date"]{
+  height:42px; padding:0 12px; border:1px solid var(--border); border-radius:12px; background:#fff; color:var(--text);
+}
+
+/* Transaction FEED */
+.tx-feed{ padding:0; overflow:hidden; }
+.tx-head{ padding:16px; }
+.section-title{ font-size:1.125rem; font-weight:700; margin:0; }
+
+.tx-group{ padding:0 16px 16px; }
+.tx-date{ color:var(--muted); font-weight:600; font-size:.85rem; margin:0 0 8px; }
+.tx-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+
+.tx{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px; border:1px solid var(--border); border-radius:14px; background:#fff; }
+.tx:hover{ background:#fafafa; }
+.tx-main{ display:grid; gap:4px; min-width:0; }
+.tx-title{ font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tx-sub{ color:var(--muted); font-size:.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tx-time{ color:var(--muted); font-size:.8rem; }
+
+.tx-meta{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; }
+.tx-amount{ font-variant-numeric: tabular-nums; white-space:nowrap; font-weight:700; }
+.tx-amount.positive{ color:#166534; } /* green */
+.tx-amount.negative{ color:#b91c1c; } /* red */
+
+.pill{ padding:4px 10px; border-radius:999px; font-size:.75rem; border:1px solid var(--border); }
+.pill.success{ background:#f0fdf4; border-color:#bbf7d0; color:#166534; }
+.pill.pending{ background:#fff7ed; border-color:#fed7aa; color:#9a3412; }
+.pill.refunded{ background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8; }
+
+/* Empty & actions */
+.empty{ display:none; text-align:center; padding:28px 18px 24px; }
+.empty h3{ margin:0 0 6px; font-size:1.05rem; }
+.empty p{ margin:0 0 12px; color:var(--muted); }
+.tx-actions{ display:flex; gap:10px; padding:0 16px 16px; }
+
+/* Mobile */
+@media (max-width: 768px){
+  .balance-card{ flex-direction:column; align-items:flex-start; }
+  .wallet-actions{ width:100%; }
+  .wallet-actions .btn-primary{ flex:1; text-align:center; }
+  .filters .row{ gap:8px; }
+  .tx{ align-items:flex-start; }
+  .tx-meta{ align-items:flex-end; }
+}
+
+/* Focus visibility */
+.wallet-page :is(select,input,button,a){ outline:none; }
+.wallet-page :is(select,input,button,a):focus{
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+  border-radius:12px;
+}
+</style>
 {% endblock %}
