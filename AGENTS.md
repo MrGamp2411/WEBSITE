@@ -106,7 +106,8 @@
   - The order total appears below the cart item list for quick review before selecting a table.
   - The checkout form places the "Message to bartender" textarea immediately after the table dropdown.
   - The cart product list is rendered inside a `.table-card` with a `.menu-table` for consistent styling with other lists.
-  - Mobile view (≤768px) stacks cart, table form, notes, payment options, and summary in one column; the cart table scrolls horizontally inside a wrapper to preserve columns, and the `.btn-primary.place-order` button becomes fixed above the footer with safe-area padding.
+  - Mobile view (≤768px) stacks cart, table form, notes, payment options, and summary in one column; the cart table scrolls horizontally inside a wrapper to preserve columns, and the `.btn-primary.place-order` button becomes fixed with safe-area padding.
+    `static/js/cart.js` watches the global footer and switches the button to absolute positioning so it stops above the footer while scrolling.
   - Checkout form asks for payment method (credit card, wallet credit, or pay at bar);
     selection is handled by `/cart/checkout` and stored in `Transaction.payment_method`.
   - The cart page uses a premium `.cart-page` wrapper with a wallet banner, summary sidebar, and scoped styles defined inline.
