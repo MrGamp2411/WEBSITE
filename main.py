@@ -1884,7 +1884,7 @@ async def checkout(
     db.add(db_order)
     db.commit()
     await send_order_update(db_order)
-    if bar:
+    if bar and payment_method != "bar":
         user.transactions.append(
             Transaction(
                 bar.id,
@@ -2063,10 +2063,13 @@ async def wallet(request: Request):
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    transactions = [
+        tx for tx in user.transactions if getattr(tx, "payment_method", "") != "bar"
+    ]
     return render_template(
         "wallet.html",
         request=request,
-        transactions=user.transactions,
+        transactions=transactions,
         cart_bar_id=None,
         cart_bar_name=None,
     )
@@ -2077,9 +2080,12 @@ async def wallet_transaction(request: Request, tx_id: int):
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
-    if tx_id < 0 or tx_id >= len(user.transactions):
+    transactions = [
+        tx for tx in user.transactions if getattr(tx, "payment_method", "") != "bar"
+    ]
+    if tx_id < 0 or tx_id >= len(transactions):
         return RedirectResponse(url="/wallet", status_code=status.HTTP_303_SEE_OTHER)
-    tx = user.transactions[tx_id]
+    tx = transactions[tx_id]
     return render_template(
         "transaction_detail.html",
         request=request,
