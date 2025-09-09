@@ -40,11 +40,13 @@
     - If any of these variables are missing or invalid, `/api/topup/init` returns 503 "Top-up service unavailable".
     - `tests/test_topup_init.py` demonstrates record creation with patched Wallee services.
     - `/wallet/topup/failed` and `/wallet/topup/success` redirect to `/wallet` with `notice*` query parameters consumed by `static/js/app.js` to show cart-style popups.
-- Front-end mapping:
-  - Styles in `static/css/components.css` (`components.min.css` for minified)
-  - Templates live under `templates/`
-  - JavaScript: `static/js/app.js` (shared/carousels), `static/js/search.js`, `static/js/view-all.js`
-  - Bar & product card size: 400×450 desktop, 300×400 mobile
+  - Cart checkout:
+    - `templates/cart.html` hides the "Place Order" button after form submission to prevent duplicate orders.
+  - Front-end mapping:
+    - Styles in `static/css/components.css` (`components.min.css` for minified)
+    - Templates live under `templates/`
+    - JavaScript: `static/js/app.js` (shared/carousels), `static/js/search.js`, `static/js/view-all.js`
+    - Bar & product card size: 400×450 desktop, 300×400 mobile
   - Global footer: `templates/layout.html` uses `.site-footer` styled in `static/css/components.css`
 - Bars:
   - `/bars` page uses `templates/all_bars.html` and `static/js/view-all.js`
