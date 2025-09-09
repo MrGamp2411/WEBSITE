@@ -152,7 +152,8 @@
 - Login and Register pages show text prompts linking to each other: "Already registered? Log in" and "Not registered yet? Register"
 - Register form requires a phone number with 9–10 digits; invalid entries show an error
 - Register form requires an email in the format text@text.text; invalid entries show an error
-- Register form requires username and password to be at least 8 characters; shorter entries show an error
+- Register form enforces username rules: 3–24 characters, lowercase letters, numbers, dot, hyphen or underscore with no spaces or consecutive punctuation; reserved names (admin, root, api, login, support, www, siplygo) are rejected
+- Register form requires password to be at least 8 characters; shorter entries show an error
 - Admin user edit form: `templates/admin_edit_user.html` posts fields
     (`username`, `password`, `email`, `prefix`, `phone`, `role`, `bar_ids`, `credit`)
     to `/admin/users/edit/{id}`. Bar selection uses checkboxes for easier multi-bar assignment.

@@ -5,7 +5,7 @@
   {% if error %}<p class="alert">{{ error }}</p>{% endif %}
   <form method="post" action="/register">
     <label for="username">Username
-      <input id="username" type="text" name="username" required autocomplete="username" inputmode="text" enterkeyhint="next" minlength="8" title="Username must be at least 8 characters">
+      <input id="username" type="text" name="username" required autocomplete="username" inputmode="text" enterkeyhint="next" minlength="3" maxlength="24" pattern="(?![._-])(?!.*[._-]{2})(?!.*[._-]$)[a-z0-9._-]{3,24}" title="3–24 characters, lowercase letters, numbers, dot, hyphen or underscore. No spaces.">
     </label>
     <label for="email">Email
       <input id="email" type="email" name="email" required autocomplete="email" inputmode="email" enterkeyhint="next" pattern="[^@]+@[^@]+\.[^@]+" title="Email must be in the format text@text.text">

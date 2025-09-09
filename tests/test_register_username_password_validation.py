@@ -18,34 +18,61 @@ def setup_module(module):
     users_by_username.clear()
 
 
-def test_register_username_length_validation():
+def test_register_username_validation():
     with TestClient(app) as client:
-        resp = client.post(
-            "/register",
-            data={
-                "username": "short",
-                "password": "password1",
-                "email": "user1@example.com",
-                "prefix": "+41",
-                "phone": "123456789",
-            },
-        )
-        assert resp.status_code == 200
-        assert "Username must be at least 8 characters" in resp.text
+        invalid_usernames = [
+            "ab",  # too short
+            "a" * 25,  # too long
+            "User",  # uppercase
+            "user name",  # space
+            "user@name",  # invalid char
+            "-user",  # starts with hyphen
+            "user_",  # ends with underscore
+            "user..name",  # consecutive punctuation
+            "1234567",  # digits only
+            "user@example.com",  # email format
+            "admin",  # reserved
+        ]
+        for i, uname in enumerate(invalid_usernames):
+            resp = client.post(
+                "/register",
+                data={
+                    "username": uname,
+                    "password": "password1",
+                    "email": f"user{i}@example.com",
+                    "prefix": "+41",
+                    "phone": f"1234567{i:02d}",
+                },
+            )
+            assert resp.status_code == 200
+            assert "3–24 characters" in resp.text
 
         resp_ok = client.post(
             "/register",
             data={
-                "username": "validuser1",
+                "username": "valid.user",
                 "password": "password1",
-                "email": "user2@example.com",
+                "email": "user_valid@example.com",
                 "prefix": "+41",
-                "phone": "123456780",
+                "phone": "123456799",
             },
             follow_redirects=False,
         )
         assert resp_ok.status_code == 303
         assert resp_ok.headers["location"] == "/login"
+
+        resp_dup = client.post(
+            "/register",
+            data={
+                "username": "valid.user",
+                "password": "password1",
+                "email": "user_dup@example.com",
+                "prefix": "+41",
+                "phone": "123456788",
+            },
+        )
+        assert resp_dup.status_code == 200
+        assert "Username already taken" in resp_dup.text
 
 
 def test_register_password_length_validation():
