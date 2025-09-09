@@ -147,3 +147,23 @@ def test_failed_topup_shows_zero_amount():
         assert "Failed" in wallet.text
         assert "+ CHF 0.00" in wallet.text
         assert 'pill canceled">Failed</span>' in wallet.text
+
+
+def test_wallet_transactions_ordered_newest_first():
+    user = _register_user()
+    with TestClient(app) as client:
+        _login_user(client, user.email, "testpass")
+        with patch("app.wallee_client.tx_service") as MockTx, patch(
+            "app.wallee_client.pp_service"
+        ) as MockPage:
+            MockTx.create.return_value = SimpleNamespace(id=111)
+            MockPage.payment_page_url.return_value = "https://pay.example/111"
+            client.post("/api/topup/init", json={"amount": 5})
+        with patch("app.wallee_client.tx_service") as MockTx, patch(
+            "app.wallee_client.pp_service"
+        ) as MockPage:
+            MockTx.create.return_value = SimpleNamespace(id=222)
+            MockPage.payment_page_url.return_value = "https://pay.example/222"
+            client.post("/api/topup/init", json={"amount": 7})
+        wallet = client.get("/wallet")
+        assert wallet.text.index("CHF 7.00") < wallet.text.index("CHF 5.00")
