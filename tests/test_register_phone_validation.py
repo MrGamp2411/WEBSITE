@@ -25,6 +25,7 @@ def test_register_phone_length_validation():
             data={
                 "username": "validuser",
                 "password": "pass1234",
+                "confirm_password": "pass1234",
                 "email": "short@example.com",
                 "prefix": "+41",
                 "phone": "12345678",
@@ -38,6 +39,7 @@ def test_register_phone_length_validation():
             data={
                 "username": "validuser2",
                 "password": "pass1234",
+                "confirm_password": "pass1234",
                 "email": "valid@example.com",
                 "prefix": "+41",
                 "phone": "123456789",

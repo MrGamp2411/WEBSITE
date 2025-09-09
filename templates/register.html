@@ -17,6 +17,13 @@
       </div>
       <span id="capsWarning" class="caps-warning" hidden>Caps Lock is on</span>
     </label>
+    <label for="confirm_password">Confirm Password
+      <div class="password-wrapper">
+        <input id="confirm_password" type="password" name="confirm_password" required autocomplete="new-password" enterkeyhint="next" minlength="8" maxlength="128" title="Passwords must match">
+        <button type="button" class="toggle-password" aria-label="Show password"><i class="bi bi-eye"></i></button>
+      </div>
+      <span id="capsWarningConfirm" class="caps-warning" hidden>Caps Lock is on</span>
+    </label>
     <label for="prefix">Phone Prefix
       <select id="prefix" name="prefix" required autocomplete="tel-country-code">
         <option value="+41">+41 (Switzerland)</option>

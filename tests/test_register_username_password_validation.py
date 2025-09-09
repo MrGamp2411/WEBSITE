@@ -39,6 +39,7 @@ def test_register_username_validation():
                 data={
                     "username": uname,
                     "password": "password1",
+                    "confirm_password": "password1",
                     "email": f"user{i}@example.com",
                     "prefix": "+41",
                     "phone": f"1234567{i:02d}",
@@ -49,13 +50,14 @@ def test_register_username_validation():
 
         resp_ok = client.post(
             "/register",
-            data={
-                "username": "valid.user",
-                "password": "password1",
-                "email": "user_valid@example.com",
-                "prefix": "+41",
-                "phone": "123456799",
-            },
+                data={
+                    "username": "valid.user",
+                    "password": "password1",
+                    "confirm_password": "password1",
+                    "email": "user_valid@example.com",
+                    "prefix": "+41",
+                    "phone": "123456799",
+                },
             follow_redirects=False,
         )
         assert resp_ok.status_code == 303
@@ -63,13 +65,14 @@ def test_register_username_validation():
 
         resp_dup = client.post(
             "/register",
-            data={
-                "username": "valid.user",
-                "password": "password1",
-                "email": "user_dup@example.com",
-                "prefix": "+41",
-                "phone": "123456788",
-            },
+                data={
+                    "username": "valid.user",
+                    "password": "password1",
+                    "confirm_password": "password1",
+                    "email": "user_dup@example.com",
+                    "prefix": "+41",
+                    "phone": "123456788",
+                },
         )
         assert resp_dup.status_code == 200
         assert "Username already taken" in resp_dup.text
@@ -79,53 +82,74 @@ def test_register_password_length_validation():
     with TestClient(app) as client:
         resp = client.post(
             "/register",
-            data={
-                "username": "validuser2",
-                "password": "short",
-                "email": "user3@example.com",
-                "prefix": "+41",
-                "phone": "123456781",
-            },
+                data={
+                    "username": "validuser2",
+                    "password": "short",
+                    "confirm_password": "short",
+                    "email": "user3@example.com",
+                    "prefix": "+41",
+                    "phone": "123456781",
+                },
         )
         assert resp.status_code == 200
         assert "Password must be between 8 and 128 characters" in resp.text
 
         resp_long = client.post(
             "/register",
-            data={
-                "username": "validuserlong",
-                "password": "p" * 129,
-                "email": "userlong@example.com",
-                "prefix": "+41",
-                "phone": "123456783",
-            },
+                data={
+                    "username": "validuserlong",
+                    "password": "p" * 129,
+                    "confirm_password": "p" * 129,
+                    "email": "userlong@example.com",
+                    "prefix": "+41",
+                    "phone": "123456783",
+                },
         )
         assert resp_long.status_code == 200
         assert "Password must be between 8 and 128 characters" in resp_long.text
 
         resp_weak = client.post(
             "/register",
-            data={
-                "username": "validuser4",
-                "password": "12345678",
-                "email": "userweak@example.com",
-                "prefix": "+41",
-                "phone": "123456784",
-            },
+                data={
+                    "username": "validuser4",
+                    "password": "12345678",
+                    "confirm_password": "12345678",
+                    "email": "userweak@example.com",
+                    "prefix": "+41",
+                    "phone": "123456784",
+                },
         )
         assert resp_weak.status_code == 200
         assert "Password is too common" in resp_weak.text
 
         resp_ok = client.post(
             "/register",
-            data={
-                "username": "validuser3",
-                "password": "longpass1",
-                "email": "user4@example.com",
-                "prefix": "+41",
-                "phone": "123456782",
-            },
+                data={
+                    "username": "validuser3",
+                    "password": "longpass1",
+                    "confirm_password": "longpass1",
+                    "email": "user4@example.com",
+                    "prefix": "+41",
+                    "phone": "123456782",
+                },
             follow_redirects=False,
         )
         assert resp_ok.status_code == 303
         assert resp_ok.headers["location"] == "/login"
+
+
+def test_register_password_mismatch_validation():
+    with TestClient(app) as client:
+        resp = client.post(
+            "/register",
+            data={
+                "username": "confirmuser",
+                "password": "password1",
+                "confirm_password": "different",
+                "email": "confirm@example.com",
+                "prefix": "+41",
+                "phone": "123456787",
+            },
+        )
+        assert resp.status_code == 200
+        assert "Passwords do not match" in resp.text

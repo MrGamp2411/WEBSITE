@@ -154,6 +154,7 @@
 - Register form requires an email in the format text@text.text; invalid entries show an error
 - Register form enforces username rules: 3–24 characters, lowercase letters, numbers, dot, hyphen or underscore with no spaces or consecutive punctuation; reserved names (admin, root, api, login, support, www, siplygo) are rejected
 - Register form requires passwords 8–128 characters long; common passwords like `12345678` are rejected. Passwords are hashed with Argon2id. Forms include show/hide toggles and a Caps Lock indicator.
+- Register form includes a required `confirm_password` field that must match the password.
 - Register and login forms use a flex `.password-wrapper` so the show/hide password toggle sits on the right side of the card.
 - Admin user edit form: `templates/admin_edit_user.html` posts fields
     (`username`, `password`, `email`, `prefix`, `phone`, `role`, `bar_ids`, `credit`)
