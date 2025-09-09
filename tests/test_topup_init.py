@@ -98,3 +98,28 @@ def test_topup_init_missing_wallee_config_returns_503():
             resp = client.post("/api/topup/init", json={"amount": 10})
         assert resp.status_code == 503
         assert resp.json()["detail"] == "Top-up service unavailable"
+
+
+def test_topup_transaction_updates_wallet():
+    user = _register_user()
+    with TestClient(app) as client:
+        _login_user(client, user.email, "testpass")
+        with patch("app.wallee_client.tx_service") as MockTx, patch(
+            "app.wallee_client.pp_service"
+        ) as MockPage:
+            MockTx.create.return_value = SimpleNamespace(id=456)
+            MockPage.payment_page_url.return_value = "https://pay.example/456"
+            resp = client.post("/api/topup/init", json={"amount": 5})
+            assert resp.status_code == 200
+        wallet = client.get("/wallet")
+        assert "Processing" in wallet.text
+        db = SessionLocal()
+        topup = db.query(WalletTopup).filter(WalletTopup.user_id == user.id).one()
+        db.close()
+        client.post(
+            "/webhooks/wallee",
+            json={"entityId": topup.wallee_tx_id, "state": "COMPLETED"},
+        )
+        wallet = client.get("/wallet")
+        assert "Completed" in wallet.text
+        assert "CHF 5.00" in wallet.text
