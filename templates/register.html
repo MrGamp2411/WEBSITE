@@ -11,7 +11,11 @@
       <input id="email" type="email" name="email" required autocomplete="email" inputmode="email" enterkeyhint="next" pattern="[^@]+@[^@]+\.[^@]+" title="Email must be in the format text@text.text">
     </label>
     <label for="password">Password
-      <input id="password" type="password" name="password" required autocomplete="new-password" enterkeyhint="next" minlength="8" title="Password must be at least 8 characters">
+      <div class="password-wrapper">
+        <input id="password" type="password" name="password" required autocomplete="new-password" enterkeyhint="next" minlength="8" maxlength="128" title="Password must be between 8 and 128 characters">
+        <button type="button" class="toggle-password" aria-label="Show password"><i class="bi bi-eye"></i></button>
+      </div>
+      <span id="capsWarning" class="caps-warning" hidden>Caps Lock is on</span>
     </label>
     <label for="prefix">Phone Prefix
       <select id="prefix" name="prefix" required autocomplete="tel-country-code">
@@ -27,5 +31,9 @@
   </form>
   <p style="align-self:center">Already registered? <a href="/login">Log in</a></p>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/password.js" defer></script>
 {% endblock %}
 

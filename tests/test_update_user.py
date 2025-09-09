@@ -265,8 +265,8 @@ def test_update_user_password_change():
 
     db = SessionLocal()
     updated = db.query(User).filter(User.id == user_id).first()
-    expected_hash = hashlib.sha256("newpass".encode("utf-8")).hexdigest()
-    assert updated.password_hash == expected_hash
+    from main import verify_password
+    assert verify_password(updated.password_hash, "newpass")
     db.close()
 
 

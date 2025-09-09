@@ -8,11 +8,19 @@
       <input id="email" type="email" name="email" required autocomplete="email" inputmode="email" enterkeyhint="next">
     </label>
     <label for="password">Password
-      <input id="password" type="password" name="password" required autocomplete="current-password" enterkeyhint="done">
+      <div class="password-wrapper">
+        <input id="password" type="password" name="password" required autocomplete="current-password" enterkeyhint="done" maxlength="128">
+        <button type="button" class="toggle-password" aria-label="Show password"><i class="bi bi-eye"></i></button>
+      </div>
+      <span id="capsWarning" class="caps-warning" hidden>Caps Lock is on</span>
     </label>
     <button class="btn btn--primary" type="submit">Login</button>
   </form>
   <p style="align-self:center">Not registered yet? <a href="/register">Register</a></p>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/password.js" defer></script>
 {% endblock %}
 
