@@ -163,6 +163,7 @@
     throughout to manage permissions and dashboard views.
 - Orders:
   - `/orders` page renders `templates/order_history.html` with past `Order` entries for the current user.
+  - The page wraps content in `.orders-page` and includes a toolbar UI (status, date range, search, sort, export). Pending and completed sections show counts and empty states, and order cards sit in a responsive `.orders-grid` without altering card markup.
   - Checkout persists orders to the database and redirects to `/orders`.
   - Mobile hamburger menu links to order history via `bi bi-clock-history` icon.
   - Bartenders manage live orders in `bartender_orders.html` using `static/js/orders.js`,
@@ -213,9 +214,9 @@
   - `order_history.html` uses `order.customer_name`, `order.customer_prefix`, `order.customer_phone`, and `order.table_name` to avoid `None` errors when related records are missing.
   - `order_history.html` displays line items via `item.menu_item_name` to handle missing menu items gracefully.
   - Order cards display the bar's name via `order.bar_name`.
-    - Order views render each order as an `<article class="order-card card">` with header, meta, and items sections. Orders are grouped in `.order-list` containers for consistent styling.
-    - Each order card exposes `data-status` with the raw status for client-side updates.
-    - `.order-list` is a flex container that wraps so order cards can flow horizontally.
+    - Order views render each order as an `<article class="order-card card">` with header, meta, and items sections. Orders are grouped in `#pending-orders` and `#completed-orders` containers that also carry an `orders-grid` class for responsive layout within `.orders-page`.
+    - Each order card exposes `data-status` with the raw status for client-side updates. Inline script `initOrderHistoryCounts` updates badge counts and toggles empty states when orders change.
+    - `.order-list` is a flex container that wraps so order cards can flow horizontally, but on the orders page this layout is overridden by `.orders-grid` to create a responsive grid without touching the cards.
     - Order list cards are 395px wide on desktop and 315px on mobile, with 10px internal padding (was 5px) while allowing their height to expand with content.
     - Order cards override the base `card` max-height so they can grow to fit all text.
     - Order card backgrounds reflect status via `card--placed` (blue), `card--accepted` (orange), `card--ready` (green), `card--completed` (default surface), and `card--canceled` (red).

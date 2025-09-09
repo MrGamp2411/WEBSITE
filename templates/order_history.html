@@ -1,91 +1,253 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Order History</h1>
+<section class="orders-page">
+  <header class="orders-head">
+    <h1 class="orders-title">Order History</h1>
+    <p class="orders-subtitle">Review your past orders, filter by status or date, and find details faster.</p>
+  </header>
 
-<h2>Pending Orders</h2>
-<div id="pending-orders" class="order-list">
-  {% for order in pending_orders %}
-  <article id="user-order-{{ order.id }}" class="order-card card card--{{ order.status|lower }}" role="article" aria-labelledby="order-{{ order.id }}-title" data-status="{{ order.status }}">
-    <header class="order-card__header">
-      <h3 id="order-{{ order.id }}-title">Order #{{ order.id }}</h3>
-      <span class="order-status chip status status-{{ order.status|lower }}" aria-label="Order status: {{ order.status|replace('_', ' ')|title }}">{{ order.status|replace('_', ' ')|title }}</span>
-    </header>
-    <div class="order-card__divider"></div>
-    <section class="order-card__meta">
-      <dl class="order-kv">
-        <div><dt>Total</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.total) }}</dd></div>
-        {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>Refunded</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
-        <div><dt>Placed</dt><dd class="num nowrap">{{ order.created_at|format_time }}</dd></div>
+  <div class="orders-toolbar" role="region" aria-label="Filters">
+    <div class="toolbar-row">
+      <label class="field">
+        <span>Status</span>
+        <select aria-label="Filter by status" id="ordersFilterStatus">
+          <option value="">All</option>
+          <option>Pending</option>
+          <option>Completed</option>
+          <option>Cancelled</option>
+          <option>Refunded</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>From</span>
+        <input type="date" id="ordersFromDate" />
+      </label>
+      <label class="field">
+        <span>To</span>
+        <input type="date" id="ordersToDate" />
+      </label>
+      <label class="field grow">
+        <span>Search</span>
+        <input type="text" id="ordersSearch" placeholder="Bar, order ID, note…" />
+      </label>
+      <label class="field">
+        <span>Sort</span>
+        <select id="ordersSort">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+        </select>
+      </label>
+      <button class="btn-outline" type="button" id="ordersExportCsv">Export CSV</button>
+    </div>
+  </div>
 
-        <div><dt>Customer</dt><dd>{{ order.customer_name or 'Unknown' }} <a href="tel:{{ (order.customer_prefix or '')|replace(' ', '') }}{{ (order.customer_phone or '')|replace(' ', '') }}">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</a></dd></div>
-        <div><dt>Bar</dt><dd>{{ order.bar_name or '' }}</dd></div>
+  <!-- Pending -->
+  <section class="orders-section" id="pending">
+    <div class="section-head">
+      <h2>Pending Orders</h2>
+      <span class="count-badge" id="pendingCount">{{ pending_orders|length }}</span>
+    </div>
 
-        <div><dt>Table</dt><dd>{{ order.table_name or '' }}</dd></div>
-        <div><dt>Payment</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
-        {% if order.notes %}<div><dt>Notes</dt><dd>{{ order.notes }}</dd></div>{% endif %}
+    <div class="orders-grid order-list" id="pending-orders">
+      {% for order in pending_orders %}
+      <article id="user-order-{{ order.id }}" class="order-card card card--{{ order.status|lower }}" role="article" aria-labelledby="order-{{ order.id }}-title" data-status="{{ order.status }}">
+        <header class="order-card__header">
+          <h3 id="order-{{ order.id }}-title">Order #{{ order.id }}</h3>
+          <span class="order-status chip status status-{{ order.status|lower }}" aria-label="Order status: {{ order.status|replace('_', ' ')|title }}">{{ order.status|replace('_', ' ')|title }}</span>
+        </header>
+        <div class="order-card__divider"></div>
+        <section class="order-card__meta">
+          <dl class="order-kv">
+            <div><dt>Total</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.total) }}</dd></div>
+            {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>Refunded</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
+            <div><dt>Placed</dt><dd class="num nowrap">{{ order.created_at|format_time }}</dd></div>
 
-        {% if order.ready_at %}<div><dt>Prep time</dt><dd class="num">{{ ((order.ready_at - order.created_at).total_seconds() // 60)|int }} min</dd></div>{% endif %}
-      </dl>
-    </section>
-    <div class="order-card__divider"></div>
-    <section class="order-card__items">
-      <ul class="order-items">
-        {% for item in order.items %}
-        <li><span class="qty">{{ item.qty }}×</span><span class="name">{{ item.menu_item_name or 'Unknown item' }}</span></li>
-        {% endfor %}
-      </ul>
-      {% if order.status == 'PLACED' %}
-      <div class="order-actions">
-        <button class="cancel-order" data-order-id="{{ order.id }}" data-status="CANCELED">Cancel</button>
-      </div>
-      {% endif %}
-    </section>
-  </article>
-  {% else %}
-  <p>No pending orders.</p>
-  {% endfor %}
-</div>
+            <div><dt>Customer</dt><dd>{{ order.customer_name or 'Unknown' }} <a href="tel:{{ (order.customer_prefix or '')|replace(' ', '') }}{{ (order.customer_phone or '')|replace(' ', '') }}">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</a></dd></div>
+            <div><dt>Bar</dt><dd>{{ order.bar_name or '' }}</dd></div>
 
-<h2>Completed Orders</h2>
-<div id="completed-orders" class="order-list">
-  {% for order in completed_orders %}
-  <article id="user-order-{{ order.id }}" class="order-card card card--{{ order.status|lower }}" role="article" aria-labelledby="order-{{ order.id }}-title" data-status="{{ order.status }}">
-    <header class="order-card__header">
-      <h3 id="order-{{ order.id }}-title">Order #{{ order.id }}</h3>
-      <span class="order-status chip status status-{{ order.status|lower }}" aria-label="Order status: {{ order.status|replace('_', ' ')|title }}">{{ order.status|replace('_', ' ')|title }}</span>
-    </header>
-    <div class="order-card__divider"></div>
-    <section class="order-card__meta">
-      <dl class="order-kv">
-        <div><dt>Total</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.total) }}</dd></div>
-        {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>Refunded</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
-        <div><dt>Placed</dt><dd class="num nowrap">{{ order.created_at|format_time }}</dd></div>
+            <div><dt>Table</dt><dd>{{ order.table_name or '' }}</dd></div>
+            <div><dt>Payment</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
+            {% if order.notes %}<div><dt>Notes</dt><dd>{{ order.notes }}</dd></div>{% endif %}
 
-        <div><dt>Customer</dt><dd>{{ order.customer_name or 'Unknown' }} <a href="tel:{{ (order.customer_prefix or '')|replace(' ', '') }}{{ (order.customer_phone or '')|replace(' ', '') }}">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</a></dd></div>
-        <div><dt>Bar</dt><dd>{{ order.bar_name or '' }}</dd></div>
+            {% if order.ready_at %}<div><dt>Prep time</dt><dd class="num">{{ ((order.ready_at - order.created_at).total_seconds() // 60)|int }} min</dd></div>{% endif %}
+          </dl>
+        </section>
+        <div class="order-card__divider"></div>
+        <section class="order-card__items">
+          <ul class="order-items">
+            {% for item in order.items %}
+            <li><span class="qty">{{ item.qty }}×</span><span class="name">{{ item.menu_item_name or 'Unknown item' }}</span></li>
+            {% endfor %}
+          </ul>
+          {% if order.status == 'PLACED' %}
+          <div class="order-actions">
+            <button class="cancel-order" data-order-id="{{ order.id }}" data-status="CANCELED">Cancel</button>
+          </div>
+          {% endif %}
+        </section>
+      </article>
+      {% endfor %}
+    </div>
 
-        <div><dt>Table</dt><dd>{{ order.table_name or '' }}</dd></div>
-        <div><dt>Payment</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
-        {% if order.notes %}<div><dt>Notes</dt><dd>{{ order.notes }}</dd></div>{% endif %}
+    {% if pending_orders|length == 0 %}
+    <div class="empty show" id="pendingEmpty" aria-live="polite">
+      <h3>No pending orders</h3>
+      <p>New orders will appear here in real time.</p>
+    </div>
+    {% else %}
+    <div class="empty" id="pendingEmpty" aria-live="polite">
+      <h3>No pending orders</h3>
+      <p>New orders will appear here in real time.</p>
+    </div>
+    {% endif %}
+  </section>
 
-        {% if order.ready_at %}<div><dt>Prep time</dt><dd class="num">{{ ((order.ready_at - order.created_at).total_seconds() // 60)|int }} min</dd></div>{% endif %}
-      </dl>
-    </section>
-    <div class="order-card__divider"></div>
-    <section class="order-card__items">
-      <ul class="order-items">
-        {% for item in order.items %}
-        <li><span class="qty">{{ item.qty }}×</span><span class="name">{{ item.menu_item_name or 'Unknown item' }}</span></li>
-        {% endfor %}
-      </ul>
-    </section>
-  </article>
-  {% else %}
-  <p>No completed orders.</p>
-  {% endfor %}
-</div>
+  <!-- Completed -->
+  <section class="orders-section" id="completed">
+    <div class="section-head">
+      <h2>Completed Orders</h2>
+      <span class="count-badge" id="completedCount">{{ completed_orders|length }}</span>
+    </div>
+
+    <div class="orders-grid order-list" id="completed-orders">
+      {% for order in completed_orders %}
+      <article id="user-order-{{ order.id }}" class="order-card card card--{{ order.status|lower }}" role="article" aria-labelledby="order-{{ order.id }}-title" data-status="{{ order.status }}">
+        <header class="order-card__header">
+          <h3 id="order-{{ order.id }}-title">Order #{{ order.id }}</h3>
+          <span class="order-status chip status status-{{ order.status|lower }}" aria-label="Order status: {{ order.status|replace('_', ' ')|title }}">{{ order.status|replace('_', ' ')|title }}</span>
+        </header>
+        <div class="order-card__divider"></div>
+        <section class="order-card__meta">
+          <dl class="order-kv">
+            <div><dt>Total</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.total) }}</dd></div>
+            {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>Refunded</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
+            <div><dt>Placed</dt><dd class="num nowrap">{{ order.created_at|format_time }}</dd></div>
+
+            <div><dt>Customer</dt><dd>{{ order.customer_name or 'Unknown' }} <a href="tel:{{ (order.customer_prefix or '')|replace(' ', '') }}{{ (order.customer_phone or '')|replace(' ', '') }}">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</a></dd></div>
+            <div><dt>Bar</dt><dd>{{ order.bar_name or '' }}</dd></div>
+
+            <div><dt>Table</dt><dd>{{ order.table_name or '' }}</dd></div>
+            <div><dt>Payment</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
+            {% if order.notes %}<div><dt>Notes</dt><dd>{{ order.notes }}</dd></div>{% endif %}
+
+            {% if order.ready_at %}<div><dt>Prep time</dt><dd class="num">{{ ((order.ready_at - order.created_at).total_seconds() // 60)|int }} min</dd></div>{% endif %}
+          </dl>
+        </section>
+        <div class="order-card__divider"></div>
+        <section class="order-card__items">
+          <ul class="order-items">
+            {% for item in order.items %}
+            <li><span class="qty">{{ item.qty }}×</span><span class="name">{{ item.menu_item_name or 'Unknown item' }}</span></li>
+            {% endfor %}
+          </ul>
+        </section>
+      </article>
+      {% endfor %}
+    </div>
+
+    {% if completed_orders|length == 0 %}
+    <div class="empty show" id="completedEmpty" aria-live="polite">
+      <h3>No completed orders yet</h3>
+      <p>When you finish an order, it will show up here.</p>
+    </div>
+    {% else %}
+    <div class="empty" id="completedEmpty" aria-live="polite">
+      <h3>No completed orders yet</h3>
+      <p>When you finish an order, it will show up here.</p>
+    </div>
+    {% endif %}
+
+    <div class="orders-actions">
+      <button class="btn-outline" type="button" id="loadMoreOrders">Load more</button>
+      <a href="#top" class="btn-ghost">Back to top</a>
+    </div>
+  </section>
+</section>
+
+<style>
+.orders-page{
+  --surface:#fff; --bg-subtle:#f6f8fb; --border:#e5e7eb;
+  --text:#0f172a; --muted:#475569; --accent:var(--brand,#7c3aed);
+  --radius:16px; --shadow:0 6px 16px rgba(0,0,0,.06);
+}
+
+/* Page head */
+.orders-page .orders-head{ margin:8px 0 14px; }
+.orders-page .orders-title{ margin:0 0 4px; font-size:1.6rem; font-weight:800; color:var(--text); }
+.orders-page .orders-subtitle{ margin:0; font-size:.95rem; color:var(--muted); }
+
+/* Toolbar */
+.orders-page .orders-toolbar{ margin:14px 0 10px; background:linear-gradient(180deg,#fff, #fafafa); border:1px solid var(--border); border-radius:12px; padding:12px; box-shadow:var(--shadow); }
+.orders-page .toolbar-row{ display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
+.orders-page .field{ display:flex; flex-direction:column; gap:6px; }
+.orders-page .field.grow{ flex:1; }
+.orders-page select, .orders-page input[type="date"], .orders-page input[type="text"]{
+  height:42px; padding:0 12px; border:1px solid var(--border); border-radius:12px; background:#fff; color:var(--text);
+}
+
+/* Section heads */
+.orders-page .orders-section{ margin-top:18px; }
+.orders-page .section-head{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.orders-page .section-head h2{ margin:0; font-size:1.125rem; font-weight:800; color:var(--text); }
+.orders-page .count-badge{ display:inline-flex; align-items:center; justify-content:center; min-width:24px; height:24px; padding:0 8px; font-size:.8rem; font-weight:700; color:#111; background:#eef2ff; border:1px solid #dbeafe; border-radius:999px; }
+
+/* Grid that hosts the EXISTING order cards */
+.orders-page .orders-grid{
+  display:grid; gap:12px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.orders-page .orders-grid .card{ width:100%; max-width:none; }
+
+/* Empty */
+.orders-page .empty{ display:none; text-align:center; border:1px dashed var(--border); border-radius:12px; padding:22px; color:var(--muted); background:#fff; }
+.orders-page .empty.show{ display:block; }
+.orders-page .empty h3{ margin:0 0 6px; font-size:1.05rem; color:var(--text); }
+
+/* Actions */
+.orders-page .orders-actions{ display:flex; gap:10px; margin-top:12px; }
+.orders-page .btn-outline{ background:transparent; color:var(--text); border:1px solid var(--border); border-radius:12px; padding:10px 14px; font-weight:600; }
+.orders-page .btn-ghost{ background:transparent; color:var(--accent); border:1px solid transparent; border-radius:12px; padding:10px 12px; font-weight:600; }
+
+/* Responsiveness */
+@media (max-width: 768px){
+  .orders-page .orders-title{ font-size:1.4rem; }
+  .orders-page .orders-toolbar{ padding:10px; }
+  .orders-page .orders-grid{ grid-template-columns: 1fr; }
+}
+
+/* Focus ring */
+.orders-page :is(select,input,button,a){ outline:none; }
+.orders-page :is(select,input,button,a):focus{
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+  border-radius:12px;
+}
+</style>
+
+<script>
+function initOrderHistoryCounts(){
+  const pendingGrid=document.getElementById('pending-orders');
+  const completedGrid=document.getElementById('completed-orders');
+  const pendingCount=document.getElementById('pendingCount');
+  const completedCount=document.getElementById('completedCount');
+  const pendingEmpty=document.getElementById('pendingEmpty');
+  const completedEmpty=document.getElementById('completedEmpty');
+  function update(){
+    const p=pendingGrid.children.length;
+    const c=completedGrid.children.length;
+    pendingCount.textContent=p;
+    completedCount.textContent=c;
+    pendingEmpty.classList.toggle('show',p===0);
+    completedEmpty.classList.toggle('show',c===0);
+  }
+  update();
+  const mo=new MutationObserver(update);
+  mo.observe(pendingGrid,{childList:true});
+  mo.observe(completedGrid,{childList:true});
+}
+</script>
 <script src="/static/js/orders.js"></script>
 <script>
   initUser({{ user.id }});
+  initOrderHistoryCounts();
 </script>
 {% endblock %}
