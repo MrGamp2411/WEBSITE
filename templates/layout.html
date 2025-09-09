@@ -64,13 +64,13 @@
       <nav id="mobileMenu" class="mobile-menu" aria-label="Menu" role="dialog" aria-modal="true" hidden>
         <button class="menu-close js-close-menu" aria-label="Close menu"><i class="bi bi-x" aria-hidden="true"></i></button>
         <a href="/search" role="menuitem"><i class="bi bi-geo-alt" aria-hidden="true"></i><span>Browse Bars</span></a>
-        <a href="#how" role="menuitem"><i class="bi bi-stars" aria-hidden="true"></i><span>How it works</span></a>
         {% if user and (user.is_super_admin or user.is_bar_admin or user.is_bartender) %}
         <a href="/dashboard" role="menuitem"><i class="bi bi-speedometer2" aria-hidden="true"></i><span>Dashboard</span></a>
         {% endif %}
         {% if user %}
         <a href="/wallet" role="menuitem"><i class="bi bi-wallet2" aria-hidden="true"></i><span>Wallet</span></a>
         <a href="/orders" role="menuitem"><i class="bi bi-clock-history" aria-hidden="true"></i><span>Orders</span></a>
+        <a href="/profile" role="menuitem"><i class="bi bi-person" aria-hidden="true"></i><span>Profile</span></a>
         <a href="/logout" role="menuitem"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Logout</span></a>
         {% else %}
         <a href="/login" role="menuitem" class="menu-login"><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>Login</span></a>
