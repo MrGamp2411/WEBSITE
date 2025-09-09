@@ -723,6 +723,23 @@ users_by_username: Dict[str, DemoUser] = {}
 users_by_email: Dict[str, DemoUser] = {}
 next_user_id = 1
 
+# Username validation
+USERNAME_REGEX = re.compile(
+    r"^(?![._-])(?!.*[._-]{2})(?!.*[._-]$)[a-z0-9._-]{3,24}$"
+)
+RESERVED_USERNAMES = {
+    "admin",
+    "root",
+    "api",
+    "login",
+    "support",
+    "www",
+    "siplygo",
+}
+USERNAME_MESSAGE = (
+    "3–24 characters, lowercase letters, numbers, dot, hyphen or underscore. No spaces."
+)
+
 # Cart storage per user
 user_carts: Dict[int, Cart] = {}
 
@@ -2285,11 +2302,18 @@ async def register(request: Request, db: Session = Depends(get_db)):
     phone = form.get("phone")
     prefix = form.get("prefix")
     if all([username, password, email, phone, prefix]):
-        if len(username) < 8:
+        username_lower = username.lower()
+        if (
+            username != username_lower
+            or not USERNAME_REGEX.fullmatch(username_lower)
+            or username_lower.isdigit()
+            or re.fullmatch(r"[^@]+@[^@]+\.[^@]+", username_lower)
+            or username_lower in RESERVED_USERNAMES
+        ):
             return render_template(
                 "register.html",
                 request=request,
-                error="Username must be at least 8 characters",
+                error=USERNAME_MESSAGE,
             )
         if len(password) < 8:
             return render_template(
@@ -2310,8 +2334,10 @@ async def register(request: Request, db: Session = Depends(get_db)):
                 error="Phone number must be 9-10 digits",
             )
         if (
-            username in users_by_username
-            or db.query(User).filter(User.username == username).first()
+            username_lower in users_by_username
+            or db.query(User)
+            .filter(func.lower(User.username) == username_lower)
+            .first()
         ):
             return render_template(
                 "register.html", request=request, error="Username already taken"
@@ -2325,7 +2351,7 @@ async def register(request: Request, db: Session = Depends(get_db)):
             )
         password_hash = hashlib.sha256(password.encode("utf-8")).hexdigest()
         db_user = User(
-            username=username,
+            username=username_lower,
             email=email,
             password_hash=password_hash,
             phone=phone,
@@ -2336,14 +2362,14 @@ async def register(request: Request, db: Session = Depends(get_db)):
         db.refresh(db_user)
         user = DemoUser(
             id=db_user.id,
-            username=username,
+            username=username_lower,
             password=password,
             email=email,
             phone=phone,
             prefix=prefix,
         )
         users[user.id] = user
-        users_by_username[user.username] = user
+        users_by_username[username_lower] = user
         users_by_email[user.email] = user
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(
@@ -2425,7 +2451,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
                             user.transactions.append(tx)
                     users[user.id] = user
                     users_by_email[user.email] = user
-                    users_by_username[user.username] = user
+                    users_by_username[user.username.lower()] = user
         if not user or user.password != password:
             return render_template(
                 "login.html", request=request, error="Invalid credentials"
@@ -3689,6 +3715,7 @@ async def admin_users_view(request: Request, db: Session = Depends(get_db)):
             existing.role = role_map.get(db_user.role, "customer")
             existing.bar_ids = bar_ids
             existing.credit = credit
+            users_by_username[existing.username.lower()] = existing
         else:
             demo = DemoUser(
                 id=db_user.id,
@@ -3702,7 +3729,7 @@ async def admin_users_view(request: Request, db: Session = Depends(get_db)):
                 credit=credit,
             )
             users[demo.id] = demo
-            users_by_username[demo.username] = demo
+            users_by_username[demo.username.lower()] = demo
             users_by_email[demo.email] = demo
     return render_template(
         "admin_users.html",
@@ -3775,7 +3802,7 @@ def _load_demo_user(user_id: int, db: Session) -> DemoUser:
             ]
             user.transactions.append(tx)
     users[user.id] = user
-    users_by_username[user.username] = user
+    users_by_username[user.username.lower()] = user
     users_by_email[user.email] = user
     return user
 
@@ -3886,9 +3913,27 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
             bars=bars.values(),
             current=current,
         )
-    if username != user.username and (
-        username in users_by_username
-        or db.query(User).filter(User.username == username).first()
+    username_lower = username.lower()
+    if (
+        username != username_lower
+        or not USERNAME_REGEX.fullmatch(username_lower)
+        or username_lower.isdigit()
+        or re.fullmatch(r"[^@]+@[^@]+\.[^@]+", username_lower)
+        or username_lower in RESERVED_USERNAMES
+    ):
+        return render_template(
+            "admin_edit_user.html",
+            request=request,
+            user=user,
+            bars=bars.values(),
+            current=current,
+            error=USERNAME_MESSAGE,
+        )
+    if username_lower != user.username.lower() and (
+        username_lower in users_by_username
+        or db.query(User)
+        .filter(func.lower(User.username) == username_lower)
+        .first()
     ):
         return render_template(
             "admin_edit_user.html",
@@ -3909,10 +3954,12 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
             current=current,
             error="Email already taken",
         )
-    if username != user.username:
-        del users_by_username[user.username]
-        user.username = username
-        users_by_username[user.username] = user
+    if username_lower != user.username.lower():
+        del users_by_username[user.username.lower()]
+        user.username = username_lower
+        users_by_username[username_lower] = user
+    else:
+        user.username = username_lower
     if email != user.email:
         del users_by_email[user.email]
         user.email = email
@@ -3974,7 +4021,7 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     db.commit()
     # Update in-memory user caches to reflect new data
     users[user.id] = user
-    users_by_username[user.username] = user
+    users_by_username[user.username.lower()] = user
     users_by_email[user.email] = user
     # Update in-memory bar assignments
     for b in bars.values():
