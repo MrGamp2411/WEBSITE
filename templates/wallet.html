@@ -28,14 +28,6 @@
           <option>Refund</option>
         </select>
       </label>
-      <label class="filter">
-        <span>Date</span>
-        <input type="date" aria-label="From" />
-      </label>
-      <label class="filter">
-        <span>&nbsp;</span>
-        <input type="date" aria-label="To" />
-      </label>
       <label class="filter grow">
         <span>Search</span>
         <input type="text" placeholder="Bar, order ID, note…" />
@@ -127,7 +119,7 @@
 .filters .row{ display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
 .filters .filter{ display:flex; flex-direction:column; gap:6px; }
 .filters .filter.grow{ flex:1; }
-.filters select, .filters input[type="text"], .filters input[type="date"]{
+.filters select, .filters input[type="text"]{
   height:42px; padding:0 12px; border:1px solid var(--border); border-radius:12px; background:#fff; color:var(--text);
 }
 
@@ -137,7 +129,6 @@
 .section-title{ font-size:1.125rem; font-weight:700; margin:0; }
 
 .tx-group{ padding:0 16px 16px; }
-.tx-date{ color:var(--muted); font-weight:600; font-size:.85rem; margin:0 0 8px; }
 .tx-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
 
 .tx{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px; border:1px solid var(--border); border-radius:14px; background:#fff; }
