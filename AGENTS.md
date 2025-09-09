@@ -4,6 +4,7 @@
 - Wallet transactions for orders begin in a `PROCESSING` state and update to `COMPLETED` once the order is accepted or to `CANCELED` if the order is canceled. Canceled transactions display a `- CHF 0.00` amount.
 - Card payments finalized by the Wallee webhook are added to the wallet feed so card orders appear alongside wallet transactions. Pay-at-bar orders are excluded from the wallet feed.
 - Top-ups append a `topup` transaction in a `PROCESSING` state during `/api/topup/init`; the Wallee webhook updates it to `COMPLETED` and refreshes the user's cached credit.
+- Failed top-ups display a red `Failed` pill and a `+ CHF 0.00` amount in the wallet.
 
 - Core modules:
   - `main.py` – routes and helpers

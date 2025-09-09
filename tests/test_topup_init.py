@@ -123,3 +123,27 @@ def test_topup_transaction_updates_wallet():
         wallet = client.get("/wallet")
         assert "Completed" in wallet.text
         assert "CHF 5.00" in wallet.text
+
+
+def test_failed_topup_shows_zero_amount():
+    user = _register_user()
+    with TestClient(app) as client:
+        _login_user(client, user.email, "testpass")
+        with patch("app.wallee_client.tx_service") as MockTx, patch(
+            "app.wallee_client.pp_service"
+        ) as MockPage:
+            MockTx.create.return_value = SimpleNamespace(id=789)
+            MockPage.payment_page_url.return_value = "https://pay.example/789"
+            resp = client.post("/api/topup/init", json={"amount": 8})
+            assert resp.status_code == 200
+        db = SessionLocal()
+        topup = db.query(WalletTopup).filter(WalletTopup.user_id == user.id).one()
+        db.close()
+        client.post(
+            "/webhooks/wallee",
+            json={"entityId": topup.wallee_tx_id, "state": "FAILED"},
+        )
+        wallet = client.get("/wallet")
+        assert "Failed" in wallet.text
+        assert "+ CHF 0.00" in wallet.text
+        assert 'pill canceled">Failed</span>' in wallet.text

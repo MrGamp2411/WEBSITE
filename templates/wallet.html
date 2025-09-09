@@ -55,7 +55,7 @@
                 {% if ttype == 'payment' %}-{% else %}+{% endif %} CHF {{ "%.2f"|format(tx.total) }}
               </div>
               {% set status = tx.status if tx.status is defined else 'COMPLETED' %}
-              <span class="pill {% if status|lower in ['processing','pending'] %}pending{% elif status|lower == 'refunded' %}refunded{% elif status|lower in ['canceled','cancelled'] %}canceled{% else %}success{% endif %}">{{ status|replace('_',' ')|title }}</span>
+              <span class="pill {% if status|lower in ['processing','pending'] %}pending{% elif status|lower == 'refunded' %}refunded{% elif status|lower in ['canceled','cancelled','failed'] %}canceled{% else %}success{% endif %}">{{ status|replace('_',' ')|title }}</span>
             </div>
           </a>
         </li>

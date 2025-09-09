@@ -165,7 +165,7 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
         db.add(topup)
         db.commit()
         logger.info("Processed Wallee topup %s with state %s", tx_id, state)
-    elif state == "FAILED":
+    elif state in ("FAILED", "DECLINE", "DECLINED", "VOIDED", "CANCELED", "CANCELLED"):
         topup.status = "FAILED"
         db.add(topup)
         db.commit()
@@ -175,6 +175,7 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
             for tx in cached.transactions:
                 if getattr(tx, "topup_id", None) == topup.id:
                     tx.status = "FAILED"
+                    tx.total = 0.0
                     break
 
     return {"ok": True}
