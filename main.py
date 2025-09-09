@@ -84,6 +84,7 @@ from models import (
     AuditLog,
     WalletTopup,
     Payment,
+    WalletTransaction,
 )
 from pydantic import BaseModel, constr, ConfigDict
 from decimal import Decimal
@@ -1885,6 +1886,14 @@ async def checkout(
     db.commit()
     await send_order_update(db_order)
     if bar and payment_method != "bar":
+        tx_items = [
+            {
+                "name": item.product.name,
+                "quantity": item.quantity,
+                "price": float(item.product.price),
+            }
+            for item in cart.items.values()
+        ]
         user.transactions.append(
             Transaction(
                 bar.id,
@@ -1896,6 +1905,21 @@ async def checkout(
                 status="PROCESSING",
             )
         )
+        db.add(
+            WalletTransaction(
+                user_id=user.id,
+                type="payment",
+                bar_id=bar.id,
+                bar_name=bar.name,
+                items_json=tx_items,
+                total=Decimal(str(order_total)),
+                payment_method=payment_method,
+                order_id=db_order.id,
+                status="PROCESSING",
+                created_at=datetime.utcnow(),
+            )
+        )
+        db.commit()
     cart.clear()
     save_cart_for_user(user.id, cart)
     return RedirectResponse(url="/orders", status_code=status.HTTP_303_SEE_OTHER)
@@ -2018,6 +2042,18 @@ async def update_order_status(
                         cached.credit = float(customer.credit)
         else:
             order.refund_amount = Decimal("0")
+    wallet_tx = (
+        db.query(WalletTransaction)
+        .filter(WalletTransaction.order_id == order.id)
+        .one_or_none()
+    )
+    if wallet_tx:
+        if new_status in ("ACCEPTED", "READY", "COMPLETED"):
+            wallet_tx.status = "COMPLETED"
+        elif new_status in ("CANCELED", "REJECTED"):
+            wallet_tx.status = "CANCELED"
+            wallet_tx.total = Decimal("0")
+        db.add(wallet_tx)
     db.commit()
     cached_user = users.get(order.customer_id) if order.customer_id else None
     if cached_user:
@@ -2164,13 +2200,27 @@ async def init_topup(
         SimpleNamespace(
             type="topup",
             total=float(amount),
-            method="Card",
+            payment_method="card",
             status="PROCESSING",
             created_at=datetime.utcnow(),
             topup_id=topup.id,
             items=[],
         )
     )
+
+    db.add(
+        WalletTransaction(
+            user_id=user.id,
+            type="topup",
+            total=Decimal(str(amount)),
+            payment_method="card",
+            status="PROCESSING",
+            topup_id=topup.id,
+            items_json=[],
+            created_at=datetime.utcnow(),
+        )
+    )
+    db.commit()
 
     try:
         base_url = os.environ["BASE_URL"].rstrip("/")
@@ -2331,6 +2381,41 @@ async def login(request: Request, db: Session = Depends(get_db)):
                         bar_ids=bar_ids,
                         credit=float(db_user.credit or 0),
                     )
+                    tx_rows = (
+                        db.query(WalletTransaction)
+                        .filter(WalletTransaction.user_id == db_user.id)
+                        .order_by(WalletTransaction.created_at)
+                        .all()
+                    )
+                    for row in tx_rows:
+                        if row.type == "topup":
+                            user.transactions.append(
+                                SimpleNamespace(
+                                    type="topup",
+                                    total=float(row.total or 0),
+                                    payment_method=row.payment_method,
+                                    status=row.status,
+                                    created_at=row.created_at,
+                                    topup_id=row.topup_id,
+                                    items=[],
+                                )
+                            )
+                        else:
+                            tx = Transaction(
+                                row.bar_id or 0,
+                                row.bar_name or "",
+                                [],
+                                float(row.total or 0),
+                                row.payment_method or "",
+                                order_id=row.order_id,
+                                status=row.status,
+                                created_at=row.created_at,
+                            )
+                            tx.items = [
+                                TransactionItem(i["name"], i["quantity"], i["price"])
+                                for i in (row.items_json or [])
+                            ]
+                            user.transactions.append(tx)
                     users[user.id] = user
                     users_by_email[user.email] = user
                     users_by_username[user.username] = user
@@ -3647,6 +3732,41 @@ def _load_demo_user(user_id: int, db: Session) -> DemoUser:
         bar_ids=bar_ids,
         credit=float(db_user.credit or 0),
     )
+    tx_rows = (
+        db.query(WalletTransaction)
+        .filter(WalletTransaction.user_id == db_user.id)
+        .order_by(WalletTransaction.created_at)
+        .all()
+    )
+    for row in tx_rows:
+        if row.type == "topup":
+            user.transactions.append(
+                SimpleNamespace(
+                    type="topup",
+                    total=float(row.total or 0),
+                    payment_method=row.payment_method,
+                    status=row.status,
+                    created_at=row.created_at,
+                    topup_id=row.topup_id,
+                    items=[],
+                )
+            )
+        else:
+            tx = Transaction(
+                row.bar_id or 0,
+                row.bar_name or "",
+                [],
+                float(row.total or 0),
+                row.payment_method or "",
+                order_id=row.order_id,
+                status=row.status,
+                created_at=row.created_at,
+            )
+            tx.items = [
+                TransactionItem(i["name"], i["quantity"], i["price"])
+                for i in (row.items_json or [])
+            ]
+            user.transactions.append(tx)
     users[user.id] = user
     users_by_username[user.username] = user
     users_by_email[user.email] = user

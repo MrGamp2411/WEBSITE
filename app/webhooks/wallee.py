@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from decimal import Decimal
 
-from models import User, WalletTopup, Payment, Order, OrderItem, Bar
+from models import User, WalletTopup, Payment, Order, OrderItem, Bar, WalletTransaction
 from .wallee_verify import verify_signature_bytes
 
 router = APIRouter()
@@ -121,6 +121,28 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
                             for i in order.items
                         ]
                         cached.transactions.append(tx)
+                        db.add(
+                            WalletTransaction(
+                                user_id=order.customer_id,
+                                type="payment",
+                                bar_id=bar.id if bar else order.bar_id,
+                                bar_name=bar.name if bar else "",
+                                items_json=[
+                                    {
+                                        "name": i.menu_item_name or "",
+                                        "quantity": i.qty,
+                                        "price": float(i.unit_price),
+                                    }
+                                    for i in order.items
+                                ],
+                                total=Decimal(str(order.total)),
+                                payment_method=order.payment_method,
+                                order_id=order.id,
+                                status="PROCESSING",
+                                created_at=order.created_at,
+                            )
+                        )
+                        db.commit()
         elif state in ("FAILED", "DECLINE", "DECLINED", "VOIDED"):
             if order:
                 order.status = "CANCELED"
@@ -163,11 +185,28 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
         topup.status = state
         topup.processed_at = datetime.utcnow()
         db.add(topup)
+        wallet_tx = (
+            db.query(WalletTransaction)
+            .filter(WalletTransaction.topup_id == topup.id)
+            .one_or_none()
+        )
+        if wallet_tx:
+            wallet_tx.status = "COMPLETED"
+            db.add(wallet_tx)
         db.commit()
         logger.info("Processed Wallee topup %s with state %s", tx_id, state)
     elif state in ("FAILED", "DECLINE", "DECLINED", "VOIDED", "CANCELED", "CANCELLED"):
         topup.status = "FAILED"
         db.add(topup)
+        wallet_tx = (
+            db.query(WalletTransaction)
+            .filter(WalletTransaction.topup_id == topup.id)
+            .one_or_none()
+        )
+        if wallet_tx:
+            wallet_tx.status = "FAILED"
+            wallet_tx.total = Decimal("0")
+            db.add(wallet_tx)
         db.commit()
         from main import users
         cached = users.get(topup.user_id)

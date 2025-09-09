@@ -59,3 +59,27 @@ def test_bar_payments_hidden_from_wallet():
     users.clear()
     users_by_email.clear()
     users_by_username.clear()
+
+
+def test_wallet_transactions_persist_across_restart():
+    setup_db()
+    with TestClient(app) as client:
+        ids = create_order(client, 'wallet')
+
+        client.post('/login', data={'email': ids['customer_email'], 'password': 'pass'})
+        wallet = client.get('/wallet')
+        assert 'Processing' in wallet.text
+        client.get('/logout')
+
+        users.clear()
+        users_by_email.clear()
+        users_by_username.clear()
+
+        client.post('/login', data={'email': ids['customer_email'], 'password': 'pass'})
+        wallet = client.get('/wallet')
+        assert 'Processing' in wallet.text
+
+    user_carts.clear()
+    users.clear()
+    users_by_email.clear()
+    users_by_username.clear()
