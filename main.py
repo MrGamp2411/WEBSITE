@@ -36,6 +36,7 @@ import asyncio
 import hashlib
 import json
 import random
+import re
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -2284,6 +2285,12 @@ async def register(request: Request, db: Session = Depends(get_db)):
     phone = form.get("phone")
     prefix = form.get("prefix")
     if all([username, password, email, phone, prefix]):
+        if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email or ""):
+            return render_template(
+                "register.html",
+                request=request,
+                error="Invalid email format",
+            )
         if not phone.isdigit() or not (9 <= len(phone) <= 10):
             return render_template(
                 "register.html",

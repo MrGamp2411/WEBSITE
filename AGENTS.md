@@ -151,6 +151,7 @@
 - Login fetches the user's bar assignment from the database so the bar is available immediately after authentication
 - Login and Register pages show text prompts linking to each other: "Already registered? Log in" and "Not registered yet? Register"
 - Register form requires a phone number with 9–10 digits; invalid entries show an error
+- Register form requires an email in the format text@text.text; invalid entries show an error
 - Admin user edit form: `templates/admin_edit_user.html` posts fields
     (`username`, `password`, `email`, `prefix`, `phone`, `role`, `bar_ids`, `credit`)
     to `/admin/users/edit/{id}`. Bar selection uses checkboxes for easier multi-bar assignment.
