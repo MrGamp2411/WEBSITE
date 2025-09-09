@@ -10,7 +10,7 @@
     <div class="balance-left">
       <span class="label">Current balance</span>
       <div class="amount">CHF {{ "%.2f"|format(user.credit) }}</div>
-      <div class="meta"><span class="badge success">Available</span> <span class="dot">•</span> Updated just now</div>
+      <div class="meta"><span class="badge success">Available</span></div>
     </div>
   <div class="balance-right wallet-actions">
       <a href="/topup" class="btn-primary">Top Up</a>
@@ -93,7 +93,6 @@
 .balance-card .meta{ color:var(--muted); font-size:.85rem; display:flex; align-items:center; gap:8px; }
 .balance-card .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; font-size:.75rem; border:1px solid var(--border); }
 .balance-card .badge.success{ background:#f0fdf4; border-color:#bbf7d0; color:#166534; }
-.balance-card .dot{ opacity:.5; }
 .wallet-actions{ display:flex; gap:10px; flex-wrap:wrap; }
 
 /* Transaction FEED */
