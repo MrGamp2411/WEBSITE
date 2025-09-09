@@ -23,8 +23,8 @@ def test_register_email_format_validation():
         resp = client.post(
             "/register",
             data={
-                "username": "invalid",
-                "password": "pass",
+                "username": "validuser",
+                "password": "pass1234",
                 "email": "invalid",
                 "prefix": "+41",
                 "phone": "123456789",
@@ -36,8 +36,8 @@ def test_register_email_format_validation():
         resp_ok = client.post(
             "/register",
             data={
-                "username": "validuser",
-                "password": "pass",
+                "username": "validuser2",
+                "password": "pass1234",
                 "email": "valid@example.com",
                 "prefix": "+41",
                 "phone": "123456789",

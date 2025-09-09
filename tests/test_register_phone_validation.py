@@ -23,8 +23,8 @@ def test_register_phone_length_validation():
         resp = client.post(
             "/register",
             data={
-                "username": "short",
-                "password": "pass",
+                "username": "validuser",
+                "password": "pass1234",
                 "email": "short@example.com",
                 "prefix": "+41",
                 "phone": "12345678",
@@ -36,8 +36,8 @@ def test_register_phone_length_validation():
         resp_ok = client.post(
             "/register",
             data={
-                "username": "validuser",
-                "password": "pass",
+                "username": "validuser2",
+                "password": "pass1234",
                 "email": "valid@example.com",
                 "prefix": "+41",
                 "phone": "123456789",

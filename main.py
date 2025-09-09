@@ -2285,6 +2285,18 @@ async def register(request: Request, db: Session = Depends(get_db)):
     phone = form.get("phone")
     prefix = form.get("prefix")
     if all([username, password, email, phone, prefix]):
+        if len(username) < 8:
+            return render_template(
+                "register.html",
+                request=request,
+                error="Username must be at least 8 characters",
+            )
+        if len(password) < 8:
+            return render_template(
+                "register.html",
+                request=request,
+                error="Password must be at least 8 characters",
+            )
         if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email or ""):
             return render_template(
                 "register.html",
