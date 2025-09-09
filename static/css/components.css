@@ -251,6 +251,9 @@ body.dark-mode{
 .auth-card label{display:flex;flex-direction:column;font-weight:600;gap:var(--space-1);}
 .auth-card input,.auth-card select{padding:var(--space-2);border:1px solid #d1d5db;border-radius:var(--radius);min-height:44px;}
 .auth-card button{align-self:center;margin-top:var(--space-1);}
+.auth-card .password-wrapper{display:flex;align-items:center;gap:var(--space-1);}
+.auth-card .password-wrapper input{flex:1;}
+.auth-card .password-wrapper .toggle-password{align-self:stretch;margin-top:0;padding:0 var(--space-2);border:1px solid #d1d5db;border-radius:var(--radius);background:transparent;}
 
 .dashboard-info{margin-bottom:var(--space-4);}
 .dashboard-info .card{padding:var(--space-3);gap:var(--space-1);}
