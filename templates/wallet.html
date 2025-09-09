@@ -17,24 +17,6 @@
   </div>
   </div>
 
-  <div class="filters">
-    <div class="row">
-      <label class="filter">
-        <span>Type</span>
-        <select aria-label="Filter by type">
-          <option value="">All</option>
-          <option>Top up</option>
-          <option>Payment</option>
-          <option>Refund</option>
-        </select>
-      </label>
-      <label class="filter grow">
-        <span>Search</span>
-        <input type="text" placeholder="Bar, order ID, note…" />
-      </label>
-    </div>
-  </div>
-
   <div class="card tx-feed">
     <div class="tx-head">
       <h2 class="section-title">Recent Activity</h2>
@@ -114,15 +96,6 @@
 .balance-card .dot{ opacity:.5; }
 .wallet-actions{ display:flex; gap:10px; flex-wrap:wrap; }
 
-/* Filters */
-.filters{ margin:14px 0; }
-.filters .row{ display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
-.filters .filter{ display:flex; flex-direction:column; gap:6px; }
-.filters .filter.grow{ flex:1; }
-.filters select, .filters input[type="text"]{
-  height:42px; padding:0 12px; border:1px solid var(--border); border-radius:12px; background:#fff; color:var(--text);
-}
-
 /* Transaction FEED */
 .tx-feed{ padding:0; overflow:hidden; }
 .tx-head{ padding:16px; }
@@ -158,7 +131,6 @@
   .balance-card{ flex-direction:column; align-items:flex-start; }
   .wallet-actions{ width:100%; }
   .wallet-actions .btn-primary{ flex:1; text-align:center; }
-  .filters .row{ gap:8px; }
   .tx{ align-items:flex-start; }
   .tx-meta{ align-items:flex-end; }
 }
