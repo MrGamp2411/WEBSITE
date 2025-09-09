@@ -6,6 +6,7 @@
 - Card payments finalized by the Wallee webhook are added to the wallet feed so card orders appear alongside wallet transactions. Pay-at-bar orders are excluded from the wallet feed.
 - Top-ups append a `topup` transaction in a `PROCESSING` state during `/api/topup/init`; the Wallee webhook updates it to `COMPLETED` and refreshes the user's cached credit.
 - Failed top-ups display a red `Failed` pill and a `+ CHF 0.00` amount in the wallet.
+- Wallet transactions persist across restarts via the `wallet_transactions` table; login hydrates cached transactions from this table.
 
 - Core modules:
   - `main.py` – routes and helpers

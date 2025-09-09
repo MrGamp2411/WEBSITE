@@ -330,6 +330,23 @@ class WalletTopup(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
+class WalletTransaction(Base):
+    __tablename__ = "wallet_transactions"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    type = Column(String(20), default="payment")
+    bar_id = Column(Integer)
+    bar_name = Column(String(100))
+    items_json = Column(JSON)
+    total = Column(Numeric(10, 2), default=0)
+    payment_method = Column(String(30))
+    order_id = Column(Integer)
+    topup_id = Column(String)
+    status = Column(String(30), default="PROCESSING")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
 class AuditLog(Base):
     __tablename__ = "audit_logs"
 
