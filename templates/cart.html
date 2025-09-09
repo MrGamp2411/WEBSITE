@@ -208,6 +208,16 @@
 }
 </style>
 {% endblock %}
-
-{% block scripts %}{% endblock %}
+{% block scripts %}
+<script>
+  const form = document.getElementById('checkoutForm');
+  const submitBtn = document.querySelector('.place-order');
+  form?.addEventListener('submit', () => {
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.style.display = 'none';
+    }
+  });
+</script>
+{% endblock %}
 
