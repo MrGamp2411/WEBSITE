@@ -120,7 +120,7 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
                             )
                             for i in order.items
                         ]
-                        cached.transactions.append(tx)
+                        cached.transactions.insert(0, tx)
                         db.add(
                             WalletTransaction(
                                 user_id=order.customer_id,

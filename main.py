@@ -1894,7 +1894,8 @@ async def checkout(
             }
             for item in cart.items.values()
         ]
-        user.transactions.append(
+        user.transactions.insert(
+            0,
             Transaction(
                 bar.id,
                 bar.name,
@@ -1903,7 +1904,7 @@ async def checkout(
                 payment_method,
                 order_id=db_order.id,
                 status="PROCESSING",
-            )
+            ),
         )
         db.add(
             WalletTransaction(
@@ -2196,7 +2197,8 @@ async def init_topup(
     db.commit()
     db.refresh(topup)
 
-    user.transactions.append(
+    user.transactions.insert(
+        0,
         SimpleNamespace(
             type="topup",
             total=float(amount),
@@ -2205,7 +2207,7 @@ async def init_topup(
             created_at=datetime.utcnow(),
             topup_id=topup.id,
             items=[],
-        )
+        ),
     )
 
     db.add(
@@ -2384,7 +2386,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
                     tx_rows = (
                         db.query(WalletTransaction)
                         .filter(WalletTransaction.user_id == db_user.id)
-                        .order_by(WalletTransaction.created_at)
+                        .order_by(WalletTransaction.created_at.desc())
                         .all()
                     )
                     for row in tx_rows:
@@ -3735,7 +3737,7 @@ def _load_demo_user(user_id: int, db: Session) -> DemoUser:
     tx_rows = (
         db.query(WalletTransaction)
         .filter(WalletTransaction.user_id == db_user.id)
-        .order_by(WalletTransaction.created_at)
+        .order_by(WalletTransaction.created_at.desc())
         .all()
     )
     for row in tx_rows:
