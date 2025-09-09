@@ -163,7 +163,7 @@
     throughout to manage permissions and dashboard views.
 - Orders:
   - `/orders` page renders `templates/order_history.html` with past `Order` entries for the current user.
-  - The page wraps content in `.orders-page` and includes a toolbar UI (status, date range, search, sort, export). Pending and completed sections show counts and empty states, and order cards sit in a responsive `.orders-grid` without altering card markup.
+  - The page wraps content in `.orders-page`; pending and completed sections show counts and empty states, and order cards sit in a responsive `.orders-grid` without altering card markup. The previous status/date/search/sort/export toolbar has been removed.
   - Checkout persists orders to the database and redirects to `/orders`.
   - Mobile hamburger menu links to order history via `bi bi-clock-history` icon.
   - Bartenders manage live orders in `bartender_orders.html` using `static/js/orders.js`,
