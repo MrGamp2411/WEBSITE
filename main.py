@@ -2112,26 +2112,6 @@ async def wallet(request: Request):
     )
 
 
-@app.get("/wallet/tx/{tx_id}", response_class=HTMLResponse)
-async def wallet_transaction(request: Request, tx_id: int):
-    user = get_current_user(request)
-    if not user:
-        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
-    transactions = [
-        tx for tx in user.transactions if getattr(tx, "payment_method", "") != "bar"
-    ]
-    if tx_id < 0 or tx_id >= len(transactions):
-        return RedirectResponse(url="/wallet", status_code=status.HTTP_303_SEE_OTHER)
-    tx = transactions[tx_id]
-    return render_template(
-        "transaction_detail.html",
-        request=request,
-        tx=tx,
-        cart_bar_id=None,
-        cart_bar_name=None,
-    )
-
-
 @app.get("/topup", response_class=HTMLResponse)
 async def topup(request: Request):
     user = get_current_user(request)
