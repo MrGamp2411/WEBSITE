@@ -3,43 +3,8 @@
 <section class="orders-page">
   <header class="orders-head">
     <h1 class="orders-title">Order History</h1>
-    <p class="orders-subtitle">Review your past orders, filter by status or date, and find details faster.</p>
+    <p class="orders-subtitle">Review your past orders and find details faster.</p>
   </header>
-
-  <div class="orders-toolbar" role="region" aria-label="Filters">
-    <div class="toolbar-row">
-      <label class="field">
-        <span>Status</span>
-        <select aria-label="Filter by status" id="ordersFilterStatus">
-          <option value="">All</option>
-          <option>Pending</option>
-          <option>Completed</option>
-          <option>Cancelled</option>
-          <option>Refunded</option>
-        </select>
-      </label>
-      <label class="field">
-        <span>From</span>
-        <input type="date" id="ordersFromDate" />
-      </label>
-      <label class="field">
-        <span>To</span>
-        <input type="date" id="ordersToDate" />
-      </label>
-      <label class="field grow">
-        <span>Search</span>
-        <input type="text" id="ordersSearch" placeholder="Bar, order ID, note…" />
-      </label>
-      <label class="field">
-        <span>Sort</span>
-        <select id="ordersSort">
-          <option value="newest">Newest first</option>
-          <option value="oldest">Oldest first</option>
-        </select>
-      </label>
-      <button class="btn-outline" type="button" id="ordersExportCsv">Export CSV</button>
-    </div>
-  </div>
 
   <!-- Pending -->
   <section class="orders-section" id="pending">
@@ -176,15 +141,6 @@
 .orders-page .orders-title{ margin:0 0 4px; font-size:1.6rem; font-weight:800; color:var(--text); }
 .orders-page .orders-subtitle{ margin:0; font-size:.95rem; color:var(--muted); }
 
-/* Toolbar */
-.orders-page .orders-toolbar{ margin:14px 0 10px; background:linear-gradient(180deg,#fff, #fafafa); border:1px solid var(--border); border-radius:12px; padding:12px; box-shadow:var(--shadow); }
-.orders-page .toolbar-row{ display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
-.orders-page .field{ display:flex; flex-direction:column; gap:6px; }
-.orders-page .field.grow{ flex:1; }
-.orders-page select, .orders-page input[type="date"], .orders-page input[type="text"]{
-  height:42px; padding:0 12px; border:1px solid var(--border); border-radius:12px; background:#fff; color:var(--text);
-}
-
 /* Section heads */
 .orders-page .orders-section{ margin-top:18px; }
 .orders-page .section-head{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
@@ -211,7 +167,6 @@
 /* Responsiveness */
 @media (max-width: 768px){
   .orders-page .orders-title{ font-size:1.4rem; }
-  .orders-page .orders-toolbar{ padding:10px; }
   .orders-page .orders-grid{ grid-template-columns: 1fr; }
 }
 
