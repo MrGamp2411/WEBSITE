@@ -79,6 +79,7 @@ def test_profile_update_password_change():
             data={
                 "username": "olduser2",
                 "email": "old2@example.com",
+                "current_password": "Oldpass123",
                 "password": "Newpass123",
                 "confirm_password": "Newpass123",
                 "prefix": "+41",
@@ -91,5 +92,30 @@ def test_profile_update_password_change():
     db = SessionLocal()
     updated = db.query(User).filter(User.id == user_id).first()
     assert verify_password(updated.password_hash, "Newpass123")
+    db.close()
+
+
+def test_profile_update_wrong_current_password():
+    user_id = _create_user("olduser3", "old3@example.com", "0790000002", "+41790000002")
+    with TestClient(app) as client:
+        _login(client, "old3@example.com")
+        resp = client.post(
+            "/profile",
+            data={
+                "username": "olduser3",
+                "email": "old3@example.com",
+                "current_password": "Wrongpass123",
+                "password": "Newpass123",
+                "confirm_password": "Newpass123",
+                "prefix": "+41",
+                "phone": "0765551236",
+            },
+            follow_redirects=False,
+        )
+        assert resp.status_code == 200
+        assert b"Current password is incorrect" in resp.content
+    db = SessionLocal()
+    updated = db.query(User).filter(User.id == user_id).first()
+    assert verify_password(updated.password_hash, "Oldpass123")
     db.close()
 
