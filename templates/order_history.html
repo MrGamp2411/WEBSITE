@@ -146,13 +146,13 @@
 /* Grid that hosts the EXISTING order cards */
 .orders-page .orders-grid{
   display:grid; gap:12px;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: 1fr;
   margin:0;
 }
 .orders-page .orders-grid .card{ width:100%; max-width:none; }
 
 @media (min-width: 960px){
-  .orders-page .orders-grid{ grid-template-columns: repeat(3, 1fr); }
+  .orders-page .orders-grid{ grid-template-columns: repeat(3, minmax(320px, 1fr)); }
 }
 
 /* Empty */
@@ -163,7 +163,6 @@
 /* Responsiveness */
 @media (max-width: 768px){
   .orders-page .orders-title{ font-size:1.4rem; }
-  .orders-page .orders-grid{ grid-template-columns: 1fr; }
 }
 
 /* Focus ring */
