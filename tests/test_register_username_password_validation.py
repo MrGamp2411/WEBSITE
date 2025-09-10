@@ -42,7 +42,7 @@ def test_register_username_validation():
                     "confirm_password": "password1",
                     "email": f"user{i}@example.com",
                     "prefix": "+41",
-                    "phone": f"1234567{i:02d}",
+                    "phone": f"07655512{i:02d}",
                 },
             )
             assert resp.status_code == 200
@@ -56,7 +56,7 @@ def test_register_username_validation():
                     "confirm_password": "password1",
                     "email": "user_valid@example.com",
                     "prefix": "+41",
-                    "phone": "123456799",
+                    "phone": "0765551299",
                 },
             follow_redirects=False,
         )
@@ -71,7 +71,7 @@ def test_register_username_validation():
                     "confirm_password": "password1",
                     "email": "user_dup@example.com",
                     "prefix": "+41",
-                    "phone": "123456788",
+                    "phone": "0765551288",
                 },
         )
         assert resp_dup.status_code == 200
@@ -88,7 +88,7 @@ def test_register_password_length_validation():
                     "confirm_password": "short",
                     "email": "user3@example.com",
                     "prefix": "+41",
-                    "phone": "123456781",
+                    "phone": "0765551281",
                 },
         )
         assert resp.status_code == 200
@@ -102,7 +102,7 @@ def test_register_password_length_validation():
                     "confirm_password": "p" * 129,
                     "email": "userlong@example.com",
                     "prefix": "+41",
-                    "phone": "123456783",
+                    "phone": "0765551283",
                 },
         )
         assert resp_long.status_code == 200
@@ -116,7 +116,7 @@ def test_register_password_length_validation():
                     "confirm_password": "12345678",
                     "email": "userweak@example.com",
                     "prefix": "+41",
-                    "phone": "123456784",
+                    "phone": "0765551284",
                 },
         )
         assert resp_weak.status_code == 200
@@ -130,7 +130,7 @@ def test_register_password_length_validation():
                     "confirm_password": "longpass1",
                     "email": "user4@example.com",
                     "prefix": "+41",
-                    "phone": "123456782",
+                    "phone": "0765551282",
                 },
             follow_redirects=False,
         )
@@ -148,7 +148,7 @@ def test_register_password_mismatch_validation():
                 "confirm_password": "different",
                 "email": "confirm@example.com",
                 "prefix": "+41",
-                "phone": "123456787",
+                "phone": "0765551287",
             },
         )
         assert resp.status_code == 200

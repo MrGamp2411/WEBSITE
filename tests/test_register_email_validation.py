@@ -28,7 +28,7 @@ def test_register_email_format_validation():
                 "confirm_password": "pass1234",
                 "email": "invalid",
                 "prefix": "+41",
-                "phone": "123456789",
+                "phone": "076 555 12 34",
             },
         )
         assert resp.status_code == 200
@@ -42,7 +42,7 @@ def test_register_email_format_validation():
                 "confirm_password": "pass1234",
                 "email": "valid@example.com",
                 "prefix": "+41",
-                "phone": "123456789",
+                "phone": "076 555 12 35",
             },
             follow_redirects=False,
         )

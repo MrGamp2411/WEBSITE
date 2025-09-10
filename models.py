@@ -24,6 +24,11 @@ from sqlalchemy.dialects.postgresql import JSONB, BIGINT
 from database import Base
 
 
+def _gen_dummy_phone_e164() -> str:
+    """Generate a placeholder unique phone in E.164 for tests/seed data."""
+    return f"+990{uuid4().int % 10**9:09d}"
+
+
 class RoleEnum(str, PyEnum):
     SUPERADMIN = "SuperAdmin"
     BARADMIN = "BarAdmin"
@@ -41,6 +46,8 @@ class User(Base):
     role = Column(Enum(RoleEnum), default=RoleEnum.CUSTOMER, nullable=False)
     phone = Column(String(30))
     prefix = Column(String(10))
+    phone_e164 = Column(String(16), unique=True, nullable=False, default=_gen_dummy_phone_e164)
+    phone_region = Column(String(8))
     twofa_secret = Column(String(32))
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)

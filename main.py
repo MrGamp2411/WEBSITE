@@ -92,7 +92,7 @@ from models import (
     Payment,
     WalletTransaction,
 )
-from pydantic import BaseModel, constr, ConfigDict
+from pydantic import BaseModel, constr, ConfigDict, ValidationError
 from decimal import Decimal
 import math
 from finance import (
@@ -107,6 +107,7 @@ from urllib.parse import urljoin, urlencode
 from app.webhooks.wallee import router as wallee_webhook_router
 from wallee.models import LineItemCreate, TransactionCreate
 from wallee.rest import ApiException
+from app.phone import normalize_phone_or_raise
 
 # Predefined categories for bars (used for filtering and admin forms)
 BAR_CATEGORIES = [
@@ -245,6 +246,8 @@ class DemoUser:
         email: str = "",
         phone: str = "",
         prefix: str = "",
+        phone_e164: str = "",
+        phone_region: str = "",
         role: str = "customer",
         bar_ids: Optional[List[int]] = None,
         pending_bar_id: Optional[int] = None,
@@ -259,6 +262,8 @@ class DemoUser:
         self.email = email
         self.phone = phone
         self.prefix = prefix
+        self.phone_e164 = phone_e164
+        self.phone_region = phone_region
         self.role = role
         self.bar_ids = bar_ids or []
         self.pending_bar_id = pending_bar_id
@@ -521,6 +526,10 @@ def seed_super_admin():
                 email=admin_email,
                 password_hash=password_hash,
                 role=RoleEnum.SUPERADMIN,
+                phone="0000000000",
+                prefix="+41",
+                phone_e164="+41000000000",
+                phone_region="CH",
             )
             db.add(user)
             db.commit()
@@ -535,6 +544,22 @@ def ensure_prefix_column():
     if "prefix" not in columns:
         with engine.begin() as conn:
             conn.execute(text("ALTER TABLE users ADD COLUMN prefix VARCHAR(10)"))
+
+
+def ensure_phone_columns():
+    """Add the phone_e164 and phone_region columns if missing."""
+    inspector = inspect(engine)
+    columns = [col["name"] for col in inspector.get_columns("users")]
+    with engine.begin() as conn:
+        if "phone_e164" not in columns:
+            conn.execute(text("ALTER TABLE users ADD COLUMN phone_e164 VARCHAR(16)"))
+            conn.execute(
+                text(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS uq_users_phone_e164 ON users(phone_e164)"
+                )
+            )
+        if "phone_region" not in columns:
+            conn.execute(text("ALTER TABLE users ADD COLUMN phone_region VARCHAR(8)"))
 
 
 def ensure_credit_column() -> None:
@@ -742,6 +767,7 @@ async def on_startup():
     """Initialise database tables on startup."""
     Base.metadata.create_all(bind=engine)
     ensure_prefix_column()
+    ensure_phone_columns()
     ensure_credit_column()
     ensure_bar_columns()
     ensure_category_columns()
@@ -1233,6 +1259,7 @@ async def save_upload(file, existing_path: Optional[str] = None) -> Optional[str
 
 
 def render_template(template_name: str, **context) -> HTMLResponse:
+    status_code = context.pop("status_code", 200)
     request: Optional[Request] = context.get("request")
     if request is not None:
         user = get_current_user(request)
@@ -1271,7 +1298,7 @@ def render_template(template_name: str, **context) -> HTMLResponse:
         context.setdefault("GOOGLE_MAPS_API_KEY", api_key)
 
     template = templates_env.get_template(template_name)
-    return HTMLResponse(template.render(**context))
+    return HTMLResponse(template.render(**context), status_code=status_code)
 
 
 # -----------------------------------------------------------------------------
@@ -1564,6 +1591,13 @@ class OrderWithItemsRead(OrderRead):
 
 class OrderStatusUpdate(BaseModel):
     status: str
+
+
+class RegisterIn(BaseModel):
+    dial_code: constr(strip_whitespace=True, pattern=r"^\+\d{1,3}$")
+    phone: constr(strip_whitespace=True, min_length=4, max_length=32)
+
+    model_config = ConfigDict(extra="ignore")
 
 
 class PayoutRunInput(BaseModel):
@@ -2410,12 +2444,24 @@ async def register(request: Request, db: Session = Depends(get_db)):
         "prefix": prefix,
     }
 
-    def render_form(error_msg: str):
+    def render_form(error_msg: str, status_code: int = 200):
         return render_template(
-            "register.html", request=request, error=error_msg, **form_data
+            "register.html",
+            request=request,
+            error=error_msg,
+            status_code=status_code,
+            **form_data,
         )
 
     if all([username, password, confirm_password, email, phone, prefix]):
+        try:
+            RegisterIn.model_validate({"dial_code": prefix, "phone": phone})
+        except ValidationError:
+            return render_form("Lunghezza numero non valida.", status_code=422)
+        try:
+            phone_e164, phone_region = normalize_phone_or_raise(prefix, phone)
+        except HTTPException as exc:
+            return render_form(exc.detail, status_code=exc.status_code)
         username_lower = username.lower()
         if (
             username != username_lower
@@ -2433,8 +2479,6 @@ async def register(request: Request, db: Session = Depends(get_db)):
             return render_form("Passwords do not match")
         if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email or ""):
             return render_form("Invalid email format")
-        if not phone.isdigit() or not (9 <= len(phone) <= 10):
-            return render_form("Phone number must be 9-10 digits")
         if (
             username_lower in users_by_username
             or db.query(User)
@@ -2448,12 +2492,10 @@ async def register(request: Request, db: Session = Depends(get_db)):
         ):
             return render_form("Email already taken")
         if (
-            any(u.phone == phone and u.prefix == prefix for u in users.values())
-            or db.query(User)
-            .filter(User.phone == phone, User.prefix == prefix)
-            .first()
+            any(u.phone_e164 == phone_e164 for u in users.values())
+            or db.query(User).filter(User.phone_e164 == phone_e164).first()
         ):
-            return render_form("Phone number already taken")
+            return render_form("Phone already in use", status_code=409)
         password_hash = hash_password(password)
         db_user = User(
             username=username_lower,
@@ -2461,6 +2503,8 @@ async def register(request: Request, db: Session = Depends(get_db)):
             password_hash=password_hash,
             phone=phone,
             prefix=prefix,
+            phone_e164=phone_e164,
+            phone_region=phone_region,
         )
         db.add(db_user)
         db.commit()
@@ -2472,6 +2516,8 @@ async def register(request: Request, db: Session = Depends(get_db)):
             email=email,
             phone=phone,
             prefix=prefix,
+            phone_e164=phone_e164,
+            phone_region=phone_region,
         )
         users[user.id] = user
         users_by_username[username_lower] = user
@@ -2514,6 +2560,8 @@ async def login(request: Request, db: Session = Depends(get_db)):
                     email=db_user.email,
                     phone=db_user.phone or "",
                     prefix=db_user.prefix or "",
+                    phone_e164=db_user.phone_e164 or "",
+                    phone_region=db_user.phone_region or "",
                     role=role_map.get(db_user.role, "customer"),
                     bar_ids=bar_ids,
                     credit=float(db_user.credit or 0),
@@ -3817,6 +3865,8 @@ async def admin_users_view(request: Request, db: Session = Depends(get_db)):
             existing.email = db_user.email
             existing.phone = db_user.phone or ""
             existing.prefix = db_user.prefix or ""
+            existing.phone_e164 = db_user.phone_e164 or ""
+            existing.phone_region = db_user.phone_region or ""
             existing.role = role_map.get(db_user.role, "customer")
             existing.bar_ids = bar_ids
             existing.credit = credit
@@ -3830,6 +3880,8 @@ async def admin_users_view(request: Request, db: Session = Depends(get_db)):
                 email=db_user.email,
                 phone=db_user.phone or "",
                 prefix=db_user.prefix or "",
+                phone_e164=db_user.phone_e164 or "",
+                phone_region=db_user.phone_region or "",
                 role=role_map.get(db_user.role, "customer"),
                 bar_ids=bar_ids,
                 credit=credit,
@@ -3868,6 +3920,8 @@ def _load_demo_user(user_id: int, db: Session) -> DemoUser:
         email=db_user.email,
         phone=db_user.phone or "",
         prefix=db_user.prefix or "",
+        phone_e164=db_user.phone_e164 or "",
+        phone_region=db_user.phone_region or "",
         role=role_map.get(db_user.role, "customer"),
         bar_ids=bar_ids,
         credit=float(db_user.credit or 0),
@@ -4077,8 +4131,35 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         login_attempts.pop(user.email, None)
         if request.session.get("user_id") == user.id:
             request.session.clear()
-    user.prefix = prefix or ""
-    user.phone = phone or ""
+    if phone:
+        try:
+            RegisterIn.model_validate({"dial_code": prefix, "phone": phone})
+        except ValidationError:
+            return render_template(
+                "admin_edit_user.html",
+                request=request,
+                user=user,
+                bars=bars.values(),
+                current=current,
+                error="Lunghezza numero non valida.",
+                status_code=422,
+            )
+        try:
+            phone_e164, phone_region = normalize_phone_or_raise(prefix or "", phone)
+        except HTTPException as exc:
+            return render_template(
+                "admin_edit_user.html",
+                request=request,
+                user=user,
+                bars=bars.values(),
+                current=current,
+                error=exc.detail,
+                status_code=exc.status_code,
+            )
+        user.prefix = prefix or ""
+        user.phone = phone or ""
+        user.phone_e164 = phone_e164
+        user.phone_region = phone_region
     if not current.is_super_admin:
         role = "bar_admin" if role == "bar_admin" else "bartender"
         bar_ids = current.bar_ids.copy()
@@ -4101,8 +4182,11 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         raise HTTPException(status_code=404, detail="User not found")
     db_user.username = username
     db_user.email = email
-    db_user.prefix = prefix or None
-    db_user.phone = phone or None
+    if phone:
+        db_user.prefix = prefix or None
+        db_user.phone = phone or None
+        db_user.phone_e164 = phone_e164
+        db_user.phone_region = phone_region
     if password:
         db_user.password_hash = user.password_hash
     role_enum_map = {
