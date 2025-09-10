@@ -2616,6 +2616,122 @@ async def login(request: Request, db: Session = Depends(get_db)):
     return render_template(
         "login.html", request=request, error="Email and password required"
     )
+
+
+@app.get("/profile", response_class=HTMLResponse)
+async def profile_form(request: Request):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template("profile.html", request=request)
+
+
+@app.post("/profile", response_class=HTMLResponse)
+async def profile_update(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    username = form.get("username") or ""
+    email = form.get("email") or ""
+    password = form.get("password") or ""
+    confirm_password = form.get("confirm_password") or ""
+    phone = form.get("phone") or ""
+    prefix = form.get("prefix") or ""
+    form_data = {"username": username, "email": email, "phone": phone, "prefix": prefix}
+
+    def render_form(msg: str, status_code: int = 200):
+        return render_template(
+            "profile.html",
+            request=request,
+            error=msg,
+            status_code=status_code,
+            **form_data,
+        )
+
+    if not all([username, email, phone, prefix]):
+        return render_form("All fields are required")
+    try:
+        RegisterIn.model_validate({"dial_code": prefix, "phone": phone})
+    except ValidationError:
+        return render_form("Lunghezza numero non valida.", status_code=422)
+    try:
+        phone_e164, phone_region = normalize_phone_or_raise(prefix, phone)
+    except HTTPException as exc:
+        return render_form(exc.detail, status_code=exc.status_code)
+    username_lower = username.lower()
+    if (
+        username != username_lower
+        or not USERNAME_REGEX.fullmatch(username_lower)
+        or username_lower.isdigit()
+        or re.fullmatch(r"[^@]+@[^@]+\.[^@]+", username_lower)
+        or username_lower in RESERVED_USERNAMES
+    ):
+        return render_form(USERNAME_MESSAGE)
+    if password:
+        if len(password) < 8 or len(password) > 128:
+            return render_form("Password must be between 8 and 128 characters")
+        if password.lower() in WEAK_PASSWORDS:
+            return render_form("Password is too common")
+        if password != confirm_password:
+            return render_form("Passwords do not match")
+    if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email or ""):
+        return render_form("Invalid email format")
+    if username_lower != user.username.lower() and (
+        username_lower in users_by_username
+        or db.query(User).filter(func.lower(User.username) == username_lower).first()
+    ):
+        return render_form("Username already taken")
+    if email != user.email and (
+        email in users_by_email or db.query(User).filter(User.email == email).first()
+    ):
+        return render_form("Email already taken")
+    if phone_e164 != user.phone_e164 and (
+        any(u.id != user.id and u.phone_e164 == phone_e164 for u in users.values())
+        or db.query(User)
+        .filter(User.phone_e164 == phone_e164, User.id != user.id)
+        .first()
+    ):
+        return render_form("Phone already in use", status_code=409)
+    db_user = db.query(User).filter(User.id == user.id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if username_lower != user.username.lower():
+        del users_by_username[user.username.lower()]
+        user.username = username_lower
+        users_by_username[username_lower] = user
+    else:
+        user.username = username_lower
+    if email != user.email:
+        del users_by_email[user.email]
+        user.email = email
+        users_by_email[email] = user
+    else:
+        user.email = email
+    user.prefix = prefix
+    user.phone = phone
+    user.phone_e164 = phone_e164
+    user.phone_region = phone_region
+    db_user.username = user.username
+    db_user.email = user.email
+    db_user.prefix = prefix
+    db_user.phone = phone
+    db_user.phone_e164 = phone_e164
+    db_user.phone_region = phone_region
+    password_changed = False
+    if password:
+        user.password_hash = hash_password(password)
+        db_user.password_hash = user.password_hash
+        login_attempts.pop(user.email, None)
+        password_changed = True
+    db.commit()
+    users[user.id] = user
+    if password_changed:
+        request.session.clear()
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url="/profile", status_code=status.HTTP_303_SEE_OTHER)
+
+
 @app.get("/logout")
 async def logout(request: Request):
     request.session.clear()
