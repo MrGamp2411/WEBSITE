@@ -2432,6 +2432,7 @@ async def register(request: Request, db: Session = Depends(get_db)):
     """Handle user registration submissions."""
     form = await request.form()
     username = form.get("username") or ""
+    current_password = form.get("current_password") or ""
     password = form.get("password") or ""
     confirm_password = form.get("confirm_password") or ""
     email = form.get("email") or ""
@@ -2634,6 +2635,7 @@ async def profile_update(request: Request, db: Session = Depends(get_db)):
     form = await request.form()
     username = form.get("username") or ""
     email = form.get("email") or ""
+    current_password = form.get("current_password") or ""
     password = form.get("password") or ""
     confirm_password = form.get("confirm_password") or ""
     phone = form.get("phone") or ""
@@ -2669,6 +2671,8 @@ async def profile_update(request: Request, db: Session = Depends(get_db)):
     ):
         return render_form(USERNAME_MESSAGE)
     if password:
+        if not current_password or not verify_password(user.password_hash, current_password):
+            return render_form("Current password is incorrect")
         if len(password) < 8 or len(password) > 128:
             return render_form("Password must be between 8 and 128 characters")
         if password.lower() in WEAK_PASSWORDS:
