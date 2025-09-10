@@ -62,6 +62,12 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
                     )
                     for i in data.get("items", [])
                 ]
+                from main import generate_public_order_code
+
+                now = datetime.utcnow()
+                local_date, seq, code = generate_public_order_code(
+                    db, data.get("bar_id"), now
+                )
                 order = Order(
                     bar_id=data.get("bar_id"),
                     customer_id=data.get("customer_id"),
@@ -69,9 +75,13 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
                     subtotal=Decimal(str(data.get("subtotal", 0))),
                     status="PLACED",
                     payment_method=data.get("payment_method", "card"),
-                    paid_at=datetime.utcnow(),
+                    paid_at=now,
                     items=items,
                     notes=data.get("notes"),
+                    created_at=now,
+                    order_local_date=local_date,
+                    daily_seq=seq,
+                    public_order_code=code,
                 )
                 db.add(order)
                 db.commit()
