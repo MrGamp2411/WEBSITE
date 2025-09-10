@@ -34,7 +34,7 @@
       <tbody>
         {% for bar in bars %}
         <tr>
-          <td>{{ "%03d"|format(loop.index) }}</td>
+          <td>{{ "%03d"|format(bar.id) }}</td>
           <td>{{ bar.name }}</td>
           <td>{{ bar.address }}</td>
           <td>{{ bar.city }}</td>
