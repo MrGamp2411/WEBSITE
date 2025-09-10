@@ -2463,6 +2463,15 @@ async def register(request: Request, db: Session = Depends(get_db)):
             return render_template(
                 "register.html", request=request, error="Email already taken"
             )
+        if (
+            any(u.phone == phone and u.prefix == prefix for u in users.values())
+            or db.query(User)
+            .filter(User.phone == phone, User.prefix == prefix)
+            .first()
+        ):
+            return render_template(
+                "register.html", request=request, error="Phone number already taken"
+            )
         password_hash = hash_password(password)
         db_user = User(
             username=username_lower,

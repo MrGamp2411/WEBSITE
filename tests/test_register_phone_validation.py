@@ -48,3 +48,40 @@ def test_register_phone_length_validation():
         )
         assert resp_ok.status_code == 303
         assert resp_ok.headers["location"] == "/login"
+
+
+def test_register_phone_duplicate():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    users.clear()
+    users_by_email.clear()
+    users_by_username.clear()
+
+    with TestClient(app) as client:
+        resp_first = client.post(
+            "/register",
+            data={
+                "username": "firstuser",
+                "password": "pass1234",
+                "confirm_password": "pass1234",
+                "email": "first@example.com",
+                "prefix": "+41",
+                "phone": "123456789",
+            },
+            follow_redirects=False,
+        )
+        assert resp_first.status_code == 303
+
+        resp_dup = client.post(
+            "/register",
+            data={
+                "username": "seconduser",
+                "password": "pass1234",
+                "confirm_password": "pass1234",
+                "email": "second@example.com",
+                "prefix": "+41",
+                "phone": "123456789",
+            },
+        )
+        assert resp_dup.status_code == 200
+        assert "Phone number already taken" in resp_dup.text
