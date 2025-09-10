@@ -5,6 +5,7 @@ from uuid import uuid4
 from sqlalchemy import (
     Boolean,
     Column,
+    Date,
     DateTime,
     Enum,
     ForeignKey,
@@ -15,6 +16,7 @@ from sqlalchemy import (
     Float,
     LargeBinary,
     JSON,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB, BIGINT
@@ -183,8 +185,19 @@ class BarClosing(Base):
     orders = relationship("Order", back_populates="closing")
 
 
+class OrderCounter(Base):
+    __tablename__ = "order_counters"
+
+    bar_id = Column(Integer, primary_key=True)
+    order_local_date = Column(Date, primary_key=True)
+    counter = Column(Integer, default=0)
+
+
 class Order(Base):
     __tablename__ = "orders"
+    __table_args__ = (
+        UniqueConstraint("bar_id", "order_local_date", "daily_seq"),
+    )
 
     id = Column(Integer, primary_key=True)
     bar_id = Column(Integer, ForeignKey("bars.id"), nullable=False)
@@ -205,6 +218,9 @@ class Order(Base):
     notes = Column(Text)
     source_channel = Column(String(30))
     closing_id = Column(Integer, ForeignKey("bar_closings.id"))
+    order_local_date = Column(Date)
+    daily_seq = Column(Integer)
+    public_order_code = Column(String(20), index=True)
 
     items = relationship("OrderItem", back_populates="order")
     customer = relationship("User")
