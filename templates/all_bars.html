@@ -83,7 +83,7 @@
           {% else %}
           <span class="status status-closed">Closed now</span>
           {% endif %}
-          <h3 class="title" itemprop="name">{{ bar.name }}</h3>
+          <h3 class="title" itemprop="name">{{ "%03d"|format(loop.index) }} {{ bar.name }}</h3>
           <div class="bar-meta">
             {% if bar.rating %}<span class="bar-rating"><i class="bi bi-star-fill" aria-hidden="true"></i> {{ '%.1f'|format(bar.rating) }}</span>{% endif %}
             <span class="bar-distance" data-has-distance="true" hidden></span>
