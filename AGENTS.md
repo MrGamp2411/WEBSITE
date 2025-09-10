@@ -219,7 +219,7 @@
     - Order views render each order as an `<article class="order-card card">` with header, meta, and items sections. Orders are grouped in `#pending-orders` and `#completed-orders` containers that also carry an `orders-grid` class for responsive layout within `.orders-page`.
     - Each order card exposes `data-status` with the raw status for client-side updates. Inline script `initOrderHistoryCounts` updates badge counts and toggles empty states when orders change.
     - `.order-list` is a flex container that wraps so order cards can flow horizontally, but on the orders page this layout is overridden by `.orders-grid` to create a responsive grid without touching the cards.
-    - Order list cards are 527px wide on desktop (a one-third increase) and 315px on mobile, with 10px internal padding (was 5px) while allowing their height to expand with content.
+    - Order list cards are 1000px wide on desktop and 315px on mobile, with 10px internal padding (was 5px) while allowing their height to expand with content.
     - Order cards override the base `card` max-height so they can grow to fit all text.
     - Order card backgrounds reflect status via `card--placed` (blue), `card--accepted` (orange), `card--ready` (green), `card--completed` (default surface), and `card--canceled` (red).
     - `.order-list .card__body` uses `gap: var(--space-1)` and removes default margins on child `p` and `ul` elements to tighten spacing.
