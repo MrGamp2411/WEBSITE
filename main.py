@@ -46,6 +46,8 @@ from datetime import datetime
 from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
+CH_TZ = ZoneInfo("Europe/Zurich")
+
 from fastapi import (
     Depends,
     FastAPI,
@@ -482,6 +484,7 @@ async def send_order_update(order: Order) -> Dict[str, Any]:
         "customer_phone": order.customer_phone,
         "table_name": order.table_name,
         "bar_name": order.bar_name,
+        "public_order_code": order.public_order_code,
         "payment_method": order.payment_method,
         "created_at": order.created_at.isoformat() if order.created_at else None,
         "accepted_at": order.accepted_at.isoformat() if order.accepted_at else None,
@@ -633,12 +636,55 @@ def ensure_order_columns() -> None:
         "notes": "TEXT",
         "source_channel": "VARCHAR(30)",
         "closing_id": "INTEGER",
+        "order_local_date": "DATE",
+        "daily_seq": "INTEGER",
+        "public_order_code": "VARCHAR(20)",
     }
     missing = {name: ddl for name, ddl in required.items() if name not in columns}
     if missing:
         with engine.begin() as conn:
             for name, ddl in missing.items():
                 conn.execute(text(f"ALTER TABLE orders ADD COLUMN {name} {ddl}"))
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_orders_bar_date_seq ON orders (bar_id, order_local_date, daily_seq)"
+            )
+        )
+        conn.execute(
+            text(
+                "CREATE INDEX IF NOT EXISTS idx_orders_public_code ON orders (public_order_code)"
+            )
+        )
+
+
+def generate_public_order_code(db: Session, bar_id: int, created_at: datetime):
+    """Generate a public order code BBB-DDMMAA-SEQ and persist the daily counter."""
+    local_dt = created_at.astimezone(CH_TZ)
+    local_date = local_dt.date()
+    db.execute(
+        text(
+            """
+            INSERT INTO order_counters (bar_id, order_local_date, counter)
+            VALUES (:bar_id, :d, 1)
+            ON CONFLICT (bar_id, order_local_date)
+            DO UPDATE SET counter = order_counters.counter + 1
+            """
+        ),
+        {"bar_id": bar_id, "d": local_date},
+    )
+    seq = db.execute(
+        text(
+            "SELECT counter FROM order_counters WHERE bar_id = :bar_id AND order_local_date = :d"
+        ),
+        {"bar_id": bar_id, "d": local_date},
+    ).scalar_one()
+    seq_int = int(seq)
+    seq_str = str(seq_int).zfill(3 if seq_int <= 999 else 4)
+    bar_code = str(bar_id).zfill(3)
+    date_code = local_dt.strftime("%d%m%y")
+    code = f"{bar_code}-{date_code}-{seq_str}"
+    return local_date, seq_int, code
 
 
 def ensure_wallet_topup_columns() -> None:
@@ -1497,6 +1543,8 @@ class OrderRead(BaseModel):
     customer_phone: Optional[str] = None
     table_name: Optional[str] = None
     bar_name: Optional[str] = None
+    public_order_code: Optional[str] = None
+    daily_seq: Optional[int] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -1591,6 +1639,9 @@ async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
     total_gross = subtotal + vat_total
     payout = calculate_payout(total_gross, fee)
 
+    now = datetime.utcnow()
+    local_date, seq, code = generate_public_order_code(db, order.bar_id, now)
+
     db_order = Order(
         bar_id=order.bar_id,
         subtotal=subtotal,
@@ -1599,6 +1650,10 @@ async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
         payout_due_to_bar=payout,
         status="PLACED",
         items=order_items,
+        created_at=now,
+        order_local_date=local_date,
+        daily_seq=seq,
+        public_order_code=code,
     )
     db.add(db_order)
     db.commit()
@@ -1929,6 +1984,8 @@ async def checkout(
             return RedirectResponse(url=page_url, status_code=status.HTTP_303_SEE_OTHER)
         except ApiException:
             return RedirectResponse(url=failed_url, status_code=status.HTTP_303_SEE_OTHER)
+    now = datetime.utcnow()
+    local_date, seq, code = generate_public_order_code(db, cart.bar_id, now)
     db_order = Order(
         bar_id=cart.bar_id,
         customer_id=user.id,
@@ -1936,9 +1993,13 @@ async def checkout(
         subtotal=order_total,
         status="PLACED",
         payment_method=payment_method,
-        paid_at=datetime.utcnow(),
+        paid_at=now,
         items=order_items,
         notes=notes,
+        created_at=now,
+        order_local_date=local_date,
+        daily_seq=seq,
+        public_order_code=code,
     )
     db.add(db_order)
     db.commit()

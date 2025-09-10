@@ -164,6 +164,7 @@
     throughout to manage permissions and dashboard views.
 - Orders:
   - `/orders` page renders `templates/order_history.html` with past `Order` entries for the current user.
+  - Orders include a `public_order_code` formatted `BBB-DDMMAA-SEQ` using the bar's 3-digit ID, the Europe/Zurich order date, and a bar-local daily counter that resets at midnight.
   - The page wraps content in `.orders-page`; pending and completed sections show counts and empty states, and order cards sit in a responsive `.orders-grid` without altering card markup. The previous status/date/search/sort/export toolbar has been removed.
   - Desktop order grids expand to full width with wider cards (minimum 100px) while still capping at three columns.
   - Mobile order grids show a single column with a 100px minimum card width.
