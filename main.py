@@ -2397,12 +2397,24 @@ async def register_form(request: Request):
 async def register(request: Request, db: Session = Depends(get_db)):
     """Handle user registration submissions."""
     form = await request.form()
-    username = form.get("username")
-    password = form.get("password")
-    confirm_password = form.get("confirm_password")
-    email = form.get("email")
-    phone = form.get("phone")
-    prefix = form.get("prefix")
+    username = form.get("username") or ""
+    password = form.get("password") or ""
+    confirm_password = form.get("confirm_password") or ""
+    email = form.get("email") or ""
+    phone = form.get("phone") or ""
+    prefix = form.get("prefix") or ""
+    form_data = {
+        "username": username,
+        "email": email,
+        "phone": phone,
+        "prefix": prefix,
+    }
+
+    def render_form(error_msg: str):
+        return render_template(
+            "register.html", request=request, error=error_msg, **form_data
+        )
+
     if all([username, password, confirm_password, email, phone, prefix]):
         username_lower = username.lower()
         if (
@@ -2412,66 +2424,36 @@ async def register(request: Request, db: Session = Depends(get_db)):
             or re.fullmatch(r"[^@]+@[^@]+\.[^@]+", username_lower)
             or username_lower in RESERVED_USERNAMES
         ):
-            return render_template(
-                "register.html",
-                request=request,
-                error=USERNAME_MESSAGE,
-            )
+            return render_form(USERNAME_MESSAGE)
         if len(password) < 8 or len(password) > 128:
-            return render_template(
-                "register.html",
-                request=request,
-                error="Password must be between 8 and 128 characters",
-            )
+            return render_form("Password must be between 8 and 128 characters")
         if password.lower() in WEAK_PASSWORDS:
-            return render_template(
-                "register.html",
-                request=request,
-                error="Password is too common",
-            )
+            return render_form("Password is too common")
         if password != confirm_password:
-            return render_template(
-                "register.html",
-                request=request,
-                error="Passwords do not match",
-            )
+            return render_form("Passwords do not match")
         if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email or ""):
-            return render_template(
-                "register.html",
-                request=request,
-                error="Invalid email format",
-            )
+            return render_form("Invalid email format")
         if not phone.isdigit() or not (9 <= len(phone) <= 10):
-            return render_template(
-                "register.html",
-                request=request,
-                error="Phone number must be 9-10 digits",
-            )
+            return render_form("Phone number must be 9-10 digits")
         if (
             username_lower in users_by_username
             or db.query(User)
             .filter(func.lower(User.username) == username_lower)
             .first()
         ):
-            return render_template(
-                "register.html", request=request, error="Username already taken"
-            )
+            return render_form("Username already taken")
         if (
             email in users_by_email
             or db.query(User).filter(User.email == email).first()
         ):
-            return render_template(
-                "register.html", request=request, error="Email already taken"
-            )
+            return render_form("Email already taken")
         if (
             any(u.phone == phone and u.prefix == prefix for u in users.values())
             or db.query(User)
             .filter(User.phone == phone, User.prefix == prefix)
             .first()
         ):
-            return render_template(
-                "register.html", request=request, error="Phone number already taken"
-            )
+            return render_form("Phone number already taken")
         password_hash = hash_password(password)
         db_user = User(
             username=username_lower,
@@ -2495,9 +2477,7 @@ async def register(request: Request, db: Session = Depends(get_db)):
         users_by_username[username_lower] = user
         users_by_email[user.email] = user
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
-    return render_template(
-        "register.html", request=request, error="All fields are required"
-    )
+    return render_form("All fields are required")
 
 
 @app.get("/login", response_class=HTMLResponse)

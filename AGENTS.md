@@ -151,6 +151,7 @@
 - Super admins can open `/admin/users/view/{id}` rendered by `templates/admin_view_user.html` to review a user's profile, orders, and audit logs
 - Login fetches the user's bar assignment from the database so the bar is available immediately after authentication
 - Login and Register pages show text prompts linking to each other: "Already registered? Log in" and "Not registered yet? Register"
+- Register form preserves entered username, email, phone number, and prefix when validation fails so users can correct errors without retyping.
 - Register form requires a phone number with 9–10 digits; invalid entries show an error
 - Register form rejects duplicate phone numbers; the combination of prefix and phone must be unique
 - Register form requires an email in the format text@text.text; invalid entries show an error

@@ -5,10 +5,10 @@
   {% if error %}<p class="alert">{{ error }}</p>{% endif %}
   <form method="post" action="/register">
     <label for="username">Username
-      <input id="username" type="text" name="username" required autocomplete="username" inputmode="text" enterkeyhint="next" minlength="3" maxlength="24" pattern="(?![._-])(?!.*[._-]{2})(?!.*[._-]$)[a-z0-9._-]{3,24}" title="3–24 characters, lowercase letters, numbers, dot, hyphen or underscore. No spaces.">
+      <input id="username" type="text" name="username" required autocomplete="username" inputmode="text" enterkeyhint="next" minlength="3" maxlength="24" pattern="(?![._-])(?!.*[._-]{2})(?!.*[._-]$)[a-z0-9._-]{3,24}" title="3–24 characters, lowercase letters, numbers, dot, hyphen or underscore. No spaces." value="{{ username|default('') }}">
     </label>
     <label for="email">Email
-      <input id="email" type="email" name="email" required autocomplete="email" inputmode="email" enterkeyhint="next" pattern="[^@]+@[^@]+\.[^@]+" title="Email must be in the format text@text.text">
+      <input id="email" type="email" name="email" required autocomplete="email" inputmode="email" enterkeyhint="next" pattern="[^@]+@[^@]+\.[^@]+" title="Email must be in the format text@text.text" value="{{ email|default('') }}">
     </label>
     <label for="password">Password
       <div class="password-wrapper">
@@ -26,13 +26,13 @@
     </label>
     <label for="prefix">Phone Prefix
       <select id="prefix" name="prefix" required autocomplete="tel-country-code">
-        <option value="+41">+41 (Switzerland)</option>
-        <option value="+1">+1 (USA)</option>
-        <option value="+44">+44 (UK)</option>
+        <option value="+41" {% if prefix == "+41" %}selected{% endif %}>+41 (Switzerland)</option>
+        <option value="+1" {% if prefix == "+1" %}selected{% endif %}>+1 (USA)</option>
+        <option value="+44" {% if prefix == "+44" %}selected{% endif %}>+44 (UK)</option>
       </select>
     </label>
     <label for="phone">Phone Number
-      <input id="phone" type="tel" name="phone" required autocomplete="tel-national" inputmode="tel" enterkeyhint="done" pattern="[0-9]{9,10}" minlength="9" maxlength="10" title="Phone number must be 9 to 10 digits">
+      <input id="phone" type="tel" name="phone" required autocomplete="tel-national" inputmode="tel" enterkeyhint="done" pattern="[0-9]{9,10}" minlength="9" maxlength="10" title="Phone number must be 9 to 10 digits" value="{{ phone|default('') }}">
     </label>
     <button class="btn btn--primary" type="submit">Register</button>
   </form>
