@@ -1382,7 +1382,7 @@ async def list_all_bars(
     lng: float | None = None,
     db: Session = Depends(get_db),
 ):
-    db_bars = db.query(BarModel).all()
+    db_bars = db.query(BarModel).order_by(BarModel.id).all()
     for bar in db_bars:
         bar.photo_url = make_absolute_url(bar.photo_url, request)
         bar.is_open_now = is_bar_open_now(bar)
@@ -1397,7 +1397,6 @@ async def list_all_bars(
             )
         else:
             bar.distance_km = None
-    db_bars.sort(key=lambda b: (b.distance_km is None, b.distance_km))
     return render_template("all_bars.html", request=request, bars=db_bars)
 
 
@@ -2839,7 +2838,7 @@ async def admin_bars_view(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request)
     if not user or not user.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    db_bars = db.query(BarModel).all()
+    db_bars = db.query(BarModel).order_by(BarModel.id).all()
     return render_template("admin_bars.html", request=request, bars=db_bars)
 
 

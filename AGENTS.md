@@ -50,7 +50,8 @@
   - Global footer: `templates/layout.html` uses `.site-footer` styled in `static/css/components.css`
 - Bars:
   - `/bars` page uses `templates/all_bars.html` and `static/js/view-all.js`
-- Admin Manage Bars page uses `templates/admin_bars.html` with `.bars-page` styles in `static/css/components.css`. The page header stacks the title above the search and Add Bar controls
+  - Bar listings show sequential numbers (001, 002, ...) based on creation order; queries order by `Bar.id` ascending
+  - Admin Manage Bars page uses `templates/admin_bars.html` with `.bars-page` styles in `static/css/components.css`. The page header stacks the title above the search and Add Bar controls
 - Admin Manage Bars page includes a client-side name search via `#barsSearch`
 - Admin Manage Bars actions use uppercase text-only pill buttons that expand to fit text; links and buttons inherit the base font so Delete matches Edit sizing while employing a brighter `.btn-danger-soft` red to deter accidental clicks
 - Admin Manage Payments page uses `templates/admin_payments.html`, reusing the `.users-page` layout classes (`.users-toolbar`, `.users-search`, `.users-table`) alongside `.payments-page` for admin tweaks. It includes a client-side bar search via `#paymentsSearch` and grouped action pills (`.btn-outline` for View/Add Test Closing, `.btn-danger-soft` for Delete Test Closing). The page header stacks the title above the search controls

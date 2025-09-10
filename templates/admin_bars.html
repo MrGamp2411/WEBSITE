@@ -23,6 +23,7 @@
     <table class="bars-table table">
       <thead>
         <tr>
+          <th>No.</th>
           <th>Name</th>
           <th>Address</th>
           <th>City</th>
@@ -33,6 +34,7 @@
       <tbody>
         {% for bar in bars %}
         <tr>
+          <td>{{ "%03d"|format(loop.index) }}</td>
           <td>{{ bar.name }}</td>
           <td>{{ bar.address }}</td>
           <td>{{ bar.city }}</td>
@@ -78,7 +80,7 @@
   function applyFilter(){
     const q = norm(input.value);
     rows.forEach(tr=>{
-      const nameCell = tr.cells && tr.cells[0] ? tr.cells[0].textContent : '';
+      const nameCell = tr.cells && tr.cells[1] ? tr.cells[1].textContent : '';
       const match = q === '' || norm(nameCell).includes(q);
       tr.style.display = match ? '' : 'none';
     });
