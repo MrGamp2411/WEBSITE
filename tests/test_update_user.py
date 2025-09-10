@@ -36,8 +36,10 @@ def test_update_user_details_without_password():
         email="old@example.com",
         password_hash=password_hash,
         role=RoleEnum.CUSTOMER,
-        phone="123",
-        prefix="+1",
+        phone="0790000000",
+        prefix="+41",
+        phone_e164="+41790000000",
+        phone_region="CH",
     )
     db.add(user)
     db.commit()
@@ -52,7 +54,7 @@ def test_update_user_details_without_password():
         "password": "",
         "email": "new@example.com",
         "prefix": "+41",
-        "phone": "763661800",
+        "phone": "076 555 12 34",
         "role": "bar_admin",
         "bar_ids": "",
         "credit": "5.0",
@@ -67,7 +69,7 @@ def test_update_user_details_without_password():
     assert updated.username == "newuser"
     assert updated.email == "new@example.com"
     assert updated.prefix == "+41"
-    assert updated.phone == "763661800"
+    assert updated.phone == "076 555 12 34"
     assert updated.role == RoleEnum.BARADMIN
     assert float(updated.credit) == 5.0
     # password should remain unchanged
@@ -89,6 +91,10 @@ def test_update_user_reassign_bar():
         email="user1@example.com",
         password_hash=password_hash,
         role=RoleEnum.BARADMIN,
+        phone="0790000001",
+        prefix="+41",
+        phone_e164="+41790000001",
+        phone_region="CH",
     )
     db.add(user)
     db.commit()
@@ -141,6 +147,10 @@ def test_update_user_credit_and_bar_assignment():
         password_hash=password_hash,
         role=RoleEnum.BARADMIN,
         credit=0,
+        phone="0790000002",
+        prefix="+41",
+        phone_e164="+41790000002",
+        phone_region="CH",
     )
     db.add(user)
     db.commit()
@@ -193,6 +203,10 @@ def test_update_user_multiple_bar_assignment():
         email="multibar@example.com",
         password_hash=password_hash,
         role=RoleEnum.BARTENDER,
+        phone="0790000003",
+        prefix="+41",
+        phone_e164="+41790000003",
+        phone_region="CH",
     )
     db.add(user)
     db.commit()
@@ -240,6 +254,10 @@ def test_update_user_password_change():
         email="userpw@example.com",
         password_hash=old_hash,
         role=RoleEnum.CUSTOMER,
+        phone="0790000004",
+        prefix="+41",
+        phone_e164="+41790000004",
+        phone_region="CH",
     )
     db.add(user)
     db.commit()
@@ -284,6 +302,10 @@ def test_admin_users_shows_reassigned_bar_after_restart():
         email="reload@example.com",
         password_hash=password_hash,
         role=RoleEnum.BARADMIN,
+        phone="0790000005",
+        prefix="+41",
+        phone_e164="+41790000005",
+        phone_region="CH",
     )
     db.add(user)
     db.commit()

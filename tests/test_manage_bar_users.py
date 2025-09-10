@@ -36,6 +36,10 @@ def test_add_existing_user_to_bar():
         email="existing@example.com",
         password_hash=hashlib.sha256("pass".encode("utf-8")).hexdigest(),
         role=RoleEnum.CUSTOMER,
+        phone="0791111111",
+        prefix="+41",
+        phone_e164="+41791111111",
+        phone_region="CH",
     )
     db.add(existing)
     db.commit()
@@ -60,7 +64,7 @@ def test_add_existing_user_to_bar():
             "email": "fresh@example.com",
             "password": "secret",
             "prefix": "+41",
-            "phone": "763661800",
+            "phone": "076 555 12 34",
             "role": "bartender",
         }
         resp = client.post(f"/admin/bars/{bar.id}/users", data=form)
@@ -88,6 +92,10 @@ def test_remove_user_from_bar():
         email="staffer@example.com",
         password_hash=hashlib.sha256("pass".encode("utf-8")).hexdigest(),
         role=RoleEnum.BARADMIN,
+        phone="0792222222",
+        prefix="+41",
+        phone_e164="+41792222222",
+        phone_region="CH",
     )
     db.add(staff)
     db.commit()
