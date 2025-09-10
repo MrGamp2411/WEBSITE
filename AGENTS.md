@@ -232,6 +232,7 @@
     - Order card backgrounds reflect status via `card--placed` (blue), `card--accepted` (orange), `card--ready` (green), `card--completed` (default surface), and `card--canceled` (red).
     - `.order-list .card__body` uses `gap: var(--space-1)` and removes default margins on child `p` and `ul` elements to tighten spacing.
     - Order card styles live in `static/css/components.css` under the `.order-card` block and dynamic rendering is handled by `static/js/orders.js`.
+    - Order card headers stack the status chip under the order number using a column layout.
     - Meta sections use a two-column grid (`.order-kv`) ordered: Total, Placed, Customer, Bar, Table, Payment, Notes, Prep time. Customer phones render as neutral `tel:` links and item lists align quantity/name with ellipsis truncation.
   - `order_history.html` displays placement date and time via the `format_time` filter so displayed values honor `BAR_TIMEZONE`.
   - `orders.js` uses `formatTime` to show `YYYY-MM-DD HH:MM` strings on bartender and user order cards for clearer chronology.
