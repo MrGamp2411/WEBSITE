@@ -8,7 +8,7 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, engine, SessionLocal  # noqa: E402
-from models import Bar, Category, MenuItem, Table, User, RoleEnum, UserBarRole  # noqa: E402
+from models import Bar, Category, MenuItem, Table, User, RoleEnum, UserBarRole, Order  # noqa: E402
 from main import (
     app,
     load_bars_from_db,
@@ -60,12 +60,15 @@ def test_rejected_order_moves_to_completed_history():
         client.post('/cart/checkout', data={'table_id': table_id, 'payment_method': 'bar'})
         client.post('/login', data={'email': bartender_email, 'password': 'pass'})
         client.post('/api/orders/1/status', json={'status': 'REJECTED'})
+        with SessionLocal() as db2:
+            order_code = db2.get(Order, 1)
+            code = order_code.public_order_code or f"#{order_code.id}"
         client.post('/login', data={'email': user_email, 'password': 'pass'})
         resp = client.get('/orders')
         pending = resp.text.split('<h2>Pending Orders</h2>')[1].split('<h2>Completed Orders</h2>')[0]
         completed = resp.text.split('<h2>Completed Orders</h2>')[1]
-        assert 'Order #1' not in pending
-        assert 'Order #1' in completed
+        assert f'Order {code}' not in pending
+        assert f'Order {code}' in completed
         assert 'Rejected' in completed
     user_carts.clear()
     users.clear()

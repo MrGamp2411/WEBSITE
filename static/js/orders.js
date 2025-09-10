@@ -65,7 +65,7 @@ function initBartender(barId) {
     el.dataset.createdAt = order.created_at;
     el.innerHTML =
       `<header class="order-card__header">` +
-      `<h3 id="order-${order.id}-title">Order #${order.id}</h3>` +
+      `<h3 id="order-${order.id}-title">Order ${order.public_order_code || ('#' + order.id)}</h3>` +
       `<span class="order-status chip status status-${order.status.toLowerCase()}" aria-label="Order status: ${formatStatus(order.status)}">${formatStatus(order.status)}</span>` +
       `</header>` +
       `<div class="order-card__divider"></div>` +
@@ -159,7 +159,7 @@ function initUser(userId) {
       : '';
     el.innerHTML =
       `<header class="order-card__header">` +
-      `<h3 id="order-${order.id}-title">Order #${order.id}</h3>` +
+      `<h3 id="order-${order.id}-title">Order ${order.public_order_code || ('#' + order.id)}</h3>` +
       `<span class="order-status chip status status-${order.status.toLowerCase()}" aria-label="Order status: ${formatStatus(order.status)}">${formatStatus(order.status)}</span>` +
       `</header>` +
       `<div class="order-card__divider"></div>` +

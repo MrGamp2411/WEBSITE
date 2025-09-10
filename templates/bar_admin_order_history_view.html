@@ -40,7 +40,7 @@
   {% for order in orders %}
   <article class="order-card card card--{{ order.status|lower }}" role="article" aria-labelledby="order-{{ order.id }}-title" data-status="{{ order.status }}">
     <header class="order-card__header">
-      <h3 id="order-{{ order.id }}-title">Order #{{ order.id }}</h3>
+      <h3 id="order-{{ order.id }}-title">Order {{ order.public_order_code or ('#' ~ order.id) }}</h3>
       <span class="order-status chip status status-{{ order.status|lower }}" aria-label="Order status: {{ order.status|replace('_', ' ')|title }}">{{ order.status|replace('_', ' ')|title }}</span>
     </header>
     <div class="order-card__divider"></div>

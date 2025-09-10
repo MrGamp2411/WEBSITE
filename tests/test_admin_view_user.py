@@ -77,6 +77,7 @@ def test_order_detail_view():
     order = Order(bar_id=bar.id, customer_id=user.id, subtotal=5, vat_total=0)
     db.add(order)
     db.commit()
+    code = order.public_order_code
     order_item = OrderItem(
         order_id=order.id,
         menu_item_id=item.id,
@@ -93,6 +94,7 @@ def test_order_detail_view():
         _login_super_admin(client)
         resp = client.get(f"/admin/orders/{order_id}")
         assert resp.status_code == 200
-        assert f"Order #{order_id}" in resp.text
+        expected = f"Order {code}" if code else f"Order #{order_id}"
+        assert expected in resp.text
         assert "Water" in resp.text
 

@@ -134,6 +134,11 @@ def test_auto_close_moves_orders_to_history():
         assert 'Credit Card</span><span class="amount">CHF 6.00' in resp.text
         assert 'Wallet</span><span class="amount">CHF 6.00' in resp.text
         assert 'Bar</span><span class="amount">CHF 6.00' in resp.text
-        assert 'Order #1' in resp.text
-        assert 'Order #2' in resp.text
-        assert 'Order #3' in resp.text
+        with SessionLocal() as db_codes:
+            codes = [
+                (o.public_order_code or f"#{o.id}")
+                for o in db_codes.query(Order).order_by(Order.id).limit(3)
+            ]
+        assert f'Order {codes[0]}' in resp.text
+        assert f'Order {codes[1]}' in resp.text
+        assert f'Order {codes[2]}' in resp.text
