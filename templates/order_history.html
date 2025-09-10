@@ -151,8 +151,9 @@
 }
 .orders-page .orders-grid .card{ width:100%; max-width:none; }
 
+/* Desktop: keep three columns with 100px minimum card width */
 @media (min-width: 960px){
-  .orders-page .orders-grid{ grid-template-columns: repeat(3, minmax(320px, 1fr)); }
+  .orders-page .orders-grid{ grid-template-columns: repeat(3, minmax(100px, 1fr)); }
 }
 
 /* Empty */
