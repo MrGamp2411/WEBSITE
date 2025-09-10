@@ -172,8 +172,9 @@
   - Mobile menu drops the "How it works" entry and adds a `bi bi-person` Profile link for logged-in users.
   - Bartenders manage live orders in `bartender_orders.html` using `static/js/orders.js`,
     which loads with `defer` and initializes `initBartender(bar.id)` on `DOMContentLoaded`.
-  - `templates/bartender_orders.html` groups orders into `<ul>` lists with IDs
-    `incoming-orders`, `preparing-orders`, `ready-orders`, and `completed-orders`.
+  - `templates/bartender_orders.html` wraps content in `.orders-page` and groups
+    orders into `.orders-grid` containers with IDs `incoming-orders`,
+    `preparing-orders`, `ready-orders`, and `completed-orders` for real-time lists.
   - The bartender dashboard lists assigned bars as `.bar-card` links to `/dashboard/bar/{id}/orders`.
   - The bartender dashboard uses `admin-dashboard` `editbar` styling with an `admin-header`, `admin-identity` card, and `admin-section` to match other dashboards.
   - The bar admin dashboard lists assigned bars as `.bar-card` items with edit and management links.
@@ -181,6 +182,9 @@
   - Each bar card includes buttons for editing the bar and managing orders via `/dashboard/bar/{id}/orders`.
   - Bar admins view live orders in `bar_admin_orders.html`, which mirrors the bartender view and adds an
     "Order History & Revenue" button linking to `/dashboard/bar/{id}/orders/history`.
+  - Bartender and bar admin live order pages reuse the order history grid styles
+    (`orders-page` wrapper with `orders-grid` for a single-column mobile layout and
+    100px minimum card width).
   - Bars close automatically at their scheduled closing time based on `opening_hours`, moving completed
     orders into a `bar_closings` record (see `BarClosing` model). Canceled or rejected orders are also
     attached to the closing but do not count toward `total_revenue`. Editing a bar's hours immediately

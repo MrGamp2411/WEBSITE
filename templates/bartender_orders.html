@@ -1,17 +1,60 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>{{ bar.name }} Orders</h1>
-<label><input type="checkbox" id="pause-ordering" {% if bar.ordering_paused %}checked{% endif %}> Pause ordering</label>
-<div id="orders-section">
-  <h2>Incoming Orders</h2>
-  <div id="incoming-orders" class="order-list"></div>
-  <h2>Preparing</h2>
-  <div id="preparing-orders" class="order-list"></div>
-  <h2>Ready</h2>
-  <div id="ready-orders" class="order-list"></div>
-  <h2>Completed</h2>
-  <div id="completed-orders" class="order-list"></div>
-</div>
+<section class="orders-page">
+  <header class="orders-head">
+    <h1 class="orders-title">{{ bar.name }} Orders</h1>
+    <label><input type="checkbox" id="pause-ordering" {% if bar.ordering_paused %}checked{% endif %}> Pause ordering</label>
+  </header>
+
+  <section class="orders-section">
+    <div class="section-head"><h2>Incoming Orders</h2></div>
+    <div id="incoming-orders" class="orders-grid order-list"></div>
+  </section>
+
+  <section class="orders-section">
+    <div class="section-head"><h2>Preparing</h2></div>
+    <div id="preparing-orders" class="orders-grid order-list"></div>
+  </section>
+
+  <section class="orders-section">
+    <div class="section-head"><h2>Ready</h2></div>
+    <div id="ready-orders" class="orders-grid order-list"></div>
+  </section>
+
+  <section class="orders-section">
+    <div class="section-head"><h2>Completed</h2></div>
+    <div id="completed-orders" class="orders-grid order-list"></div>
+  </section>
+</section>
+
+<style>
+.orders-page{
+  --surface:#fff; --bg-subtle:#f6f8fb; --border:#e5e7eb;
+  --text:#0f172a; --muted:#475569; --accent:var(--brand,#7c3aed);
+  --radius:16px; --shadow:0 6px 16px rgba(0,0,0,.06);
+}
+.orders-page .orders-head{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin:8px 0 14px;
+}
+.orders-page .orders-title{ margin:0; font-size:1.6rem; font-weight:800; color:var(--text); }
+.orders-page .orders-section{ margin-top:18px; }
+.orders-page .section-head{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.orders-page .section-head h2{ margin:0; font-size:1.125rem; font-weight:800; color:var(--text); }
+.orders-page .orders-grid{
+  display:grid; gap:12px;
+  grid-template-columns:minmax(100px,1fr);
+  margin:0;
+}
+.orders-page .orders-grid .card{ width:100%; max-width:none; min-width:100px; }
+@media (min-width:960px){
+  .orders-page .orders-grid{ grid-template-columns:repeat(3,minmax(100px,1fr)); }
+}
+@media (max-width:768px){
+  .orders-page .orders-title{ font-size:1.4rem; }
+}
+</style>
+
 <script src="/static/js/orders.js" defer></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
