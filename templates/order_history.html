@@ -146,11 +146,14 @@
 /* Grid that hosts the EXISTING order cards */
 .orders-page .orders-grid{
   display:grid; gap:12px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  max-width: calc(260px * 3 + 24px);
-  margin:0 auto;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  margin:0;
 }
 .orders-page .orders-grid .card{ width:100%; max-width:none; }
+
+@media (min-width: 960px){
+  .orders-page .orders-grid{ grid-template-columns: repeat(3, 1fr); }
+}
 
 /* Empty */
 .orders-page .empty{ display:none; text-align:center; border:1px dashed var(--border); border-radius:12px; padding:22px; color:var(--muted); background:#fff; }

@@ -164,7 +164,7 @@
 - Orders:
   - `/orders` page renders `templates/order_history.html` with past `Order` entries for the current user.
   - The page wraps content in `.orders-page`; pending and completed sections show counts and empty states, and order cards sit in a responsive `.orders-grid` without altering card markup. The previous status/date/search/sort/export toolbar has been removed.
-  - Desktop order grids center and show at most three columns via `max-width: calc(260px * 3 + 24px)`.
+  - Desktop order grids expand to full width with wider cards (minimum 320px) while still capping at three columns.
   - Order history lists all orders with no "Load more" button or "Back to top" link; the `.orders-actions` block was removed.
   - Checkout persists orders to the database and redirects to `/orders`.
   - Mobile hamburger menu links to order history via `bi bi-clock-history` icon.
