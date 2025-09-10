@@ -146,10 +146,10 @@
 /* Grid that hosts the EXISTING order cards */
 .orders-page .orders-grid{
   display:grid; gap:12px;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(100px, 1fr);
   margin:0;
 }
-.orders-page .orders-grid .card{ width:100%; max-width:none; }
+.orders-page .orders-grid .card{ width:100%; max-width:none; min-width:100px; }
 
 /* Desktop: keep three columns with 100px minimum card width */
 @media (min-width: 960px){
