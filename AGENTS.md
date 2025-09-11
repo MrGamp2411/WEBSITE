@@ -67,6 +67,7 @@
 - Manage Bar Users list now shows only a red `Remove` button to unassign staff from the current bar; user editing is handled on the main Admin Users page
 - Removing a user triggers a popup confirmation using `.cart-blocker` and `.cart-popup`
 - Admin Edit User page (`templates/admin_edit_user.html`) lists assigned bars separately from available bars, each with its own search (`#assignedBarSearch` and `#availableBarSearch`) and shows bar ID and city columns. Rows use Add/Remove pill buttons and hidden `bar_ids` checkboxes to track selections before save.
+- Admin Edit User page includes a Delete button that opens a confirmation popup before removing the user.
 - Admin Manage Bars delete links open a popup confirmation using `.cart-blocker` and `.cart-popup`
 - `BAR_CATEGORIES` defined in `main.py`; reused in `search.js` and `view-all.js`
 - Categories stored in `bars.bar_categories`
