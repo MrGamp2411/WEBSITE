@@ -970,3 +970,7 @@ body.dark-mode{
   font-size: 0.75rem;
   padding: 0.5625rem 0.75rem;
 }
+
+.change-password-page .form-grid {
+  grid-template-columns: 1fr;
+}

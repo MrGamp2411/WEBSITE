@@ -267,3 +267,4 @@
 - Change Password now sits under the phone number help text, and the Save button appears at the bottom-left without sticky behavior.
 - Change Password button uses inline-flex styling to match the Save button size, and the password strength meter has been removed from the Change Password form.
 - Change Password button is 25% smaller than the Save button using reduced font size and padding.
+- Change Password fields stack in a single column on all screen sizes.
