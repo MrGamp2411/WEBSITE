@@ -7,6 +7,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 os.environ['DATABASE_URL'] = 'sqlite:///:memory:'
+os.environ['WALLEE_VERIFY_SIGNATURE'] = 'false'
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
@@ -64,7 +65,7 @@ def create_order(client, payment_method):
         'customer_email': customer.email,
         'bartender_email': bartender.email,
         'customer_id': customer.id,
-        'order_total': 5.0,
+        'order_total': 5.2,
     }
     db.close(); load_bars_from_db()
 
@@ -114,7 +115,7 @@ def cancel_order(client, ids):
 
 
 def test_cancel_order_refunds_wallet_and_card():
-    for method, expected in [('wallet', 10), ('card', 15)]:
+    for method, expected in [('wallet', 10), ('card', 15.2)]:
         setup_db()
         with TestClient(app) as client:
             ids = create_order(client, method)

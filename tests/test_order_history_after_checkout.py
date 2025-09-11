@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 os.environ['DATABASE_URL'] = 'sqlite:///:memory:'
+os.environ['WALLEE_VERIFY_SIGNATURE'] = 'false'
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
@@ -68,4 +69,4 @@ def test_order_history_page_after_checkout():
         assert f"Order {code}" in orders_page.text
         assert "<dt>Bar</dt><dd>Test Bar</dd>" in orders_page.text
         assert "<dt>Payment</dt><dd>Card</dd>" in orders_page.text
-        assert "<dt>Total</dt><dd class=\"num nowrap\">CHF 5.00</dd>" in orders_page.text
+        assert "<dt>Total</dt><dd class=\"num nowrap\">CHF 5.20</dd>" in orders_page.text

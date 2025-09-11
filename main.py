@@ -368,6 +368,13 @@ class Cart:
     def total_price(self) -> float:
         return sum(item.total for item in self.items.values())
 
+    def small_order_fee(self) -> float:
+        subtotal = self.total_price()
+        return 0.20 if 0 < subtotal < 10 else 0.0
+
+    def total_with_fee(self) -> float:
+        return self.total_price() + self.small_order_fee()
+
     def clear(self):
         self.items.clear()
         self.table_id = None
@@ -1804,7 +1811,7 @@ async def add_to_cart(request: Request, bar_id: int, product_id: int = Form(...)
     save_cart_for_user(user.id, cart)
     if "application/json" in request.headers.get("accept", ""):
         count = sum(item.quantity for item in cart.items.values())
-        total = cart.total_price()
+        total = cart.total_with_fee()
         items = [
             {
                 "id": item.product.id,
@@ -1835,7 +1842,7 @@ async def view_cart(request: Request):
         save_cart_for_user(user.id, cart)
     if "application/json" in request.headers.get("accept", ""):
         count = sum(item.quantity for item in cart.items.values())
-        total = cart.total_price()
+        total = cart.total_with_fee()
         items = [
             {
                 "id": item.product.id,
@@ -1886,7 +1893,7 @@ async def update_cart(
     save_cart_for_user(user.id, cart)
     if "application/json" in request.headers.get("accept", ""):
         count = sum(item.quantity for item in cart.items.values())
-        total = cart.total_price()
+        total = cart.total_with_fee()
         items = [
             {
                 "id": item.product.id,
@@ -1936,7 +1943,7 @@ async def checkout(
         raise HTTPException(
             status_code=400, detail="Please select a table before checking out"
         )
-    order_total = cart.total_price()
+    order_total = cart.total_with_fee()
     if payment_method == "wallet":
         if user.credit < order_total:
             raise HTTPException(status_code=400, detail="Insufficient credit")

@@ -59,4 +59,4 @@ def test_checkout_uses_amount_including_tax():
             create_kwargs = MockTx.create.call_args.kwargs
         assert resp.status_code == 303
         line_item = create_kwargs['transaction'].line_items[0]
-        assert line_item.amount_including_tax == 5.0
+        assert line_item.amount_including_tax == 5.2
