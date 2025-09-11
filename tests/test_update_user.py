@@ -50,15 +50,14 @@ def test_update_user_details_without_password():
         _login_super_admin(client)
 
         form = {
-        "username": "newuser",
-        "password": "",
-        "email": "new@example.com",
-        "prefix": "+41",
-        "phone": "076 555 12 34",
-        "role": "bar_admin",
-        "bar_ids": "",
-        "credit": "5.0",
-    }
+            "username": "newuser",
+            "email": "new@example.com",
+            "prefix": "+41",
+            "phone": "076 555 12 34",
+            "role": "bar_admin",
+            "bar_ids": "",
+            "credit": "5.0",
+        }
         resp = client.post(
             f"/admin/users/edit/{user.id}", data=form, follow_redirects=False
         )
@@ -112,7 +111,6 @@ def test_update_user_reassign_bar():
         _login_super_admin(client)
         form = {
             "username": "user1",
-            "password": "",
             "email": "user1@example.com",
             "prefix": "",
             "phone": "",
@@ -168,7 +166,6 @@ def test_update_user_credit_and_bar_assignment():
         _login_super_admin(client)
         form = {
             "username": "user2",
-            "password": "",
             "email": "user2@example.com",
             "prefix": "",
             "phone": "",
@@ -222,7 +219,6 @@ def test_update_user_multiple_bar_assignment():
         _login_super_admin(client)
         form = {
             "username": "multibar",
-            "password": "",
             "email": "multibar@example.com",
             "prefix": "",
             "phone": "",
@@ -266,25 +262,16 @@ def test_update_user_password_change():
 
     with TestClient(app) as client:
         _login_super_admin(client)
-        form = {
-            "username": "userpw",
-            "password": "newpass",
-            "email": "userpw@example.com",
-            "prefix": "",
-            "phone": "",
-            "role": "customer",
-            "bar_ids": "",
-            "credit": "0",
-        }
+        form = {"password": "newpass123", "confirm_password": "newpass123"}
         resp = client.post(
-            f"/admin/users/edit/{user_id}", data=form, follow_redirects=False
+            f"/admin/users/{user_id}/password", data=form, follow_redirects=False
         )
         assert resp.status_code == 303
 
     db = SessionLocal()
     updated = db.query(User).filter(User.id == user_id).first()
     from main import verify_password
-    assert verify_password(updated.password_hash, "newpass")
+    assert verify_password(updated.password_hash, "newpass123")
     db.close()
 
 
@@ -323,7 +310,6 @@ def test_admin_users_shows_reassigned_bar_after_restart():
         _login_super_admin(client)
         form = {
             "username": "reloaduser",
-            "password": "",
             "email": "reload@example.com",
             "prefix": "",
             "phone": "",

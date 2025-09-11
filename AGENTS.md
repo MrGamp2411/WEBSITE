@@ -166,8 +166,11 @@
 - Profile page edit pencils match the password toggle's minimal button style and sit on the right edge of each input.
 - Profile fields start disabled and are unlocked by clicking their pencil icons; `static/js/profile.js` handles enabling inputs and re-disabling them after saving with a success message.
 - Admin user edit form: `templates/admin_edit_user.html` posts fields
-    (`username`, `password`, `email`, `prefix`, `phone`, `role`, `bar_ids`, `credit`)
-    to `/admin/users/edit/{id}`. Bar selection uses checkboxes for easier multi-bar assignment.
+    (`username`, `email`, `prefix`, `phone`, `role`, `bar_ids`, `credit`)
+    to `/admin/users/edit/{id}`. Password changes use
+    `templates/admin_change_user_password.html` via
+    `/admin/users/{id}/password` without requiring the current password.
+    Bar selection uses checkboxes for easier multi-bar assignment.
   - Bar admins and bartenders may be assigned to multiple bars. `bar_ids` lists are used
     throughout to manage permissions and dashboard views.
 - Orders:
