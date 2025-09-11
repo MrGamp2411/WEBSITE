@@ -964,4 +964,9 @@ body.dark-mode{
 
 /* Form actions and change password */
 .profile-page .form-actions { margin-top: 10px; }
-.profile-page .change-password { margin-top: 8px; display: inline-flex; }
+.profile-page .change-password {
+  margin-top: 8px;
+  display: inline-flex;
+  font-size: 0.75rem;
+  padding: 0.5625rem 0.75rem;
+}
