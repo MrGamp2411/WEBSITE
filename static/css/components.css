@@ -82,7 +82,7 @@ body.dark-mode{
 .mobile-menu a:hover{background:var(--sg-purple-100);color:var(--sg-purple-700);transform:translateX(2px);}
 .mobile-menu a:hover i{opacity:1;transform:translateX(2px);}
 .mobile-menu a + a{border-top:1px solid rgba(14,11,23,.08);}
-.menu-close{align-self:flex-end;background:none;border:0;color:var(--sg-ink-900);min-width:44px;min-height:44px;font-size:1.25rem;}
+.menu-close{align-self:flex-start;background:none;border:0;color:var(--sg-ink-900);min-width:44px;min-height:44px;font-size:1.25rem;}
 .menu-close:hover{color:var(--sg-purple-700);}
 .menu-register{border:1px solid transparent;background:#fff;border-radius:999px;margin-top:4px;text-align:center;}
 .menu-register:hover{border-color:var(--sg-purple-700);background:var(--sg-purple-100);}
