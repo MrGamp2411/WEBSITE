@@ -936,13 +936,10 @@ body.dark-mode{
 .profile-page input[type="email"],
 .profile-page input[type="password"],
 .profile-page select {
-  width: 100%; min-height: 44px; border-radius: var(--radius); border: 1px solid #d1d5db;
-  padding: var(--space-2); background: #fff; transition: box-shadow .2s, border-color .2s;
-}
-.profile-page input:focus,
-.profile-page select:focus {
-  outline: none; border-color: #b197fc;
-  box-shadow: 0 0 0 4px rgba(147, 51, 234, .12);
+  padding: var(--space-2);
+  border: 1px solid #d1d5db;
+  border-radius: var(--radius);
+  min-height: 44px;
 }
 
 .profile-page .help { color: #6b7280; display: block; margin-top: 6px; }

@@ -161,7 +161,7 @@
 - Register and login forms use a flex `.password-wrapper` so the show/hide password toggle sits on the right side of the card.
 - Profile page (`templates/profile.html`) lets logged-in users update username, email, password, prefix, and phone using the same validation rules as registration. `/profile` GET renders the form and `/profile` POST saves changes to the database and in-memory cache, logging the user out after password changes. Each field shows a Bootstrap pencil icon to indicate editability, and changing the password requires the current password for verification.
 - Profile page UI wraps content in `.profile-page` and `.profile-card`, arranges fields in a responsive grid, groups phone prefix/number on desktop, includes a visual password strength meter, and keeps a sticky Save button inside the card.
-- Profile page text inputs reuse the registration `.auth-card` styles for consistent text box appearance.
+- Profile page text inputs reuse the registration `.auth-card` styles (padding, border, default focus) for consistent text box appearance.
 - Profile page edit pencils match the password toggle's minimal button style and sit on the right edge of each input.
 - Admin user edit form: `templates/admin_edit_user.html` posts fields
     (`username`, `password`, `email`, `prefix`, `phone`, `role`, `bar_ids`, `credit`)
