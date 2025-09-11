@@ -108,6 +108,7 @@ from app.webhooks.wallee import router as wallee_webhook_router
 from wallee.models import LineItemCreate, TransactionCreate
 from wallee.rest import ApiException
 from app.phone import normalize_phone_or_raise
+from app.utils.disposable_email import ensure_not_disposable, get_disposable_stats
 
 # Predefined categories for bars (used for filtering and admin forms)
 BAR_CATEGORIES = [
@@ -1600,6 +1601,10 @@ class RegisterIn(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
 
+class AuthRegister(BaseModel):
+    email: str
+
+
 class PayoutRunInput(BaseModel):
     bar_id: int
     period_start: datetime
@@ -2421,6 +2426,13 @@ async def init_topup(
 # -----------------------------------------------------------------------------
 
 
+@app.post("/api/auth/register")
+async def api_auth_register(payload: AuthRegister):
+    """JSON registration endpoint used for testing disposable domains."""
+    ensure_not_disposable(payload.email)
+    return {"status": "ok"}
+
+
 @app.get("/register", response_class=HTMLResponse)
 async def register_form(request: Request):
     """Display the registration form."""
@@ -2480,6 +2492,10 @@ async def register(request: Request, db: Session = Depends(get_db)):
             return render_form("Passwords do not match")
         if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email or ""):
             return render_form("Invalid email format")
+        try:
+            ensure_not_disposable(email)
+        except HTTPException as exc:
+            return render_form(exc.detail["message"], status_code=exc.status_code)
         if (
             username_lower in users_by_username
             or db.query(User)
@@ -2617,6 +2633,12 @@ async def login(request: Request, db: Session = Depends(get_db)):
     return render_template(
         "login.html", request=request, error="Email and password required"
     )
+
+
+@app.get("/internal/disposable-domains/stats")
+async def disposable_domains_stats():
+    """Return disposable domain cache statistics."""
+    return get_disposable_stats()
 
 
 @app.get("/profile", response_class=HTMLResponse)

@@ -84,6 +84,13 @@ Optional variables:
 - `BASE_URL` – public base URL of the app used for payment callbacks.
 - `CURRENCY` – currency code for payments (defaults to `CHF`).
 
+### Disposable email controls
+
+- `DISPOSABLE_EMAIL_ENFORCE` – set to `true` to block disposable email addresses.
+- `DISPOSABLE_DOMAIN_URLS` – comma-separated HTTPS URLs pointing to disposable domain lists.
+- `DISPOSABLE_CACHE_TTL_MIN` – cache TTL in minutes for the domain list (default `360`).
+- `ENV` – environment name (`dev`, `staging`, or `prod`).
+
 ## Frontend redesign
 
 The home page and shared layout were refreshed with a mobile‑first design.
