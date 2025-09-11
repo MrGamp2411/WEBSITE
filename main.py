@@ -907,6 +907,20 @@ def get_current_user(request: Request) -> Optional[DemoUser]:
     return users.get(user_id)
 
 
+@app.middleware("http")
+async def enforce_registration_completion(request: Request, call_next):
+    session = request.scope.get("session")
+    user = users.get(session.get("user_id")) if session else None
+    path = request.url.path
+    if user and user.role == "registering" and not (
+        path.startswith("/register/details")
+        or path.startswith("/static")
+        or path.startswith("/logout")
+    ):
+        return RedirectResponse(url="/register/details", status_code=status.HTTP_303_SEE_OTHER)
+    return await call_next(request)
+
+
 def get_cart_for_user(user: DemoUser) -> Cart:
     cart = user_carts.get(user.id)
     if cart is None:
@@ -2442,27 +2456,90 @@ async def api_auth_register(payload: AuthRegister):
 
 @app.get("/register", response_class=HTMLResponse)
 async def register_form(request: Request):
-    """Display the registration form."""
-    return render_template("register.html", request=request)
+    """Display the first step of registration (email & password)."""
+    return render_template("register_step1.html", request=request)
 
 
 @app.post("/register", response_class=HTMLResponse)
-async def register(request: Request, db: Session = Depends(get_db)):
-    """Handle user registration submissions."""
+async def register_step_one(request: Request, db: Session = Depends(get_db)):
+    """Handle step one of registration."""
     form = await request.form()
-    username = form.get("username") or ""
-    current_password = form.get("current_password") or ""
+    email = form.get("email") or ""
     password = form.get("password") or ""
     confirm_password = form.get("confirm_password") or ""
-    email = form.get("email") or ""
+    form_data = {"email": email}
+
+    def render_form(error_msg: str, status_code: int = 200):
+        return render_template(
+            "register_step1.html",
+            request=request,
+            error=error_msg,
+            status_code=status_code,
+            **form_data,
+        )
+
+    if all([email, password, confirm_password]):
+        if len(password) < 8 or len(password) > 128:
+            return render_form("Password must be between 8 and 128 characters")
+        if password.lower() in WEAK_PASSWORDS:
+            return render_form("Password is too common")
+        if password != confirm_password:
+            return render_form("Passwords do not match")
+        if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email):
+            return render_form("Invalid email format")
+        try:
+            ensure_not_disposable(email)
+        except HTTPException as exc:
+            return render_form(exc.detail["message"], status_code=exc.status_code)
+        if email in users_by_email or db.query(User).filter(User.email == email).first():
+            return render_form("Email already taken")
+        password_hash = hash_password(password)
+        temp_username = f"pending_{uuid4().hex[:8]}"
+        temp_username_lower = temp_username.lower()
+        db_user = User(
+            username=temp_username_lower,
+            email=email,
+            password_hash=password_hash,
+            role=RoleEnum.REGISTERING,
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        user = DemoUser(
+            id=db_user.id,
+            username=temp_username_lower,
+            password_hash=password_hash,
+            email=email,
+            role="registering",
+        )
+        users[user.id] = user
+        users_by_username[temp_username_lower] = user
+        users_by_email[email] = user
+        request.session["user_id"] = user.id
+        return RedirectResponse(url="/register/details", status_code=status.HTTP_303_SEE_OTHER)
+    return render_form("All fields are required")
+
+
+@app.get("/register/details", response_class=HTMLResponse)
+async def register_details_form(request: Request):
+    """Display step two of registration (username & phone)."""
+    user = get_current_user(request)
+    if not user or user.role != "registering":
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template("register.html", request=request)
+
+
+@app.post("/register/details", response_class=HTMLResponse)
+async def register_details(request: Request, db: Session = Depends(get_db)):
+    """Handle step two of registration."""
+    user = get_current_user(request)
+    if not user or user.role != "registering":
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    username = form.get("username") or ""
     phone = form.get("phone") or ""
     prefix = form.get("prefix") or ""
-    form_data = {
-        "username": username,
-        "email": email,
-        "phone": phone,
-        "prefix": prefix,
-    }
+    form_data = {"username": username, "phone": phone, "prefix": prefix}
 
     def render_form(error_msg: str, status_code: int = 200):
         return render_template(
@@ -2473,7 +2550,7 @@ async def register(request: Request, db: Session = Depends(get_db)):
             **form_data,
         )
 
-    if all([username, password, confirm_password, email, phone, prefix]):
+    if all([username, phone, prefix]):
         try:
             RegisterIn.model_validate({"dial_code": prefix, "phone": phone})
         except ValidationError:
@@ -2491,18 +2568,6 @@ async def register(request: Request, db: Session = Depends(get_db)):
             or username_lower in RESERVED_USERNAMES
         ):
             return render_form(USERNAME_MESSAGE)
-        if len(password) < 8 or len(password) > 128:
-            return render_form("Password must be between 8 and 128 characters")
-        if password.lower() in WEAK_PASSWORDS:
-            return render_form("Password is too common")
-        if password != confirm_password:
-            return render_form("Passwords do not match")
-        if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email or ""):
-            return render_form("Invalid email format")
-        try:
-            ensure_not_disposable(email)
-        except HTTPException as exc:
-            return render_form(exc.detail["message"], status_code=exc.status_code)
         if (
             username_lower in users_by_username
             or db.query(User)
@@ -2511,41 +2576,26 @@ async def register(request: Request, db: Session = Depends(get_db)):
         ):
             return render_form("Username already taken")
         if (
-            email in users_by_email
-            or db.query(User).filter(User.email == email).first()
-        ):
-            return render_form("Email already taken")
-        if (
             any(u.phone_e164 == phone_e164 for u in users.values())
             or db.query(User).filter(User.phone_e164 == phone_e164).first()
         ):
             return render_form("Phone already in use", status_code=409)
-        password_hash = hash_password(password)
-        db_user = User(
-            username=username_lower,
-            email=email,
-            password_hash=password_hash,
-            phone=phone,
-            prefix=prefix,
-            phone_e164=phone_e164,
-            phone_region=phone_region,
-        )
-        db.add(db_user)
+        db_user = db.query(User).filter(User.id == user.id).first()
+        db_user.username = username_lower
+        db_user.phone = phone
+        db_user.prefix = prefix
+        db_user.phone_e164 = phone_e164
+        db_user.phone_region = phone_region
+        db_user.role = RoleEnum.CUSTOMER
         db.commit()
-        db.refresh(db_user)
-        user = DemoUser(
-            id=db_user.id,
-            username=username_lower,
-            password_hash=password_hash,
-            email=email,
-            phone=phone,
-            prefix=prefix,
-            phone_e164=phone_e164,
-            phone_region=phone_region,
-        )
-        users[user.id] = user
+        del users_by_username[user.username.lower()]
+        user.username = username_lower
+        user.phone = phone
+        user.prefix = prefix
+        user.phone_e164 = phone_e164
+        user.phone_region = phone_region
+        user.role = "customer"
         users_by_username[username_lower] = user
-        users_by_email[user.email] = user
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     return render_form("All fields are required")
 
@@ -2575,6 +2625,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
                     RoleEnum.BARADMIN: "bar_admin",
                     RoleEnum.BARTENDER: "bartender",
                     RoleEnum.CUSTOMER: "customer",
+                    RoleEnum.REGISTERING: "registering",
                 }
                 bar_ids = [r.bar_id for r in db_user.bar_roles]
                 user = DemoUser(
@@ -4031,6 +4082,7 @@ async def admin_users_view(request: Request, db: Session = Depends(get_db)):
         RoleEnum.BARADMIN: "bar_admin",
         RoleEnum.BARTENDER: "bartender",
         RoleEnum.CUSTOMER: "customer",
+        RoleEnum.REGISTERING: "registering",
     }
     for db_user in db_users:
         existing = users.get(db_user.id)
@@ -4087,6 +4139,7 @@ def _load_demo_user(user_id: int, db: Session) -> DemoUser:
         RoleEnum.BARADMIN: "bar_admin",
         RoleEnum.BARTENDER: "bartender",
         RoleEnum.CUSTOMER: "customer",
+        RoleEnum.REGISTERING: "registering",
     }
     bar_ids = [r.bar_id for r in db_user.bar_roles]
     user = DemoUser(
