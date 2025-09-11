@@ -6,27 +6,28 @@
       <h1 class="profile-title">Profile</h1>
       <p class="profile-subtitle">Manage your account, security, and phone number.</p>
     </div>
+    {% if success %}<p class="alert success">Profile updated successfully.</p>{% endif %}
     {% if error %}<p class="alert">{{ error }}</p>{% endif %}
     <form method="post" action="/profile" id="profile-form" class="profile-form">
       <div class="form-grid">
         <div class="field" data-name="username">
           <label for="username" class="block-label">Username</label>
           <div class="input-with-icon">
-            <input id="username" type="text" name="username" required autocomplete="username" inputmode="text" enterkeyhint="next" minlength="3" maxlength="24" pattern="(?![._-])(?!.*[._-]{2})(?!.*[._-]$)[a-z0-9._-]{3,24}" title="3–24 characters, lowercase letters, numbers, dot, hyphen or underscore. No spaces." value="{{ username|default(user.username) }}">
+            <input id="username" type="text" name="username" required autocomplete="username" inputmode="text" enterkeyhint="next" minlength="3" maxlength="24" pattern="(?![._-])(?!.*[._-]{2})(?!.*[._-]$)[a-z0-9._-]{3,24}" title="3–24 characters, lowercase letters, numbers, dot, hyphen or underscore. No spaces." value="{{ username|default(user.username) }}" disabled>
             <button type="button" class="edit-btn icon" aria-label="Edit username"><i class="bi bi-pencil-square"></i></button>
           </div>
         </div>
         <div class="field" data-name="email">
           <label for="email" class="block-label">Email</label>
           <div class="input-with-icon">
-            <input id="email" type="email" name="email" required autocomplete="email" inputmode="email" enterkeyhint="next" pattern="[^@]+@[^@]+\.[^@]+" title="Email must be in the format text@text.text" value="{{ email|default(user.email) }}">
+            <input id="email" type="email" name="email" required autocomplete="email" inputmode="email" enterkeyhint="next" pattern="[^@]+@[^@]+\.[^@]+" title="Email must be in the format text@text.text" value="{{ email|default(user.email) }}" disabled>
             <button type="button" class="edit-btn icon" aria-label="Edit email"><i class="bi bi-pencil-square"></i></button>
           </div>
         </div>
         <div class="field" data-name="prefix">
           <label for="prefix" class="block-label">Phone Prefix</label>
           <div class="input-with-icon">
-            <select id="prefix" name="prefix" required autocomplete="tel-country-code">
+            <select id="prefix" name="prefix" required autocomplete="tel-country-code" disabled>
               <option value="+41" {% if (prefix|default(user.prefix)) == "+41" %}selected{% endif %}>+41 (Switzerland)</option>
               <option value="+1" {% if (prefix|default(user.prefix)) == "+1" %}selected{% endif %}>+1 (USA)</option>
               <option value="+44" {% if (prefix|default(user.prefix)) == "+44" %}selected{% endif %}>+44 (UK)</option>
@@ -37,7 +38,7 @@
         <div class="field" data-name="phone">
           <label for="phone" class="block-label">Phone Number</label>
           <div class="input-with-icon">
-            <input id="phone" type="tel" name="phone" required autocomplete="tel-national" inputmode="tel" enterkeyhint="done" pattern="[0-9]{9,10}" minlength="9" maxlength="10" title="Phone number must be 9 to 10 digits" value="{{ phone|default(user.phone) }}">
+            <input id="phone" type="tel" name="phone" required autocomplete="tel-national" inputmode="tel" enterkeyhint="done" pattern="[0-9]{9,10}" minlength="9" maxlength="10" title="Phone number must be 9 to 10 digits" value="{{ phone|default(user.phone) }}" disabled>
             <button type="button" class="edit-btn icon" aria-label="Edit phone number"><i class="bi bi-pencil-square"></i></button>
           </div>
           <small class="help">Use mobile format for your country.</small>
@@ -50,4 +51,8 @@
     </form>
   </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/profile.js" defer></script>
 {% endblock %}

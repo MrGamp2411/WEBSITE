@@ -2624,7 +2624,8 @@ async def profile_form(request: Request):
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
-    return render_template("profile.html", request=request)
+    success = request.query_params.get("success")
+    return render_template("profile.html", request=request, success=success)
 
 
 @app.post("/profile", response_class=HTMLResponse)
@@ -2712,7 +2713,7 @@ async def profile_update(request: Request, db: Session = Depends(get_db)):
     db_user.phone_region = phone_region
     db.commit()
     users[user.id] = user
-    return RedirectResponse(url="/profile", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url="/profile?success=1", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get("/profile/password", response_class=HTMLResponse)
