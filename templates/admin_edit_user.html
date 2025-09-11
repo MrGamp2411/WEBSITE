@@ -30,30 +30,33 @@
     <option value="customer" {% if user.role=='customer' %}selected{% endif %}>Customer</option>
   </select>
 
+  <h2>Assigned Bars</h2>
   <div class="toolbar-actions">
-    <div class="bars-search" role="search" aria-label="Search bars" onsubmit="return false">
+    <div class="bars-search" role="search" aria-label="Search assigned bars" onsubmit="return false">
       <i class="bi bi-search" aria-hidden="true"></i>
-      <input id="barSearch" type="search" inputmode="search" autocomplete="off"
-             placeholder="Search bars by name…" aria-label="Search bars by name">
+      <input id="assignedBarSearch" type="search" inputmode="search" autocomplete="off"
+             placeholder="Search bars by name…" aria-label="Search assigned bars by name">
       <button class="clear" type="button" aria-label="Clear search">
         <i class="bi bi-x-circle" aria-hidden="true"></i>
       </button>
     </div>
   </div>
-
-  <h2>Assigned Bars</h2>
   <div class="table-card">
     <table class="bars-table">
       <thead>
         <tr>
+          <th>No.</th>
           <th>Name</th>
+          <th>City</th>
           <th class="actions">Actions</th>
         </tr>
       </thead>
       <tbody id="assignedBars">
         {% for b in bars if b.id in user.bar_ids %}
         <tr data-name="{{ b.name }}">
+          <td>{{ "%03d"|format(b.id) }}</td>
           <td>{{ b.name }}</td>
+          <td>{{ b.city }}</td>
           <td class="actions">
             <div class="actions-group">
               <button type="button" class="btn-danger-soft js-remove-bar" data-bar-id="{{ b.id }}">Remove</button>
@@ -67,18 +70,32 @@
   </div>
 
   <h2>Assign a Bar</h2>
+  <div class="toolbar-actions">
+    <div class="bars-search" role="search" aria-label="Search available bars" onsubmit="return false">
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <input id="availableBarSearch" type="search" inputmode="search" autocomplete="off"
+             placeholder="Search bars by name…" aria-label="Search available bars by name">
+      <button class="clear" type="button" aria-label="Clear search">
+        <i class="bi bi-x-circle" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
   <div class="table-card">
     <table class="bars-table">
       <thead>
         <tr>
+          <th>No.</th>
           <th>Name</th>
+          <th>City</th>
           <th class="actions">Actions</th>
         </tr>
       </thead>
       <tbody id="availableBars">
         {% for b in bars if b.id not in user.bar_ids %}
         <tr data-name="{{ b.name }}">
+          <td>{{ "%03d"|format(b.id) }}</td>
           <td>{{ b.name }}</td>
+          <td>{{ b.city }}</td>
           <td class="actions">
             <div class="actions-group">
               <button type="button" class="btn-outline js-add-bar" data-bar-id="{{ b.id }}">Add</button>
@@ -110,25 +127,31 @@
 
 <script>
 (function(){
-  const searchInput = document.getElementById('barSearch');
+  const assignedSearch = document.getElementById('assignedBarSearch');
+  const availableSearch = document.getElementById('availableBarSearch');
   const assigned = document.getElementById('assignedBars');
   const available = document.getElementById('availableBars');
-  if(!searchInput || !assigned || !available) return;
-  const rows = Array.from(assigned.querySelectorAll('tr')).concat(Array.from(available.querySelectorAll('tr')));
+  if(!assigned || !available) return;
   const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
-  function applyFilter(){
-    const q = norm(searchInput.value);
-    rows.forEach(tr => {
-      const name = tr.dataset.name || '';
-      tr.style.display = !q || norm(name).includes(q) ? '' : 'none';
-    });
-  }
   function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}}
-  const run = debounce(applyFilter,120);
-  searchInput.addEventListener('input', run);
-  document.querySelector('.bars-search .clear')?.addEventListener('click', () => {
-    searchInput.value=''; applyFilter(); searchInput.focus();
-  });
+  function setupSearch(input, tbody){
+    if(!input) return ()=>{};
+    const apply = () => {
+      const q = norm(input.value);
+      Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+        const name = tr.dataset.name || '';
+        tr.style.display = !q || norm(name).includes(q) ? '' : 'none';
+      });
+    };
+    input.addEventListener('input', debounce(apply,120));
+    input.closest('.bars-search')?.querySelector('.clear')?.addEventListener('click', () => {
+      input.value=''; apply(); input.focus();
+    });
+    return apply;
+  }
+
+  const applyAssigned = setupSearch(assignedSearch, assigned);
+  const applyAvailable = setupSearch(availableSearch, available);
 
   function moveRow(tr, toAssigned){
     const checkbox = tr.querySelector('input[name="bar_ids"]');
@@ -148,7 +171,8 @@
       btn.classList.remove('js-remove-bar');
       available.appendChild(tr);
     }
-    applyFilter();
+    applyAssigned();
+    applyAvailable();
   }
 
   assigned.addEventListener('click', e => {
