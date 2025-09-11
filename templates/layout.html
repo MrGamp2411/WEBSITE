@@ -37,13 +37,15 @@
         </button>
         <a class="hdr-logo" href="/">SiplyGo</a>
         <div class="hdr-actions">
-          {% if user %}
+          {% if user and not user.is_display %}
           <a class="credit-pill" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
           {% endif %}
+          {% if not user or not user.is_display %}
           <a class="cart-icon" href="/cart" aria-label="Cart">
             <i class="bi bi-cart2" aria-hidden="true"></i>
             <span class="cart-badge" aria-live="polite">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
           </a>
+          {% endif %}
         </div>
       </div>
       <nav aria-label="Primary" class="navbar desktop-nav">
@@ -52,17 +54,22 @@
         </button>
         <a class="hdr-logo" href="/">SiplyGo</a>
         <div class="hdr-actions">
-          {% if user %}
+          {% if user and not user.is_display %}
           <a class="credit-pill desktop-credit" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
           {% endif %}
+          {% if not user or not user.is_display %}
           <a class="cart-icon" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
             <i class="bi bi-cart2" aria-hidden="true"></i>
             <span class="cart-badge" aria-live="polite">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
           </a>
+          {% endif %}
         </div>
       </nav>
       <nav id="mobileMenu" class="mobile-menu" aria-label="Menu" role="dialog" aria-modal="true" hidden>
         <button class="menu-close js-close-menu" aria-label="Close menu"><i class="bi bi-x" aria-hidden="true"></i></button>
+        {% if user and user.is_display %}
+        <a href="/logout" role="menuitem"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Logout</span></a>
+        {% else %}
         <a href="/search" role="menuitem"><i class="bi bi-geo-alt" aria-hidden="true"></i><span>Browse Bars</span></a>
         {% if user and (user.is_super_admin or user.is_bar_admin or user.is_bartender) %}
         <a href="/dashboard" role="menuitem"><i class="bi bi-speedometer2" aria-hidden="true"></i><span>Dashboard</span></a>
@@ -76,60 +83,65 @@
         <a href="/login" role="menuitem" class="menu-login"><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>Login</span></a>
         <a href="/register" role="menuitem" class="menu-register"><i class="bi bi-person-plus" aria-hidden="true"></i><span>Register</span></a>
         {% endif %}
+        {% endif %}
       </nav>
     <div class="menu-backdrop" hidden></div>
   </header>
-  <div class="hdr-sub">
-    <button class="location-pill location-selector js-open-location" aria-label="Change location"><span id="locationDisplay">📍 Detecting location...</span></button>
-    <a class="btn-icon" href="/search" aria-label="Search"><i class="bi bi-search"></i></a>
-  </div>
-  <input type="search" id="locationInput" class="visually-hidden" value="Detecting location..." placeholder="Enter city or ZIP" aria-label="Current location" list="citySuggestionsMobile" autocomplete="postal-code">
-  <datalist id="citySuggestionsMobile">
-    <option value="Lugano"></option>
-    <option value="Locarno"></option>
-    <option value="Zurich"></option>
-  </datalist>
-  <div class="search-overlay" hidden>
-    <button class="overlay-close" aria-label="Close">×</button>
-    <div class="overlay-body">
-      <input type="search" id="barSearch" placeholder="Search bars..." aria-label="Search bars" inputmode="search" autocomplete="off" enterkeyhint="search">
-      <div id="searchSuggestions" class="search-suggestions"></div>
+    {% if not user or not user.is_display %}
+    <div class="hdr-sub">
+      <button class="location-pill location-selector js-open-location" aria-label="Change location"><span id="locationDisplay">📍 Detecting location...</span></button>
+      <a class="btn-icon" href="/search" aria-label="Search"><i class="bi bi-search"></i></a>
     </div>
-  </div>
+    <input type="search" id="locationInput" class="visually-hidden" value="Detecting location..." placeholder="Enter city or ZIP" aria-label="Current location" list="citySuggestionsMobile" autocomplete="postal-code">
+    <datalist id="citySuggestionsMobile">
+      <option value="Lugano"></option>
+      <option value="Locarno"></option>
+      <option value="Zurich"></option>
+    </datalist>
+    <div class="search-overlay" hidden>
+      <button class="overlay-close" aria-label="Close">×</button>
+      <div class="overlay-body">
+        <input type="search" id="barSearch" placeholder="Search bars..." aria-label="Search bars" inputmode="search" autocomplete="off" enterkeyhint="search">
+        <div id="searchSuggestions" class="search-suggestions"></div>
+      </div>
+    </div>
+    {% endif %}
   <main id="main" class="container">
       {% block content %}{% endblock %}
   </main>
-  <footer class="site-footer" role="contentinfo">
-    <div class="container">
-      <p>SiplyGo © 2025 · <a href="#">About</a> · <a href="#">Help Center</a> · <a href="#">For Bars</a> · <a href="#">Legal</a></p>
-    </div>
-  </footer>
-  <div id="cartBlocker" class="cart-blocker" {% if cart_bar_id and current_bar_id != cart_bar_id %}{% else %}hidden{% endif %}>
-    <div class="cart-popup">
-      <p>You still have products in your cart at <strong>{{ cart_bar_name }}</strong>.</p>
-      <div class="cart-popup-actions">
-        <button type="button" class="btn btn--secondary js-clear-cart">Remove products</button>
-        <a class="btn btn--primary" href="/bars/{{ cart_bar_id }}">Go to the bar menu</a>
+    {% if not user or not user.is_display %}
+    <footer class="site-footer" role="contentinfo">
+      <div class="container">
+        <p>SiplyGo © 2025 · <a href="#">About</a> · <a href="#">Help Center</a> · <a href="#">For Bars</a> · <a href="#">Legal</a></p>
+      </div>
+    </footer>
+    <div id="cartBlocker" class="cart-blocker" {% if cart_bar_id and current_bar_id != cart_bar_id %}{% else %}hidden{% endif %}>
+      <div class="cart-popup">
+        <p>You still have products in your cart at <strong>{{ cart_bar_name }}</strong>.</p>
+        <div class="cart-popup-actions">
+          <button type="button" class="btn btn--secondary js-clear-cart">Remove products</button>
+          <a class="btn btn--primary" href="/bars/{{ cart_bar_id }}">Go to the bar menu</a>
+        </div>
       </div>
     </div>
-  </div>
-  <div id="servicePaused" class="cart-blocker" hidden>
-    <div class="cart-popup">
-      <p>Ordering is paused for <strong>{{ cart_bar_name }}</strong>. Please contact a staff member for more information.</p>
-      <div class="cart-popup-actions">
-        {% if pause_popup_close|default(False) %}
-        <button type="button" class="btn btn--secondary js-close-service-paused">Close</button>
-        {% endif %}
-        {% if pause_popup_back|default(False) %}
-        <a class="btn btn--primary" href="/bars/{{ cart_bar_id }}">Back to the menu</a>
-        {% endif %}
+    <div id="servicePaused" class="cart-blocker" hidden>
+      <div class="cart-popup">
+        <p>Ordering is paused for <strong>{{ cart_bar_name }}</strong>. Please contact a staff member for more information.</p>
+        <div class="cart-popup-actions">
+          {% if pause_popup_close|default(False) %}
+          <button type="button" class="btn btn--secondary js-close-service-paused">Close</button>
+          {% endif %}
+          {% if pause_popup_back|default(False) %}
+          <a class="btn btn--primary" href="/bars/{{ cart_bar_id }}">Back to the menu</a>
+          {% endif %}
+        </div>
       </div>
     </div>
-  </div>
-  <script>
-    window.orderingPaused = {{ 'true' if cart_bar_paused else 'false' }};
-    window.showServicePausedOnLoad = {{ 'true' if show_service_paused|default(False) else 'false' }};
-  </script>
+    <script>
+      window.orderingPaused = {{ 'true' if cart_bar_paused else 'false' }};
+      window.showServicePausedOnLoad = {{ 'true' if show_service_paused|default(False) else 'false' }};
+    </script>
+    {% endif %}
   <script src="/static/js/app.min.js" defer></script>
   {% block scripts %}{% endblock %}
 </body>

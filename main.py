@@ -284,6 +284,10 @@ class DemoUser:
         return self.role == "bartender"
 
     @property
+    def is_display(self) -> bool:
+        return self.role == "display"
+
+    @property
     def bar_id(self) -> Optional[int]:
         return self.bar_ids[0] if self.bar_ids else None
 
@@ -546,7 +550,7 @@ def seed_super_admin():
 
 
 def ensure_role_enum() -> None:
-    """Ensure the role enum includes the REGISTERING state."""
+    """Ensure the role enum includes required states."""
     if engine.dialect.name != "postgresql":
         return
     with engine.begin() as conn:
@@ -557,8 +561,11 @@ def ensure_role_enum() -> None:
                 "WHERE t.typname = 'roleenum'"
             )
         ).scalars().all()
-        if "REGISTERING" not in existing:
-            conn.execute(text("ALTER TYPE roleenum ADD VALUE IF NOT EXISTS 'REGISTERING'"))
+        for label in ["REGISTERING", "DISPLAY"]:
+            if label not in existing:
+                conn.execute(
+                    text(f"ALTER TYPE roleenum ADD VALUE IF NOT EXISTS '{label}'")
+                )
 
 
 def ensure_prefix_column():
@@ -2174,7 +2181,12 @@ async def get_bar_orders(
     if (
         not user
         or (bar_id not in user.bar_ids and not user.is_super_admin)
-        or not (user.is_bartender or user.is_bar_admin or user.is_super_admin)
+        or not (
+            user.is_bartender
+            or user.is_bar_admin
+            or user.is_super_admin
+            or user.is_display
+        )
     ):
         raise HTTPException(status_code=403, detail="Not authorised")
     orders = (
@@ -2651,6 +2663,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
                     RoleEnum.BARTENDER: "bartender",
                     RoleEnum.CUSTOMER: "customer",
                     RoleEnum.REGISTERING: "registering",
+                    RoleEnum.DISPLAY: "display",
                 }
                 bar_ids = [r.bar_id for r in db_user.bar_roles]
                 user = DemoUser(
@@ -2891,6 +2904,13 @@ async def dashboard(request: Request):
         return render_template(
             "bartender_dashboard.html", request=request, bars=bar_list
         )
+    if user.is_display:
+        if user.bar_ids:
+            return RedirectResponse(
+                url=f"/dashboard/bar/{user.bar_id}/orders",
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
+        return RedirectResponse(url="/logout", status_code=status.HTTP_303_SEE_OTHER)
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -2900,13 +2920,25 @@ async def manage_orders(request: Request, bar_id: int):
     if (
         not user
         or (bar_id not in user.bar_ids and not user.is_super_admin)
-        or not (user.is_bartender or user.is_bar_admin or user.is_super_admin)
+        or not (
+            user.is_bartender
+            or user.is_bar_admin
+            or user.is_super_admin
+            or user.is_display
+        )
     ):
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     bar = bars.get(bar_id)
     if not bar:
         raise HTTPException(status_code=404)
-    template = "bar_admin_orders.html" if user.is_bar_admin or user.is_super_admin else "bartender_orders.html"
+    if user.is_display:
+        template = "display_orders.html"
+    else:
+        template = (
+            "bar_admin_orders.html"
+            if user.is_bar_admin or user.is_super_admin
+            else "bartender_orders.html"
+        )
     return render_template(template, request=request, bar=bar)
 
 
@@ -3541,7 +3573,11 @@ async def manage_bar_users_post(
     form = await request.form()
     action = form.get("action")
     role = form.get("role")
-    role_map = {"bar_admin": RoleEnum.BARADMIN, "bartender": RoleEnum.BARTENDER}
+    role_map = {
+        "bar_admin": RoleEnum.BARADMIN,
+        "bartender": RoleEnum.BARTENDER,
+        "display": RoleEnum.DISPLAY,
+    }
     error = None
     message = None
     if action == "existing":
@@ -4095,7 +4131,9 @@ async def admin_profile(request: Request):
 
 
 @app.get("/admin/users", response_class=HTMLResponse)
-async def admin_users_view(request: Request, db: Session = Depends(get_db)):
+async def admin_users_view(
+    request: Request, db: Session = Depends(get_db), error: str | None = None
+):
     user = get_current_user(request)
     if not user or not user.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -4108,6 +4146,7 @@ async def admin_users_view(request: Request, db: Session = Depends(get_db)):
         RoleEnum.BARTENDER: "bartender",
         RoleEnum.CUSTOMER: "customer",
         RoleEnum.REGISTERING: "registering",
+        RoleEnum.DISPLAY: "display",
     }
     for db_user in db_users:
         existing = users.get(db_user.id)
@@ -4148,7 +4187,53 @@ async def admin_users_view(request: Request, db: Session = Depends(get_db)):
         user=user,
         users=users.values(),
         bars=bars,
+        error=error,
     )
+
+
+@app.post("/admin/users/new", response_class=HTMLResponse)
+async def admin_users_new(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    if not user or not user.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    email = (form.get("email") or "").strip()
+    password = (form.get("password") or "").strip()
+    if not email or not password or not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email):
+        return await admin_users_view(request, db, error="Invalid email or password")
+    if email in users_by_email or db.query(User).filter(User.email == email).first():
+        return await admin_users_view(request, db, error="Email already taken")
+    password_hash = hash_password(password)
+    base_username = re.sub(r"[^a-z0-9._-]", "", email.split("@")[0].lower()) or f"user_{uuid4().hex[:8]}"
+    username = base_username
+    counter = 1
+    while (
+        username in users_by_username
+        or db.query(User).filter(func.lower(User.username) == username).first()
+    ):
+        username = f"{base_username}{counter}"
+        counter += 1
+    db_user = User(username=username, email=email, password_hash=password_hash)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    demo = DemoUser(
+        id=db_user.id,
+        username=db_user.username,
+        password_hash=db_user.password_hash,
+        email=db_user.email,
+        phone=db_user.phone or "",
+        prefix=db_user.prefix or "",
+        phone_e164=db_user.phone_e164 or "",
+        phone_region=db_user.phone_region or "",
+        role="customer",
+        bar_ids=[r.bar_id for r in db_user.bar_roles],
+        credit=float(db_user.credit or 0),
+    )
+    users[demo.id] = demo
+    users_by_username[demo.username.lower()] = demo
+    users_by_email[demo.email] = demo
+    return RedirectResponse(url="/admin/users", status_code=status.HTTP_303_SEE_OTHER)
 
 
 def _load_demo_user(user_id: int, db: Session) -> DemoUser:
@@ -4165,6 +4250,7 @@ def _load_demo_user(user_id: int, db: Session) -> DemoUser:
         RoleEnum.BARTENDER: "bartender",
         RoleEnum.CUSTOMER: "customer",
         RoleEnum.REGISTERING: "registering",
+        RoleEnum.DISPLAY: "display",
     }
     bar_ids = [r.bar_id for r in db_user.bar_roles]
     user = DemoUser(
@@ -4444,6 +4530,7 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         "bar_admin": RoleEnum.BARADMIN,
         "bartender": RoleEnum.BARTENDER,
         "customer": RoleEnum.CUSTOMER,
+        "display": RoleEnum.DISPLAY,
     }
     role_enum = role_enum_map.get(role, RoleEnum.CUSTOMER)
     db_user.role = role_enum

@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="display-page">
+  <div class="display-column">
+    <div class="section-head"><h2>Preparing</h2></div>
+    <div id="preparing-orders" class="display-orders"></div>
+  </div>
+  <div class="display-column">
+    <div class="section-head"><h2>Ready</h2></div>
+    <div id="ready-orders" class="display-orders"></div>
+  </div>
+</section>
+
+<style>
+.display-page{display:flex;gap:20px;margin-top:10px;}
+.display-column{flex:1;}
+.display-orders{display:flex;flex-direction:column;gap:12px;}
+.display-orders .order-card{width:100%;max-width:none;min-width:100px;text-align:center;}
+.display-orders .order-card__header{justify-content:center;}
+</style>
+
+<script src="/static/js/display.js" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    initDisplay({{ bar.id }});
+  });
+</script>
+{% endblock %}
