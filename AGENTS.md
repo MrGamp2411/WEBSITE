@@ -154,6 +154,7 @@
 - Login fetches the user's bar assignment from the database so the bar is available immediately after authentication
 - Login and Register pages show text prompts linking to each other: "Already registered? Log in" and "Not registered yet? Register"
 - Register form preserves entered username, email, phone number, and prefix when validation fails so users can correct errors without retyping.
+- Register and profile forms offer phone prefixes for Switzerland (+41), Italy (+39), Germany (+49), and France (+33); USA and UK options have been removed.
 - Register form requires a phone number with 9–10 digits; invalid entries show an error
 - Register form rejects duplicate phone numbers; the combination of prefix and phone must be unique
 - Register form requires an email in the format text@text.text; invalid entries show an error
