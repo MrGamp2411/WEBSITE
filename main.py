@@ -420,6 +420,26 @@ app.include_router(wallee_webhook_router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
+class RegisterRedirectMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        session = request.session
+        user = users.get(session.get("user_id")) if session else None
+        path = request.url.path
+        if user and user.role == "registering":
+            allowed = (
+                path.startswith("/register/details")
+                or path.startswith("/static")
+                or path == "/logout"
+                or path == "/favicon.ico"
+            )
+            if not allowed:
+                return RedirectResponse(
+                    url="/register/details",
+                    status_code=status.HTTP_303_SEE_OTHER,
+                )
+        return await call_next(request)
+
+
 class DisplayRedirectMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         session = request.session
@@ -455,6 +475,7 @@ app.add_middleware(
 
 # Enable server-side sessions for authentication
 app.add_middleware(DisplayRedirectMiddleware)
+app.add_middleware(RegisterRedirectMiddleware)
 app.add_middleware(SessionMiddleware, secret_key="dev-secret")
 
 
@@ -964,18 +985,6 @@ def get_current_user(request: Request) -> Optional[DemoUser]:
             return None
 
 
-@app.middleware("http")
-async def enforce_registration_completion(request: Request, call_next):
-    session = request.scope.get("session")
-    user = users.get(session.get("user_id")) if session else None
-    path = request.url.path
-    if user and user.role == "registering" and not (
-        path.startswith("/register/details")
-        or path.startswith("/static")
-        or path.startswith("/logout")
-    ):
-        return RedirectResponse(url="/register/details", status_code=status.HTTP_303_SEE_OTHER)
-    return await call_next(request)
 
 
 def get_cart_for_user(user: DemoUser) -> Cart:
