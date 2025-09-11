@@ -921,7 +921,15 @@ def get_current_user(request: Request) -> Optional[DemoUser]:
     user_id = request.session.get("user_id")
     if user_id is None:
         return None
-    return users.get(user_id)
+    user = users.get(user_id)
+    if user:
+        return user
+    # If the user was logged in before a restart, reload it from the database
+    with SessionLocal() as db:
+        try:
+            return _load_demo_user(user_id, db)
+        except HTTPException:
+            return None
 
 
 @app.middleware("http")
