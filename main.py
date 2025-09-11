@@ -4475,6 +4475,46 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     return RedirectResponse(url="/admin/users", status_code=status.HTTP_303_SEE_OTHER)
 
 
+@app.post("/admin/users/{user_id}/delete")
+async def delete_user(request: Request, user_id: int, db: Session = Depends(get_db)):
+    current = get_current_user(request)
+    if not current or not current.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    db_user = db.get(User, user_id)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.query(UserBarRole).filter(UserBarRole.user_id == user_id).delete(
+        synchronize_session=False
+    )
+    db.query(UserCart).filter(UserCart.user_id == user_id).delete(
+        synchronize_session=False
+    )
+    db.query(WalletTransaction).filter(WalletTransaction.user_id == user_id).delete(
+        synchronize_session=False
+    )
+    db.query(WalletTopup).filter(WalletTopup.user_id == user_id).delete(
+        synchronize_session=False
+    )
+    db.query(AuditLog).filter(AuditLog.actor_user_id == user_id).delete(
+        synchronize_session=False
+    )
+    db.query(Order).filter(Order.customer_id == user_id).update(
+        {Order.customer_id: None}, synchronize_session=False
+    )
+    db.delete(db_user)
+    db.commit()
+    demo = users.pop(user_id, None)
+    if demo:
+        users_by_username.pop(demo.username.lower(), None)
+        users_by_email.pop(demo.email, None)
+    for b in bars.values():
+        if user_id in b.bar_admin_ids:
+            b.bar_admin_ids.remove(user_id)
+        if user_id in b.bartender_ids:
+            b.bartender_ids.remove(user_id)
+    return RedirectResponse(url="/admin/users", status_code=status.HTTP_303_SEE_OTHER)
+
+
 @app.get("/admin/users/{user_id}/password", response_class=HTMLResponse)
 async def admin_password_form(
     request: Request, user_id: int, db: Session = Depends(get_db)
