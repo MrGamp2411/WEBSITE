@@ -67,6 +67,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from sqlalchemy import inspect, text, func, extract, or_, and_
 from sqlalchemy.orm import Session
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from argon2 import PasswordHasher, exceptions as argon2_exceptions
 
@@ -418,6 +419,29 @@ app.include_router(wallee_webhook_router)
 # Mount a static files directory for CSS/JS/image assets if needed
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+
+class DisplayRedirectMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        session = request.session
+        user = users.get(session.get("user_id")) if session else None
+        path = request.url.path
+        if user and user.is_display:
+            allowed = (
+                re.fullmatch(r"/dashboard/bar/\d+/orders", path)
+                or re.fullmatch(r"/api/bars/\d+/orders", path)
+                or path.startswith("/static")
+                or path == "/logout"
+                or path == "/favicon.ico"
+            )
+            if not allowed:
+                if user.bar_id:
+                    return RedirectResponse(
+                        url=f"/dashboard/bar/{user.bar_id}/orders",
+                        status_code=status.HTTP_303_SEE_OTHER,
+                    )
+                return RedirectResponse(url="/logout", status_code=status.HTTP_303_SEE_OTHER)
+        return await call_next(request)
+
 # Allow cross-origin requests from configured frontends
 origins_env = os.getenv("FRONTEND_ORIGINS", "http://localhost:5173")
 origins = [o.strip() for o in origins_env.split(",") if o.strip()]
@@ -430,6 +454,7 @@ app.add_middleware(
 )
 
 # Enable server-side sessions for authentication
+app.add_middleware(DisplayRedirectMiddleware)
 app.add_middleware(SessionMiddleware, secret_key="dev-secret")
 
 

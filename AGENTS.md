@@ -5,6 +5,7 @@
 - Startup ensures the `roleenum` type contains `REGISTERING` via `ensure_role_enum()`.
 - Display role users see only a two-column live orders screen (preparing/ready) at `/dashboard/bar/{id}/orders` with order codes only and no footer or cart links.
 - Display role header removes navigation links and menu toggles; the logo is not clickable and only a Logout link remains.
+- Display users are redirected from any non-display route to their bar's display orders page.
 - The display orders page stretches to the full viewport width and doubles the size of order headers for clearer visibility.
 - Display orders include 10px horizontal margins and center the order text within each card.
 
