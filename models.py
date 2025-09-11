@@ -35,6 +35,7 @@ class RoleEnum(str, PyEnum):
     BARTENDER = "Bartender"
     CUSTOMER = "Customer"
     REGISTERING = "Registering"
+    DISPLAY = "Display"
 
 
 class User(Base):
