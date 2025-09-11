@@ -9,7 +9,10 @@ sqlalchemy
 alembic
 psycopg2-binary
 pytest
-httpx
+httpx>=0.27
+disposable-email-domains>=0.0.100
+idna>=3.6
+cachetools>=5.3
 wallee
 cryptography
 argon2-cffi

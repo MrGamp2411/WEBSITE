@@ -1,0 +1,2 @@
+# Local disposable domains fallback
+trashmail.com

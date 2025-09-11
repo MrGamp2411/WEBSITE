@@ -276,3 +276,7 @@
 - Change Password fields stack in a single column on all screen sizes.
 - Change Password Save button has added top margin to separate it from the Confirm Password field.
 - Profile and Change Password pages display errors and warnings in red using `.alert-danger` or `.caps-warning`, and success messages in green via `.alert-success`.
+- Disposable email enforcement:
+  - Normalization and blocklist checks live in `app/utils/email_normalize.py` and `app/utils/disposable_email.py`.
+  - CLI `python -m app.scripts.refresh_disposable_domains --force` refreshes the cache and writes `app/data/disposable_domains.snapshot`.
+  - Dev endpoint `/internal/disposable-domains/stats` shows cache count and refresh time.
