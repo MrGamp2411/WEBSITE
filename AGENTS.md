@@ -1,6 +1,7 @@
 # AGENT Notes
 
 - Registration is a two-step flow. `/register` collects email and password and assigns a temporary `REGISTERING` role. Users are redirected to `/register/details` to supply username, phone prefix, and number, and cannot access other pages until this step completes.
+- Registering users hitting any other route are redirected back to `/register/details` by middleware until step two finishes.
 - Super admins can create users directly from the Admin Users page by entering only an email and password; this bypasses the normal registration flow and checks.
 - Startup ensures the `roleenum` type contains `REGISTERING` via `ensure_role_enum()`.
 - Display role users see only a two-column live orders screen (preparing/ready) at `/dashboard/bar/{id}/orders` with order codes only and no footer or cart links.
