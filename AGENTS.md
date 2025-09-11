@@ -5,6 +5,7 @@
 - Startup ensures the `roleenum` type contains `REGISTERING` via `ensure_role_enum()`.
 - Display role users see only a two-column live orders screen (preparing/ready) at `/dashboard/bar/{id}/orders` with order codes only and no footer or cart links.
 - The display orders page stretches to the full viewport width and doubles the size of order headers for clearer visibility.
+- Display orders include 10px horizontal margins and center the order text within each card.
 
 - Wallet page UI lives in `templates/wallet.html` using a `.wallet-page` wrapper and inline scoped styles. Transaction rows render inside `<ul id="txList">` as static `.tx` divs with no detail links. "Load more," "Export CSV," "Manage payment methods," and all filters have been removed; the "Top Up" button uses `text-decoration:none` to avoid an underline.
 - Transaction detail views have been removed, so there is no `/wallet/tx/{index}` route or `transaction_detail.html` template.
