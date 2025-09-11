@@ -56,7 +56,8 @@ def test_update_user_details_without_password():
             "phone": "076 555 12 34",
             "role": "bar_admin",
             "bar_ids": "",
-            "credit": "5.0",
+            "add_credit": "5.0",
+            "remove_credit": "0",
         }
         resp = client.post(
             f"/admin/users/edit/{user.id}", data=form, follow_redirects=False
@@ -116,7 +117,8 @@ def test_update_user_reassign_bar():
             "phone": "",
             "role": "bar_admin",
             "bar_ids": str(bar2_id),
-            "credit": "0",
+            "add_credit": "0",
+            "remove_credit": "0",
         }
         resp = client.post(
             f"/admin/users/edit/{user_id}", data=form, follow_redirects=False
@@ -171,7 +173,8 @@ def test_update_user_credit_and_bar_assignment():
             "phone": "",
             "role": "bar_admin",
             "bar_ids": str(bar2_id),
-            "credit": "15.5",
+            "add_credit": "15.5",
+            "remove_credit": "0",
         }
         resp = client.post(
             f"/admin/users/edit/{user_id}", data=form, follow_redirects=False
@@ -224,7 +227,8 @@ def test_update_user_multiple_bar_assignment():
             "phone": "",
             "role": "bartender",
             "bar_ids": [str(bar1_id), str(bar2_id)],
-            "credit": "0",
+            "add_credit": "0",
+            "remove_credit": "0",
         }
         resp = client.post(
             f"/admin/users/edit/{user_id}", data=form, follow_redirects=False
@@ -315,7 +319,8 @@ def test_admin_users_shows_reassigned_bar_after_restart():
             "phone": "",
             "role": "bar_admin",
             "bar_ids": str(bar2_id),
-            "credit": "0",
+            "add_credit": "0",
+            "remove_credit": "0",
         }
         resp = client.post(
             f"/admin/users/edit/{user_id}", data=form, follow_redirects=False

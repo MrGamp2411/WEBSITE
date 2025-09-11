@@ -33,14 +33,18 @@
     {% endfor %}
   </fieldset>
 
-  <label for="credit">Credit</label>
-  <input id="credit" name="credit" type="number" step="0.01" value="{{ user.credit }}" required>
+  <label for="add_credit">Add Credit</label>
+  <input id="add_credit" name="add_credit" type="number" step="0.01" value="0">
+
+  <label for="remove_credit">Remove Credit</label>
+  <input id="remove_credit" name="remove_credit" type="number" step="0.01" value="0">
   {% else %}
   <select id="role" name="role">
     <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>Bar Admin</option>
     <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>Bartender</option>
   </select>
-  <input type="hidden" name="credit" value="{{ user.credit }}">
+  <input type="hidden" name="add_credit" value="0">
+  <input type="hidden" name="remove_credit" value="0">
   {% endif %}
 
   <button class="btn btn--primary" type="submit">Save</button>
