@@ -51,6 +51,46 @@ def test_admin_edit_user_prefix_select():
         assert "+41 (Switzerland)" in resp.text
 
 
+def test_admin_can_assign_display_role():
+    db = SessionLocal()
+    password_hash = hashlib.sha256("pass".encode("utf-8")).hexdigest()
+    user = User(
+        username="dispuser",
+        email="dispuser@example.com",
+        password_hash=password_hash,
+        role=RoleEnum.CUSTOMER,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    user_id = user.id
+    db.close()
+
+    with TestClient(app) as client:
+        _login_super_admin(client)
+        resp = client.get(f"/admin/users/edit/{user_id}")
+        assert "<option value=\"display\"" in resp.text
+        form = {
+            "username": "dispuser",
+            "email": "dispuser@example.com",
+            "prefix": "",
+            "phone": "",
+            "role": "display",
+            "bar_ids": "",
+            "add_credit": "0",
+            "remove_credit": "0",
+        }
+        resp = client.post(
+            f"/admin/users/edit/{user_id}", data=form, follow_redirects=False
+        )
+        assert resp.status_code == 303
+
+    db = SessionLocal()
+    updated = db.query(User).filter(User.id == user_id).first()
+    assert updated.role == RoleEnum.DISPLAY
+    db.close()
+
+
 def test_update_user_details_without_password():
     db = SessionLocal()
     password_hash = hashlib.sha256("oldpass".encode("utf-8")).hexdigest()
