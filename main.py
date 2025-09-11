@@ -4205,7 +4205,6 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
     username = form.get("username")
-    password = form.get("password")
     email = form.get("email")
     prefix = form.get("prefix")
     phone = form.get("phone")
@@ -4273,11 +4272,6 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         users_by_email[user.email] = user
     else:
         user.email = email
-    if password:
-        user.password_hash = hash_password(password)
-        login_attempts.pop(user.email, None)
-        if request.session.get("user_id") == user.id:
-            request.session.clear()
     if phone:
         try:
             RegisterIn.model_validate({"dial_code": prefix, "phone": phone})
@@ -4334,8 +4328,6 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         db_user.phone = phone or None
         db_user.phone_e164 = phone_e164
         db_user.phone_region = phone_region
-    if password:
-        db_user.password_hash = user.password_hash
     role_enum_map = {
         "super_admin": RoleEnum.SUPERADMIN,
         "bar_admin": RoleEnum.BARADMIN,
@@ -4378,6 +4370,76 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
             if user_id not in target.bartender_ids:
                 target.bartender_ids.append(user_id)
     return RedirectResponse(url="/admin/users", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.get("/admin/users/{user_id}/password", response_class=HTMLResponse)
+async def admin_password_form(
+    request: Request, user_id: int, db: Session = Depends(get_db)
+):
+    current = get_current_user(request)
+    if not current:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    user = _load_demo_user(user_id, db)
+    if not (
+        current.is_super_admin
+        or (
+            current.is_bar_admin
+            and any(bid in current.bar_ids for bid in user.bar_ids)
+        )
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template(
+        "admin_change_user_password.html", request=request, user=user
+    )
+
+
+@app.post("/admin/users/{user_id}/password", response_class=HTMLResponse)
+async def admin_password_update(
+    request: Request, user_id: int, db: Session = Depends(get_db)
+):
+    current = get_current_user(request)
+    if not current:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    user = _load_demo_user(user_id, db)
+    if not (
+        current.is_super_admin
+        or (
+            current.is_bar_admin
+            and any(bid in current.bar_ids for bid in user.bar_ids)
+        )
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    password = form.get("password") or ""
+    confirm = form.get("confirm_password") or ""
+
+    def render_form(msg: str, status_code: int = 200):
+        return render_template(
+            "admin_change_user_password.html",
+            request=request,
+            user=user,
+            error=msg,
+            status_code=status_code,
+        )
+
+    if not all([password, confirm]):
+        return render_form("All fields are required")
+    if len(password) < 8 or len(password) > 128:
+        return render_form("Password must be between 8 and 128 characters")
+    if password.lower() in WEAK_PASSWORDS:
+        return render_form("Password is too common")
+    if password != confirm:
+        return render_form("Passwords do not match")
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.password_hash = hash_password(password)
+    db_user.password_hash = user.password_hash
+    login_attempts.pop(user.email, None)
+    db.commit()
+    return RedirectResponse(
+        url=f"/admin/users/edit/{user_id}", status_code=status.HTTP_303_SEE_OTHER
+    )
 
 
 @app.get("/bar/{bar_id}/categories", response_class=HTMLResponse)

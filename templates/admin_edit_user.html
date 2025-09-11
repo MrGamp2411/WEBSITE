@@ -6,8 +6,7 @@
   <label for="username">Username</label>
   <input id="username" name="username" type="text" value="{{ user.username }}" required>
 
-  <label for="password">Password</label>
-  <input id="password" name="password" type="password" placeholder="Leave blank to keep current">
+  <a class="btn-outline" href="/admin/users/{{ user.id }}/password">Edit Password</a>
 
   <label for="email">Email</label>
   <input id="email" name="email" type="email" value="{{ user.email }}" required>
