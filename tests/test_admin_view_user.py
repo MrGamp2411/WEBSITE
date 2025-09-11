@@ -43,6 +43,7 @@ def test_view_user_lists_orders():
     db.add(order)
     db.commit()
     order_id = order.id
+    code = order.public_order_code or f"#{order_id}"
     user_id = user.id
     db.close()
 
@@ -51,6 +52,7 @@ def test_view_user_lists_orders():
         resp = client.get(f"/admin/users/view/{user_id}")
         assert resp.status_code == 200
         assert f"/admin/orders/{order_id}" in resp.text
+        assert code in resp.text
 
 
 def test_order_detail_view():

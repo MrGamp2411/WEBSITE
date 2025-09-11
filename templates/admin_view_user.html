@@ -35,7 +35,7 @@
       <tbody>
         {% for o in orders %}
         <tr>
-          <td>{{ o.id }}</td>
+          <td>{{ o.public_order_code or ('#' ~ o.id) }}</td>
           <td>{{ o.bar_name }}</td>
           <td>CHF {{ "%.2f"|format(o.total) }}</td>
           <td>{{ o.status }}</td>
