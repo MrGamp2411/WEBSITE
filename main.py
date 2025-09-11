@@ -4209,7 +4209,8 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     prefix = form.get("prefix")
     phone = form.get("phone")
     role = form.get("role")
-    credit = form.get("credit")
+    add_credit = form.get("add_credit") or "0"
+    remove_credit = form.get("remove_credit") or "0"
     bar_ids = [int(b) for b in form.getlist("bar_ids") if b]
     if not (username and email is not None and role is not None):
         return render_template(
@@ -4304,11 +4305,13 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     if not current.is_super_admin:
         role = "bar_admin" if role == "bar_admin" else "bartender"
         bar_ids = current.bar_ids.copy()
-        credit = str(user.credit)
+        add_credit = "0"
+        remove_credit = "0"
     user.role = role
     user.bar_ids = bar_ids
     try:
-        user.credit = float(credit)
+        add_amt = float(add_credit)
+        remove_amt = float(remove_credit)
     except (TypeError, ValueError):
         return render_template(
             "admin_edit_user.html",
@@ -4318,6 +4321,7 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
             current=current,
             error="Invalid credit amount",
         )
+    user.credit = user.credit + add_amt - remove_amt
     db_user = db.query(User).filter(User.id == user_id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
