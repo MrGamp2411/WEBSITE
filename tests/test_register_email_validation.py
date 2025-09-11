@@ -23,12 +23,9 @@ def test_register_email_format_validation():
         resp = client.post(
             "/register",
             data={
-                "username": "validuser",
+                "email": "invalid",
                 "password": "pass1234",
                 "confirm_password": "pass1234",
-                "email": "invalid",
-                "prefix": "+41",
-                "phone": "076 555 12 34",
             },
         )
         assert resp.status_code == 200
@@ -37,15 +34,11 @@ def test_register_email_format_validation():
         resp_ok = client.post(
             "/register",
             data={
-                "username": "validuser2",
+                "email": "valid@example.com",
                 "password": "pass1234",
                 "confirm_password": "pass1234",
-                "email": "valid@example.com",
-                "prefix": "+41",
-                "phone": "076 555 12 35",
             },
             follow_redirects=False,
         )
         assert resp_ok.status_code == 303
-        assert resp_ok.headers["location"] == "/login"
-
+        assert resp_ok.headers["location"] == "/register/details"
