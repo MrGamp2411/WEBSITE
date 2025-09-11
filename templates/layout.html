@@ -30,62 +30,65 @@
 <body data-cart-bar-id="{{ cart_bar_id or '' }}" data-current-bar-id="{{ current_bar_id or '' }}">
   <div class="site-bg" aria-hidden="true"></div>
   <header class="site-header" role="banner">
-      <div class="mobile-header">
-        <!-- Premium hamburger trigger -->
-        <button class="nav-toggle js-open-menu" aria-label="Menu" aria-controls="mobileMenu" aria-expanded="false">
-          <i class="bi bi-list" aria-hidden="true"></i>
-        </button>
-        <a class="hdr-logo" href="/">SiplyGo</a>
-        <div class="hdr-actions">
-          {% if user and not user.is_display %}
-          <a class="credit-pill" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
-          {% endif %}
-          {% if not user or not user.is_display %}
-          <a class="cart-icon" href="/cart" aria-label="Cart">
-            <i class="bi bi-cart2" aria-hidden="true"></i>
-            <span class="cart-badge" aria-live="polite">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
-          </a>
-          {% endif %}
-        </div>
+    {% if user and user.is_display %}
+    <div class="display-header">
+      <span class="hdr-logo">SiplyGo</span>
+      <a href="/logout">Logout</a>
+    </div>
+    {% else %}
+    <div class="mobile-header">
+      <!-- Premium hamburger trigger -->
+      <button class="nav-toggle js-open-menu" aria-label="Menu" aria-controls="mobileMenu" aria-expanded="false">
+        <i class="bi bi-list" aria-hidden="true"></i>
+      </button>
+      <a class="hdr-logo" href="/">SiplyGo</a>
+      <div class="hdr-actions">
+        {% if user and not user.is_display %}
+        <a class="credit-pill" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
+        {% endif %}
+        {% if not user or not user.is_display %}
+        <a class="cart-icon" href="/cart" aria-label="Cart">
+          <i class="bi bi-cart2" aria-hidden="true"></i>
+          <span class="cart-badge" aria-live="polite">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
+        </a>
+        {% endif %}
       </div>
-      <nav aria-label="Primary" class="navbar desktop-nav">
-        <button class="nav-toggle js-open-menu" aria-label="Menu" aria-controls="mobileMenu" aria-expanded="false">
-          <i class="bi bi-list" aria-hidden="true"></i>
-        </button>
-        <a class="hdr-logo" href="/">SiplyGo</a>
-        <div class="hdr-actions">
-          {% if user and not user.is_display %}
-          <a class="credit-pill desktop-credit" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
-          {% endif %}
-          {% if not user or not user.is_display %}
-          <a class="cart-icon" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
-            <i class="bi bi-cart2" aria-hidden="true"></i>
-            <span class="cart-badge" aria-live="polite">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
-          </a>
-          {% endif %}
-        </div>
-      </nav>
-      <nav id="mobileMenu" class="mobile-menu" aria-label="Menu" role="dialog" aria-modal="true" hidden>
-        <button class="menu-close js-close-menu" aria-label="Close menu"><i class="bi bi-x" aria-hidden="true"></i></button>
-        {% if user and user.is_display %}
-        <a href="/logout" role="menuitem"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Logout</span></a>
-        {% else %}
-        <a href="/search" role="menuitem"><i class="bi bi-geo-alt" aria-hidden="true"></i><span>Browse Bars</span></a>
-        {% if user and (user.is_super_admin or user.is_bar_admin or user.is_bartender) %}
-        <a href="/dashboard" role="menuitem"><i class="bi bi-speedometer2" aria-hidden="true"></i><span>Dashboard</span></a>
+    </div>
+    <nav aria-label="Primary" class="navbar desktop-nav">
+      <button class="nav-toggle js-open-menu" aria-label="Menu" aria-controls="mobileMenu" aria-expanded="false">
+        <i class="bi bi-list" aria-hidden="true"></i>
+      </button>
+      <a class="hdr-logo" href="/">SiplyGo</a>
+      <div class="hdr-actions">
+        {% if user and not user.is_display %}
+        <a class="credit-pill desktop-credit" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
         {% endif %}
-        {% if user %}
-        <a href="/wallet" role="menuitem"><i class="bi bi-wallet2" aria-hidden="true"></i><span>Wallet</span></a>
-        <a href="/orders" role="menuitem"><i class="bi bi-clock-history" aria-hidden="true"></i><span>Orders</span></a>
-        <a href="/profile" role="menuitem"><i class="bi bi-person" aria-hidden="true"></i><span>Profile</span></a>
-        <a href="/logout" role="menuitem"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Logout</span></a>
-        {% else %}
-        <a href="/login" role="menuitem" class="menu-login"><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>Login</span></a>
-        <a href="/register" role="menuitem" class="menu-register"><i class="bi bi-person-plus" aria-hidden="true"></i><span>Register</span></a>
+        {% if not user or not user.is_display %}
+        <a class="cart-icon" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
+          <i class="bi bi-cart2" aria-hidden="true"></i>
+          <span class="cart-badge" aria-live="polite">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
+        </a>
         {% endif %}
-        {% endif %}
-      </nav>
+      </div>
+    </nav>
+    <nav id="mobileMenu" class="mobile-menu" aria-label="Menu" role="dialog" aria-modal="true" hidden>
+      <button class="menu-close js-close-menu" aria-label="Close menu"><i class="bi bi-x" aria-hidden="true"></i></button>
+      <a href="/search" role="menuitem"><i class="bi bi-geo-alt" aria-hidden="true"></i><span>Browse Bars</span></a>
+      {% if user and (user.is_super_admin or user.is_bar_admin or user.is_bartender) %}
+      <a href="/dashboard" role="menuitem"><i class="bi bi-speedometer2" aria-hidden="true"></i><span>Dashboard</span></a>
+      {% endif %}
+      {% if user %}
+      <a href="/wallet" role="menuitem"><i class="bi bi-wallet2" aria-hidden="true"></i><span>Wallet</span></a>
+      <a href="/orders" role="menuitem"><i class="bi bi-clock-history" aria-hidden="true"></i><span>Orders</span></a>
+      <a href="/profile" role="menuitem"><i class="bi bi-person" aria-hidden="true"></i><span>Profile</span></a>
+      <a href="/logout" role="menuitem"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Logout</span></a>
+      {% else %}
+      <a href="/login" role="menuitem" class="menu-login"><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>Login</span></a>
+      <a href="/register" role="menuitem" class="menu-register"><i class="bi bi-person-plus" aria-hidden="true"></i><span>Register</span></a>
+      {% endif %}
+    </nav>
     <div class="menu-backdrop" hidden></div>
+    {% endif %}
   </header>
     {% if not user or not user.is_display %}
     <div class="hdr-sub">
