@@ -925,7 +925,6 @@ body.dark-mode{
 }
 @media (min-width: 900px) {
   .profile-page .form-grid { grid-template-columns: 1fr 1fr; gap: 16px 18px; }
-  .profile-page .field.span-2 { grid-column: 1 / -1; }
 }
 
 
@@ -957,8 +956,6 @@ body.dark-mode{
 .profile-page .input-with-icon .toggle-password { right: 38px; }
 .profile-page .input-with-icon .icon:hover { opacity: 1; }
 
-.profile-page .phone-row { display: grid; grid-template-columns: 1fr; gap: 10px; }
-@media (min-width: 900px) { .profile-page .phone-row { grid-template-columns: 0.45fr 1fr; gap: 12px; } }
 
 .profile-page .invalid input,
 .profile-page .invalid select { border-color: #ef4444; }

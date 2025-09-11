@@ -53,8 +53,6 @@ def test_profile_update_details():
             data={
                 "username": "newuser",
                 "email": "new@example.com",
-                "password": "",
-                "confirm_password": "",
                 "prefix": "+41",
                 "phone": "0765551234",
             },
@@ -75,15 +73,11 @@ def test_profile_update_password_change():
     with TestClient(app) as client:
         _login(client, "old2@example.com")
         resp = client.post(
-            "/profile",
+            "/profile/password",
             data={
-                "username": "olduser2",
-                "email": "old2@example.com",
                 "current_password": "Oldpass123",
                 "password": "Newpass123",
                 "confirm_password": "Newpass123",
-                "prefix": "+41",
-                "phone": "0765551235",
             },
             follow_redirects=False,
         )
@@ -100,15 +94,11 @@ def test_profile_update_wrong_current_password():
     with TestClient(app) as client:
         _login(client, "old3@example.com")
         resp = client.post(
-            "/profile",
+            "/profile/password",
             data={
-                "username": "olduser3",
-                "email": "old3@example.com",
                 "current_password": "Wrongpass123",
                 "password": "Newpass123",
                 "confirm_password": "Newpass123",
-                "prefix": "+41",
-                "phone": "0765551236",
             },
             follow_redirects=False,
         )
