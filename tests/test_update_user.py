@@ -28,6 +28,29 @@ def _login_super_admin(client: TestClient) -> None:
     assert resp.status_code == 303
 
 
+def test_admin_edit_user_prefix_select():
+    db = SessionLocal()
+    password_hash = hashlib.sha256("pass".encode("utf-8")).hexdigest()
+    user = User(
+        username="prefixuser",
+        email="prefix@example.com",
+        password_hash=password_hash,
+        role=RoleEnum.CUSTOMER,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    user_id = user.id
+    db.close()
+
+    with TestClient(app) as client:
+        _login_super_admin(client)
+        resp = client.get(f"/admin/users/edit/{user_id}")
+        assert resp.status_code == 200
+        assert "<select id=\"prefix\"" in resp.text
+        assert "+41 (Switzerland)" in resp.text
+
+
 def test_update_user_details_without_password():
     db = SessionLocal()
     password_hash = hashlib.sha256("oldpass".encode("utf-8")).hexdigest()
