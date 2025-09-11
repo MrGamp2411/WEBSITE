@@ -353,8 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
     applyFilters();
   });
 
-  document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
-
   filtersToggle?.addEventListener('click', () => {
     const open = filtersToggle.getAttribute('aria-expanded') !== 'true';
     setFiltersOpen(open);
