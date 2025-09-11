@@ -934,6 +934,7 @@ body.dark-mode{
 .profile-page input[type="text"],
 .profile-page input[type="email"],
 .profile-page input[type="password"],
+.profile-page input[type="tel"],
 .profile-page select {
   padding: var(--space-2);
   border: 1px solid #d1d5db;

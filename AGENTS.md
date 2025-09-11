@@ -262,3 +262,4 @@
   - Reverted merge commit 9bc986e (PR #315) in commit 11e13a9 to restore the bar admin dashboard to its previous state; `static/js/bar_admin_dashboard.js` was removed.
   - Reverted merge commit a169f9f (PR #359) and its fix commit 2617f16 to restore payout calculations to their previous logic.
 - Profile page now collects username, email, and phone prefix/number only; a "Change Password" button links to `/profile/password` which uses `templates/change_password.html` and dedicated routes in `main.py`.
+- Phone number fields on the profile page share the same rounded style as other inputs by styling `input[type="tel"]`.
