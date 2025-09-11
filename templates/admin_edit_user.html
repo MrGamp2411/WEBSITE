@@ -1,7 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>Edit User {{ user.username }}</h1>
-{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+{% if error %}
+<div id="errorBlocker" class="cart-blocker">
+  <div class="cart-popup">
+    <p>{{ error }}</p>
+    <div class="cart-popup-actions">
+      <button type="button" class="btn btn--primary js-close-error">OK</button>
+    </div>
+  </div>
+</div>
+{% endif %}
 <form class="form" method="post" action="/admin/users/edit/{{ user.id }}">
   <label for="username">Username</label>
   <input id="username" name="username" type="text" value="{{ user.username }}" required>
@@ -28,6 +37,7 @@
     <option value="super_admin" {% if user.role=='super_admin' %}selected{% endif %}>Super Admin</option>
     <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>Bar Admin</option>
     <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>Bartender</option>
+    <option value="display" {% if user.role=='display' %}selected{% endif %}>Display</option>
     <option value="customer" {% if user.role=='customer' %}selected{% endif %}>Customer</option>
   </select>
 
@@ -220,6 +230,10 @@
   });
   confirmBtn?.addEventListener('click', () => {
     deleteForm?.submit();
+  });
+  const errBlocker = document.getElementById('errorBlocker');
+  errBlocker?.querySelector('.js-close-error')?.addEventListener('click', () => {
+    errBlocker.hidden = true;
   });
 })();
 </script>
