@@ -59,7 +59,7 @@ def test_profile_update_details():
             follow_redirects=False,
         )
         assert resp.status_code == 303
-        assert resp.headers["location"] == "/profile"
+        assert resp.headers["location"] == "/profile?success=1"
     db = SessionLocal()
     updated = db.query(User).filter(User.id == user_id).first()
     assert updated.username == "newuser"
