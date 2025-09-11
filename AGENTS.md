@@ -63,6 +63,7 @@
 - Admin Manage Users page uses `templates/admin_bar_users.html` with `.users-page` styles in `static/css/components.css`, a client-side username/email search via `#userSearch`, and grouped action pills. The page header stacks the title above an Add Existing User form and the search controls; new user creation has been removed
 - Manage Bar Users list now shows only a red `Remove` button to unassign staff from the current bar; user editing is handled on the main Admin Users page
 - Removing a user triggers a popup confirmation using `.cart-blocker` and `.cart-popup`
+- Admin Edit User page (`templates/admin_edit_user.html`) lists assigned bars separately from available bars with a `#barSearch` filter. Rows use Add/Remove pill buttons and hidden `bar_ids` checkboxes to track selections before save.
 - Admin Manage Bars delete links open a popup confirmation using `.cart-blocker` and `.cart-popup`
 - `BAR_CATEGORIES` defined in `main.py`; reused in `search.js` and `view-all.js`
 - Categories stored in `bars.bar_categories`
