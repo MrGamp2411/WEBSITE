@@ -12,6 +12,7 @@
 - Top-ups append a `topup` transaction in a `PROCESSING` state during `/api/topup/init`; the Wallee webhook updates it to `COMPLETED` and refreshes the user's cached credit.
 - Failed top-ups display a red `Failed` pill and a `+ CHF 0.00` amount in the wallet.
 - Wallet transactions persist across restarts via the `wallet_transactions` table; login hydrates cached transactions from this table.
+- User sessions survive server restarts by reloading missing user data from the database on demand.
 
 - Core modules:
   - `main.py` – routes and helpers
