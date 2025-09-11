@@ -351,6 +351,7 @@ body.dark-mode{
 .alert{padding:var(--space-2);border-radius:var(--radius);margin-bottom:var(--space-3);}
 .alert-danger{background:#fee2e2;color:#991b1b;}
 .alert-success{background:#d1fae5;color:#065f46;}
+.caps-warning{color:var(--color-danger);}
 .text-center{text-align:center;}
 
   @media (max-width: 768px){
