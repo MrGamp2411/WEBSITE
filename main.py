@@ -2635,9 +2635,6 @@ async def profile_update(request: Request, db: Session = Depends(get_db)):
     form = await request.form()
     username = form.get("username") or ""
     email = form.get("email") or ""
-    current_password = form.get("current_password") or ""
-    password = form.get("password") or ""
-    confirm_password = form.get("confirm_password") or ""
     phone = form.get("phone") or ""
     prefix = form.get("prefix") or ""
     form_data = {"username": username, "email": email, "phone": phone, "prefix": prefix}
@@ -2670,15 +2667,6 @@ async def profile_update(request: Request, db: Session = Depends(get_db)):
         or username_lower in RESERVED_USERNAMES
     ):
         return render_form(USERNAME_MESSAGE)
-    if password:
-        if not current_password or not verify_password(user.password_hash, current_password):
-            return render_form("Current password is incorrect")
-        if len(password) < 8 or len(password) > 128:
-            return render_form("Password must be between 8 and 128 characters")
-        if password.lower() in WEAK_PASSWORDS:
-            return render_form("Password is too common")
-        if password != confirm_password:
-            return render_form("Passwords do not match")
     if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email or ""):
         return render_form("Invalid email format")
     if username_lower != user.username.lower() and (
@@ -2722,18 +2710,56 @@ async def profile_update(request: Request, db: Session = Depends(get_db)):
     db_user.phone = phone
     db_user.phone_e164 = phone_e164
     db_user.phone_region = phone_region
-    password_changed = False
-    if password:
-        user.password_hash = hash_password(password)
-        db_user.password_hash = user.password_hash
-        login_attempts.pop(user.email, None)
-        password_changed = True
     db.commit()
     users[user.id] = user
-    if password_changed:
-        request.session.clear()
-        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     return RedirectResponse(url="/profile", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.get("/profile/password", response_class=HTMLResponse)
+async def profile_password_form(request: Request):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template("change_password.html", request=request)
+
+
+@app.post("/profile/password", response_class=HTMLResponse)
+async def profile_password_update(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    current_password = form.get("current_password") or ""
+    password = form.get("password") or ""
+    confirm_password = form.get("confirm_password") or ""
+
+    def render_form(msg: str, status_code: int = 200):
+        return render_template(
+            "change_password.html",
+            request=request,
+            error=msg,
+            status_code=status_code,
+        )
+
+    if not all([current_password, password, confirm_password]):
+        return render_form("All fields are required")
+    if not verify_password(user.password_hash, current_password):
+        return render_form("Current password is incorrect")
+    if len(password) < 8 or len(password) > 128:
+        return render_form("Password must be between 8 and 128 characters")
+    if password.lower() in WEAK_PASSWORDS:
+        return render_form("Password is too common")
+    if password != confirm_password:
+        return render_form("Passwords do not match")
+    db_user = db.query(User).filter(User.id == user.id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.password_hash = hash_password(password)
+    db_user.password_hash = user.password_hash
+    login_attempts.pop(user.email, None)
+    db.commit()
+    request.session.clear()
+    return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get("/logout")
