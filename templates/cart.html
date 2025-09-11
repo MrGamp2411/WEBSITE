@@ -102,10 +102,13 @@
         <h3 class="section-title">Order Summary</h3>
         <dl class="sum-rows">
           <div class="row"><dt>Subtotal</dt><dd>CHF {{ "%.2f"|format(cart.total_price()) }}</dd></div>
-          <div class="row"><dt>Fees</dt><dd>—</dd></div>
-          <div class="row total"><dt>Total</dt><dd>CHF {{ "%.2f"|format(cart.total_price()) }}</dd></div>
+          <div class="row"><dt>Fees</dt><dd>{% if cart.small_order_fee() %}CHF {{ "%.2f"|format(cart.small_order_fee()) }}{% else %}—{% endif %}</dd></div>
+          <div class="row total"><dt>Total</dt><dd>CHF {{ "%.2f"|format(cart.total_with_fee()) }}</dd></div>
         </dl>
         <button type="submit" class="btn-primary place-order" form="checkoutForm">Place Order</button>
+        {% if cart.small_order_fee() %}
+        <p class="sum-note">Orders under CHF 10 include a CHF 0.20 fee.</p>
+        {% endif %}
         <p class="sum-note">Your payment will be processed securely.</p>
       </div>
     </aside>

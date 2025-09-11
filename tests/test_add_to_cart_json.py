@@ -49,5 +49,13 @@ def test_add_to_cart_returns_json_count():
         assert resp.status_code == 200
         data = resp.json()
         assert data["count"] == 1
-        assert data["totalFormatted"] == "CHF 5.00"
+        assert data["totalFormatted"] == "CHF 5.20"
         assert data["items"][0]["id"] == item_id
+        resp = client.post(
+            f"/bars/{bar_id}/add_to_cart",
+            data={"product_id": item_id},
+            headers={"accept": "application/json"},
+        )
+        data = resp.json()
+        assert data["count"] == 2
+        assert data["totalFormatted"] == "CHF 10.00"
