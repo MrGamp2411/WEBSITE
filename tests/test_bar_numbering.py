@@ -19,7 +19,7 @@ def reset_env():
     users_by_username.clear()
 
 
-def test_bar_listing_numbers():
+def test_bar_listing_no_numbers():
     reset_env()
     db = SessionLocal()
     bars = [Bar(name=f"Bar {i}", slug=f"bar-{i}") for i in range(1, 4)]
@@ -30,10 +30,9 @@ def test_bar_listing_numbers():
     client = TestClient(app)
     resp = client.get("/bars")
     assert resp.status_code == 200
-    idx1 = resp.text.index("001")
-    idx2 = resp.text.index("002")
-    idx3 = resp.text.index("003")
-    assert idx1 < idx2 < idx3
+    assert "001" not in resp.text
+    assert "002" not in resp.text
+    assert "003" not in resp.text
 
 
 def test_admin_bars_numbers():

@@ -51,7 +51,7 @@
 - Bars:
   - `/bars` page uses `templates/all_bars.html` and `static/js/view-all.js`
   - Filters apply automatically on change; the old "Apply" button and its handler were removed
-  - Bar listings display each bar's `bar.id` zero-padded to three digits so numbers match order codes
+  - Public `/bars` listings show only bar names without numeric IDs, while admin listings keep each bar's `bar.id` zero-padded to three digits to match order codes
   - Admin Manage Bars page uses `templates/admin_bars.html` with `.bars-page` styles in `static/css/components.css`. The page header stacks the title above the search and Add Bar controls
 - Admin Manage Bars page includes a client-side name search via `#barsSearch`
 - Admin Manage Bars actions use uppercase text-only pill buttons that expand to fit text; links and buttons inherit the base font so Delete matches Edit sizing while employing a brighter `.btn-danger-soft` red to deter accidental clicks
