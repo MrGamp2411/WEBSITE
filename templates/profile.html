@@ -6,8 +6,8 @@
       <h1 class="profile-title">Profile</h1>
       <p class="profile-subtitle">Manage your account, security, and phone number.</p>
     </div>
-    {% if success %}<p class="alert success">Profile updated successfully.</p>{% endif %}
-    {% if error %}<p class="alert">{{ error }}</p>{% endif %}
+    {% if success %}<p class="alert alert-success">Profile updated successfully.</p>{% endif %}
+    {% if error %}<p class="alert alert-danger">{{ error }}</p>{% endif %}
     <form method="post" action="/profile" id="profile-form" class="profile-form">
       <div class="form-grid">
         <div class="field" data-name="username">

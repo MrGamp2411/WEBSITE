@@ -269,3 +269,4 @@
 - Change Password button is 25% smaller than the Save button using reduced font size and padding.
 - Change Password fields stack in a single column on all screen sizes.
 - Change Password Save button has added top margin to separate it from the Confirm Password field.
+- Profile and Change Password pages display errors and warnings in red using `.alert-danger` or `.caps-warning`, and success messages in green via `.alert-success`.
