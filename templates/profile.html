@@ -29,8 +29,9 @@
           <div class="input-with-icon">
             <select id="prefix" name="prefix" required autocomplete="tel-country-code" disabled>
               <option value="+41" {% if (prefix|default(user.prefix)) == "+41" %}selected{% endif %}>+41 (Switzerland)</option>
-              <option value="+1" {% if (prefix|default(user.prefix)) == "+1" %}selected{% endif %}>+1 (USA)</option>
-              <option value="+44" {% if (prefix|default(user.prefix)) == "+44" %}selected{% endif %}>+44 (UK)</option>
+              <option value="+39" {% if (prefix|default(user.prefix)) == "+39" %}selected{% endif %}>+39 (Italy)</option>
+              <option value="+49" {% if (prefix|default(user.prefix)) == "+49" %}selected{% endif %}>+49 (Germany)</option>
+              <option value="+33" {% if (prefix|default(user.prefix)) == "+33" %}selected{% endif %}>+33 (France)</option>
             </select>
             <button type="button" class="edit-btn icon" aria-label="Edit phone prefix"><i class="bi bi-pencil-square"></i></button>
           </div>

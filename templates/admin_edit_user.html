@@ -14,8 +14,9 @@
   <label for="prefix">Prefix</label>
   <select id="prefix" name="prefix" autocomplete="tel-country-code">
     <option value="+41" {% if user.prefix == "+41" %}selected{% endif %}>+41 (Switzerland)</option>
-    <option value="+1" {% if user.prefix == "+1" %}selected{% endif %}>+1 (USA)</option>
-    <option value="+44" {% if user.prefix == "+44" %}selected{% endif %}>+44 (UK)</option>
+    <option value="+39" {% if user.prefix == "+39" %}selected{% endif %}>+39 (Italy)</option>
+    <option value="+49" {% if user.prefix == "+49" %}selected{% endif %}>+49 (Germany)</option>
+    <option value="+33" {% if user.prefix == "+33" %}selected{% endif %}>+33 (France)</option>
   </select>
 
   <label for="phone">Phone</label>

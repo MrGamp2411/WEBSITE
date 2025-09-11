@@ -27,13 +27,13 @@ def test_register_preserves_fields_on_error():
                 "password": "pass1234",
                 "confirm_password": "pass1234",
                 "email": "invalid",
-                "prefix": "+44",
-                "phone": "07123 456789",
+                "prefix": "+39",
+                "phone": "345 1234567",
             },
         )
         assert resp.status_code == 200
         assert 'value="myuser"' in resp.text
         assert 'value="invalid"' in resp.text
-        assert 'value="07123 456789"' in resp.text
-        assert '<option value="+44" selected>' in resp.text
+        assert 'value="345 1234567"' in resp.text
+        assert '<option value="+39" selected>' in resp.text
 
