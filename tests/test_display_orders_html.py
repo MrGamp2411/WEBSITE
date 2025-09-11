@@ -43,3 +43,21 @@ def test_display_orders_page_shows_two_columns():
         assert 'href="/"' not in resp.text
         assert 'js-open-menu' not in resp.text
         assert 'href="/logout"' in resp.text
+
+
+def test_display_user_redirected_from_home():
+    setup_db()
+    with TestClient(app) as client:
+        db = SessionLocal()
+        bar = Bar(name="Test Bar", slug="test-bar")
+        pwd = hashlib.sha256("pass".encode("utf-8")).hexdigest()
+        display = User(username="d", email="d@example.com", password_hash=pwd, role=RoleEnum.DISPLAY)
+        db.add_all([bar, display])
+        db.commit()
+        db.add(UserBarRole(user_id=display.id, bar_id=bar.id, role=RoleEnum.DISPLAY))
+        db.commit(); db.refresh(bar); db.close()
+        load_bars_from_db()
+        client.post('/login', data={'email': 'd@example.com', 'password': 'pass'})
+        resp = client.get('/', follow_redirects=False)
+        assert resp.status_code == 303
+        assert resp.headers['location'] == f'/dashboard/bar/{bar.id}/orders'
