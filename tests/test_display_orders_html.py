@@ -40,3 +40,6 @@ def test_display_orders_page_shows_two_columns():
         assert '<div id="ready-orders"' in resp.text
         assert 'Incoming Orders' not in resp.text
         assert 'Completed' not in resp.text
+        assert 'href="/"' not in resp.text
+        assert 'js-open-menu' not in resp.text
+        assert 'href="/logout"' in resp.text
