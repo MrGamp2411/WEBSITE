@@ -160,6 +160,7 @@
 - Register form includes a required `confirm_password` field that must match the password.
 - Register and login forms use a flex `.password-wrapper` so the show/hide password toggle sits on the right side of the card.
 - Profile page (`templates/profile.html`) lets logged-in users update username, email, password, prefix, and phone using the same validation rules as registration. `/profile` GET renders the form and `/profile` POST saves changes to the database and in-memory cache, logging the user out after password changes. Each field shows a Bootstrap pencil icon to indicate editability, and changing the password requires the current password for verification.
+- Profile page UI wraps content in `.profile-page` and `.profile-card`, arranges fields in a responsive grid, groups phone prefix/number on desktop, includes a visual password strength meter, and keeps a sticky Save button inside the card.
 - Admin user edit form: `templates/admin_edit_user.html` posts fields
     (`username`, `password`, `email`, `prefix`, `phone`, `role`, `bar_ids`, `credit`)
     to `/admin/users/edit/{id}`. Bar selection uses checkboxes for easier multi-bar assignment.
