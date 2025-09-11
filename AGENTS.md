@@ -50,6 +50,7 @@
   - Global footer: `templates/layout.html` uses `.site-footer` styled in `static/css/components.css`
 - Bars:
   - `/bars` page uses `templates/all_bars.html` and `static/js/view-all.js`
+  - Filters apply automatically on change; the old "Apply" button and its handler were removed
   - Bar listings display each bar's `bar.id` zero-padded to three digits so numbers match order codes
   - Admin Manage Bars page uses `templates/admin_bars.html` with `.bars-page` styles in `static/css/components.css`. The page header stacks the title above the search and Add Bar controls
 - Admin Manage Bars page includes a client-side name search via `#barsSearch`
