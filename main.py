@@ -545,6 +545,22 @@ def seed_super_admin():
         db.close()
 
 
+def ensure_role_enum() -> None:
+    """Ensure the role enum includes the REGISTERING state."""
+    if engine.dialect.name != "postgresql":
+        return
+    with engine.begin() as conn:
+        existing = conn.execute(
+            text(
+                "SELECT e.enumlabel FROM pg_type t "
+                "JOIN pg_enum e ON t.oid = e.enumtypid "
+                "WHERE t.typname = 'roleenum'"
+            )
+        ).scalars().all()
+        if "REGISTERING" not in existing:
+            conn.execute(text("ALTER TYPE roleenum ADD VALUE IF NOT EXISTS 'REGISTERING'"))
+
+
 def ensure_prefix_column():
     """Add the `prefix` column to users table if it's missing."""
     inspector = inspect(engine)
@@ -774,6 +790,7 @@ def ensure_bar_closing_columns() -> None:
 async def on_startup():
     """Initialise database tables on startup."""
     Base.metadata.create_all(bind=engine)
+    ensure_role_enum()
     ensure_prefix_column()
     ensure_phone_columns()
     ensure_credit_column()

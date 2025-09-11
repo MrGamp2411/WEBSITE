@@ -1,6 +1,7 @@
 # AGENT Notes
 
 - Registration is a two-step flow. `/register` collects email and password and assigns a temporary `REGISTERING` role. Users are redirected to `/register/details` to supply username, phone prefix, and number, and cannot access other pages until this step completes.
+- Startup ensures the `roleenum` type contains `REGISTERING` via `ensure_role_enum()`.
 
 - Wallet page UI lives in `templates/wallet.html` using a `.wallet-page` wrapper and inline scoped styles. Transaction rows render inside `<ul id="txList">` as static `.tx` divs with no detail links. "Load more," "Export CSV," "Manage payment methods," and all filters have been removed; the "Top Up" button uses `text-decoration:none` to avoid an underline.
 - Transaction detail views have been removed, so there is no `/wallet/tx/{index}` route or `transaction_detail.html` template.
