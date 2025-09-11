@@ -13,14 +13,14 @@
           <label for="username" class="block-label">Username</label>
           <div class="input-with-icon">
             <input id="username" type="text" name="username" required autocomplete="username" inputmode="text" enterkeyhint="next" minlength="3" maxlength="24" pattern="(?![._-])(?!.*[._-]{2})(?!.*[._-]$)[a-z0-9._-]{3,24}" title="3–24 characters, lowercase letters, numbers, dot, hyphen or underscore. No spaces." value="{{ username|default(user.username) }}">
-            <button type="button" class="btn-icon edit-btn icon" aria-label="Edit username"><i class="bi bi-pencil-square"></i></button>
+            <button type="button" class="edit-btn icon" aria-label="Edit username"><i class="bi bi-pencil-square"></i></button>
           </div>
         </div>
         <div class="field" data-name="email">
           <label for="email" class="block-label">Email</label>
           <div class="input-with-icon">
             <input id="email" type="email" name="email" required autocomplete="email" inputmode="email" enterkeyhint="next" pattern="[^@]+@[^@]+\.[^@]+" title="Email must be in the format text@text.text" value="{{ email|default(user.email) }}">
-            <button type="button" class="btn-icon edit-btn icon" aria-label="Edit email"><i class="bi bi-pencil-square"></i></button>
+            <button type="button" class="edit-btn icon" aria-label="Edit email"><i class="bi bi-pencil-square"></i></button>
           </div>
         </div>
         <div class="field" data-name="current-password">
@@ -28,7 +28,7 @@
           <div class="password-wrapper input-with-icon">
             <input id="current_password" type="password" name="current_password" autocomplete="current-password" enterkeyhint="next" minlength="8" maxlength="128" title="Password must be between 8 and 128 characters">
             <button type="button" class="toggle-password icon" aria-label="Show password"><i class="bi bi-eye"></i></button>
-            <button type="button" class="btn-icon edit-btn icon" aria-label="Edit current password"><i class="bi bi-pencil-square"></i></button>
+            <button type="button" class="edit-btn icon" aria-label="Edit current password"><i class="bi bi-pencil-square"></i></button>
           </div>
           <span id="capsWarningCurrent" class="caps-warning" hidden>Caps Lock is on</span>
         </div>
@@ -37,7 +37,7 @@
           <div class="password-wrapper input-with-icon">
             <input id="password" type="password" name="password" autocomplete="new-password" enterkeyhint="next" minlength="8" maxlength="128" title="Password must be between 8 and 128 characters">
             <button type="button" class="toggle-password icon" aria-label="Show password"><i class="bi bi-eye"></i></button>
-            <button type="button" class="btn-icon edit-btn icon" aria-label="Edit new password"><i class="bi bi-pencil-square"></i></button>
+            <button type="button" class="edit-btn icon" aria-label="Edit new password"><i class="bi bi-pencil-square"></i></button>
           </div>
           <span id="capsWarning" class="caps-warning" hidden>Caps Lock is on</span>
           <div class="pw-meter" aria-hidden="true">
@@ -50,7 +50,7 @@
           <div class="password-wrapper input-with-icon">
             <input id="confirm_password" type="password" name="confirm_password" autocomplete="new-password" enterkeyhint="next" minlength="8" maxlength="128" title="Passwords must match">
             <button type="button" class="toggle-password icon" aria-label="Show password"><i class="bi bi-eye"></i></button>
-            <button type="button" class="btn-icon edit-btn icon" aria-label="Edit confirm password"><i class="bi bi-pencil-square"></i></button>
+            <button type="button" class="edit-btn icon" aria-label="Edit confirm password"><i class="bi bi-pencil-square"></i></button>
           </div>
           <span id="capsWarningConfirm" class="caps-warning" hidden>Caps Lock is on</span>
         </div>
@@ -63,11 +63,11 @@
                 <option value="+1" {% if (prefix|default(user.prefix)) == "+1" %}selected{% endif %}>+1 (USA)</option>
                 <option value="+44" {% if (prefix|default(user.prefix)) == "+44" %}selected{% endif %}>+44 (UK)</option>
               </select>
-              <button type="button" class="btn-icon edit-btn icon" aria-label="Edit phone prefix"><i class="bi bi-pencil-square"></i></button>
+              <button type="button" class="edit-btn icon" aria-label="Edit phone prefix"><i class="bi bi-pencil-square"></i></button>
             </div>
             <div class="input-with-icon">
               <input id="phone" type="tel" name="phone" required autocomplete="tel-national" inputmode="tel" enterkeyhint="done" pattern="[0-9]{9,10}" minlength="9" maxlength="10" title="Phone number must be 9 to 10 digits" value="{{ phone|default(user.phone) }}">
-              <button type="button" class="btn-icon edit-btn icon" aria-label="Edit phone number"><i class="bi bi-pencil-square"></i></button>
+              <button type="button" class="edit-btn icon" aria-label="Edit phone number"><i class="bi bi-pencil-square"></i></button>
             </div>
           </div>
           <small class="help">Use mobile format for your country.</small>
