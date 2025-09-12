@@ -1387,6 +1387,16 @@ def render_template(template_name: str, **context) -> HTMLResponse:
                     context.setdefault("cart_bar_id", bar.id)
                     context.setdefault("cart_bar_name", bar.name)
                     context.setdefault("cart_bar_paused", bar.ordering_paused)
+            with SessionLocal() as db:
+                unread_count = (
+                    db.query(Notification)
+                    .filter(
+                        Notification.user_id == user.id,
+                        Notification.read.is_(False),
+                    )
+                    .count()
+                )
+                context.setdefault("unread_notifications", unread_count)
         bar_obj = context.get("bar")
         if bar_obj and hasattr(bar_obj, "id"):
             context.setdefault("current_bar_id", bar_obj.id)

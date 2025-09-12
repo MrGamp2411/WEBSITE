@@ -314,5 +314,6 @@
   - `/notifications` lists each message as a clickable card showing the subject and a truncated body; unread notes use `card--unread` styling and are marked read when opened at `/notifications/{id}`.
   - Notification lists use `.notifications-list` to remove bullets and padding; each `.notification-card` has a subtle border and unread cards display a light purple background (`#EDE9FE`).
   - Deleting a notification from `/admin/notifications` removes the corresponding `NotificationLog` and all recipient `Notification` rows so the message disappears from `/notifications` for every user.
-  - Each `Notification` stores a `log_id` linking back to its `NotificationLog` so deletions reliably remove every user's copy.
-    - Mobile menu includes `Notifications` link (`/notifications`) with `bi-bell` icon for accessing admin messages.
+- Each `Notification` stores a `log_id` linking back to its `NotificationLog` so deletions reliably remove every user's copy.
+  - Mobile menu includes `Notifications` link (`/notifications`) with `bi-bell` icon for accessing admin messages.
+- Mobile menu shows a red notification badge when the user has unread messages.
