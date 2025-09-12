@@ -42,7 +42,7 @@ import time
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
@@ -883,6 +883,7 @@ async def on_startup():
     seed_super_admin()
     load_bars_from_db()
     asyncio.create_task(auto_close_bars_worker())
+    asyncio.create_task(purge_old_notifications_worker())
 
 
 # Jinja2 environment for rendering HTML templates
@@ -1102,6 +1103,26 @@ async def auto_close_bars_worker() -> None:
         except Exception:
             pass
         await asyncio.sleep(60)
+
+
+def purge_old_notifications_once(db: Session, now: datetime) -> None:
+    """Remove notifications older than 30 days."""
+    cutoff = now - timedelta(days=30)
+    db.query(Notification).filter(Notification.created_at < cutoff).delete(synchronize_session=False)
+    db.query(NotificationLog).filter(NotificationLog.created_at < cutoff).delete(synchronize_session=False)
+    db.commit()
+
+
+async def purge_old_notifications_worker() -> None:
+    """Periodically purge notifications older than 30 days."""
+    while True:
+        try:
+            now = datetime.utcnow()
+            with SessionLocal() as db:
+                purge_old_notifications_once(db, now)
+        except Exception:
+            pass
+        await asyncio.sleep(24 * 60 * 60)
 
 
 def weekly_hours_list(
