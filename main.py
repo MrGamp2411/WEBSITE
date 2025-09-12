@@ -4805,6 +4805,11 @@ async def admin_notifications_send(
             url="/admin/notifications?error=Invalid+target",
             status_code=status.HTTP_303_SEE_OTHER,
         )
+    if len(subject) > 30:
+        return RedirectResponse(
+            url="/admin/notifications?error=Subject+too+long",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
     image_bytes = await image.read() if image else None
     image_mime = image.content_type if image else None
     attachment_bytes = await attachment.read() if attachment else None

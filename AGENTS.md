@@ -1,5 +1,8 @@
 # AGENT Notes
 
+- Commit messages subject line must not exceed 30 characters.
+- Notification subject line must not exceed 30 characters.
+- Review recent commit history before starting new tasks.
 - Registration is a two-step flow. `/register` collects email and password and assigns a temporary `REGISTERING` role. Users are redirected to `/register/details` to supply username, phone prefix, and number, and cannot access other pages until this step completes.
 - Registering users hitting any other route are redirected back to `/register/details` by middleware until step two finishes.
 - Super admins can create users directly from the Admin Users page by entering only an email and password; this bypasses the normal registration flow and checks.
