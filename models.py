@@ -392,6 +392,7 @@ class Notification(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     sender_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    log_id = Column(Integer, ForeignKey("notification_logs.id"), nullable=False)
     subject = Column(String(200))
     body = Column(Text)
     image = Column(LargeBinary)
@@ -404,6 +405,7 @@ class Notification(Base):
 
     user = relationship("User", foreign_keys=[user_id])
     sender = relationship("User", foreign_keys=[sender_id])
+    log = relationship("NotificationLog", foreign_keys=[log_id])
 
 
 class NotificationLog(Base):

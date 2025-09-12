@@ -54,6 +54,11 @@ def test_view_and_delete_notification():
         )
         assert resp.status_code == 303
 
+        db = SessionLocal()
+        note = db.query(Notification).first()
+        assert note.log_id == 1
+        db.close()
+
         resp = client.get("/admin/notifications/1")
         assert resp.status_code == 200
         assert "u1" in resp.text
