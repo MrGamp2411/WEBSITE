@@ -54,6 +54,11 @@ def test_notification_deletion_removes_user_entries():
         )
         assert resp.status_code == 303
 
+        db = SessionLocal()
+        note = db.query(Notification).first()
+        assert note.log_id == 1
+        db.close()
+
         _login(client, "u1@example.com", "pass")
         resp = client.get("/notifications")
         assert resp.status_code == 200

@@ -307,4 +307,5 @@
   - The form disables hidden `user_id` and `bar_id` inputs when not targeting specific recipients and alerts if a required selection is missing.
   - Users view messages at `/notifications` with downloadable attachments and inline images.
   - Deleting a notification from `/admin/notifications` removes the corresponding `NotificationLog` and all recipient `Notification` rows so the message disappears from `/notifications` for every user.
+  - Each `Notification` stores a `log_id` linking back to its `NotificationLog` so deletions reliably remove every user's copy.
     - Mobile menu includes `Notifications` link (`/notifications`) with `bi-bell` icon for accessing admin messages.

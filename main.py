@@ -841,6 +841,26 @@ def ensure_bar_closing_columns() -> None:
             )
 
 
+def ensure_notification_log_column() -> None:
+    """Ensure notifications table includes log_id foreign key."""
+    inspector = inspect(engine)
+    columns = {col["name"] for col in inspector.get_columns("notifications")}
+    if "log_id" not in columns:
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE notifications "
+                    "ADD COLUMN log_id INTEGER REFERENCES notification_logs(id)"
+                )
+            )
+            conn.execute(
+                text(
+                    "CREATE INDEX IF NOT EXISTS ix_notifications_log_id "
+                    "ON notifications (log_id)"
+                )
+            )
+
+
 @app.on_event("startup")
 async def on_startup():
     """Initialise database tables on startup."""
@@ -855,6 +875,7 @@ async def on_startup():
     ensure_order_columns()
     ensure_wallet_topup_columns()
     ensure_bar_closing_columns()
+    ensure_notification_log_column()
     users.clear()
     users_by_username.clear()
     users_by_email.clear()
@@ -4789,20 +4810,6 @@ async def admin_notifications_send(
     attachment_bytes = await attachment.read() if attachment else None
     attachment_filename = attachment.filename if attachment else None
     now = datetime.utcnow()
-    for uid in recipient_ids:
-        note = Notification(
-            user_id=uid,
-            sender_id=current.id,
-            subject=subject,
-            body=body,
-            link_url=link_url or None,
-            image=image_bytes,
-            image_mime=image_mime,
-            attachment=attachment_bytes,
-            attachment_filename=attachment_filename,
-            created_at=now,
-        )
-        db.add(note)
     log = NotificationLog(
         sender_id=current.id,
         target=target,
@@ -4814,6 +4821,22 @@ async def admin_notifications_send(
         created_at=now,
     )
     db.add(log)
+    db.flush()
+    for uid in recipient_ids:
+        note = Notification(
+            user_id=uid,
+            sender_id=current.id,
+            log_id=log.id,
+            subject=subject,
+            body=body,
+            link_url=link_url or None,
+            image=image_bytes,
+            image_mime=image_mime,
+            attachment=attachment_bytes,
+            attachment_filename=attachment_filename,
+            created_at=now,
+        )
+        db.add(note)
     db.commit()
     return RedirectResponse(
         url="/admin/notifications?message=Sent",
@@ -4843,10 +4866,7 @@ async def admin_notification_detail(
     recipients = (
         db.query(Notification)
         .options(joinedload(Notification.user))
-        .filter(
-            Notification.sender_id == log.sender_id,
-            Notification.created_at == log.created_at,
-        )
+        .filter(Notification.log_id == log.id)
         .order_by(Notification.user_id)
         .all()
     )
@@ -4869,16 +4889,9 @@ async def admin_notification_delete(
     log = db.query(NotificationLog).filter(NotificationLog.id == log_id).first()
     if not log:
         raise HTTPException(status_code=404)
-    notes = (
-        db.query(Notification)
-        .filter(
-            Notification.sender_id == log.sender_id,
-            Notification.created_at == log.created_at,
-        )
-        .all()
+    db.query(Notification).filter(Notification.log_id == log.id).delete(
+        synchronize_session=False
     )
-    for n in notes:
-        db.delete(n)
     db.delete(log)
     db.commit()
     return RedirectResponse(
