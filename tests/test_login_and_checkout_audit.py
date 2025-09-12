@@ -19,11 +19,19 @@ def test_login_creates_audit_log():
             "/login",
             data={"email": "admin@example.com", "password": "ChangeMe!123"},
             follow_redirects=False,
+            headers={"User-Agent": "test-agent"},
         )
         assert resp.status_code == 303
     db = SessionLocal()
     logs = db.query(AuditLog).all()
     assert any(log.action == "login" for log in logs)
+    assert any(
+        log.action == "POST /login"
+        and log.user_agent == "test-agent"
+        and log.phone == "+41000000000"
+        and log.ip
+        for log in logs
+    )
     db.close()
 
 

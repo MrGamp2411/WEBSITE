@@ -17,6 +17,7 @@ def log_action(
     payload: Optional[Dict[str, Any]] = None,
     ip: Optional[str] = None,
     user_agent: Optional[str] = None,
+    phone: Optional[str] = None,
 ) -> AuditLog:
     """Persist an audit log entry to the database."""
     log = AuditLog(
@@ -27,6 +28,7 @@ def log_action(
         payload_json=json.dumps(payload) if payload else None,
         ip=ip,
         user_agent=user_agent,
+        phone=phone,
         created_at=datetime.utcnow(),
     )
     db.add(log)

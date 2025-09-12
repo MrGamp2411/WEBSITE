@@ -51,9 +51,10 @@ def test_run_payout_creates_audit_log():
     payout_id = resp.json()["id"]
 
     logs = db.query(AuditLog).all()
-    assert len(logs) == 1
-    log = logs[0]
-    assert log.actor_user_id == 42
-    assert log.action == "payout_run"
-    assert log.entity_type == "payout"
-    assert log.entity_id == payout_id
+    assert any(
+        log.actor_user_id == 42
+        and log.action == "payout_run"
+        and log.entity_type == "payout"
+        and log.entity_id == payout_id
+        for log in logs
+    )
