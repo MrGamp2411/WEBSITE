@@ -4821,6 +4821,72 @@ async def admin_notifications_send(
     )
 
 
+@app.get("/admin/notifications/{log_id}", response_class=HTMLResponse)
+async def admin_notification_detail(
+    log_id: int, request: Request, db: Session = Depends(get_db)
+):
+    current = get_current_user(request)
+    if not current or not current.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    log = (
+        db.query(NotificationLog)
+        .options(
+            joinedload(NotificationLog.user),
+            joinedload(NotificationLog.bar),
+            joinedload(NotificationLog.sender),
+        )
+        .filter(NotificationLog.id == log_id)
+        .first()
+    )
+    if not log:
+        raise HTTPException(status_code=404)
+    recipients = (
+        db.query(Notification)
+        .options(joinedload(Notification.user))
+        .filter(
+            Notification.sender_id == log.sender_id,
+            Notification.created_at == log.created_at,
+        )
+        .order_by(Notification.user_id)
+        .all()
+    )
+    return render_template(
+        "admin_notification_view.html",
+        request=request,
+        user=current,
+        note=log,
+        recipients=recipients,
+    )
+
+
+@app.post("/admin/notifications/{log_id}/delete", response_class=HTMLResponse)
+async def admin_notification_delete(
+    log_id: int, request: Request, db: Session = Depends(get_db)
+):
+    current = get_current_user(request)
+    if not current or not current.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    log = db.query(NotificationLog).filter(NotificationLog.id == log_id).first()
+    if not log:
+        raise HTTPException(status_code=404)
+    notes = (
+        db.query(Notification)
+        .filter(
+            Notification.sender_id == log.sender_id,
+            Notification.created_at == log.created_at,
+        )
+        .all()
+    )
+    for n in notes:
+        db.delete(n)
+    db.delete(log)
+    db.commit()
+    return RedirectResponse(
+        url="/admin/notifications?message=Deleted",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
 @app.get("/notifications", response_class=HTMLResponse)
 async def notifications_view(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request)

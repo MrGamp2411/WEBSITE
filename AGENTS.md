@@ -300,6 +300,8 @@
   - `Notification` model in `models.py` stores per-user messages with optional image, attachment, and link.
   - Super admins send messages via `/admin/notifications`, targeting all users, a single user, or users who ordered at a specific bar.
   - The Admin Notifications page shows a table of recently sent messages above the form including recipient, subject, body, sent time, and sender.
+  - Each row includes **View** and **Delete** actions; Delete requires confirmation via `.cart-popup`.
+  - Viewing a notification at `/admin/notifications/{id}` shows full details and a list of recipient users.
   - Each send is logged to `NotificationLog` so broadcasts to all users appear once in the table instead of repeating per user.
   - Selecting a specific user or bar uses searchable tables; choosing "All Users" hides these selectors and does not require an ID.
   - The form disables hidden `user_id` and `bar_id` inputs when not targeting specific recipients and alerts if a required selection is missing.
