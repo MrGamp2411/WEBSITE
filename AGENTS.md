@@ -307,6 +307,7 @@
   - The form disables hidden `user_id` and `bar_id` inputs when not targeting specific recipients and alerts if a required selection is missing.
   - Users view messages at `/notifications` with downloadable attachments and inline images.
   - `/notifications` lists each message as a clickable card showing the subject and a truncated body; unread notes use `card--unread` styling and are marked read when opened at `/notifications/{id}`.
+  - Notification lists use `.notifications-list` to remove bullets and padding; each `.notification-card` has a subtle border and unread cards display a light purple background (`#EDE9FE`).
   - Deleting a notification from `/admin/notifications` removes the corresponding `NotificationLog` and all recipient `Notification` rows so the message disappears from `/notifications` for every user.
   - Each `Notification` stores a `log_id` linking back to its `NotificationLog` so deletions reliably remove every user's copy.
     - Mobile menu includes `Notifications` link (`/notifications`) with `bi-bell` icon for accessing admin messages.
