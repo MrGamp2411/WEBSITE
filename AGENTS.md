@@ -302,3 +302,4 @@
   - The Admin Notifications page shows a table of recently sent messages above the form including recipient, subject, body, sent time, and sender.
   - Selecting a specific user or bar uses searchable tables; choosing "All Users" hides these selectors and does not require an ID.
   - Users view messages at `/notifications` with downloadable attachments and inline images.
+    - Mobile menu includes `Notifications` link (`/notifications`) with `bi-bell` icon for accessing admin messages.
