@@ -47,7 +47,7 @@ def test_subject_too_long_is_rejected():
             follow_redirects=False,
         )
         assert resp.status_code == 303
-        assert "Subject+too+long" in resp.headers["location"]
+        assert "/admin/notifications/new?error=Subject+too+long" in resp.headers["location"]
 
     db = SessionLocal()
     assert db.query(Notification).count() == 0

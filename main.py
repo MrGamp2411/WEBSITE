@@ -4789,8 +4789,6 @@ async def admin_notifications_view(
         .limit(50)
         .all()
     )
-    users = db.query(User).order_by(User.id).all()
-    bars = db.query(BarModel).order_by(BarModel.name).all()
     return render_template(
         "admin_notifications.html",
         request=request,
@@ -4798,6 +4796,25 @@ async def admin_notifications_view(
         message=message,
         error=error,
         notifications=notes,
+    )
+
+
+@app.get("/admin/notifications/new", response_class=HTMLResponse)
+async def admin_notifications_new(
+    request: Request,
+    error: str | None = None,
+    db: Session = Depends(get_db),
+):
+    current = get_current_user(request)
+    if not current or not current.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    users = db.query(User).order_by(User.id).all()
+    bars = db.query(BarModel).order_by(BarModel.name).all()
+    return render_template(
+        "admin_new_notification.html",
+        request=request,
+        user=current,
+        error=error,
         users=users,
         bars=bars,
     )
@@ -4833,12 +4850,12 @@ async def admin_notifications_send(
         }
     else:
         return RedirectResponse(
-            url="/admin/notifications?error=Invalid+target",
+            url="/admin/notifications/new?error=Invalid+target",
             status_code=status.HTTP_303_SEE_OTHER,
         )
     if len(subject) > 30:
         return RedirectResponse(
-            url="/admin/notifications?error=Subject+too+long",
+            url="/admin/notifications/new?error=Subject+too+long",
             status_code=status.HTTP_303_SEE_OTHER,
         )
     image_bytes = await image.read() if image else None
