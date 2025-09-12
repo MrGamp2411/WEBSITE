@@ -26,6 +26,7 @@
           <th>Message</th>
           <th>Sent</th>
           <th>Sender</th>
+          <th class="actions">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -45,6 +46,13 @@
           <td>{{ n.body }}</td>
           <td>{{ n.created_at|format_time }}</td>
           <td>{{ n.sender.username }}</td>
+          <td class="actions">
+            <div class="actions-group">
+              <a href="/admin/notifications/{{ n.id }}" class="btn-outline">View</a>
+              <button type="button" class="btn-danger-soft js-delete-note" data-note-id="{{ n.id }}">Delete</button>
+            </div>
+            <form id="delete-note-{{ n.id }}" method="post" action="/admin/notifications/{{ n.id }}/delete" style="display:none;"></form>
+          </td>
         </tr>
         {% endfor %}
       </tbody>
@@ -151,6 +159,15 @@
     <button class="btn btn--primary" type="submit">Send</button>
   </form>
 </section>
+<div id="deleteBlocker" class="cart-blocker" hidden>
+  <div class="cart-popup">
+    <p>Are you sure you want to delete this notification?</p>
+    <div class="cart-popup-actions">
+      <button type="button" class="btn btn--secondary js-cancel-delete">Cancel</button>
+      <button type="button" class="btn btn--primary js-confirm-delete">Delete</button>
+    </div>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -211,6 +228,29 @@
     barInput.value = btn.dataset.barId;
     document.querySelectorAll('.js-pick-bar').forEach(b=>b.textContent='Select');
     btn.textContent='Selected';
+  });
+
+  const blocker = document.getElementById('deleteBlocker');
+  const cancelBtn = document.querySelector('.js-cancel-delete');
+  const confirmBtn = document.querySelector('.js-confirm-delete');
+  let targetForm = null;
+
+  document.querySelectorAll('.js-delete-note').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      const id = btn.dataset.noteId;
+      targetForm = document.getElementById('delete-note-' + id);
+      if(blocker) blocker.hidden = false;
+    });
+  });
+
+  cancelBtn?.addEventListener('click', () => {
+    if(blocker) blocker.hidden = true;
+    targetForm = null;
+  });
+
+  confirmBtn?.addEventListener('click', () => {
+    if(targetForm) targetForm.submit();
   });
 })();
 </script>
