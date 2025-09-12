@@ -11,17 +11,10 @@
     <ul>
     {% for n in notifications %}
       <li class="mb-3">
-        <h3>{{ n.subject }}</h3>
-        <p>{{ n.body }}</p>
-        {% if n.link_url %}
-        <p><a href="{{ n.link_url }}">{{ n.link_url }}</a></p>
-        {% endif %}
-        {% if n.image %}
-        <p><img src="/notifications/{{ n.id }}/image" alt="image"></p>
-        {% endif %}
-        {% if n.attachment %}
-        <p><a href="/notifications/{{ n.id }}/attachment">Download attachment</a></p>
-        {% endif %}
+        <a href="/notifications/{{ n.id }}" class="card notification-card{% if not n.read %} card--unread{% endif %}">
+          <h3>{{ n.subject }}</h3>
+          <p>{{ n.body|truncate(100) }}</p>
+        </a>
       </li>
     {% else %}
       <li>No notifications.</li>
