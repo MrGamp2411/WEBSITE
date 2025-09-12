@@ -468,6 +468,8 @@ class DisplayRedirectMiddleware(BaseHTTPMiddleware):
 
 class AuditLogMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        if request.url.path.endswith(".css"):
+            return await call_next(request)
         response = await call_next(request)
         session = request.session
         user = users.get(session.get("user_id")) if session else None
@@ -4087,10 +4089,39 @@ async def admin_audit_logs(
             )
         )
     logs = query.order_by(AuditLog.created_at.desc()).all()
-    parsed = []
+    user_ids = {log.actor_user_id for log in logs if log.actor_user_id}
+    bar_ids = set()
+    raw_payloads: dict[int, dict] = {}
     for log in logs:
         payload = json.loads(log.payload_json) if log.payload_json else {}
-        parsed.append({"log": log, "payload": payload})
+        raw_payloads[log.id] = payload
+        bar_ref = payload.get("bar_id")
+        if not bar_ref and log.entity_type == "bar" and log.entity_id:
+            bar_ref = log.entity_id
+        if bar_ref:
+            bar_ids.add(bar_ref)
+    users_map = {
+        u.id: u.username
+        for u in db.query(User).filter(User.id.in_(user_ids)).all()
+    } if user_ids else {}
+    bars_map = {
+        b.id: b.name
+        for b in db.query(BarModel).filter(BarModel.id.in_(bar_ids)).all()
+    } if bar_ids else {}
+    parsed = []
+    for log in logs:
+        payload = raw_payloads.get(log.id, {})
+        bar_ref = payload.get("bar_id")
+        if not bar_ref and log.entity_type == "bar" and log.entity_id:
+            bar_ref = log.entity_id
+        parsed.append(
+            {
+                "log": log,
+                "payload": payload,
+                "user_name": users_map.get(log.actor_user_id, ""),
+                "bar_name": bars_map.get(bar_ref, ""),
+            }
+        )
     return render_template(
         "admin_audit_logs.html",
         request=request,

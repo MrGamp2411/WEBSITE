@@ -33,7 +33,7 @@
   - `database.py` – database utilities
   - `audit.py` – records user actions to `AuditLog`
     - Login and cart checkout log `login` and `order_create` actions via `log_action`
-    - `AuditLogMiddleware` logs every request with IP, user agent, and phone
+    - `AuditLogMiddleware` logs every non-CSS request with IP, user agent, and phone
     - Startup ensures `audit_logs` has `ip`, `user_agent`, and `phone` via `ensure_audit_log_columns()`
   - `finance.py` – VAT and payout calculations
   - `payouts.py` – schedule periodic payouts for bars
@@ -74,7 +74,7 @@
 - Admin Manage Bars page includes a client-side name search via `#barsSearch`
 - Admin Manage Bars actions use uppercase text-only pill buttons that expand to fit text; links and buttons inherit the base font so Delete matches Edit sizing while employing a brighter `.btn-danger-soft` red to deter accidental clicks
 - Admin Manage Payments page uses `templates/admin_payments.html`, reusing the `.users-page` layout classes (`.users-toolbar`, `.users-search`, `.users-table`) alongside `.payments-page` for admin tweaks. It includes a client-side bar search via `#paymentsSearch` and grouped action pills (`.btn-outline` for View/Add Test Closing, `.btn-danger-soft` for Delete Test Closing). The page header stacks the title above the search controls
-- Admin Audit Logs page uses `templates/admin_audit_logs.html` with `.users-page` layout and a filter form for user ID, bar ID, and action.
+- Admin Audit Logs page uses `templates/admin_audit_logs.html` with `.users-page` layout and a filter form for user ID, bar ID, and action. The table shows usernames and bar names instead of numeric IDs.
 - Admin Manage Categories page uses `templates/bar_manage_categories.html` with `.menu-page` styles in `static/css/components.css`, a client-side category search via `#categorySearch`, and grouped uppercase action pills (`.btn-outline` for Products and Edit, `.btn-danger-soft` for Delete). The page header stacks the title above the search and Add Category controls
 - Category edit and create forms live in `templates/bar_edit_category.html` and `templates/bar_new_category.html`; the description field uses a `<textarea>` styled by the `.form textarea` rule in `static/css/components.css`.
 - Product edit and create forms live in `templates/bar_edit_product.html` and `templates/bar_new_product.html`; the description field uses a `<textarea>` styled by the `.form textarea` rule in `static/css/components.css`.
