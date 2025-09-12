@@ -2218,6 +2218,16 @@ async def checkout(
     )
     db.add(db_order)
     db.commit()
+    log_action(
+        db,
+        actor_user_id=user.id,
+        action="order_create",
+        entity_type="order",
+        entity_id=db_order.id,
+        payload={"bar_id": cart.bar_id, "payment_method": payment_method},
+        ip=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+    )
     await send_order_update(db_order)
     if bar and payment_method != "bar":
         tx_items = [
@@ -2871,6 +2881,15 @@ async def login(request: Request, db: Session = Depends(get_db)):
             )
         login_attempts.pop(email, None)
         request.session["user_id"] = user.id
+        log_action(
+            db,
+            actor_user_id=user.id,
+            action="login",
+            entity_type="User",
+            entity_id=user.id,
+            ip=request.client.host if request.client else None,
+            user_agent=request.headers.get("user-agent"),
+        )
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(
         "login.html", request=request, error="Email and password required"
