@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="users-page">
+  <header class="users-toolbar">
+    <div class="title-wrap">
+      <h1>Edit Welcome Message</h1>
+    </div>
+  </header>
+  {% if error %}
+  <p class="alert-danger">{{ error }}</p>
+  {% endif %}
+  <form class="form" method="post" action="/admin/notifications/welcome">
+    <label>Subject
+      <input type="text" name="subject" value="{{ subject }}" maxlength="30" required>
+    </label>
+    <label>Message
+      <textarea name="body" required>{{ body }}</textarea>
+    </label>
+    <button class="btn btn--primary" type="submit">Save</button>
+  </form>
+</section>
+{% endblock %}

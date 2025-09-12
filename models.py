@@ -424,3 +424,11 @@ class NotificationLog(Base):
     sender = relationship("User", foreign_keys=[sender_id])
     user = relationship("User", foreign_keys=[user_id])
     bar = relationship("Bar", foreign_keys=[bar_id])
+
+
+class WelcomeMessage(Base):
+    __tablename__ = "welcome_message"
+
+    id = Column(Integer, primary_key=True)
+    subject = Column(String(30))
+    body = Column(Text)

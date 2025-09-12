@@ -94,6 +94,7 @@ from models import (
     WalletTransaction,
     Notification,
     NotificationLog,
+    WelcomeMessage,
 )
 from pydantic import BaseModel, constr, ConfigDict, ValidationError
 from decimal import Decimal
@@ -857,8 +858,41 @@ def ensure_notification_log_column() -> None:
                 text(
                     "CREATE INDEX IF NOT EXISTS ix_notifications_log_id "
                     "ON notifications (log_id)"
+            )
+            )
+
+
+def ensure_welcome_message_table() -> None:
+    """Ensure welcome message table and default row exist."""
+    inspector = inspect(engine)
+    tables = inspector.get_table_names()
+    if "welcome_message" not in tables:
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "CREATE TABLE welcome_message ("
+                    "id INTEGER PRIMARY KEY,"
+                    "subject VARCHAR(30),"
+                    "body TEXT"
+                    ")"
                 )
             )
+            conn.execute(
+                text(
+                    "INSERT INTO welcome_message (id, subject, body) "
+                    "VALUES (1, 'Welcome', 'Welcome to SiplyGo!')"
+                )
+            )
+    else:
+        with engine.begin() as conn:
+            result = conn.execute(text("SELECT COUNT(*) FROM welcome_message"))
+            if result.scalar() == 0:
+                conn.execute(
+                    text(
+                        "INSERT INTO welcome_message (id, subject, body) "
+                        "VALUES (1, 'Welcome', 'Welcome to SiplyGo!')"
+                    )
+                )
 
 
 @app.on_event("startup")
@@ -876,6 +910,7 @@ async def on_startup():
     ensure_wallet_topup_columns()
     ensure_bar_closing_columns()
     ensure_notification_log_column()
+    ensure_welcome_message_table()
     users.clear()
     users_by_username.clear()
     users_by_email.clear()
@@ -2721,6 +2756,29 @@ async def register_details(request: Request, db: Session = Depends(get_db)):
         user.phone_region = phone_region
         user.role = "customer"
         users_by_username[username_lower] = user
+        wm = db.get(WelcomeMessage, 1)
+        if wm:
+            now = datetime.utcnow()
+            log = NotificationLog(
+                sender_id=user.id,
+                target="user",
+                user_id=user.id,
+                subject=wm.subject,
+                body=wm.body,
+                created_at=now,
+            )
+            db.add(log)
+            db.flush()
+            note = Notification(
+                user_id=user.id,
+                sender_id=user.id,
+                log_id=log.id,
+                subject=wm.subject,
+                body=wm.body,
+                created_at=now,
+            )
+            db.add(note)
+            db.commit()
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     return render_form("All fields are required")
 
@@ -4817,6 +4875,52 @@ async def admin_notifications_new(
         error=error,
         users=users,
         bars=bars,
+    )
+
+
+@app.get("/admin/notifications/welcome", response_class=HTMLResponse)
+async def admin_welcome_get(
+    request: Request, error: str | None = None, db: Session = Depends(get_db)
+):
+    current = get_current_user(request)
+    if not current or not current.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    wm = db.get(WelcomeMessage, 1)
+    return render_template(
+        "admin_edit_welcome.html",
+        request=request,
+        user=current,
+        error=error,
+        subject=wm.subject if wm else "",
+        body=wm.body if wm else "",
+    )
+
+
+@app.post("/admin/notifications/welcome", response_class=HTMLResponse)
+async def admin_welcome_post(
+    request: Request,
+    subject: str = Form(""),
+    body: str = Form(""),
+    db: Session = Depends(get_db),
+):
+    current = get_current_user(request)
+    if not current or not current.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    if len(subject) > 30:
+        return RedirectResponse(
+            url="/admin/notifications/welcome?error=Subject+too+long",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    wm = db.get(WelcomeMessage, 1)
+    if not wm:
+        wm = WelcomeMessage(id=1)
+        db.add(wm)
+    wm.subject = subject
+    wm.body = body
+    db.commit()
+    return RedirectResponse(
+        url="/admin/notifications?message=Saved",
+        status_code=status.HTTP_303_SEE_OTHER,
     )
 
 

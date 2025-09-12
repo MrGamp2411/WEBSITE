@@ -303,7 +303,7 @@
 - Notifications:
   - `Notification` model in `models.py` stores per-user messages with optional image, attachment, and link.
   - Super admins send messages via `/admin/notifications/new`, targeting all users, a single user, or users who ordered at a specific bar.
-  - The Admin Notifications page lists recent messages with a **New Message** button linking to the send form.
+  - The Admin Notifications page lists recent messages with a **New Message** button linking to the send form and an **Edit Welcome** button for updating the default welcome message.
   - Each row includes **View** and **Delete** actions; Delete requires confirmation via `.cart-popup`.
   - Viewing a notification at `/admin/notifications/{id}` shows full details and a list of recipient users.
   - Each send is logged to `NotificationLog` so broadcasts to all users appear once in the table instead of repeating per user.
@@ -318,3 +318,4 @@
   - Mobile menu includes `Notifications` link (`/notifications`) with `bi-bell` icon for accessing admin messages.
 - Mobile menu shows a red notification badge when the user has unread messages.
 - Notifications older than 30 days are purged automatically by `purge_old_notifications_worker`.
+- New users automatically receive the welcome message after completing registration.
