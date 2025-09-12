@@ -93,6 +93,7 @@ from models import (
     Payment,
     WalletTransaction,
     Notification,
+    NotificationLog,
 )
 from pydantic import BaseModel, constr, ConfigDict, ValidationError
 from decimal import Decimal
@@ -4726,9 +4727,13 @@ async def admin_notifications_view(
     if not current or not current.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     notes = (
-        db.query(Notification)
-        .options(joinedload(Notification.user), joinedload(Notification.sender))
-        .order_by(Notification.created_at.desc())
+        db.query(NotificationLog)
+        .options(
+            joinedload(NotificationLog.user),
+            joinedload(NotificationLog.bar),
+            joinedload(NotificationLog.sender),
+        )
+        .order_by(NotificationLog.created_at.desc())
         .limit(50)
         .all()
     )
@@ -4783,6 +4788,7 @@ async def admin_notifications_send(
     image_mime = image.content_type if image else None
     attachment_bytes = await attachment.read() if attachment else None
     attachment_filename = attachment.filename if attachment else None
+    now = datetime.utcnow()
     for uid in recipient_ids:
         note = Notification(
             user_id=uid,
@@ -4794,8 +4800,20 @@ async def admin_notifications_send(
             image_mime=image_mime,
             attachment=attachment_bytes,
             attachment_filename=attachment_filename,
+            created_at=now,
         )
         db.add(note)
+    log = NotificationLog(
+        sender_id=current.id,
+        target=target,
+        user_id=user_id if target == "user" else None,
+        bar_id=bar_id if target == "bar" else None,
+        subject=subject,
+        body=body,
+        link_url=link_url or None,
+        created_at=now,
+    )
+    db.add(log)
     db.commit()
     return RedirectResponse(
         url="/admin/notifications?message=Sent",
