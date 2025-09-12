@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="users-page">
+  <header class="users-toolbar">
+    <div class="title-wrap">
+      <h1>{{ note.subject }}</h1>
+      <p class="subtitle">Notification details.</p>
+    </div>
+    <a href="/notifications" class="btn-outline">Back</a>
+  </header>
+  <div class="table-card">
+    <p>{{ note.body }}</p>
+    {% if note.link_url %}
+    <p><a href="{{ note.link_url }}">{{ note.link_url }}</a></p>
+    {% endif %}
+    {% if note.image %}
+    <p><img src="/notifications/{{ note.id }}/image" alt="image"></p>
+    {% endif %}
+    {% if note.attachment %}
+    <p><a href="/notifications/{{ note.id }}/attachment">Download attachment</a></p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

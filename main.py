@@ -4916,6 +4916,28 @@ async def notifications_view(request: Request, db: Session = Depends(get_db)):
     )
 
 
+@app.get("/notifications/{note_id}", response_class=HTMLResponse)
+async def notification_detail(
+    note_id: int, request: Request, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    note = (
+        db.query(Notification)
+        .filter(Notification.id == note_id, Notification.user_id == user.id)
+        .first()
+    )
+    if not note:
+        raise HTTPException(status_code=404)
+    if not note.read:
+        note.read = True
+        db.commit()
+    return render_template(
+        "notification_detail.html", request=request, user=user, note=note
+    )
+
+
 @app.get("/notifications/{note_id}/image")
 async def notification_image(
     note_id: int, request: Request, db: Session = Depends(get_db)
