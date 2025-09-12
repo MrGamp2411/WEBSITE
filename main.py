@@ -3995,6 +3995,42 @@ async def admin_payments(request: Request, db: Session = Depends(get_db)):
     return render_template("admin_payments.html", request=request, bars=db_bars)
 
 
+@app.get("/admin/audit", response_class=HTMLResponse)
+async def admin_audit_logs(
+    request: Request,
+    user_id: int | None = None,
+    bar_id: int | None = None,
+    action: str | None = None,
+    db: Session = Depends(get_db),
+):
+    user = get_current_user(request)
+    if not user or not user.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    query = db.query(AuditLog)
+    if user_id:
+        query = query.filter(AuditLog.actor_user_id == user_id)
+    if action:
+        query = query.filter(AuditLog.action == action)
+    if bar_id:
+        query = query.filter(
+            or_(
+                and_(AuditLog.entity_type == "bar", AuditLog.entity_id == bar_id),
+                AuditLog.payload_json.like(f'%"bar_id": {bar_id}%'),
+            )
+        )
+    logs = query.order_by(AuditLog.created_at.desc()).all()
+    parsed = []
+    for log in logs:
+        payload = json.loads(log.payload_json) if log.payload_json else {}
+        parsed.append({"log": log, "payload": payload})
+    return render_template(
+        "admin_audit_logs.html",
+        request=request,
+        logs=parsed,
+        filters={"user_id": user_id, "bar_id": bar_id, "action": action},
+    )
+
+
 @app.post("/admin/payments/{bar_id}/test_closing")
 async def admin_create_test_closing(
     request: Request, bar_id: int, db: Session = Depends(get_db)

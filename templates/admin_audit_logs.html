@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="users-page audit-page">
+  <header class="users-toolbar">
+    <div class="title-wrap">
+      <h1>Audit Logs</h1>
+      <p class="subtitle">Review system activity.</p>
+    </div>
+    <form class="users-search" method="get">
+      <input name="user_id" type="number" placeholder="User ID" value="{{ filters.user_id or '' }}">
+      <input name="bar_id" type="number" placeholder="Bar ID" value="{{ filters.bar_id or '' }}">
+      <input name="action" type="text" placeholder="Action" value="{{ filters.action or '' }}">
+      <button class="btn btn--primary" type="submit">Filter</button>
+    </form>
+  </header>
+  <div class="table-card">
+    <table class="users-table audit-table">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>User</th>
+          <th>Action</th>
+          <th>Entity</th>
+          <th>Entity ID</th>
+          <th>Bar</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for entry in logs %}
+        <tr>
+          <td>{{ entry.log.created_at }}</td>
+          <td>{{ entry.log.actor_user_id }}</td>
+          <td>{{ entry.log.action }}</td>
+          <td>{{ entry.log.entity_type }}</td>
+          <td>{{ entry.log.entity_id or '' }}</td>
+          <td>{{ entry.payload.get('bar_id', '') }}</td>
+          <td>{{ entry.payload }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
