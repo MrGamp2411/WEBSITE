@@ -151,17 +151,25 @@
   const barSection = document.getElementById('barSection');
   const userInput = document.getElementById('user_id');
   const barInput = document.getElementById('bar_id');
+  const form = document.querySelector('form');
   function updateTarget(){
     const val = target.value;
     userSection.hidden = val !== 'user';
     barSection.hidden = val !== 'bar';
-    userInput.required = val === 'user';
-    barInput.required = val === 'bar';
+    userInput.disabled = val !== 'user';
+    barInput.disabled = val !== 'bar';
     if(val !== 'user') userInput.value = '';
     if(val !== 'bar') barInput.value = '';
   }
   target.addEventListener('change', updateTarget);
   updateTarget();
+  form.addEventListener('submit', e => {
+    const val = target.value;
+    if((val === 'user' && !userInput.value) || (val === 'bar' && !barInput.value)){
+      e.preventDefault();
+      alert('Please select a ' + (val === 'user' ? 'user' : 'bar'));
+    }
+  });
   const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
   function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms);}}
   function setupSearch(input, tbody){
