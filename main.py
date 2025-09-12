@@ -92,6 +92,7 @@ from models import (
     WalletTopup,
     Payment,
     WalletTransaction,
+    Notification,
 )
 from pydantic import BaseModel, constr, ConfigDict, ValidationError
 from decimal import Decimal
@@ -4711,6 +4712,137 @@ async def admin_password_update(
     db.commit()
     return RedirectResponse(
         url=f"/admin/users/edit/{user_id}", status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@app.get("/admin/notifications", response_class=HTMLResponse)
+async def admin_notifications_view(
+    request: Request,
+    message: str | None = None,
+    error: str | None = None,
+    db: Session = Depends(get_db),
+):
+    current = get_current_user(request)
+    if not current or not current.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template(
+        "admin_notifications.html",
+        request=request,
+        user=current,
+        message=message,
+        error=error,
+    )
+
+
+@app.post("/admin/notifications", response_class=HTMLResponse)
+async def admin_notifications_send(
+    request: Request,
+    target: str = Form(...),
+    user_id: int | None = Form(None),
+    bar_id: int | None = Form(None),
+    subject: str = Form(""),
+    body: str = Form(""),
+    link_url: str = Form(""),
+    image: UploadFile | None = File(None),
+    attachment: UploadFile | None = File(None),
+    db: Session = Depends(get_db),
+):
+    current = get_current_user(request)
+    if not current or not current.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    recipient_ids: set[int] = set()
+    if target == "all":
+        recipient_ids = {uid for (uid,) in db.query(User.id).all()}
+    elif target == "user" and user_id:
+        recipient_ids = {user_id}
+    elif target == "bar" and bar_id:
+        recipient_ids = {
+            uid
+            for (uid,) in db.query(Order.customer_id)
+            .filter(Order.bar_id == bar_id, Order.customer_id.isnot(None))
+            .distinct()
+        }
+    else:
+        return RedirectResponse(
+            url="/admin/notifications?error=Invalid+target",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    image_bytes = await image.read() if image else None
+    image_mime = image.content_type if image else None
+    attachment_bytes = await attachment.read() if attachment else None
+    attachment_filename = attachment.filename if attachment else None
+    for uid in recipient_ids:
+        note = Notification(
+            user_id=uid,
+            sender_id=current.id,
+            subject=subject,
+            body=body,
+            link_url=link_url or None,
+            image=image_bytes,
+            image_mime=image_mime,
+            attachment=attachment_bytes,
+            attachment_filename=attachment_filename,
+        )
+        db.add(note)
+    db.commit()
+    return RedirectResponse(
+        url="/admin/notifications?message=Sent",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@app.get("/notifications", response_class=HTMLResponse)
+async def notifications_view(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    notes = (
+        db.query(Notification)
+        .filter(Notification.user_id == user.id)
+        .order_by(Notification.created_at.desc())
+        .all()
+    )
+    return render_template(
+        "notifications.html", request=request, user=user, notifications=notes
+    )
+
+
+@app.get("/notifications/{note_id}/image")
+async def notification_image(
+    note_id: int, request: Request, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=403)
+    note = (
+        db.query(Notification)
+        .filter(Notification.id == note_id, Notification.user_id == user.id)
+        .first()
+    )
+    if not note or not note.image:
+        raise HTTPException(status_code=404)
+    return Response(note.image, media_type=note.image_mime or "application/octet-stream")
+
+
+@app.get("/notifications/{note_id}/attachment")
+async def notification_attachment(
+    note_id: int, request: Request, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=403)
+    note = (
+        db.query(Notification)
+        .filter(Notification.id == note_id, Notification.user_id == user.id)
+        .first()
+    )
+    if not note or not note.attachment:
+        raise HTTPException(status_code=404)
+    headers = {
+        "Content-Disposition": f"attachment; filename={note.attachment_filename or 'file'}"
+    }
+    return Response(
+        note.attachment, media_type="application/octet-stream", headers=headers
     )
 
 

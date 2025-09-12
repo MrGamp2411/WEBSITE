@@ -384,3 +384,23 @@ class AuditLog(Base):
     ip = Column(String(50))
     user_agent = Column(String(255))
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    sender_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    subject = Column(String(200))
+    body = Column(Text)
+    image = Column(LargeBinary)
+    image_mime = Column(String(100))
+    attachment = Column(LargeBinary)
+    attachment_filename = Column(String(255))
+    link_url = Column(String(255))
+    read = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", foreign_keys=[user_id])
+    sender = relationship("User", foreign_keys=[sender_id])

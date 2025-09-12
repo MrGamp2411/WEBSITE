@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="users-page">
+  <header class="users-toolbar">
+    <div class="title-wrap">
+      <h1>Notifications</h1>
+      <p class="subtitle">Send messages to users.</p>
+    </div>
+  </header>
+  {% if message %}
+  <p class="alert-success">{{ message }}</p>
+  {% endif %}
+  {% if error %}
+  <p class="alert-danger">{{ error }}</p>
+  {% endif %}
+  <form class="form" method="post" action="/admin/notifications" enctype="multipart/form-data">
+    <label>Target
+      <select name="target" required>
+        <option value="all">All Users</option>
+        <option value="user">Specific User</option>
+        <option value="bar">Users of Bar</option>
+      </select>
+    </label>
+    <label>User ID
+      <input type="number" name="user_id">
+    </label>
+    <label>Bar ID
+      <input type="number" name="bar_id">
+    </label>
+    <label>Subject
+      <input type="text" name="subject">
+    </label>
+    <label>Message
+      <textarea name="body" rows="4"></textarea>
+    </label>
+    <label>Link URL
+      <input type="url" name="link_url">
+    </label>
+    <label>Image
+      <input type="file" name="image" accept="image/*">
+    </label>
+    <label>Attachment
+      <input type="file" name="attachment">
+    </label>
+    <button class="btn btn--primary" type="submit">Send</button>
+  </form>
+</section>
+{% endblock %}
