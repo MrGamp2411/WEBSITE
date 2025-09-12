@@ -383,6 +383,7 @@ class AuditLog(Base):
     payload_json = Column(Text)
     ip = Column(String(50))
     user_agent = Column(String(255))
+    phone = Column(String(30))
     created_at = Column(DateTime, default=datetime.utcnow)
 
 

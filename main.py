@@ -465,6 +465,27 @@ class DisplayRedirectMiddleware(BaseHTTPMiddleware):
                 return RedirectResponse(url="/logout", status_code=status.HTTP_303_SEE_OTHER)
         return await call_next(request)
 
+
+class AuditLogMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        session = request.session
+        user = users.get(session.get("user_id")) if session else None
+        ip = request.client.host if request.client else None
+        user_agent = request.headers.get("user-agent")
+        phone = user.phone_e164 if user else None
+        with SessionLocal() as db:
+            log_action(
+                db,
+                actor_user_id=user.id if user else None,
+                action=f"{request.method} {request.url.path}",
+                entity_type="request",
+                ip=ip,
+                user_agent=user_agent,
+                phone=phone,
+            )
+        return response
+
 # Allow cross-origin requests from configured frontends
 origins_env = os.getenv("FRONTEND_ORIGINS", "http://localhost:5173")
 origins = [o.strip() for o in origins_env.split(",") if o.strip()]
@@ -479,6 +500,7 @@ app.add_middleware(
 # Enable server-side sessions for authentication
 app.add_middleware(DisplayRedirectMiddleware)
 app.add_middleware(RegisterRedirectMiddleware)
+app.add_middleware(AuditLogMiddleware)
 app.add_middleware(SessionMiddleware, secret_key="dev-secret")
 
 
@@ -1880,12 +1902,13 @@ async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
 @app.post(
     "/api/payouts/run", response_model=PayoutRead, status_code=status.HTTP_201_CREATED
 )
-def run_payout(data: PayoutRunInput, db: Session = Depends(get_db)):
+def run_payout(data: PayoutRunInput, request: Request, db: Session = Depends(get_db)):
     """Aggregate completed orders for a bar within a date range and create a payout."""
     try:
         payout = schedule_payout(db, data.bar_id, data.period_start, data.period_end)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
+    actor_user = db.get(User, data.actor_user_id) if data.actor_user_id else None
     log_action(
         db,
         actor_user_id=data.actor_user_id,
@@ -1897,6 +1920,9 @@ def run_payout(data: PayoutRunInput, db: Session = Depends(get_db)):
             "period_start": data.period_start.isoformat(),
             "period_end": data.period_end.isoformat(),
         },
+        ip=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+        phone=actor_user.phone_e164 if actor_user else None,
     )
     return payout
 
@@ -2227,6 +2253,7 @@ async def checkout(
         payload={"bar_id": cart.bar_id, "payment_method": payment_method},
         ip=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent"),
+        phone=user.phone_e164,
     )
     await send_order_update(db_order)
     if bar and payment_method != "bar":
@@ -2889,6 +2916,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
             entity_id=user.id,
             ip=request.client.host if request.client else None,
             user_agent=request.headers.get("user-agent"),
+            phone=user.phone_e164,
         )
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(

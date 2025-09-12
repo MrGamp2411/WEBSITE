@@ -33,6 +33,7 @@
   - `database.py` – database utilities
   - `audit.py` – records user actions to `AuditLog`
     - Login and cart checkout log `login` and `order_create` actions via `log_action`
+    - `AuditLogMiddleware` logs every request with IP, user agent, and phone
   - `finance.py` – VAT and payout calculations
   - `payouts.py` – schedule periodic payouts for bars
   - `app/webhooks/wallee.py` – webhook endpoint for Wallee payments
