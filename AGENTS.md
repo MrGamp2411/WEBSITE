@@ -317,3 +317,4 @@
 - Each `Notification` stores a `log_id` linking back to its `NotificationLog` so deletions reliably remove every user's copy.
   - Mobile menu includes `Notifications` link (`/notifications`) with `bi-bell` icon for accessing admin messages.
 - Mobile menu shows a red notification badge when the user has unread messages.
+- Notifications older than 30 days are purged automatically by `purge_old_notifications_worker`.
