@@ -404,3 +404,21 @@ class Notification(Base):
 
     user = relationship("User", foreign_keys=[user_id])
     sender = relationship("User", foreign_keys=[sender_id])
+
+
+class NotificationLog(Base):
+    __tablename__ = "notification_logs"
+
+    id = Column(Integer, primary_key=True)
+    sender_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    target = Column(String(20))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    bar_id = Column(Integer, ForeignKey("bars.id"))
+    subject = Column(String(200))
+    body = Column(Text)
+    link_url = Column(String(255))
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    sender = relationship("User", foreign_keys=[sender_id])
+    user = relationship("User", foreign_keys=[user_id])
+    bar = relationship("Bar", foreign_keys=[bar_id])

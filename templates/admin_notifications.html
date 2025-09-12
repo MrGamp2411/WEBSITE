@@ -32,7 +32,15 @@
         {% for n in notifications %}
         <tr>
           <td>{{ n.id }}</td>
-          <td>{{ n.user.username }} (#{{ n.user_id }})</td>
+          <td>
+            {% if n.target == 'all' %}
+              All Users
+            {% elif n.target == 'user' %}
+              {{ n.user.username }} (#{{ n.user_id }})
+            {% elif n.target == 'bar' %}
+              {{ n.bar.name }} (#{{ "%03d"|format(n.bar_id) }})
+            {% endif %}
+          </td>
           <td>{{ n.subject }}</td>
           <td>{{ n.body }}</td>
           <td>{{ n.created_at|format_time }}</td>
