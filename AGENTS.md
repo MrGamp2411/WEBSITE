@@ -296,3 +296,7 @@
   - Normalization and blocklist checks live in `app/utils/email_normalize.py` and `app/utils/disposable_email.py`.
   - CLI `python -m app.scripts.refresh_disposable_domains --force` refreshes the cache and writes `app/data/disposable_domains.snapshot`.
   - Dev endpoint `/internal/disposable-domains/stats` shows cache count and refresh time.
+- Notifications:
+  - `Notification` model in `models.py` stores per-user messages with optional image, attachment, and link.
+  - Super admins send messages via `/admin/notifications`, targeting all users, a single user, or users who ordered at a specific bar.
+  - Users view messages at `/notifications` with downloadable attachments and inline images.
