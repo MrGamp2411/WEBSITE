@@ -13,20 +13,118 @@
   {% if error %}
   <p class="alert-danger">{{ error }}</p>
   {% endif %}
+
+  {% if notifications %}
+  <h2>Sent Notifications</h2>
+  <div class="table-card">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Recipient</th>
+          <th>Subject</th>
+          <th>Message</th>
+          <th>Sent</th>
+          <th>Sender</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for n in notifications %}
+        <tr>
+          <td>{{ n.id }}</td>
+          <td>{{ n.user.username }} (#{{ n.user_id }})</td>
+          <td>{{ n.subject }}</td>
+          <td>{{ n.body }}</td>
+          <td>{{ n.created_at|format_time }}</td>
+          <td>{{ n.sender.username }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
   <form class="form" method="post" action="/admin/notifications" enctype="multipart/form-data">
     <label>Target
-      <select name="target" required>
+      <select name="target" id="target" required>
         <option value="all">All Users</option>
         <option value="user">Specific User</option>
         <option value="bar">Users of Bar</option>
       </select>
     </label>
-    <label>User ID
-      <input type="number" name="user_id">
-    </label>
-    <label>Bar ID
-      <input type="number" name="bar_id">
-    </label>
+
+    <section id="userSection" hidden>
+      <h2>Select User</h2>
+      <div class="users-search" role="search" aria-label="Search users" onsubmit="return false">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input id="userSearch" type="search" inputmode="search" autocomplete="off" placeholder="Search users…" aria-label="Search users">
+        <button class="clear" type="button" aria-label="Clear search">
+          <i class="bi bi-x-circle" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="table-card">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th class="actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userRows">
+            {% for u in users %}
+            <tr data-name="{{ u.username }} {{ u.email }}">
+              <td>{{ u.id }}</td>
+              <td>{{ u.username }}</td>
+              <td>{{ u.email }}</td>
+              <td class="actions">
+                <button type="button" class="btn-outline js-pick-user" data-user-id="{{ u.id }}">Select</button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <input type="hidden" name="user_id" id="user_id">
+    </section>
+
+    <section id="barSection" hidden>
+      <h2>Select Bar</h2>
+      <div class="bars-search" role="search" aria-label="Search bars" onsubmit="return false">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input id="barSearch" type="search" inputmode="search" autocomplete="off" placeholder="Search bars…" aria-label="Search bars">
+        <button class="clear" type="button" aria-label="Clear search">
+          <i class="bi bi-x-circle" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="table-card">
+        <table class="bars-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>City</th>
+              <th class="actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="barRows">
+            {% for b in bars %}
+            <tr data-name="{{ b.name }}">
+              <td>{{ "%03d"|format(b.id) }}</td>
+              <td>{{ b.name }}</td>
+              <td>{{ b.city }}</td>
+              <td class="actions">
+                <button type="button" class="btn-outline js-pick-bar" data-bar-id="{{ b.id }}">Select</button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <input type="hidden" name="bar_id" id="bar_id">
+    </section>
+
     <label>Subject
       <input type="text" name="subject">
     </label>
@@ -45,4 +143,60 @@
     <button class="btn btn--primary" type="submit">Send</button>
   </form>
 </section>
+
+<script>
+(function(){
+  const target = document.getElementById('target');
+  const userSection = document.getElementById('userSection');
+  const barSection = document.getElementById('barSection');
+  const userInput = document.getElementById('user_id');
+  const barInput = document.getElementById('bar_id');
+  function updateTarget(){
+    const val = target.value;
+    userSection.hidden = val !== 'user';
+    barSection.hidden = val !== 'bar';
+    userInput.required = val === 'user';
+    barInput.required = val === 'bar';
+    if(val !== 'user') userInput.value = '';
+    if(val !== 'bar') barInput.value = '';
+  }
+  target.addEventListener('change', updateTarget);
+  updateTarget();
+  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms);}}
+  function setupSearch(input, tbody){
+    if(!input) return;
+    const apply = () => {
+      const q = norm(input.value);
+      Array.from(tbody.querySelectorAll('tr')).forEach(tr=>{
+        const name = tr.dataset.name || '';
+        tr.style.display = !q || norm(name).includes(q) ? '' : 'none';
+      });
+    };
+    input.addEventListener('input', debounce(apply,120));
+    input.closest('.users-search, .bars-search')?.querySelector('.clear')?.addEventListener('click', () => {
+      input.value=''; apply(); input.focus();
+    });
+  }
+  setupSearch(document.getElementById('userSearch'), document.getElementById('userRows'));
+  setupSearch(document.getElementById('barSearch'), document.getElementById('barRows'));
+  document.getElementById('userRows')?.addEventListener('click', e => {
+    const btn = e.target.closest('.js-pick-user');
+    if(!btn) return;
+    e.preventDefault();
+    userInput.value = btn.dataset.userId;
+    document.querySelectorAll('.js-pick-user').forEach(b=>b.textContent='Select');
+    btn.textContent='Selected';
+  });
+  document.getElementById('barRows')?.addEventListener('click', e => {
+    const btn = e.target.closest('.js-pick-bar');
+    if(!btn) return;
+    e.preventDefault();
+    barInput.value = btn.dataset.barId;
+    document.querySelectorAll('.js-pick-bar').forEach(b=>b.textContent='Select');
+    btn.textContent='Selected';
+  });
+})();
+</script>
 {% endblock %}
+
