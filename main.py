@@ -66,7 +66,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from sqlalchemy import inspect, text, func, extract, or_, and_
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from argon2 import PasswordHasher, exceptions as argon2_exceptions
@@ -4725,12 +4725,24 @@ async def admin_notifications_view(
     current = get_current_user(request)
     if not current or not current.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    notes = (
+        db.query(Notification)
+        .options(joinedload(Notification.user), joinedload(Notification.sender))
+        .order_by(Notification.created_at.desc())
+        .limit(50)
+        .all()
+    )
+    users = db.query(User).order_by(User.id).all()
+    bars = db.query(BarModel).order_by(BarModel.name).all()
     return render_template(
         "admin_notifications.html",
         request=request,
         user=current,
         message=message,
         error=error,
+        notifications=notes,
+        users=users,
+        bars=bars,
     )
 
 
