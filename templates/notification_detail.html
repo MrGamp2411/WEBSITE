@@ -9,7 +9,7 @@
     <a href="/notifications" class="btn-outline">Back</a>
   </header>
   <div class="table-card">
-    <p>{{ note.body }}</p>
+    <p class="notification-body">{{ note.body }}</p>
     {% if note.link_url %}
     <p><a href="{{ note.link_url }}">{{ note.link_url }}</a></p>
     {% endif %}
