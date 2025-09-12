@@ -864,6 +864,26 @@ def ensure_bar_closing_columns() -> None:
             )
 
 
+def ensure_audit_log_columns() -> None:
+    """Ensure expected columns exist on the audit_logs table."""
+    inspector = inspect(engine)
+    columns = {col["name"] for col in inspector.get_columns("audit_logs")}
+    required = {
+        "ip": "VARCHAR(50)",
+        "user_agent": "VARCHAR(255)",
+        "phone": "VARCHAR(30)",
+    }
+    missing = {name: ddl for name, ddl in required.items() if name not in columns}
+    if missing:
+        with engine.begin() as conn:
+            for name, ddl in missing.items():
+                conn.execute(
+                    text(
+                        f"ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS {name} {ddl}"
+                    )
+                )
+
+
 def ensure_notification_log_column() -> None:
     """Ensure notifications table includes log_id foreign key."""
     inspector = inspect(engine)
@@ -931,6 +951,7 @@ async def on_startup():
     ensure_order_columns()
     ensure_wallet_topup_columns()
     ensure_bar_closing_columns()
+    ensure_audit_log_columns()
     ensure_notification_log_column()
     ensure_welcome_message_table()
     users.clear()
