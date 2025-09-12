@@ -347,11 +347,13 @@ body.dark-mode{
 .card--ready{background:#D1FAE5;}
 .card--completed{background:var(--surface);}
 .card--canceled{background:#FECACA;}
-.card--unread{background:#DBEAFE;}
+.card--unread{background:#EDE9FE;}
 
-.notification-card{padding:var(--space-3);color:inherit;text-decoration:none;display:flex;flex-direction:column;gap:var(--space-1);}
+.notification-card{padding:var(--space-3);color:inherit;text-decoration:none;display:flex;flex-direction:column;gap:var(--space-1);border:1px solid var(--sg-card-border);}
 .notification-card h3{margin:0;}
 .notification-card p{margin:0;}
+
+.notifications-list{list-style:none;margin:0;padding:0;}
 
 /* utilities */
 .alert{padding:var(--space-2);border-radius:var(--radius);margin-bottom:var(--space-3);}

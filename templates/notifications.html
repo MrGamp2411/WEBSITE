@@ -8,7 +8,7 @@
     </div>
   </header>
   <div class="table-card">
-    <ul>
+    <ul class="notifications-list">
     {% for n in notifications %}
       <li class="mb-3">
         <a href="/notifications/{{ n.id }}" class="card notification-card{% if not n.read %} card--unread{% endif %}">
