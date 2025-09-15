@@ -104,7 +104,7 @@ body.dark-mode{
 .hero__content{position:relative;z-index:1;padding-block:var(--space-4);max-width:640px;}
 .hero__content h1{font-size:clamp(32px,5vw,36px);line-height:1.15;margin-bottom:var(--space-2);}
 .hero__content p{color:var(--color-muted);}
-.hero__cta{display:flex;gap:var(--space-2);margin-top:var(--space-3);}
+.hero__cta{display:flex;gap:var(--space-2);margin-top:var(--space-3);justify-content:center;}
 .btn--primary{background:linear-gradient(90deg,var(--sg-purple-700),var(--sg-purple-600));color:#fff;}
 .btn--primary:hover{background:linear-gradient(90deg,var(--sg-purple-600),var(--sg-purple-700));transform:none;}
 
