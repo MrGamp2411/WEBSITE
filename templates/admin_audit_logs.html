@@ -6,11 +6,15 @@
       <h1>Audit Logs</h1>
       <p class="subtitle">Review system activity.</p>
     </div>
-    <form class="users-search" method="get">
-      <input name="user_id" type="number" placeholder="User ID" value="{{ filters.user_id or '' }}">
-      <input name="bar_id" type="number" placeholder="Bar ID" value="{{ filters.bar_id or '' }}">
-      <input name="action" type="text" placeholder="Action" value="{{ filters.action or '' }}">
-      <button class="btn btn--primary" type="submit">Filter</button>
+    <form class="users-search" method="get" id="auditFilters">
+      <input name="username" type="search" placeholder="User" value="{{ filters.username or '' }}" style="min-width:0">
+      <input name="bar" type="search" placeholder="Bar" value="{{ filters.bar or '' }}" style="min-width:0">
+      <select name="action" style="min-width:0">
+        <option value="">All actions</option>
+        {% for a in actions %}
+          <option value="{{ a }}" {% if filters.action == a %}selected{% endif %}>{{ a }}</option>
+        {% endfor %}
+      </select>
     </form>
   </header>
   <div class="table-card">
@@ -44,4 +48,18 @@
     </table>
   </div>
 </section>
+<script>
+(function(){
+  const form = document.getElementById('auditFilters');
+  if(!form) return;
+  let t;
+  form.querySelectorAll('input[type="search"]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      clearTimeout(t);
+      t = setTimeout(()=>form.submit(), 300);
+    });
+  });
+  form.querySelector('select')?.addEventListener('change', ()=>form.submit());
+})();
+</script>
 {% endblock %}
