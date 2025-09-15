@@ -7,7 +7,7 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, engine, SessionLocal  # noqa: E402
-from models import AuditLog  # noqa: E402
+from models import AuditLog, User, RoleEnum  # noqa: E402
 from main import app  # noqa: E402
 
 
@@ -27,6 +27,8 @@ def _login_super_admin(client: TestClient) -> None:
 
 def test_audit_log_filter_by_user():
     db = SessionLocal()
+    u1 = User(id=1, username="alice", email="a@example.com", password_hash="x", role=RoleEnum.CUSTOMER)
+    u2 = User(id=2, username="bob", email="b@example.com", password_hash="x", role=RoleEnum.CUSTOMER)
     log1 = AuditLog(
         actor_user_id=1,
         action="order",
@@ -41,13 +43,13 @@ def test_audit_log_filter_by_user():
         entity_id=2,
         payload_json='{"bar_id": 1}'
     )
-    db.add_all([log1, log2])
+    db.add_all([u1, u2, log1, log2])
     db.commit()
     db.close()
 
     with TestClient(app) as client:
         _login_super_admin(client)
-        resp = client.get("/admin/audit?user_id=1")
+        resp = client.get("/admin/audit?username=alice")
         assert resp.status_code == 200
-        assert "order" in resp.text
-        assert "topup" not in resp.text
+        assert "<td>order</td>" in resp.text
+        assert "<td>topup</td>" not in resp.text

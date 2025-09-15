@@ -4075,8 +4075,8 @@ async def admin_payments(request: Request, db: Session = Depends(get_db)):
 @app.get("/admin/audit", response_class=HTMLResponse)
 async def admin_audit_logs(
     request: Request,
-    user_id: int | None = None,
-    bar_id: int | None = None,
+    username: str | None = None,
+    bar: str | None = None,
     action: str | None = None,
     db: Session = Depends(get_db),
 ):
@@ -4084,17 +4084,12 @@ async def admin_audit_logs(
     if not user or not user.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     query = db.query(AuditLog)
-    if user_id:
-        query = query.filter(AuditLog.actor_user_id == user_id)
+    if username:
+        query = query.join(User, AuditLog.actor_user_id == User.id).filter(
+            User.username.ilike(f"%{username}%")
+        )
     if action:
         query = query.filter(AuditLog.action == action)
-    if bar_id:
-        query = query.filter(
-            or_(
-                and_(AuditLog.entity_type == "bar", AuditLog.entity_id == bar_id),
-                AuditLog.payload_json.like(f'%"bar_id": {bar_id}%'),
-            )
-        )
     logs = query.order_by(AuditLog.created_at.desc()).all()
     user_ids = {log.actor_user_id for log in logs if log.actor_user_id}
     bar_ids = set()
@@ -4129,11 +4124,19 @@ async def admin_audit_logs(
                 "bar_name": bars_map.get(bar_ref, ""),
             }
         )
+    if bar:
+        b = bar.lower()
+        parsed = [p for p in parsed if b in (p["bar_name"] or "").lower()]
+    actions = [
+        a[0]
+        for a in db.query(AuditLog.action).distinct().order_by(AuditLog.action).all()
+    ]
     return render_template(
         "admin_audit_logs.html",
         request=request,
         logs=parsed,
-        filters={"user_id": user_id, "bar_id": bar_id, "action": action},
+        filters={"username": username, "bar": bar, "action": action},
+        actions=actions,
     )
 
 
