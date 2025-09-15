@@ -9,8 +9,9 @@
 - Homepage hero displays the artwork as a single `<img class="hero-art">` absolutely positioned under the content with pointer-events disabled.
 - Hero image is non-draggable (`draggable="false"` and `user-select:none`) so it can't shift text or cards.
 - Hero art is centered and rotated via `transform:translateX(-50%) rotate(-30deg)`.
+- Hero art is positioned 500px to the right via `left:calc(50% + 500px)`.
 - The image extends 12rem beyond the hero (8rem on mobile) with no mask, clip, or fade.
-- Hero image is shifted an additional 500px downward from the hero section.
+- Hero image is shifted an additional 500px downward and 500px right from the hero section.
 - Hero art displays at a fixed 1024x1024 size regardless of screen width.
 - Homepage hero no longer hides overflow, letting the image extend beyond the hero section.
 - Homepage hero only shows a Browse Bars button linking to `/search`; Search and How it works buttons and promo chips were removed.

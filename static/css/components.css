@@ -124,7 +124,7 @@ body.dark-mode{
 
 .home-hero .hero-art{
   position:absolute;
-  left:50%;
+  left:calc(50% + 500px);
   bottom:calc(var(--hero-overhang,-12rem) - 500px);
   transform:translateX(-50%) rotate(-30deg);
   width:1024px;
