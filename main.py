@@ -487,6 +487,7 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
                 ip=ip,
                 user_agent=user_agent,
                 phone=phone,
+                credit=float(user.credit or 0),
             )
         return response
 
@@ -876,6 +877,7 @@ def ensure_audit_log_columns() -> None:
         "ip": "VARCHAR(50)",
         "user_agent": "VARCHAR(255)",
         "phone": "VARCHAR(30)",
+        "actor_credit": "NUMERIC(10, 2)",
     }
     missing = {name: ddl for name, ddl in required.items() if name not in columns}
     if missing:
@@ -1948,6 +1950,7 @@ def run_payout(data: PayoutRunInput, request: Request, db: Session = Depends(get
         ip=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent"),
         phone=actor_user.phone_e164 if actor_user else None,
+        credit=float(actor_user.credit) if actor_user else None,
     )
     return payout
 
@@ -2279,6 +2282,7 @@ async def checkout(
         ip=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent"),
         phone=user.phone_e164,
+        credit=float(user.credit),
     )
     await send_order_update(db_order)
     if bar and payment_method != "bar":
@@ -2942,6 +2946,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
             ip=request.client.host if request.client else None,
             user_agent=request.headers.get("user-agent"),
             phone=user.phone_e164,
+            credit=float(user.credit or 0),
         )
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(

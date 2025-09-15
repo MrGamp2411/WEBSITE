@@ -384,6 +384,7 @@ class AuditLog(Base):
     ip = Column(String(50))
     user_agent = Column(String(255))
     phone = Column(String(30))
+    actor_credit = Column(Numeric(10, 2))
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
