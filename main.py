@@ -477,7 +477,7 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
             return response
         ip = request.client.host if request.client else None
         user_agent = request.headers.get("user-agent")
-        phone = user.phone_e164 if user else None
+        phone = user.phone_e164 if user and request.url.path != "/login" else None
         with SessionLocal() as db:
             log_action(
                 db,
@@ -877,6 +877,8 @@ def ensure_audit_log_columns() -> None:
         "ip": "VARCHAR(50)",
         "user_agent": "VARCHAR(255)",
         "phone": "VARCHAR(30)",
+        "latitude": "NUMERIC(9, 6)",
+        "longitude": "NUMERIC(9, 6)",
         "actor_credit": "NUMERIC(10, 2)",
     }
     missing = {name: ddl for name, ddl in required.items() if name not in columns}
@@ -2861,6 +2863,10 @@ async def login(request: Request, db: Session = Depends(get_db)):
     form = await request.form()
     email = form.get("email")
     password = form.get("password")
+    latitude = form.get("latitude")
+    longitude = form.get("longitude")
+    lat = float(latitude) if latitude else None
+    lon = float(longitude) if longitude else None
     if email and password:
         record = login_attempts[email]
         if record["count"] >= 5:
@@ -2945,8 +2951,9 @@ async def login(request: Request, db: Session = Depends(get_db)):
             entity_id=user.id,
             ip=request.client.host if request.client else None,
             user_agent=request.headers.get("user-agent"),
-            phone=user.phone_e164,
             credit=float(user.credit or 0),
+            latitude=lat,
+            longitude=lon,
         )
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(

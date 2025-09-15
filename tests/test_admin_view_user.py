@@ -84,6 +84,8 @@ def test_view_user_lists_login_activity():
         entity_id=user.id,
         ip="1.2.3.4",
         user_agent="test-agent",
+        latitude=12.34,
+        longitude=56.78,
     )
     db.add(log)
     db.commit()
@@ -96,6 +98,8 @@ def test_view_user_lists_login_activity():
         assert resp.status_code == 200
         assert "1.2.3.4" in resp.text
         assert "test-agent" in resp.text
+        assert "12.34" in resp.text
+        assert "56.78" in resp.text
 
 
 def test_order_detail_view():

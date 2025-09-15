@@ -20,6 +20,8 @@ def log_action(
     user_agent: Optional[str] = None,
     phone: Optional[str] = None,
     credit: Optional[float] = None,
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
 ) -> AuditLog:
     """Persist an audit log entry to the database."""
     log = AuditLog(
@@ -31,6 +33,8 @@ def log_action(
         ip=ip,
         user_agent=user_agent,
         phone=phone,
+        latitude=Decimal(str(latitude)) if latitude is not None else None,
+        longitude=Decimal(str(longitude)) if longitude is not None else None,
         actor_credit=Decimal(str(credit)) if credit is not None else None,
         created_at=datetime.utcnow(),
     )

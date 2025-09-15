@@ -63,7 +63,7 @@
         <tr>
           <th>IP</th>
           <th>User Agent</th>
-          <th>Phone</th>
+          <th>Location</th>
           <th>Date</th>
         </tr>
       </thead>
@@ -72,7 +72,7 @@
         <tr>
           <td>{{ l.ip or '-' }}</td>
           <td>{{ l.user_agent or '-' }}</td>
-          <td>{{ l.phone or '-' }}</td>
+          <td>{% if l.latitude is not none and l.longitude is not none %}{{ l.latitude }}, {{ l.longitude }}{% else %}-{% endif %}</td>
           <td>{{ l.created_at|format_time }}</td>
         </tr>
         {% endfor %}
