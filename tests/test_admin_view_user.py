@@ -8,7 +8,16 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, engine, SessionLocal  # noqa: E402
-from models import User, RoleEnum, Bar, Order, Category, MenuItem, OrderItem  # noqa: E402
+from models import (
+    User,
+    RoleEnum,
+    Bar,
+    Order,
+    Category,
+    MenuItem,
+    OrderItem,
+    AuditLog,
+)  # noqa: E402
 from main import app, refresh_bar_from_db  # noqa: E402
 
 
@@ -53,6 +62,40 @@ def test_view_user_lists_orders():
         assert resp.status_code == 200
         assert f"/admin/orders/{order_id}" in resp.text
         assert code in resp.text
+
+
+def test_view_user_lists_login_activity():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    password_hash = hashlib.sha256("pass".encode("utf-8")).hexdigest()
+    user = User(
+        username="cust",
+        email="cust@example.com",
+        password_hash=password_hash,
+        role=RoleEnum.CUSTOMER,
+    )
+    db.add(user)
+    db.commit()
+    log = AuditLog(
+        actor_user_id=user.id,
+        action="login",
+        entity_type="User",
+        entity_id=user.id,
+        ip="1.2.3.4",
+        user_agent="test-agent",
+    )
+    db.add(log)
+    db.commit()
+    user_id = user.id
+    db.close()
+
+    with TestClient(app) as client:
+        _login_super_admin(client)
+        resp = client.get(f"/admin/users/view/{user_id}")
+        assert resp.status_code == 200
+        assert "1.2.3.4" in resp.text
+        assert "test-agent" in resp.text
 
 
 def test_order_detail_view():
