@@ -10,6 +10,7 @@
 - Hero image is non-draggable (`draggable="false"` and `user-select:none`) so it can't shift text or cards.
 - Hero art is centered and rotated via `transform:translateX(-50%) rotate(-30deg)`.
 - The image extends 12rem beyond the hero (8rem on mobile) with no mask, clip, or fade.
+- Hero image is shifted an additional 500px downward from the hero section.
 - Homepage hero no longer hides overflow, letting the image extend beyond the hero section.
 - Homepage hero only shows a Browse Bars button linking to `/search`; Search and How it works buttons and promo chips were removed.
 - Browse Bars button is centered in the hero section.
