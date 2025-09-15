@@ -131,6 +131,8 @@ body.dark-mode{
   max-width:none;
   height:auto;
   pointer-events:none;
+  -webkit-user-drag:none;
+  user-select:none;
   z-index:1;
   -webkit-mask-image:none!important;
           mask-image:none!important;
