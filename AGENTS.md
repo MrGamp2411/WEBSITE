@@ -6,16 +6,12 @@
 - Review recent commit history before starting new tasks.
 - Homepage image stored in photo/homepage.png.
 - `/photo` static path serves the homepage image.
-- Homepage hero displays this image behind text via an absolutely positioned `.hero__image` with pointer-events disabled.
-- Inline style on `.hero__image` keeps it from shifting text before CSS loads.
-- Hero image center shifted right via `object-position:60% center`.
-- Hero image offset 300px right via `transform:translateX(300px)`.
-- Hero image rotated 30deg counterclockwise via `rotate(-30deg)`.
-- Rotation applies only to the image element; wrappers keep masks and effects upright.
+- Homepage hero displays the artwork as a single `<img class="hero-art">` absolutely positioned under the content with pointer-events disabled.
+- Hero art is centered and rotated via `transform:translateX(-50%) rotate(-30deg)`.
+- The image extends 12rem beyond the hero (8rem on mobile) with no mask, clip, or fade.
 - Homepage hero no longer hides overflow, letting the image extend beyond the hero section.
 - Homepage hero only shows a Browse Bars button linking to `/search`; Search and How it works buttons and promo chips were removed.
 - Browse Bars button is centered in the hero section.
-- `.home-hero` extends the homepage artwork 12rem beyond the hero (8rem on mobile) with a masked fade.
 - Registration is a two-step flow. `/register` collects email and password and assigns a temporary `REGISTERING` role. Users are redirected to `/register/details` to supply username, phone prefix, and number, and cannot access other pages until this step completes.
 - Registering users hitting any other route are redirected back to `/register/details` by middleware until step two finishes.
 - Super admins can create users directly from the Admin Users page by entering only an email and password; this bypasses the normal registration flow and checks.
