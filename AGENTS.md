@@ -11,7 +11,7 @@
 - Hero art is centered and rotated via `transform:translateX(-50%) rotate(70deg)`.
 - Hero art is positioned 450px to the left via `left:calc(50% - 450px)`.
 - The image extends 12rem beyond the hero (8rem on mobile) with no mask, clip, or fade.
-- Hero image is shifted an additional 100px downward and 450px left from the hero section.
+- Hero image is shifted an additional 150px downward and 450px left from the hero section.
 - Hero art displays at a fixed 819x819 size (20% smaller) regardless of screen width.
 - Hero art uses `z-index:-1` to sit behind cards.
 - Hero art styles live in `static/css/components.css` under `.home-hero .hero-art`.
