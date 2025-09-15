@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+from decimal import Decimal
 from typing import Optional, Dict, Any
 
 from sqlalchemy.orm import Session
@@ -18,6 +19,7 @@ def log_action(
     ip: Optional[str] = None,
     user_agent: Optional[str] = None,
     phone: Optional[str] = None,
+    credit: Optional[float] = None,
 ) -> AuditLog:
     """Persist an audit log entry to the database."""
     log = AuditLog(
@@ -29,6 +31,7 @@ def log_action(
         ip=ip,
         user_agent=user_agent,
         phone=phone,
+        actor_credit=Decimal(str(credit)) if credit is not None else None,
         created_at=datetime.utcnow(),
     )
     db.add(log)

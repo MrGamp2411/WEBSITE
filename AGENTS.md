@@ -35,6 +35,8 @@
     - Login and cart checkout log `login` and `order_create` actions via `log_action`
     - `AuditLogMiddleware` logs authenticated requests excluding `.css`, `.js`, `.png`, and `.ico` files with IP, user agent, and phone
     - Startup ensures `audit_logs` has `ip`, `user_agent`, and `phone` via `ensure_audit_log_columns()`
+    - Audit logs capture `actor_credit` to record a user's credit at action time; pass `credit` to `log_action`
+    - `ensure_audit_log_columns` adds the `actor_credit` column when missing
     - Admin audit logs display times with `format_time` to honor local time
   - `finance.py` – VAT and payout calculations
   - `payouts.py` – schedule periodic payouts for bars

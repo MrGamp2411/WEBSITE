@@ -1,6 +1,7 @@
 import os
 import sys
 import pathlib
+from decimal import Decimal
 
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
@@ -30,6 +31,7 @@ def test_login_creates_audit_log():
         and log.user_agent == "test-agent"
         and log.phone == "+41000000000"
         and log.ip
+        and log.actor_credit == Decimal("0")
         for log in logs
     )
     db.close()
@@ -42,7 +44,9 @@ def test_checkout_creates_audit_log():
     db = SessionLocal()
     logs = db.query(AuditLog).all()
     assert any(
-        log.action == "order_create" and log.entity_id == ids["order_id"]
+        log.action == "order_create"
+        and log.entity_id == ids["order_id"]
+        and log.actor_credit == Decimal("4.8")
         for log in logs
     )
     db.close()

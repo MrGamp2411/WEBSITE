@@ -19,6 +19,7 @@
         <tr>
           <th>Time</th>
           <th>User</th>
+          <th>Credit</th>
           <th>Action</th>
           <th>Entity</th>
           <th>Entity ID</th>
@@ -31,6 +32,7 @@
         <tr>
           <td>{{ entry.log.created_at|format_time }}</td>
           <td>{{ entry.user_name }}</td>
+          <td>{{ '%.2f' % entry.log.actor_credit if entry.log.actor_credit is not none else '' }}</td>
           <td>{{ entry.log.action }}</td>
           <td>{{ entry.log.entity_type }}</td>
           <td>{{ entry.log.entity_id or '' }}</td>
