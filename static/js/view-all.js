@@ -303,8 +303,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const debouncedApply = debounce(applyFilters, 250);
-  nameInput?.addEventListener('input', debouncedApply);
-  cityInput?.addEventListener('input', debouncedApply);
+  nameInput?.addEventListener('keydown', e => {
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      debouncedApply();
+    }
+  });
+  cityInput?.addEventListener('keydown', e => {
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      debouncedApply();
+    }
+  });
   if (distInput) {
     const updateDist = () => {
       distanceValue.textContent = distInput.value + ' km';

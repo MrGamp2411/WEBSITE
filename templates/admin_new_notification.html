@@ -147,7 +147,13 @@
         tr.style.display = !q || norm(name).includes(q) ? '' : 'none';
       });
     };
-    input.addEventListener('input', debounce(apply,120));
+    const run = debounce(apply,120);
+    input.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        run();
+      }
+    });
     input.closest('.users-search, .bars-search')?.querySelector('.clear')?.addEventListener('click', () => {
       input.value=''; apply(); input.focus();
     });
