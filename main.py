@@ -421,6 +421,7 @@ app.include_router(wallee_webhook_router)
 
 # Mount a static files directory for CSS/JS/image assets if needed
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/photo", StaticFiles(directory="photo"), name="photo")
 
 
 class RegisterRedirectMiddleware(BaseHTTPMiddleware):
