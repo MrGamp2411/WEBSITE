@@ -10,6 +10,7 @@
 - Inline style on `.hero__image` keeps it from shifting text before CSS loads.
 - Hero image center shifted right via `object-position:60% center`.
 - Hero image offset 300px right via `transform:translateX(300px)`.
+- Hero image rotated 30deg counterclockwise via `rotate(-30deg)`.
 - Homepage hero no longer hides overflow, letting the image extend beyond the hero section.
 - Homepage hero only shows a Browse Bars button linking to `/search`; Search and How it works buttons and promo chips were removed.
 - Browse Bars button is centered in the hero section.
