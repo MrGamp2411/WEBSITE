@@ -8,6 +8,7 @@
 - `/photo` static path serves the homepage image.
 - Homepage hero displays this image behind text via an absolutely positioned `.hero__image` with pointer-events disabled.
 - Inline style on `.hero__image` keeps it from shifting text before CSS loads.
+- Hero image center shifted right via `object-position:60% center`.
 - Homepage hero no longer hides overflow, letting the image extend beyond the hero section.
 - Homepage hero only shows a Browse Bars button linking to `/search`; Search and How it works buttons and promo chips were removed.
 - Browse Bars button is centered in the hero section.
