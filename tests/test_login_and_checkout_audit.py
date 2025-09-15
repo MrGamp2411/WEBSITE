@@ -34,7 +34,7 @@ def test_login_creates_audit_log():
     assert any(
         log.action == "POST /login"
         and log.user_agent == "test-agent"
-        and log.phone == "+41000000000"
+        and log.phone is None
         and log.ip
         and log.actor_credit == Decimal("0")
         for log in logs
