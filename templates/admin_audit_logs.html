@@ -29,7 +29,7 @@
       <tbody>
       {% for entry in logs %}
         <tr>
-          <td>{{ entry.log.created_at }}</td>
+          <td>{{ entry.log.created_at|format_time }}</td>
           <td>{{ entry.user_name }}</td>
           <td>{{ entry.log.action }}</td>
           <td>{{ entry.log.entity_type }}</td>
