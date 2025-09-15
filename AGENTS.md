@@ -11,8 +11,9 @@
 - Hero art is centered and rotated via `transform:translateX(-50%) rotate(-30deg)`.
 - Hero art is positioned 500px to the right via `left:calc(50% + 500px)`.
 - The image extends 12rem beyond the hero (8rem on mobile) with no mask, clip, or fade.
-- Hero image is shifted an additional 500px downward and 500px right from the hero section.
-- Hero art displays at a fixed 1024x1024 size regardless of screen width.
+- Hero image is shifted an additional 200px downward and 500px right from the hero section.
+- Hero art displays at a fixed 819x819 size (20% smaller) regardless of screen width.
+- Hero art styles live in `static/css/components.css` under `.home-hero .hero-art`.
 - Homepage hero no longer hides overflow, letting the image extend beyond the hero section.
 - Homepage hero only shows a Browse Bars button linking to `/search`; Search and How it works buttons and promo chips were removed.
 - Browse Bars button is centered in the hero section.
