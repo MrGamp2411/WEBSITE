@@ -178,7 +178,7 @@
 - Super admins can open `/admin/users/view/{id}` rendered by `templates/admin_view_user.html` to review a user's profile, orders, and audit logs
 - The Orders table on this view displays each order's `public_order_code` or `#id` in the ID column to match order card formatting
 - Admin user view lists orders and audit logs in fixed-height scrollable tables so longer histories don't stretch the page
-- Admin user view also shows login activity with IP, user agent, phone, and date in a scrollable table
+- Admin user view also shows login activity with IP, user agent, phone, location, and date in a scrollable table
 - Login fetches the user's bar assignment from the database so the bar is available immediately after authentication
 - Login and Register pages show text prompts linking to each other: "Already registered? Log in" and "Not registered yet? Register"
 - Register form preserves entered username, email, phone number, and prefix when validation fails so users can correct errors without retyping.

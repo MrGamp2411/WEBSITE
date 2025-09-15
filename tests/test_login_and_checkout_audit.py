@@ -18,7 +18,12 @@ def test_login_creates_audit_log():
     with TestClient(app) as client:
         resp = client.post(
             "/login",
-            data={"email": "admin@example.com", "password": "ChangeMe!123"},
+            data={
+                "email": "admin@example.com",
+                "password": "ChangeMe!123",
+                "latitude": "12.34",
+                "longitude": "56.78",
+            },
             follow_redirects=False,
             headers={"User-Agent": "test-agent"},
         )
@@ -32,6 +37,12 @@ def test_login_creates_audit_log():
         and log.phone == "+41000000000"
         and log.ip
         and log.actor_credit == Decimal("0")
+        for log in logs
+    )
+    assert any(
+        log.action == "login"
+        and log.latitude == Decimal("12.34")
+        and log.longitude == Decimal("56.78")
         for log in logs
     )
     db.close()
