@@ -4608,6 +4608,7 @@ async def view_user(request: Request, user_id: int, db: Session = Depends(get_db
         db.query(Order)
         .filter(Order.customer_id == user.id)
         .order_by(Order.created_at.desc())
+        .limit(20)
         .all()
     )
     logs = (
@@ -4619,6 +4620,7 @@ async def view_user(request: Request, user_id: int, db: Session = Depends(get_db
             )
         )
         .order_by(AuditLog.created_at.desc())
+        .limit(20)
         .all()
     )
     return render_template(
