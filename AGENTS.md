@@ -11,6 +11,7 @@
 - Homepage hero no longer hides overflow, letting the image extend beyond the hero section.
 - Homepage hero only shows a Browse Bars button linking to `/search`; Search and How it works buttons and promo chips were removed.
 - Browse Bars button is centered in the hero section.
+- `.home-hero` extends the homepage artwork 12rem beyond the hero (8rem on mobile) with a masked fade.
 - Registration is a two-step flow. `/register` collects email and password and assigns a temporary `REGISTERING` role. Users are redirected to `/register/details` to supply username, phone prefix, and number, and cannot access other pages until this step completes.
 - Registering users hitting any other route are redirected back to `/register/details` by middleware until step two finishes.
 - Super admins can create users directly from the Admin Users page by entering only an email and password; this bypasses the normal registration flow and checks.
