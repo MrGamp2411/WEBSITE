@@ -108,7 +108,7 @@ body.dark-mode{
 .hero__cta{display:flex;gap:var(--space-2);margin-top:var(--space-3);justify-content:center;}
 .home-hero{position:relative;overflow:visible;z-index:0;}
 .home-hero .hero__content{position:relative;z-index:1;}
-.home-hero .hero__image{position:absolute;top:0;left:0;right:0;bottom:-12rem;width:100%;object-fit:cover;object-position:60% center;transform:translateX(300px);pointer-events:none;z-index:-1;-webkit-mask-image:linear-gradient(to bottom,#000 65%,transparent 100%);mask-image:linear-gradient(to bottom,#000 65%,transparent 100%);}
+.home-hero .hero__image{position:absolute;top:0;left:0;right:0;bottom:-12rem;width:100%;object-fit:cover;object-position:60% center;transform:translateX(300px) rotate(-30deg);pointer-events:none;z-index:-1;-webkit-mask-image:linear-gradient(to bottom,#000 65%,transparent 100%);mask-image:linear-gradient(to bottom,#000 65%,transparent 100%);}
 @media (max-width:768px){.home-hero .hero__image{bottom:-8rem;}}
 .btn--primary{background:linear-gradient(90deg,var(--sg-purple-700),var(--sg-purple-600));color:#fff;}
 .btn--primary:hover{background:linear-gradient(90deg,var(--sg-purple-600),var(--sg-purple-700));transform:none;}
