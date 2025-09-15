@@ -119,13 +119,13 @@ body.dark-mode{
   filter:none!important;
 }
 
-.home-hero{position:relative;overflow:visible!important;border-radius:0;z-index:0;}
+.home-hero{position:relative;overflow-y:visible;overflow-x:visible;border-radius:0;z-index:0;}
 .home-hero .hero__content{position:relative;z-index:2;}
 
 .home-hero .hero-art{
   position:absolute;
   left:50%;
-  bottom:-12rem;
+  bottom:var(--hero-overhang,-12rem);
   transform:translateX(-50%) rotate(-30deg);
   width:120%;
   max-width:none;
@@ -134,17 +134,21 @@ body.dark-mode{
   -webkit-user-drag:none;
   user-select:none;
   z-index:1;
-  -webkit-mask-image:none!important;
-          mask-image:none!important;
-  clip-path:none!important;
-  mix-blend-mode:normal!important;
-  filter:none!important;
+  -webkit-mask:none;
+          mask:none;
+  clip-path:none;
+  mix-blend-mode:normal;
+  filter:none;
 }
 
 @media (max-width:768px){.home-hero .hero-art{bottom:-8rem;width:130%;}}
 
 /* Common wrappers that sometimes clip */
-main,.page,.container,.section-hero{overflow:visible;}
+/* containers/wrappers */
+.page,main,.container,.section,.section-hero,.carousel,.cards-row{max-width:100%;overflow:visible;}
+/* carousels/sliders shouldn’t expand page width */
+.carousel,.carousel-viewport,.cards-row{overflow-x:hidden;}
+.homepage,.home-root{overflow-x:hidden;}
 .btn--primary{background:linear-gradient(90deg,var(--sg-purple-700),var(--sg-purple-600));color:#fff;}
 .btn--primary:hover{background:linear-gradient(90deg,var(--sg-purple-600),var(--sg-purple-700));transform:none;}
 
@@ -536,7 +540,7 @@ main,.page,.container,.section-hero{overflow:visible;}
     top: 0;
     left: 0;
     right: 0;
-    width: 100vw;
+    width: 100%;
     padding-top: max(12px, env(safe-area-inset-top));
     z-index: 1000;
   }
