@@ -64,7 +64,6 @@
           <th>IP</th>
           <th>User Agent</th>
           <th>Phone</th>
-          <th>Credit</th>
           <th>Date</th>
         </tr>
       </thead>
@@ -74,12 +73,11 @@
           <td>{{ l.ip or '-' }}</td>
           <td>{{ l.user_agent or '-' }}</td>
           <td>{{ l.phone or '-' }}</td>
-          <td>{% if l.actor_credit is not none %}CHF {{ "%.2f"|format(l.actor_credit) }}{% else %}-{% endif %}</td>
           <td>{{ l.created_at|format_time }}</td>
         </tr>
         {% endfor %}
         {% if logins|length == 0 %}
-        <tr><td colspan="5">No logins found.</td></tr>
+        <tr><td colspan="4">No logins found.</td></tr>
         {% endif %}
       </tbody>
     </table>
