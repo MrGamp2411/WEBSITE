@@ -126,7 +126,7 @@ body.dark-mode{
   position:absolute;
   left:calc(50% + 600px);
   bottom:calc(var(--hero-overhang,-12rem) - 100px);
-  transform:translateX(-50%) rotate(-30deg);
+  transform:translateX(-50%) rotate(20deg);
   width:819px;
   height:819px;
   max-width:none;
