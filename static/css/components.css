@@ -127,9 +127,9 @@ body.dark-mode{
   left:50%;
   bottom:calc(var(--hero-overhang,-12rem) - 500px);
   transform:translateX(-50%) rotate(-30deg);
-  width:120%;
+  width:1024px;
+  height:1024px;
   max-width:none;
-  height:auto;
   pointer-events:none;
   -webkit-user-drag:none;
   user-select:none;
@@ -141,7 +141,7 @@ body.dark-mode{
   filter:none;
 }
 
-@media (max-width:768px){.home-hero .hero-art{bottom:calc(-8rem - 500px);width:130%;}}
+@media (max-width:768px){.home-hero .hero-art{bottom:calc(-8rem - 500px);}}
 
 /* Common wrappers that sometimes clip */
 /* containers/wrappers */
