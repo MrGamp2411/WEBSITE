@@ -55,6 +55,36 @@
     </table>
   </div>
 
+  <h2>Login Activity</h2>
+  <p class="subtitle">Most recent first. Scroll to view older logins.</p>
+  <div class="table-card" style="max-height:300px; overflow-y:auto;">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>IP</th>
+          <th>User Agent</th>
+          <th>Phone</th>
+          <th>Credit</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in logins %}
+        <tr>
+          <td>{{ l.ip or '-' }}</td>
+          <td>{{ l.user_agent or '-' }}</td>
+          <td>{{ l.phone or '-' }}</td>
+          <td>{% if l.actor_credit is not none %}CHF {{ "%.2f"|format(l.actor_credit) }}{% else %}-{% endif %}</td>
+          <td>{{ l.created_at|format_time }}</td>
+        </tr>
+        {% endfor %}
+        {% if logins|length == 0 %}
+        <tr><td colspan="5">No logins found.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
   <h2>Audit Logs</h2>
   <p class="subtitle">Most recent first. Scroll to view older logs.</p>
   <div class="table-card" style="max-height:300px; overflow-y:auto;">

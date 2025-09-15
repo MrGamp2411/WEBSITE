@@ -4621,6 +4621,15 @@ async def view_user(request: Request, user_id: int, db: Session = Depends(get_db
         .order_by(AuditLog.created_at.desc())
         .all()
     )
+    logins = (
+        db.query(AuditLog)
+        .filter(
+            AuditLog.actor_user_id == user.id,
+            AuditLog.action == "login",
+        )
+        .order_by(AuditLog.created_at.desc())
+        .all()
+    )
     return render_template(
         "admin_view_user.html",
         request=request,
@@ -4628,6 +4637,7 @@ async def view_user(request: Request, user_id: int, db: Session = Depends(get_db
         user=user,
         orders=orders,
         logs=logs,
+        logins=logins,
         bars=bars,
     )
 
