@@ -33,7 +33,7 @@
   - `database.py` – database utilities
   - `audit.py` – records user actions to `AuditLog`
     - Login and cart checkout log `login` and `order_create` actions via `log_action`
-    - `AuditLogMiddleware` logs every non-CSS request with IP, user agent, and phone
+    - `AuditLogMiddleware` logs authenticated requests excluding `.css`, `.js`, `.png`, and `.ico` files with IP, user agent, and phone
     - Startup ensures `audit_logs` has `ip`, `user_agent`, and `phone` via `ensure_audit_log_columns()`
   - `finance.py` – VAT and payout calculations
   - `payouts.py` – schedule periodic payouts for bars

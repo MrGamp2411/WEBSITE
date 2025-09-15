@@ -468,18 +468,20 @@ class DisplayRedirectMiddleware(BaseHTTPMiddleware):
 
 class AuditLogMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        if request.url.path.endswith(".css"):
+        if request.url.path.endswith((".css", ".js", ".png", ".ico")):
             return await call_next(request)
         response = await call_next(request)
         session = request.session
         user = users.get(session.get("user_id")) if session else None
+        if not user or user.role == RoleEnum.REGISTERING:
+            return response
         ip = request.client.host if request.client else None
         user_agent = request.headers.get("user-agent")
         phone = user.phone_e164 if user else None
         with SessionLocal() as db:
             log_action(
                 db,
-                actor_user_id=user.id if user else None,
+                actor_user_id=user.id,
                 action=f"{request.method} {request.url.path}",
                 entity_type="request",
                 ip=ip,
