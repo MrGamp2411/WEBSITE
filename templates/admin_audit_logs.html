@@ -52,11 +52,12 @@
 (function(){
   const form = document.getElementById('auditFilters');
   if(!form) return;
-  let t;
   form.querySelectorAll('input[type="search"]').forEach(inp=>{
-    inp.addEventListener('input', ()=>{
-      clearTimeout(t);
-      t = setTimeout(()=>form.submit(), 300);
+    inp.addEventListener('keydown', e=>{
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        form.submit();
+      }
     });
   });
   form.querySelector('select')?.addEventListener('change', ()=>form.submit());
