@@ -137,7 +137,7 @@ def test_reorder_completed_order_populates_cart():
             stored = verify.get(UserCart, ids['user_id'])
             assert stored is not None
             assert stored.bar_id == ids['bar_id']
-            assert stored.table_id == ids['table_id']
+            assert stored.table_id is None
 
 
 def test_reorder_returns_error_when_item_missing():
