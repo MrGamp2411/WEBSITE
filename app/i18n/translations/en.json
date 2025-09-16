@@ -155,5 +155,109 @@
       "contact": "Send us a note at <a href=\"mailto:{email}\">{email}</a>. Include the bar name, order code, and a short description so we can assist quickly.",
       "hours": "We respond Monday through Friday, 9:00-18:00 CET."
     }
+  },
+  "for_bars": {
+    "title": "For Bars",
+    "intro": "SiplyGo helps venues deliver quicker service, increase order value, and give staff clearer visibility into what guests need next.",
+    "why": {
+      "title": "Why venues choose SiplyGo",
+      "items": {
+        "menus": "<strong>Digital menus that stay fresh</strong> – highlight specials, mark items out of stock, and share allergen details instantly.",
+        "fulfilment": "<strong>Faster fulfilment</strong> – bar dashboards show incoming orders, prep status, and ready times in one place.",
+        "payments": "<strong>Flexible payments</strong> – accept wallet credit, cards, or pay-at-bar while keeping transaction fees predictable.",
+        "insights": "<strong>Insights that matter</strong> – track nightly revenue, payouts, and repeat guests without spreadsheets."
+      }
+    },
+    "onboarding": {
+      "title": "How onboarding works",
+      "steps": {
+        "one": "We map your menu, categories, and pricing in a shared workspace.",
+        "two": "Staff receive a walkthrough covering live orders, notifications, and service best practices.",
+        "three": "Go live with marketing assets, QR codes, and support resources tailored to your bar."
+      }
+    },
+    "requirements": {
+      "title": "What you need",
+      "items": {
+        "device": "A tablet or laptop behind the bar to monitor orders.",
+        "wifi": "Reliable Wi-Fi for staff devices and optional guest QR scanning.",
+        "contact": "A point of contact to manage payouts and menu updates."
+      }
+    },
+    "demo": {
+      "title": "Schedule a demo",
+      "cta": "Email <a href=\"mailto:{email}\">{email}</a> or call {phone} to learn how SiplyGo can support your service model."
+    }
+  },
+  "terms": {
+    "title": "Terms of Use",
+    "meta": "Version {version} · Effective {effective} · Next review {next_review}",
+    "intro": "These terms explain how SiplyGo provides services to guests and bar partners. By creating an account or placing an order you agree to the rules below.",
+    "sections": {
+      "eligibility": {
+        "title": "1. Eligibility and accounts",
+        "items": {
+          "age": "You must be at least 18 years old and able to form a binding agreement.",
+          "credentials": "Keep your login credentials secure and notify us immediately if you suspect unauthorized access.",
+          "suspend": "We may suspend or close accounts that violate these terms or local regulations."
+        }
+      },
+      "ordering": {
+        "title": "2. Ordering and payments",
+        "items": {
+          "fulfilment": "Orders placed through SiplyGo are fulfilled directly by the bar you select.",
+          "pricing": "Displayed prices include any applicable taxes or service fees. The final receipt will be available in your wallet history.",
+          "refunds": "Refunds for cancellations or order issues are managed jointly by SiplyGo and the venue."
+        }
+      },
+      "use": {
+        "title": "3. Acceptable use",
+        "items": {
+          "responsible": "Use the platform responsibly and avoid activities that disrupt service, attempt fraud, or harm other guests and staff.",
+          "content": "Content you submit, such as order notes, must be respectful and accurate.",
+          "monitoring": "We monitor usage to keep the experience safe and may remove content or limit access when necessary."
+        }
+      }
+    },
+    "contact": {
+      "title": "4. Contact",
+      "body": "For questions about these terms or to report an issue, email <a href=\"mailto:{email}\">{email}</a> or call <a href=\"tel:{phone_tel}\">{phone}</a>.",
+      "update": "We update this page whenever policies change. Continued use of SiplyGo after updates means you accept the revised terms."
+    }
+  },
+  "wallet": {
+    "title": "Wallet",
+    "subtitle": "Manage your balance, top up instantly, and review your recent activity.",
+    "balance": {
+      "label": "Current balance",
+      "available": "Available"
+    },
+    "actions": {
+      "top_up": "Top Up"
+    },
+    "activity": {
+      "title": "Recent Activity"
+    },
+    "tx": {
+      "topup": "Top up",
+      "refund": "Refund",
+      "refund_with_order": "Refund · Order #{order_id}",
+      "order": "Order placed",
+      "order_with_bar": "Order placed · {bar}"
+    },
+    "empty": {
+      "title": "No transactions yet",
+      "body": "Your top ups and payments will appear here.",
+      "cta": "Make your first top up"
+    },
+    "status": {
+      "completed": "Completed",
+      "processing": "Processing",
+      "pending": "Pending",
+      "refunded": "Refunded",
+      "canceled": "Canceled",
+      "cancelled": "Cancelled",
+      "failed": "Failed"
+    }
   }
 }

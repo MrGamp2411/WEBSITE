@@ -1,43 +1,39 @@
 {% extends "layout.html" %}
 {% block content %}
 <article class="static-page">
-  <h1>Terms of Use</h1>
+  <h1>{{ _('terms.title', default='Terms of Use') }}</h1>
   <p class="terms-meta">
-    Version {{ TERMS_VERSION }} · Effective {{ TERMS_EFFECTIVE_DATE }} · Next review {{ TERMS_NEXT_REVIEW_DATE }}
+    {{ _('terms.meta', version=TERMS_VERSION, effective=TERMS_EFFECTIVE_DATE, next_review=TERMS_NEXT_REVIEW_DATE, default='Version {version} · Effective {effective} · Next review {next_review}') }}
   </p>
-  <p>These terms explain how SiplyGo provides services to guests and bar partners. By creating an account or placing an order you agree to the rules below.</p>
+  <p>{{ _('terms.intro', default='These terms explain how SiplyGo provides services to guests and bar partners. By creating an account or placing an order you agree to the rules below.') }}</p>
   <section>
-    <h2>1. Eligibility and accounts</h2>
+    <h2>{{ _('terms.sections.eligibility.title', default='1. Eligibility and accounts') }}</h2>
     <ul>
-      <li>You must be at least 18 years old and able to form a binding agreement.</li>
-      <li>Keep your login credentials secure and notify us immediately if you suspect unauthorized access.</li>
-      <li>We may suspend or close accounts that violate these terms or local regulations.</li>
+      <li>{{ _('terms.sections.eligibility.items.age', default='You must be at least 18 years old and able to form a binding agreement.') }}</li>
+      <li>{{ _('terms.sections.eligibility.items.credentials', default='Keep your login credentials secure and notify us immediately if you suspect unauthorized access.') }}</li>
+      <li>{{ _('terms.sections.eligibility.items.suspend', default='We may suspend or close accounts that violate these terms or local regulations.') }}</li>
     </ul>
   </section>
   <section>
-    <h2>2. Ordering and payments</h2>
+    <h2>{{ _('terms.sections.ordering.title', default='2. Ordering and payments') }}</h2>
     <ul>
-      <li>Orders placed through SiplyGo are fulfilled directly by the bar you select.</li>
-      <li>Displayed prices include any applicable taxes or service fees. The final receipt will be available in your wallet history.</li>
-      <li>Refunds for cancellations or order issues are managed jointly by SiplyGo and the venue.</li>
+      <li>{{ _('terms.sections.ordering.items.fulfilment', default='Orders placed through SiplyGo are fulfilled directly by the bar you select.') }}</li>
+      <li>{{ _('terms.sections.ordering.items.pricing', default='Displayed prices include any applicable taxes or service fees. The final receipt will be available in your wallet history.') }}</li>
+      <li>{{ _('terms.sections.ordering.items.refunds', default='Refunds for cancellations or order issues are managed jointly by SiplyGo and the venue.') }}</li>
     </ul>
   </section>
   <section>
-    <h2>3. Acceptable use</h2>
+    <h2>{{ _('terms.sections.use.title', default='3. Acceptable use') }}</h2>
     <ul>
-      <li>Use the platform responsibly and avoid activities that disrupt service, attempt fraud, or harm other guests and staff.</li>
-      <li>Content you submit, such as order notes, must be respectful and accurate.</li>
-      <li>We monitor usage to keep the experience safe and may remove content or limit access when necessary.</li>
+      <li>{{ _('terms.sections.use.items.responsible', default='Use the platform responsibly and avoid activities that disrupt service, attempt fraud, or harm other guests and staff.') }}</li>
+      <li>{{ _('terms.sections.use.items.content', default='Content you submit, such as order notes, must be respectful and accurate.') }}</li>
+      <li>{{ _('terms.sections.use.items.monitoring', default='We monitor usage to keep the experience safe and may remove content or limit access when necessary.') }}</li>
     </ul>
   </section>
   <section>
-    <h2>4. Contact</h2>
-    <p>
-      For questions about these terms or to report an issue, email
-      <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>
-      or call <a href="tel:{{ SUPPORT_NUMBER_TEL }}">{{ SUPPORT_NUMBER }}</a>.
-    </p>
-    <p>We update this page whenever policies change. Continued use of SiplyGo after updates means you accept the revised terms.</p>
+    <h2>{{ _('terms.contact.title', default='4. Contact') }}</h2>
+    <p>{{ _('terms.contact.body', email=SUPPORT_EMAIL, phone=SUPPORT_NUMBER, phone_tel=SUPPORT_NUMBER_TEL, default='For questions about these terms or to report an issue, email <a href="mailto:{email}">{email}</a> or call <a href="tel:{phone_tel}">{phone}</a>.')|safe }}</p>
+    <p>{{ _('terms.contact.update', default='We update this page whenever policies change. Continued use of SiplyGo after updates means you accept the revised terms.') }}</p>
   </section>
 </article>
 {% endblock %}
