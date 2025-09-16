@@ -1,30 +1,30 @@
 {% extends "layout.html" %}
 {% block content %}
 <article class="static-page">
-  <h1>Help Center</h1>
-  <p>Find answers to the most common questions about browsing bars, placing orders, and managing your account. These guides apply to both the web app and the mobile experience.</p>
+  <h1>{{ _('help_center.title', default='Help Center') }}</h1>
+  <p>{{ _('help_center.intro', default='Find answers to the most common questions about browsing bars, placing orders, and managing your account. These guides apply to both the web app and the mobile experience.') }}</p>
   <section>
-    <h2>Getting started</h2>
+    <h2>{{ _('help_center.getting_started.title', default='Getting started') }}</h2>
     <ol>
-      <li>Create an account or log in with your existing credentials.</li>
-      <li>Share your location or search for a city to find nearby venues.</li>
-      <li>Select a bar, pick your table, and add items to the cart.</li>
-      <li>Review your order, choose a payment method, and submit.</li>
+      <li>{{ _('help_center.getting_started.steps.one', default='Create an account or log in with your existing credentials.') }}</li>
+      <li>{{ _('help_center.getting_started.steps.two', default='Share your location or search for a city to find nearby venues.') }}</li>
+      <li>{{ _('help_center.getting_started.steps.three', default='Select a bar, pick your table, and add items to the cart.') }}</li>
+      <li>{{ _('help_center.getting_started.steps.four', default='Review your order, choose a payment method, and submit.') }}</li>
     </ol>
-    <p>After placing an order you can track the live status from the Orders page or receive updates via notifications.</p>
+    <p>{{ _('help_center.getting_started.after', default='After placing an order you can track the live status from the Orders page or receive updates via notifications.') }}</p>
   </section>
   <section>
-    <h2>Managing your account</h2>
+    <h2>{{ _('help_center.account.title', default='Managing your account') }}</h2>
     <ul>
-      <li>Update profile details, phone number, and password from the <a href="/profile">Profile</a> page.</li>
-      <li>Top up credits, review transactions, and download receipts in the <a href="/wallet">Wallet</a>.</li>
-      <li>Check unread messages from bar staff or administrators in <a href="/notifications">Notifications</a>.</li>
+      <li>{{ _('help_center.account.profile', default='Update profile details, phone number, and password from the <a href="/profile">Profile</a> page.')|safe }}</li>
+      <li>{{ _('help_center.account.wallet', default='Top up credits, review transactions, and download receipts in the <a href="/wallet">Wallet</a>.')|safe }}</li>
+      <li>{{ _('help_center.account.notifications', default='Check unread messages from bar staff or administrators in <a href="/notifications">Notifications</a>.')|safe }}</li>
     </ul>
   </section>
   <section>
-    <h2>Need more help?</h2>
-    <p>Send us a note at <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>. Include the bar name, order code, and a short description so we can assist quickly.</p>
-    <p>We respond Monday through Friday, 9:00-18:00 CET.</p>
+    <h2>{{ _('help_center.support.title', default='Need more help?') }}</h2>
+    <p>{{ _('help_center.support.contact', email=SUPPORT_EMAIL, default='Send us a note at <a href="mailto:{email}">{email}</a>. Include the bar name, order code, and a short description so we can assist quickly.')|safe }}</p>
+    <p>{{ _('help_center.support.hours', default='We respond Monday through Friday, 9:00-18:00 CET.') }}</p>
   </section>
 </article>
 {% endblock %}
