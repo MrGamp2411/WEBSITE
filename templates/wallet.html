@@ -2,24 +2,24 @@
 {% block content %}
 <section class="wallet-page">
   <div class="wallet-head">
-    <h1 class="wallet-title">Wallet</h1>
-    <p class="wallet-subtitle">Manage your balance, top up instantly, and review your recent activity.</p>
+    <h1 class="wallet-title">{{ _('wallet.title', default='Wallet') }}</h1>
+    <p class="wallet-subtitle">{{ _('wallet.subtitle', default='Manage your balance, top up instantly, and review your recent activity.') }}</p>
   </div>
 
   <div class="balance-card card">
     <div class="balance-left">
-      <span class="label">Current balance</span>
+      <span class="label">{{ _('wallet.balance.label', default='Current balance') }}</span>
       <div class="amount">CHF {{ "%.2f"|format(user.credit) }}</div>
-      <div class="meta"><span class="badge success">Available</span></div>
+      <div class="meta"><span class="badge success">{{ _('wallet.balance.available', default='Available') }}</span></div>
     </div>
   <div class="balance-right wallet-actions">
-      <a href="/topup" class="btn-primary">Top Up</a>
+      <a href="/topup" class="btn-primary">{{ _('wallet.actions.top_up', default='Top Up') }}</a>
   </div>
   </div>
 
   <div class="card tx-feed">
     <div class="tx-head">
-      <h2 class="section-title">Recent Activity</h2>
+      <h2 class="section-title">{{ _('wallet.activity.title', default='Recent Activity') }}</h2>
     </div>
 
     {% if transactions %}
@@ -32,11 +32,19 @@
             <div class="tx-main">
               <div class="tx-title">
                 {% if ttype == 'topup' %}
-                  Top up
+                  {{ _('wallet.tx.topup', default='Top up') }}
                 {% elif ttype == 'refund' %}
-                  Refund{% if tx.order_id is defined %} · Order #{{ tx.order_id }}{% endif %}
+                  {% if tx.order_id is defined %}
+                    {{ _('wallet.tx.refund_with_order', order_id=tx.order_id, default='Refund · Order #{order_id}') }}
+                  {% else %}
+                    {{ _('wallet.tx.refund', default='Refund') }}
+                  {% endif %}
                 {% else %}
-                  Order placed{% if tx.bar_name is defined %} · {{ tx.bar_name }}{% endif %}
+                  {% if tx.bar_name is defined %}
+                    {{ _('wallet.tx.order_with_bar', bar=tx.bar_name, default='Order placed · {bar}') }}
+                  {% else %}
+                    {{ _('wallet.tx.order', default='Order placed') }}
+                  {% endif %}
                 {% endif %}
               </div>
               <div class="tx-sub">
@@ -55,7 +63,7 @@
                 {% if ttype == 'payment' %}-{% else %}+{% endif %} CHF {{ "%.2f"|format(tx.total) }}
               </div>
               {% set status = tx.status if tx.status is defined else 'COMPLETED' %}
-              <span class="pill {% if status|lower in ['processing','pending'] %}pending{% elif status|lower == 'refunded' %}refunded{% elif status|lower in ['canceled','cancelled','failed'] %}canceled{% else %}success{% endif %}">{{ status|replace('_',' ')|title }}</span>
+              <span class="pill {% if status|lower in ['processing','pending'] %}pending{% elif status|lower == 'refunded' %}refunded{% elif status|lower in ['canceled','cancelled','failed'] %}canceled{% else %}success{% endif %}">{{ _('wallet.status.' ~ status|lower, default=status.replace('_',' ')|title) }}</span>
             </div>
           </div>
         </li>
@@ -64,9 +72,9 @@
     </div>
     {% else %}
     <div class="empty" aria-live="polite">
-      <h3>No transactions yet</h3>
-      <p>Your top ups and payments will appear here.</p>
-      <a class="btn-primary" href="/topup">Make your first top up</a>
+      <h3>{{ _('wallet.empty.title', default='No transactions yet') }}</h3>
+      <p>{{ _('wallet.empty.body', default='Your top ups and payments will appear here.') }}</p>
+      <a class="btn-primary" href="/topup">{{ _('wallet.empty.cta', default='Make your first top up') }}</a>
     </div>
     {% endif %}
 

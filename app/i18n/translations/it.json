@@ -155,5 +155,109 @@
       "contact": "Scrivici a <a href=\"mailto:{email}\">{email}</a>. Indica il nome del bar, il codice dell'ordine e una breve descrizione per aiutarci a rispondere rapidamente.",
       "hours": "Rispondiamo dal lunedì al venerdì, 9:00-18:00 CET."
     }
+  },
+  "for_bars": {
+    "title": "Per i bar",
+    "intro": "SiplyGo aiuta i locali a offrire un servizio più rapido, aumentare il valore degli ordini e fornire allo staff una visibilità più chiara su ciò di cui gli ospiti hanno bisogno.",
+    "why": {
+      "title": "Perché i locali scelgono SiplyGo",
+      "items": {
+        "menus": "<strong>Menu digitali sempre aggiornati</strong> – metti in evidenza le specialità, segnala gli articoli non disponibili e condividi subito le informazioni sugli allergeni.",
+        "fulfilment": "<strong>Evasione più rapida</strong> – le dashboard del bar mostrano ordini in arrivo, stato di preparazione e tempi di consegna in un unico posto.",
+        "payments": "<strong>Pagamenti flessibili</strong> – accetta credito del portafoglio, carte o pagamento al bancone mantenendo commissioni prevedibili.",
+        "insights": "<strong>Analisi utili</strong> – monitora incassi serali, pagamenti e clienti abituali senza fogli di calcolo."
+      }
+    },
+    "onboarding": {
+      "title": "Come funziona l'onboarding",
+      "steps": {
+        "one": "Mappiamo il tuo menù, le categorie e i prezzi in uno spazio di lavoro condiviso.",
+        "two": "Il personale riceve una sessione guidata su ordini live, notifiche e buone pratiche di servizio.",
+        "three": "Vai online con materiali marketing, codici QR e risorse di supporto su misura per il tuo locale."
+      }
+    },
+    "requirements": {
+      "title": "Cosa ti serve",
+      "items": {
+        "device": "Un tablet o laptop al bancone per monitorare gli ordini.",
+        "wifi": "Una connessione Wi-Fi affidabile per i dispositivi dello staff e per la scansione facoltativa dei QR dei clienti.",
+        "contact": "Un referente che gestisca pagamenti e aggiornamenti del menù."
+      }
+    },
+    "demo": {
+      "title": "Prenota una demo",
+      "cta": "Scrivici a <a href=\"mailto:{email}\">{email}</a> o chiama {phone} per scoprire come SiplyGo può supportare il tuo modello di servizio."
+    }
+  },
+  "terms": {
+    "title": "Termini d'uso",
+    "meta": "Versione {version} · In vigore dal {effective} · Prossima revisione {next_review}",
+    "intro": "Questi termini spiegano come SiplyGo offre i servizi a ospiti e partner. Creando un account o effettuando un ordine accetti le regole riportate di seguito.",
+    "sections": {
+      "eligibility": {
+        "title": "1. Requisiti e account",
+        "items": {
+          "age": "Devi avere almeno 18 anni e la capacità di stipulare un accordo vincolante.",
+          "credentials": "Mantieni le credenziali di accesso al sicuro e avvisaci subito se sospetti accessi non autorizzati.",
+          "suspend": "Possiamo sospendere o chiudere gli account che violano questi termini o le normative locali."
+        }
+      },
+      "ordering": {
+        "title": "2. Ordini e pagamenti",
+        "items": {
+          "fulfilment": "Gli ordini effettuati tramite SiplyGo sono evasi direttamente dal bar che scegli.",
+          "pricing": "I prezzi mostrati includono tasse o eventuali commissioni di servizio applicabili. La ricevuta finale sarà disponibile nello storico del tuo portafoglio.",
+          "refunds": "I rimborsi per cancellazioni o problemi con l'ordine sono gestiti congiuntamente da SiplyGo e dal locale."
+        }
+      },
+      "use": {
+        "title": "3. Uso consentito",
+        "items": {
+          "responsible": "Usa la piattaforma in modo responsabile ed evita attività che interrompono il servizio, tentano frodi o danneggiano ospiti e staff.",
+          "content": "I contenuti che invii, come le note agli ordini, devono essere rispettosi e accurati.",
+          "monitoring": "Monitoriamo l'utilizzo per mantenere l'esperienza sicura e possiamo rimuovere contenuti o limitare l'accesso quando necessario."
+        }
+      }
+    },
+    "contact": {
+      "title": "4. Contatti",
+      "body": "Per domande su questi termini o per segnalare un problema, scrivici a <a href=\"mailto:{email}\">{email}</a> o chiama <a href=\"tel:{phone_tel}\">{phone}</a>.",
+      "update": "Aggiorniamo questa pagina ogni volta che le policy cambiano. Continuando a utilizzare SiplyGo dopo gli aggiornamenti accetti i termini rivisti."
+    }
+  },
+  "wallet": {
+    "title": "Portafoglio",
+    "subtitle": "Gestisci il tuo saldo, ricarica all'istante e rivedi le attività recenti.",
+    "balance": {
+      "label": "Saldo attuale",
+      "available": "Disponibile"
+    },
+    "actions": {
+      "top_up": "Ricarica"
+    },
+    "activity": {
+      "title": "Attività recenti"
+    },
+    "tx": {
+      "topup": "Ricarica",
+      "refund": "Rimborso",
+      "refund_with_order": "Rimborso · Ordine n. {order_id}",
+      "order": "Ordine effettuato",
+      "order_with_bar": "Ordine effettuato · {bar}"
+    },
+    "empty": {
+      "title": "Nessuna transazione",
+      "body": "Le tue ricariche e i tuoi pagamenti appariranno qui.",
+      "cta": "Effettua la tua prima ricarica"
+    },
+    "status": {
+      "completed": "Completato",
+      "processing": "In elaborazione",
+      "pending": "In attesa",
+      "refunded": "Rimborsato",
+      "canceled": "Annullato",
+      "cancelled": "Annullato",
+      "failed": "Non riuscito"
+    }
   }
 }

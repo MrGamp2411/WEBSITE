@@ -370,3 +370,4 @@
   `Accept-Language` header before falling back to English.
 - About page strings live under the `about` namespace in `app/i18n/translations/*.json`; `templates/about.html` pulls from these keys.
 - Help Center page strings live under the `help_center` namespace in `app/i18n/translations/*.json`; `templates/help_center.html` pulls from these keys.
+- "For Bars", "Terms", and "Wallet" pages localize through `for_bars`, `terms`, and `wallet` namespaces inside `app/i18n/translations/*.json`.
