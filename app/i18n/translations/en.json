@@ -130,5 +130,30 @@
       "title": "Stay in touch",
       "body": "Questions about the roadmap or partnerships? Reach out at <a href=\"mailto:{email}\">{email}</a> and we will be happy to connect."
     }
+  },
+  "help_center": {
+    "title": "Help Center",
+    "intro": "Find answers to the most common questions about browsing bars, placing orders, and managing your account. These guides apply to both the web app and the mobile experience.",
+    "getting_started": {
+      "title": "Getting started",
+      "steps": {
+        "one": "Create an account or log in with your existing credentials.",
+        "two": "Share your location or search for a city to find nearby venues.",
+        "three": "Select a bar, pick your table, and add items to the cart.",
+        "four": "Review your order, choose a payment method, and submit."
+      },
+      "after": "After placing an order you can track the live status from the Orders page or receive updates via notifications."
+    },
+    "account": {
+      "title": "Managing your account",
+      "profile": "Update profile details, phone number, and password from the <a href=\"/profile\">Profile</a> page.",
+      "wallet": "Top up credits, review transactions, and download receipts in the <a href=\"/wallet\">Wallet</a>.",
+      "notifications": "Check unread messages from bar staff or administrators in <a href=\"/notifications\">Notifications</a>."
+    },
+    "support": {
+      "title": "Need more help?",
+      "contact": "Send us a note at <a href=\"mailto:{email}\">{email}</a>. Include the bar name, order code, and a short description so we can assist quickly.",
+      "hours": "We respond Monday through Friday, 9:00-18:00 CET."
+    }
   }
 }

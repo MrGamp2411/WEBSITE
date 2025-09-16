@@ -130,5 +130,30 @@
       "title": "Rimaniamo in contatto",
       "body": "Domande sulla roadmap o sulle partnership? Scrivici a <a href=\"mailto:{email}\">{email}</a> e saremo felici di metterci in contatto."
     }
+  },
+  "help_center": {
+    "title": "Centro assistenza",
+    "intro": "Trova le risposte alle domande più frequenti su come esplorare i bar, effettuare ordini e gestire il tuo account. Queste guide valgono sia per l'app web che per l'esperienza mobile.",
+    "getting_started": {
+      "title": "Per iniziare",
+      "steps": {
+        "one": "Crea un account o accedi con le tue credenziali esistenti.",
+        "two": "Condividi la tua posizione o cerca una città per trovare i locali vicini.",
+        "three": "Seleziona un bar, scegli il tavolo e aggiungi articoli al carrello.",
+        "four": "Controlla l'ordine, scegli il metodo di pagamento e invia."
+      },
+      "after": "Dopo aver inoltrato un ordine puoi seguire lo stato in tempo reale dalla pagina Ordini o ricevere aggiornamenti tramite notifiche."
+    },
+    "account": {
+      "title": "Gestione del tuo account",
+      "profile": "Aggiorna i dati del profilo, il numero di telefono e la password dalla pagina <a href=\"/profile\">Profilo</a>.",
+      "wallet": "Ricarica i crediti, consulta le transazioni e scarica le ricevute nel <a href=\"/wallet\">Portafoglio</a>.",
+      "notifications": "Controlla i messaggi non letti dello staff o degli amministratori in <a href=\"/notifications\">Notifiche</a>."
+    },
+    "support": {
+      "title": "Serve altro supporto?",
+      "contact": "Scrivici a <a href=\"mailto:{email}\">{email}</a>. Indica il nome del bar, il codice dell'ordine e una breve descrizione per aiutarci a rispondere rapidamente.",
+      "hours": "Rispondiamo dal lunedì al venerdì, 9:00-18:00 CET."
+    }
   }
 }
