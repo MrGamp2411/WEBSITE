@@ -1,24 +1,24 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="auth-card">
-  <h1>Login</h1>
+  <h1>{{ _('login.title', default='Login') }}</h1>
   {% if error %}<p class="alert">{{ error }}</p>{% endif %}
   <form method="post" action="/login">
-    <label for="email">Email
+    <label for="email">{{ _('login.fields.email.label', default='Email') }}
       <input id="email" type="email" name="email" required autocomplete="email" inputmode="email" enterkeyhint="next">
     </label>
-    <label for="password">Password
+    <label for="password">{{ _('login.fields.password.label', default='Password') }}
       <div class="password-wrapper">
         <input id="password" type="password" name="password" required autocomplete="current-password" enterkeyhint="done" maxlength="128">
-        <button type="button" class="toggle-password" aria-label="Show password"><i class="bi bi-eye"></i></button>
+        <button type="button" class="toggle-password" aria-label="{{ _('auth.password_toggle.show', default='Show password') }}" data-show-label="{{ _('auth.password_toggle.show', default='Show password') }}" data-hide-label="{{ _('auth.password_toggle.hide', default='Hide password') }}"><i class="bi bi-eye"></i></button>
       </div>
-      <span id="capsWarning" class="caps-warning" hidden>Caps Lock is on</span>
+      <span id="capsWarning" class="caps-warning" hidden>{{ _('auth.caps_warning', default='Caps Lock is on') }}</span>
     </label>
     <input type="hidden" name="latitude" id="latitude">
     <input type="hidden" name="longitude" id="longitude">
-    <button class="btn btn--primary" type="submit">Login</button>
+    <button class="btn btn--primary" type="submit">{{ _('login.actions.submit', default='Login') }}</button>
   </form>
-  <p style="align-self:center">Not registered yet? <a href="/register">Register</a></p>
+  <p style="align-self:center">{{ _('login.actions.register_prompt', default="Not registered yet? <a href=\"/register\">Register</a>")|safe }}</p>
 </div>
 {% endblock %}
 

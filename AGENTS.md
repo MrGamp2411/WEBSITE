@@ -371,3 +371,8 @@
 - About page strings live under the `about` namespace in `app/i18n/translations/*.json`; `templates/about.html` pulls from these keys.
 - Help Center page strings live under the `help_center` namespace in `app/i18n/translations/*.json`; `templates/help_center.html` pulls from these keys.
 - "For Bars", "Terms", and "Wallet" pages localize through `for_bars`, `terms`, and `wallet` namespaces inside `app/i18n/translations/*.json`.
+
+- Login page strings live under the `login` namespace in `app/i18n/translations/*.json`; `templates/login.html` pulls from these keys.
+- Registration step one page strings live under the `register_step1` namespace in `app/i18n/translations/*.json`; `templates/register_step1.html` pulls from these keys.
+- Registration details page strings live under the `register` namespace in `app/i18n/translations/*.json`; `templates/register.html` pulls from these keys.
+- Shared authentication UI strings (password toggles, caps lock warning) live under the `auth` namespace in `app/i18n/translations/*.json`.
