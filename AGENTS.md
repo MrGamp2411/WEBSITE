@@ -12,7 +12,7 @@
 - Hero art is positioned 450px to the left via `left:calc(50% - 450px)`.
 - The image extends 12rem beyond the hero (8rem on mobile) with no mask, clip, or fade.
 - Hero image is shifted an additional 150px downward and 450px left from the hero section.
-- Mobile layout lowers the hero art an extra 50px so the mobile offset is `bottom:calc(-8rem - 150px)`.
+- Mobile layout lowers the hero art an extra 100px so the mobile offset is `bottom:calc(-8rem - 200px)`.
 - Hero art displays at a fixed 819x819 size (20% smaller) regardless of screen width.
 - Hero art uses `z-index:-1` to sit behind cards.
 - Bar and info sections use `position:relative;z-index:1` so the hero image remains behind "Nearby Open Bars" and later content.
