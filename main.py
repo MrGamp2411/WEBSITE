@@ -119,6 +119,13 @@ from app.webhooks.wallee import router as wallee_webhook_router
 from wallee.models import LineItemCreate, TransactionCreate
 from wallee.rest import ApiException
 from app.phone import normalize_phone_or_raise
+from app.i18n import (
+    DEFAULT_LANGUAGE,
+    available_languages,
+    create_translator,
+    load_translations,
+    translator_for_request,
+)
 from app.utils.disposable_email import ensure_not_disposable, get_disposable_stats
 
 # Predefined categories for bars (used for filtering and admin forms)
@@ -956,6 +963,7 @@ def ensure_welcome_message_table() -> None:
 @app.on_event("startup")
 async def on_startup():
     """Initialise database tables on startup."""
+    load_translations()
     Base.metadata.create_all(bind=engine)
     ensure_role_enum()
     ensure_prefix_column()
@@ -1541,6 +1549,17 @@ def render_template(template_name: str, **context) -> HTMLResponse:
     api_key = os.getenv("GOOGLE_MAPS_API_KEY")
     if api_key:
         context.setdefault("GOOGLE_MAPS_API_KEY", api_key)
+
+    language_code = DEFAULT_LANGUAGE
+    translator = create_translator(DEFAULT_LANGUAGE)
+    if request is not None:
+        translator = translator_for_request(request)
+        language_code = getattr(request.state, "language_code", DEFAULT_LANGUAGE)
+
+    context.setdefault("language_code", language_code)
+    context.setdefault("available_languages", available_languages())
+    context.setdefault("_", translator)
+    context.setdefault("translate", translator)
 
     template = templates_env.get_template(template_name)
     return HTMLResponse(template.render(**context), status_code=status_code)

@@ -351,3 +351,18 @@
 - Mobile menu shows a red notification badge when the user has unread messages.
 - Notifications older than 30 days are purged automatically by `purge_old_notifications_worker`.
 - New users automatically receive the welcome message after completing registration.
+
+## Internationalization
+
+- Translation utilities live in `app/i18n/__init__.py`. Use `translator_for_request(request)` inside FastAPI endpoints to
+  access the request-aware translator or `create_translator("<code>")` for background tasks.
+- Language resources are stored as JSON files in `app/i18n/translations/`. Each language file currently contains metadata only;
+  add new keys under descriptive namespaces (e.g. `"home": {"hero_title": "..."}`) when localising copy.
+- `render_template` injects four helpers into every template context:
+  - `language_code` – currently active language code
+  - `available_languages` – list of `{code, name}` dictionaries for every supported locale (`en`, `it`, `fr`, `de`)
+  - `_` and `translate` – both reference the same translator callable supporting
+    `_("key.path", default="Fallback", name="Alice")` syntax with optional `str.format` keywords
+- Passing `?lang=<code>` in the query string updates the user's preferred language and persists it in the session for
+  subsequent requests. Absent an explicit choice, the resolver checks the stored session value followed by the
+  `Accept-Language` header before falling back to English.
