@@ -369,3 +369,4 @@
   subsequent requests. Absent an explicit choice, the resolver checks the stored session value followed by the
   `Accept-Language` header before falling back to English.
 - About page strings live under the `about` namespace in `app/i18n/translations/*.json`; `templates/about.html` pulls from these keys.
+- Help Center page strings live under the `help_center` namespace in `app/i18n/translations/*.json`; `templates/help_center.html` pulls from these keys.
