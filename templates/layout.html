@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ language_code }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -8,11 +8,11 @@
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>SiplyGo Prototype</title>
-  <meta name="description" content="SiplyGo helps you discover bars nearby and manage your orders effortlessly.">
+  <title>{{ _('layout.meta.title', default='SiplyGo Prototype') }}</title>
+  <meta name="description" content="{{ _('layout.meta.description', default='SiplyGo helps you discover bars nearby and manage your orders effortlessly.') }}">
   <link rel="canonical" href="https://siplygo.example.com/">
-  <meta property="og:title" content="SiplyGo Prototype">
-  <meta property="og:description" content="Discover bars nearby and manage orders with SiplyGo.">
+  <meta property="og:title" content="{{ _('layout.meta.title', default='SiplyGo Prototype') }}">
+  <meta property="og:description" content="{{ _('layout.meta.og_description', default='Discover bars nearby and manage orders with SiplyGo.') }}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://siplygo.example.com/">
   <meta property="og:image" content="/static/favicon.png">
@@ -33,12 +33,12 @@
     {% if user and user.is_display %}
     <div class="display-header">
       <span class="hdr-logo">SiplyGo</span>
-      <a href="/logout">Logout</a>
+      <a href="/logout">{{ _('common.logout', default='Logout') }}</a>
     </div>
     {% else %}
     <div class="mobile-header">
       <!-- Premium hamburger trigger -->
-      <button class="nav-toggle js-open-menu" aria-label="Menu" aria-controls="mobileMenu" aria-expanded="false">
+      <button class="nav-toggle js-open-menu" aria-label="{{ _('layout.header.menu_button_aria', default='Menu') }}" aria-controls="mobileMenu" aria-expanded="false">
         <i class="bi bi-list" aria-hidden="true"></i>
         {% if unread_notifications %}
         <span class="notif-badge" aria-live="polite">{{ unread_notifications }}</span>
@@ -47,18 +47,19 @@
       <a class="hdr-logo" href="/">SiplyGo</a>
       <div class="hdr-actions">
         {% if user and not user.is_display %}
-        <a class="credit-pill" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
+        <a class="credit-pill" href="/wallet" aria-label="{{ _('common.credits', default='Credits') }}">CHF {{ "%.2f"|format(user.credit) }}</a>
         {% endif %}
         {% if not user or not user.is_display %}
-        <a class="cart-icon" href="/cart" aria-label="Cart">
+        {% set cart_count_display = cart_count if cart_count else 0 %}
+        <a class="cart-icon" href="/cart" aria-label="{{ _('layout.header.cart_aria', count=cart_count_display, default='Cart ({count} items)') }}">
           <i class="bi bi-cart2" aria-hidden="true"></i>
-          <span class="cart-badge" aria-live="polite">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
+          <span class="cart-badge" aria-live="polite">{{ cart_count_display }}</span>
         </a>
         {% endif %}
       </div>
     </div>
     <nav aria-label="Primary" class="navbar desktop-nav">
-      <button class="nav-toggle js-open-menu" aria-label="Menu" aria-controls="mobileMenu" aria-expanded="false">
+      <button class="nav-toggle js-open-menu" aria-label="{{ _('layout.header.menu_button_aria', default='Menu') }}" aria-controls="mobileMenu" aria-expanded="false">
         <i class="bi bi-list" aria-hidden="true"></i>
         {% if unread_notifications %}
         <span class="notif-badge" aria-live="polite">{{ unread_notifications }}</span>
@@ -67,31 +68,32 @@
       <a class="hdr-logo" href="/">SiplyGo</a>
       <div class="hdr-actions">
         {% if user and not user.is_display %}
-        <a class="credit-pill desktop-credit" href="/wallet" aria-label="Credits">CHF {{ "%.2f"|format(user.credit) }}</a>
+        <a class="credit-pill desktop-credit" href="/wallet" aria-label="{{ _('common.credits', default='Credits') }}">CHF {{ "%.2f"|format(user.credit) }}</a>
         {% endif %}
         {% if not user or not user.is_display %}
-        <a class="cart-icon" href="/cart" aria-label="Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %} items)">
+        {% set cart_count_display = cart_count if cart_count else 0 %}
+        <a class="cart-icon" href="/cart" aria-label="{{ _('layout.header.cart_aria', count=cart_count_display, default='Cart ({count} items)') }}">
           <i class="bi bi-cart2" aria-hidden="true"></i>
-          <span class="cart-badge" aria-live="polite">{% if cart_count %}{{ cart_count }}{% else %}0{% endif %}</span>
+          <span class="cart-badge" aria-live="polite">{{ cart_count_display }}</span>
         </a>
         {% endif %}
       </div>
     </nav>
     <nav id="mobileMenu" class="mobile-menu" aria-label="Menu" role="dialog" aria-modal="true" hidden>
-      <button class="menu-close js-close-menu" aria-label="Close menu"><i class="bi bi-x" aria-hidden="true"></i></button>
-      <a href="/search" role="menuitem"><i class="bi bi-geo-alt" aria-hidden="true"></i><span>Browse Bars</span></a>
+      <button class="menu-close js-close-menu" aria-label="{{ _('layout.header.close_menu_aria', default='Close menu') }}"><i class="bi bi-x" aria-hidden="true"></i></button>
+      <a href="/search" role="menuitem"><i class="bi bi-geo-alt" aria-hidden="true"></i><span>{{ _('common.browse_bars', default='Browse Bars') }}</span></a>
       {% if user and (user.is_super_admin or user.is_bar_admin or user.is_bartender) %}
-      <a href="/dashboard" role="menuitem"><i class="bi bi-speedometer2" aria-hidden="true"></i><span>Dashboard</span></a>
+      <a href="/dashboard" role="menuitem"><i class="bi bi-speedometer2" aria-hidden="true"></i><span>{{ _('common.dashboard', default='Dashboard') }}</span></a>
       {% endif %}
       {% if user %}
-      <a href="/wallet" role="menuitem"><i class="bi bi-wallet2" aria-hidden="true"></i><span>Wallet</span></a>
-      <a href="/orders" role="menuitem"><i class="bi bi-clock-history" aria-hidden="true"></i><span>Orders</span></a>
-      <a href="/notifications" role="menuitem"><i class="bi bi-bell" aria-hidden="true"></i><span>Notifications</span>{% if unread_notifications %}<span class="notif-badge" aria-live="polite">{{ unread_notifications }}</span>{% endif %}</a>
-      <a href="/profile" role="menuitem"><i class="bi bi-person" aria-hidden="true"></i><span>Profile</span></a>
-      <a href="/logout" role="menuitem"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Logout</span></a>
+      <a href="/wallet" role="menuitem"><i class="bi bi-wallet2" aria-hidden="true"></i><span>{{ _('common.wallet', default='Wallet') }}</span></a>
+      <a href="/orders" role="menuitem"><i class="bi bi-clock-history" aria-hidden="true"></i><span>{{ _('common.orders', default='Orders') }}</span></a>
+      <a href="/notifications" role="menuitem"><i class="bi bi-bell" aria-hidden="true"></i><span>{{ _('common.notifications', default='Notifications') }}</span>{% if unread_notifications %}<span class="notif-badge" aria-live="polite">{{ unread_notifications }}</span>{% endif %}</a>
+      <a href="/profile" role="menuitem"><i class="bi bi-person" aria-hidden="true"></i><span>{{ _('common.profile', default='Profile') }}</span></a>
+      <a href="/logout" role="menuitem"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>{{ _('common.logout', default='Logout') }}</span></a>
       {% else %}
-      <a href="/login" role="menuitem" class="menu-login"><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>Login</span></a>
-      <a href="/register" role="menuitem" class="menu-register"><i class="bi bi-person-plus" aria-hidden="true"></i><span>Register</span></a>
+      <a href="/login" role="menuitem" class="menu-login"><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>{{ _('common.login', default='Login') }}</span></a>
+      <a href="/register" role="menuitem" class="menu-register"><i class="bi bi-person-plus" aria-hidden="true"></i><span>{{ _('common.register', default='Register') }}</span></a>
       {% endif %}
     </nav>
     <div class="menu-backdrop" hidden></div>
@@ -99,19 +101,19 @@
   </header>
     {% if not user or not user.is_display %}
     <div class="hdr-sub">
-      <button class="location-pill location-selector js-open-location" aria-label="Change location"><span id="locationDisplay">📍 Detecting location...</span></button>
-      <a class="btn-icon" href="/search" aria-label="Search"><i class="bi bi-search"></i></a>
+      <button class="location-pill location-selector js-open-location" aria-label="{{ _('layout.location.change', default='Change location') }}"><span id="locationDisplay">📍 {{ _('layout.location.detecting', default='Detecting location...') }}</span></button>
+      <a class="btn-icon" href="/search" aria-label="{{ _('layout.search.button_aria', default='Search') }}"><i class="bi bi-search"></i></a>
     </div>
-    <input type="search" id="locationInput" class="visually-hidden" value="Detecting location..." placeholder="Enter city or ZIP" aria-label="Current location" list="citySuggestionsMobile" autocomplete="postal-code">
+    <input type="search" id="locationInput" class="visually-hidden" value="{{ _('layout.location.detecting', default='Detecting location...') }}" placeholder="{{ _('layout.location.input_placeholder', default='Enter city or ZIP') }}" aria-label="{{ _('layout.location.input_label', default='Current location') }}" list="citySuggestionsMobile" autocomplete="postal-code">
     <datalist id="citySuggestionsMobile">
       <option value="Lugano"></option>
       <option value="Locarno"></option>
       <option value="Zurich"></option>
     </datalist>
     <div class="search-overlay" hidden>
-      <button class="overlay-close" aria-label="Close">×</button>
+      <button class="overlay-close" aria-label="{{ _('layout.search.overlay_close', default='Close') }}">×</button>
       <div class="overlay-body">
-        <input type="search" id="barSearch" placeholder="Search bars..." aria-label="Search bars" inputmode="search" autocomplete="off" enterkeyhint="search">
+        <input type="search" id="barSearch" placeholder="{{ _('layout.search.input_placeholder', default='Search bars...') }}" aria-label="{{ _('layout.search.input_aria', default='Search bars') }}" inputmode="search" autocomplete="off" enterkeyhint="search">
         <div id="searchSuggestions" class="search-suggestions"></div>
       </div>
     </div>
@@ -122,27 +124,27 @@
     {% if not user or not user.is_display %}
     <footer class="site-footer" role="contentinfo">
       <div class="container">
-        <p>SiplyGo © 2025 · <a href="/about">About</a> · <a href="/help-center">Help Center</a> · <a href="/for-bars">For Bars</a> · <a href="/terms">Terms</a></p>
+        <p>{{ _('layout.footer.copyright', default='SiplyGo © 2025') }} · <a href="/about">{{ _('layout.footer.about', default='About') }}</a> · <a href="/help-center">{{ _('layout.footer.help_center', default='Help Center') }}</a> · <a href="/for-bars">{{ _('layout.footer.for_bars', default='For Bars') }}</a> · <a href="/terms">{{ _('layout.footer.terms', default='Terms') }}</a></p>
       </div>
     </footer>
     <div id="cartBlocker" class="cart-blocker" {% if cart_bar_id and current_bar_id != cart_bar_id %}{% else %}hidden{% endif %}>
       <div class="cart-popup">
-        <p>You still have products in your cart at <strong>{{ cart_bar_name }}</strong>.</p>
+        <p>{{ _('layout.cart_blocker.message', bar_name=cart_bar_name, default='You still have products in your cart at <strong>{bar_name}</strong>.')|safe }}</p>
         <div class="cart-popup-actions">
-          <button type="button" class="btn btn--secondary js-clear-cart">Remove products</button>
-          <a class="btn btn--primary" href="/bars/{{ cart_bar_id }}">Go to the bar menu</a>
+          <button type="button" class="btn btn--secondary js-clear-cart">{{ _('layout.cart_blocker.remove', default='Remove products') }}</button>
+          <a class="btn btn--primary" href="/bars/{{ cart_bar_id }}">{{ _('layout.cart_blocker.go_to_menu', default='Go to the bar menu') }}</a>
         </div>
       </div>
     </div>
     <div id="servicePaused" class="cart-blocker" hidden>
       <div class="cart-popup">
-        <p>Ordering is paused for <strong>{{ cart_bar_name }}</strong>. Please contact a staff member for more information.</p>
+        <p>{{ _('layout.service_paused.message', bar_name=cart_bar_name, default='Ordering is paused for <strong>{bar_name}</strong>. Please contact a staff member for more information.')|safe }}</p>
         <div class="cart-popup-actions">
           {% if pause_popup_close|default(False) %}
-          <button type="button" class="btn btn--secondary js-close-service-paused">Close</button>
+          <button type="button" class="btn btn--secondary js-close-service-paused">{{ _('layout.service_paused.close', default='Close') }}</button>
           {% endif %}
           {% if pause_popup_back|default(False) %}
-          <a class="btn btn--primary" href="/bars/{{ cart_bar_id }}">Back to the menu</a>
+          <a class="btn btn--primary" href="/bars/{{ cart_bar_id }}">{{ _('layout.service_paused.back', default='Back to the menu') }}</a>
           {% endif %}
         </div>
       </div>

@@ -3,10 +3,10 @@
 {% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
   <section class="hero home-hero">
   <div class="hero__content container">
-    <h1>Order drinks instantly, right from your table.</h1>
-    <p>Skip the wait. Discover nearby bars and order with one tap.</p>
+    <h1>{{ _('home.hero.title', default='Order drinks instantly, right from your table.') }}</h1>
+    <p>{{ _('home.hero.subtitle', default='Skip the wait. Discover nearby bars and order with one tap.') }}</p>
     <div class="hero__cta">
-      <a class="btn btn--primary" href="/search">Browse Bars</a>
+      <a class="btn btn--primary" href="/search">{{ _('common.browse_bars', default='Browse Bars') }}</a>
     </div>
   </div>
   <img class="hero-art" src="/photo/homepage.png" alt="" aria-hidden="true" draggable="false" width="1024" height="1024" />
@@ -14,8 +14,8 @@
 
 {% if user %}
 <section class="info-section">
-  <h2>Hi {{ user.username }} 👋</h2>
-  <p>Ready for your next drink?</p>
+  <h2>{{ _('home.hero.greeting', name=user.username, default='Hi {name} 👋') }}</h2>
+  <p>{{ _('home.hero.greeting_subtitle', default='Ready for your next drink?') }}</p>
 </section>
 {% endif %}
 
@@ -23,16 +23,16 @@
 <section class="bar-section">
   <div class="section-track">
     <div class="section-head">
-      <h2>Recently visited</h2>
+      <h2>{{ _('home.recent.title', default='Recently visited') }}</h2>
       <div class="scroller-nav">
-        <button class="scroll-btn prev" aria-label="Previous">‹</button>
-        <button class="scroll-btn next" aria-label="Next">›</button>
+        <button class="scroll-btn prev" aria-label="{{ _('common.previous', default='Previous') }}">‹</button>
+        <button class="scroll-btn next" aria-label="{{ _('common.next', default='Next') }}">›</button>
       </div>
     </div>
     <ul class="bars scroller">
       {% for bar in recent_bars %}
       <li>
-        <a class="bar-card{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="Open {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
+        <a class="bar-card{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="{{ _('home.bar_card.open_label', bar_name=bar.name, default='Open {bar_name}') }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
         <div class="thumb-wrapper">
         {% if bar.photo_url %}
         <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
@@ -41,9 +41,9 @@
         {% endif %}
         </div>
         {% if bar.is_open_now %}
-        <span class="status status-open">Open now</span>
+        <span class="status status-open">{{ _('home.bar_card.status_open', default='Open now') }}</span>
         {% else %}
-        <span class="status status-closed">Closed now</span>
+        <span class="status status-closed">{{ _('home.bar_card.status_closed', default='Closed now') }}</span>
         {% endif %}
         <h3 class="title" itemprop="name">{{ bar.name }}</h3>
         <div class="bar-meta">
@@ -63,17 +63,17 @@
 <section class="bar-section">
   <div class="section-track">
     <div class="section-head">
-      <h2 id="bars">Nearby Open Bars</h2>
+      <h2 id="bars">{{ _('home.bars.title', default='Nearby Open Bars') }}</h2>
       <div class="scroller-nav">
-        <button class="scroll-btn prev" aria-label="Previous">‹</button>
-        <button class="scroll-btn next" aria-label="Next">›</button>
+        <button class="scroll-btn prev" aria-label="{{ _('common.previous', default='Previous') }}">‹</button>
+        <button class="scroll-btn next" aria-label="{{ _('common.next', default='Next') }}">›</button>
       </div>
     </div>
     <p id="nearestBar" aria-live="polite"></p>
     <ul class="bars scroller" id="barList">
       {% for bar in bars %}
       <li>
-          <a class="bar-card{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="Open {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
+          <a class="bar-card{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="{{ _('home.bar_card.open_label', bar_name=bar.name, default='Open {bar_name}') }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
         <div class="thumb-wrapper">
         {% if bar.photo_url %}
         <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" {% if not recent_bars and loop.first %}fetchpriority="high"{% endif %} onerror="this.src='{{ fallback_img }}';this.onerror=null;">
@@ -82,9 +82,9 @@
         {% endif %}
         </div>
         {% if bar.is_open_now %}
-        <span class="status status-open">Open now</span>
+        <span class="status status-open">{{ _('home.bar_card.status_open', default='Open now') }}</span>
         {% else %}
-        <span class="status status-closed">Closed now</span>
+        <span class="status status-closed">{{ _('home.bar_card.status_closed', default='Closed now') }}</span>
         {% endif %}
         <h3 class="title" itemprop="name">{{ bar.name }}</h3>
         <div class="bar-meta">
@@ -101,28 +101,28 @@
           <div class="thumb-wrapper">
             <i class="bi bi-arrow-left" aria-hidden="true"></i>
           </div>
-          <span>Browse Bars</span>
+          <span>{{ _('common.browse_bars', default='Browse Bars') }}</span>
         </a>
       </li>
     </ul>
-    <p id="noBarsMessage" hidden>Sorry but all bars are closed at the moment</p>
+    <p id="noBarsMessage" hidden>{{ _('home.bars.no_bars', default='Sorry but all bars are closed at the moment') }}</p>
   </div>
 </section>
 
 <section id="how" class="info-section">
-  <h2>How it works</h2>
-  <p>Find a bar you love, take a seat, order and pay directly in the app—no more waiting, no more confusion.</p>
+  <h2>{{ _('home.how.title', default='How it works') }}</h2>
+  <p>{{ _('home.how.body', default='Find a bar you love, take a seat, order and pay directly in the app—no more waiting, no more confusion.') }}</p>
 </section>
 
 <section class="info-section">
-  <h2>Benefits</h2>
+  <h2>{{ _('home.benefits.title', default='Benefits') }}</h2>
   <ul>
-    <li><strong>Order via app/web:</strong> Open, choose, and pay right from the browser.</li>
-    <li><strong>Faster service:</strong> Skip the counter line and track your order in real time.</li>
-    <li><strong>Always up-to-date menu:</strong> Variants, allergens, and live availability.</li>
-    <li><strong>Modern payments:</strong> Supports gateways like Twint, Apple Pay, Google Pay, and many more.</li>
-    <li><strong>Wallet/Credits:</strong> Top-ups, bonuses, and quicker reorders.</li>
-    <li><strong>Multilingual:</strong> Ideal for locals and tourists.</li>
+    <li>{{ _('home.benefits.order', default='<strong>Order via app/web:</strong> Open, choose, and pay right from the browser.')|safe }}</li>
+    <li>{{ _('home.benefits.faster', default='<strong>Faster service:</strong> Skip the counter line and track your order in real time.')|safe }}</li>
+    <li>{{ _('home.benefits.menu', default='<strong>Always up-to-date menu:</strong> Variants, allergens, and live availability.')|safe }}</li>
+    <li>{{ _('home.benefits.payments', default='<strong>Modern payments:</strong> Supports gateways like Twint, Apple Pay, Google Pay, and many more.')|safe }}</li>
+    <li>{{ _('home.benefits.wallet', default='<strong>Wallet/Credits:</strong> Top-ups, bonuses, and quicker reorders.')|safe }}</li>
+    <li>{{ _('home.benefits.multilingual', default='<strong>Multilingual:</strong> Ideal for locals and tourists.')|safe }}</li>
   </ul>
 </section>
 

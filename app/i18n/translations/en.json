@@ -3,5 +3,98 @@
     "language": "English",
     "code": "en",
     "fallback": null
+  },
+  "common": {
+    "menu": "Menu",
+    "close": "Close",
+    "browse_bars": "Browse Bars",
+    "dashboard": "Dashboard",
+    "wallet": "Wallet",
+    "orders": "Orders",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register",
+    "credits": "Credits",
+    "cart": "Cart",
+    "previous": "Previous",
+    "next": "Next",
+    "search": "Search"
+  },
+  "layout": {
+    "meta": {
+      "title": "SiplyGo Prototype",
+      "description": "SiplyGo helps you discover bars nearby and manage your orders effortlessly.",
+      "og_description": "Discover bars nearby and manage orders with SiplyGo."
+    },
+    "header": {
+      "menu_button_aria": "Menu",
+      "close_menu_aria": "Close menu",
+      "credit_aria": "Credits",
+      "cart_aria": "Cart ({count} items)"
+    },
+    "location": {
+      "change": "Change location",
+      "detecting": "Detecting location...",
+      "input_placeholder": "Enter city or ZIP",
+      "input_label": "Current location"
+    },
+    "search": {
+      "button_aria": "Search",
+      "input_placeholder": "Search bars...",
+      "input_aria": "Search bars",
+      "overlay_close": "Close"
+    },
+    "footer": {
+      "copyright": "SiplyGo © 2025",
+      "about": "About",
+      "help_center": "Help Center",
+      "for_bars": "For Bars",
+      "terms": "Terms"
+    },
+    "cart_blocker": {
+      "message": "You still have products in your cart at <strong>{bar_name}</strong>.",
+      "remove": "Remove products",
+      "go_to_menu": "Go to the bar menu"
+    },
+    "service_paused": {
+      "message": "Ordering is paused for <strong>{bar_name}</strong>. Please contact a staff member for more information.",
+      "close": "Close",
+      "back": "Back to the menu"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Order drinks instantly, right from your table.",
+      "subtitle": "Skip the wait. Discover nearby bars and order with one tap.",
+      "greeting": "Hi {name} 👋",
+      "greeting_subtitle": "Ready for your next drink?"
+    },
+    "recent": {
+      "title": "Recently visited"
+    },
+    "bar_card": {
+      "open_label": "Open {bar_name}",
+      "status_open": "Open now",
+      "status_closed": "Closed now"
+    },
+    "bars": {
+      "title": "Nearby Open Bars",
+      "no_bars": "Sorry but all bars are closed at the moment"
+    },
+    "how": {
+      "title": "How it works",
+      "body": "Find a bar you love, take a seat, order and pay directly in the app—no more waiting, no more confusion."
+    },
+    "benefits": {
+      "title": "Benefits",
+      "order": "<strong>Order via app/web:</strong> Open, choose, and pay right from the browser.",
+      "faster": "<strong>Faster service:</strong> Skip the counter line and track your order in real time.",
+      "menu": "<strong>Always up-to-date menu:</strong> Variants, allergens, and live availability.",
+      "payments": "<strong>Modern payments:</strong> Supports gateways like Twint, Apple Pay, Google Pay, and many more.",
+      "wallet": "<strong>Wallet/Credits:</strong> Top-ups, bonuses, and quicker reorders.",
+      "multilingual": "<strong>Multilingual:</strong> Ideal for locals and tourists."
+    }
   }
 }
