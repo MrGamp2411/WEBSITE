@@ -4,6 +4,7 @@
 - Notification subject line must not exceed 30 characters.
 - Admin notifications form subject input enforces this with `maxlength=30`.
 - Phone validation errors must use English messaging; see `app/phone.py` and `tests/test_register_phone_validation.py`.
+- Product image uploads surface English errors: "No file uploaded", "Uploaded file must be an image", and "File too large (>5MB)".
 - Review recent commit history before starting new tasks.
 - Footer marketing pages (About, Help Center, For Bars, Terms) live in `templates/about.html`, `templates/help_center.html`, `templates/for_bars.html`, and `templates/terms.html`; they share the `.static-page` styles defined in `static/css/components.css`.
   - Support contact details for these static pages pull from Jinja globals defined in `main.py` (`SUPPORT_EMAIL`, `SUPPORT_NUMBER`, `TERMS_VERSION`, etc.); update those constants to change emails, phone numbers, or term dates sitewide.
@@ -43,6 +44,7 @@
 - Wallet transactions for orders begin in a `PROCESSING` state and update to `COMPLETED` once the order is accepted or to `CANCELED` if the order is canceled. Canceled transactions display a `- CHF 0.00` amount.
 - Card payments finalized by the Wallee webhook are added to the wallet feed so card orders appear alongside wallet transactions. Pay-at-bar orders are excluded from the wallet feed.
 - Top-ups append a `topup` transaction in a `PROCESSING` state during `/api/topup/init`; the Wallee webhook updates it to `COMPLETED` and refreshes the user's cached credit.
+- The `/topup` form submits with a "Top up with card" button so the call-to-action stays in English.
 - Failed top-ups display a red `Failed` pill and a `+ CHF 0.00` amount in the wallet.
 - Wallet transactions persist across restarts via the `wallet_transactions` table; login hydrates cached transactions from this table.
 - User sessions survive server restarts by reloading missing user data from the database on demand.
