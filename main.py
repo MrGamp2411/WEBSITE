@@ -42,11 +42,18 @@ import time
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
 CH_TZ = ZoneInfo("Europe/Zurich")
+
+SUPPORT_EMAIL = os.getenv("SUPPORT_EMAIL", "support@siplygo.example.com")
+SUPPORT_NUMBER = os.getenv("SUPPORT_NUMBER", "+41 91 555 01 23")
+SUPPORT_NUMBER_TEL = re.sub(r"[^0-9+]", "", SUPPORT_NUMBER)
+TERMS_VERSION = "V1.0"
+TERMS_EFFECTIVE_DATE = date.today().strftime("%d.%m.%Y")
+TERMS_NEXT_REVIEW_DATE = date(2025, 9, 16).strftime("%d.%m.%Y")
 
 from fastapi import (
     Depends,
@@ -1254,6 +1261,15 @@ def format_time(dt: Optional[datetime]) -> str:
     return dt.strftime("%Y-%m-%d %H:%M")
 
 templates_env.filters["format_time"] = format_time
+
+templates_env.globals.update(
+    SUPPORT_EMAIL=SUPPORT_EMAIL,
+    SUPPORT_NUMBER=SUPPORT_NUMBER,
+    SUPPORT_NUMBER_TEL=SUPPORT_NUMBER_TEL,
+    TERMS_VERSION=TERMS_VERSION,
+    TERMS_EFFECTIVE_DATE=TERMS_EFFECTIVE_DATE,
+    TERMS_NEXT_REVIEW_DATE=TERMS_NEXT_REVIEW_DATE,
+)
 
 
 def is_bar_open_now(bar: BarModel) -> bool:

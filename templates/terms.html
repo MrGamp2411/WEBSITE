@@ -2,6 +2,9 @@
 {% block content %}
 <article class="static-page">
   <h1>Terms of Use</h1>
+  <p class="terms-meta">
+    Version {{ TERMS_VERSION }} · Effective {{ TERMS_EFFECTIVE_DATE }} · Next review {{ TERMS_NEXT_REVIEW_DATE }}
+  </p>
   <p>These terms explain how SiplyGo provides services to guests and bar partners. By creating an account or placing an order you agree to the rules below.</p>
   <section>
     <h2>1. Eligibility and accounts</h2>
@@ -29,7 +32,11 @@
   </section>
   <section>
     <h2>4. Contact</h2>
-    <p>For questions about these terms or to report an issue, email <a href="mailto:legal@siplygo.example.com">legal@siplygo.example.com</a>.</p>
+    <p>
+      For questions about these terms or to report an issue, email
+      <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>
+      or call <a href="tel:{{ SUPPORT_NUMBER_TEL }}">{{ SUPPORT_NUMBER }}</a>.
+    </p>
     <p>We update this page whenever policies change. Continued use of SiplyGo after updates means you accept the revised terms.</p>
   </section>
 </article>
