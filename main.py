@@ -2402,7 +2402,7 @@ async def reorder_order(
     cart.items.clear()
     cart.items.update(desired_items)
     cart.bar_id = bar.id
-    cart.table_id = order.table_id if order.table_id in bar.tables else None
+    cart.table_id = None
     save_cart_for_user(user.id, cart)
     if "application/json" in request.headers.get("accept", ""):
         return JSONResponse({"redirect": "/cart"})

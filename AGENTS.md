@@ -301,6 +301,7 @@
 - User cache (`users`) is updated when an order is canceled so the wallet shows the refunded credit.
 - Order history and live order views display refund amounts for canceled orders.
 - Customers may cancel their own `PLACED` orders from the order history page using the cancel button; this posts `CANCELED` via `/api/orders/{id}/status`.
+- Reordering a past order clears any saved table selection so customers must choose a table again before checkout.
 - Admin dashboard includes a testing-only "Delete all orders" button at `/admin/orders/clear` to remove every order record.
 - Admin dashboard groups actions into `.admin-section` grids using `.quick-card` links for Bars, Users, Payments, Analytics, Profile, and a Danger Zone.
 - Super admin dashboard uses `editbar` styling and adds Bootstrap icons to card titles for Bars, Users, Payments, Analytics, Profile, and Danger Zone.
