@@ -2362,6 +2362,53 @@ async def order_history(request: Request, db: Session = Depends(get_db)):
     )
 
 
+@app.post("/orders/{order_id}/reorder")
+async def reorder_order(
+    request: Request, order_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    order = db.get(Order, order_id)
+    if not order or order.customer_id != user.id:
+        raise HTTPException(status_code=404, detail="Order not found")
+    if order.status not in ("COMPLETED", "CANCELED"):
+        raise HTTPException(status_code=400, detail="Order cannot be reordered")
+    bar = bars.get(order.bar_id)
+    if not bar:
+        load_bars_from_db()
+        bar = bars.get(order.bar_id)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    desired_items: Dict[int, CartItem] = {}
+    missing_items = False
+    for order_item in order.items:
+        product = bar.products.get(order_item.menu_item_id) if bar else None
+        qty = int(order_item.qty or 0)
+        if not product:
+            missing_items = True
+            break
+        if qty <= 0:
+            continue
+        if product.id in desired_items:
+            desired_items[product.id].quantity += qty
+        else:
+            desired_items[product.id] = CartItem(product, qty)
+    if missing_items or not desired_items:
+        if "application/json" in request.headers.get("accept", ""):
+            return JSONResponse({"error": "items_unavailable"}, status_code=409)
+        return RedirectResponse(url="/orders", status_code=status.HTTP_303_SEE_OTHER)
+    cart = get_cart_for_user(user)
+    cart.items.clear()
+    cart.items.update(desired_items)
+    cart.bar_id = bar.id
+    cart.table_id = order.table_id if order.table_id in bar.tables else None
+    save_cart_for_user(user.id, cart)
+    if "application/json" in request.headers.get("accept", ""):
+        return JSONResponse({"redirect": "/cart"})
+    return RedirectResponse(url="/cart", status_code=status.HTTP_303_SEE_OTHER)
+
+
 @app.get(
     "/api/bars/{bar_id}/orders",
     response_model=List[OrderWithItemsRead],
