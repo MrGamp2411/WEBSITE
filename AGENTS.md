@@ -14,6 +14,7 @@
 - Hero image is shifted an additional 150px downward and 450px left from the hero section.
 - Hero art displays at a fixed 819x819 size (20% smaller) regardless of screen width.
 - Hero art uses `z-index:-1` to sit behind cards.
+- Bar and info sections use `position:relative;z-index:1` so the hero image remains behind "Nearby Open Bars" and later content.
 - Hero art styles live in `static/css/components.css` under `.home-hero .hero-art`.
 - Homepage hero no longer hides overflow, letting the image extend beyond the hero section.
 - Homepage hero only shows a Browse Bars button linking to `/search`; Search and How it works buttons and promo chips were removed.
