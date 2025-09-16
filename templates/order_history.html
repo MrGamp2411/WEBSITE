@@ -105,6 +105,11 @@
             <li><span class="qty">{{ item.qty }}×</span><span class="name">{{ item.menu_item_name or 'Unknown item' }}</span></li>
             {% endfor %}
           </ul>
+          {% if order.status in ('COMPLETED', 'CANCELED') %}
+          <div class="order-actions">
+            <button class="reorder-order" data-order-id="{{ order.id }}" type="button">Reorder</button>
+          </div>
+          {% endif %}
         </section>
       </article>
       {% endfor %}

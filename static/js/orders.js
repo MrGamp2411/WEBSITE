@@ -154,9 +154,12 @@ function initUser(userId) {
     const refund = order.status === 'CANCELED' && order.refund_amount ? `<div><dt>Refunded</dt><dd class="num nowrap">CHF ${order.refund_amount.toFixed(2)}</dd></div>` : '';
     const notes = order.notes ? `<div><dt>Notes</dt><dd>${order.notes}</dd></div>` : '';
     const prep = order.ready_at ? `<div><dt>Prep time</dt><dd class="num">${diffMinutes(order.created_at, order.ready_at)} min</dd></div>` : '';
-    const actions = order.status === 'PLACED'
-      ? `<div class="order-actions"><button data-order-id="${order.id}" data-status="CANCELED">Cancel</button></div>`
-      : '';
+    let actions = '';
+    if (order.status === 'PLACED') {
+      actions = `<div class="order-actions"><button data-order-id="${order.id}" data-status="CANCELED">Cancel</button></div>`;
+    } else if (['COMPLETED', 'CANCELED'].includes(order.status)) {
+      actions = `<div class="order-actions"><button class="reorder-order" data-order-id="${order.id}" type="button">Reorder</button></div>`;
+    }
     el.innerHTML =
       `<header class="order-card__header">` +
       `<h3 id="order-${order.id}-title">Order ${order.public_order_code || ('#' + order.id)}</h3>` +
@@ -205,6 +208,46 @@ function initUser(userId) {
       updateStatus(btn.dataset.orderId, btn.dataset.status);
     }
   });
+  if (completed) {
+    completed.addEventListener('click', e => {
+      const btn = e.target.closest('button.reorder-order');
+      if (!btn) {
+        return;
+      }
+      if (btn.disabled) {
+        return;
+      }
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Reordering…';
+      fetch(`/orders/${btn.dataset.orderId}/reorder`, {
+        method: 'POST',
+        headers: { Accept: 'application/json' }
+      })
+        .then(res => {
+          if (!res.ok) {
+            return res
+              .json()
+              .catch(() => ({}))
+              .then(data => Promise.reject({ status: res.status, ...data }));
+          }
+          return res.json().catch(() => ({}));
+        })
+        .then(data => {
+          const redirect = data.redirect || '/cart';
+          window.location.href = redirect;
+        })
+        .catch(err => {
+          btn.disabled = false;
+          btn.textContent = originalText;
+          let message = 'Unable to reorder this order right now.';
+          if (err && err.error === 'items_unavailable') {
+            message = 'Some items are no longer available for reorder.';
+          }
+          alert(message);
+        });
+    });
+  }
 }
 
 function updateStatus(orderId, status, onUpdate) {
