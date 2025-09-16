@@ -1577,12 +1577,12 @@ async def upload_product_image(
     db: Session = Depends(get_db),
 ):
     if not image.filename:
-        raise HTTPException(status_code=400, detail="Nessun file")
+        raise HTTPException(status_code=400, detail="No file uploaded")
     data = await image.read()
     if not image.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="File non immagine")
+        raise HTTPException(status_code=400, detail="Uploaded file must be an image")
     if len(data) > 5 * 1024 * 1024:
-        raise HTTPException(status_code=413, detail="File troppo grande (>5MB)")
+        raise HTTPException(status_code=413, detail="File too large (>5MB)")
     db_item = db.get(MenuItem, product_id)
     if not db_item:
         raise HTTPException(status_code=404, detail="Product not found")
