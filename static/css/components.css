@@ -143,7 +143,7 @@ body.dark-mode{
 
 @media (max-width:768px){
   .home-hero .hero-art{
-    bottom:calc(-8rem - 150px);
+    bottom:calc(-8rem - 200px);
     left:calc(50% - 200px);
   }
 }
