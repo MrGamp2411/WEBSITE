@@ -2874,7 +2874,7 @@ async def register_details(request: Request, db: Session = Depends(get_db)):
         try:
             RegisterIn.model_validate({"dial_code": prefix, "phone": phone})
         except ValidationError:
-            return render_form("Lunghezza numero non valida.", status_code=422)
+            return render_form("Invalid phone number length.", status_code=422)
         try:
             phone_e164, phone_region = normalize_phone_or_raise(prefix, phone)
         except HTTPException as exc:
@@ -3094,7 +3094,7 @@ async def profile_update(request: Request, db: Session = Depends(get_db)):
     try:
         RegisterIn.model_validate({"dial_code": prefix, "phone": phone})
     except ValidationError:
-        return render_form("Lunghezza numero non valida.", status_code=422)
+        return render_form("Invalid phone number length.", status_code=422)
     try:
         phone_e164, phone_region = normalize_phone_or_raise(prefix, phone)
     except HTTPException as exc:
@@ -4876,7 +4876,7 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
                 user=user,
                 bars=bars.values(),
                 current=current,
-                error="Lunghezza numero non valida.",
+                error="Invalid phone number length.",
                 status_code=422,
             )
         try:

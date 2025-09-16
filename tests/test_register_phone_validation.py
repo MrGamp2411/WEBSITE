@@ -67,7 +67,7 @@ def test_register_phone_prefix_mismatch():
             data={"username": "mismatch1", "prefix": "+41", "phone": "0039 345 123 4567"},
         )
         assert resp.status_code == 422
-        assert "Il numero non corrisponde al prefisso selezionato (+41)." in resp.text
+        assert "The number does not match the selected dial code (+41)." in resp.text
         client.get("/logout")
         _start(client, "mm2@example.com")
         resp2 = client.post(
@@ -75,7 +75,7 @@ def test_register_phone_prefix_mismatch():
             data={"username": "mismatch2", "prefix": "+39", "phone": "0041 76 555 12 34"},
         )
         assert resp2.status_code == 422
-        assert "Il numero non corrisponde al prefisso selezionato (+39)." in resp2.text
+        assert "The number does not match the selected dial code (+39)." in resp2.text
 
 
 def test_register_phone_format_errors():
@@ -91,7 +91,7 @@ def test_register_phone_format_errors():
             data={"username": "shortnum", "prefix": "+41", "phone": "123"},
         )
         assert resp_short.status_code == 422
-        assert "Lunghezza numero non valida." in resp_short.text
+        assert "Invalid phone number length." in resp_short.text
         client.get("/logout")
         _start(client, "ext@example.com")
         resp_ext = client.post(
@@ -99,7 +99,7 @@ def test_register_phone_format_errors():
             data={"username": "extnum", "prefix": "+39", "phone": "345-123-4567 ext. 2"},
         )
         assert resp_ext.status_code == 422
-        assert "Le estensioni non sono supportate." in resp_ext.text
+        assert "Phone extensions are not supported." in resp_ext.text
 
 
 def test_register_phone_duplicate():
