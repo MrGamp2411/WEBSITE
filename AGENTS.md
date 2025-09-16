@@ -5,6 +5,7 @@
 - Admin notifications form subject input enforces this with `maxlength=30`.
 - Review recent commit history before starting new tasks.
 - Footer marketing pages (About, Help Center, For Bars, Terms) live in `templates/about.html`, `templates/help_center.html`, `templates/for_bars.html`, and `templates/terms.html`; they share the `.static-page` styles defined in `static/css/components.css`.
+  - Support contact details for these static pages pull from Jinja globals defined in `main.py` (`SUPPORT_EMAIL`, `SUPPORT_NUMBER`, `TERMS_VERSION`, etc.); update those constants to change emails, phone numbers, or term dates sitewide.
 - Homepage image stored in photo/homepage.png.
 - `/photo` static path serves the homepage image.
 - Homepage hero displays the artwork as a single `<img class="hero-art">` absolutely positioned under the content with pointer-events disabled.
