@@ -3,6 +3,7 @@
 - Commit messages subject line must not exceed 30 characters.
 - Notification subject line must not exceed 30 characters.
 - Admin notifications form subject input enforces this with `maxlength=30`.
+- Phone validation errors must use English messaging; see `app/phone.py` and `tests/test_register_phone_validation.py`.
 - Review recent commit history before starting new tasks.
 - Footer marketing pages (About, Help Center, For Bars, Terms) live in `templates/about.html`, `templates/help_center.html`, `templates/for_bars.html`, and `templates/terms.html`; they share the `.static-page` styles defined in `static/css/components.css`.
   - Support contact details for these static pages pull from Jinja globals defined in `main.py` (`SUPPORT_EMAIL`, `SUPPORT_NUMBER`, `TERMS_VERSION`, etc.); update those constants to change emails, phone numbers, or term dates sitewide.

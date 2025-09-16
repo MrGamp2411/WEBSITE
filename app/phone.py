@@ -32,26 +32,26 @@ def validate_and_format_phone(
 ) -> Tuple[str, str]:
     """Validate a phone number and return (E.164, region)."""
     if re.search(r"(ext\.?|x)\s*\d+", number_raw, re.IGNORECASE):
-        raise PhoneValidationError("Le estensioni non sono supportate.")
+        raise PhoneValidationError("Phone extensions are not supported.")
     region = region_from_dial_code(dial_code)
     try:
         num = phonenumbers.parse(number_raw, region)
     except phonenumbers.NumberParseException:
         raise PhoneValidationError(
-            "Numero di telefono non valido per la nazione selezionata."
+            "Invalid phone number for the selected country."
         )
     if getattr(num, "extension", None):
-        raise PhoneValidationError("Le estensioni non sono supportate.")
+        raise PhoneValidationError("Phone extensions are not supported.")
     if not phonenumbers.is_possible_number(num):
-        raise PhoneValidationError("Lunghezza numero non valida.")
+        raise PhoneValidationError("Invalid phone number length.")
     if not phonenumbers.is_valid_number(num):
-        raise PhoneValidationError("Numero di telefono non valido per la nazione selezionata.")
+        raise PhoneValidationError("Invalid phone number for the selected country.")
     if num.country_code != int(dial_code.lstrip("+")):
         raise PhoneValidationError(
-            f"Il numero non corrisponde al prefisso selezionato ({dial_code})."
+            f"The number does not match the selected dial code ({dial_code})."
         )
     if allowed_types is not None and phonenumbers.number_type(num) not in allowed_types:
-        raise PhoneValidationError("Numero di telefono non valido per la nazione selezionata.")
+        raise PhoneValidationError("Invalid phone number for the selected country.")
     e164 = phonenumbers.format_number(num, PhoneNumberFormat.E164)
     region_code = phonenumbers.region_code_for_number(num) or ""
     return e164, region_code
@@ -73,5 +73,5 @@ def normalize_phone_or_raise(dial_code: str, phone: str) -> Tuple[str, str]:
     except Exception:
         raise HTTPException(
             status_code=422,
-            detail="Numero di telefono non valido o non coerente con il prefisso selezionato.",
+            detail="Invalid phone number or it does not match the selected dial code.",
         )
