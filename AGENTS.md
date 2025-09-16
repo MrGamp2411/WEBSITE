@@ -368,3 +368,4 @@
 - Passing `?lang=<code>` in the query string updates the user's preferred language and persists it in the session for
   subsequent requests. Absent an explicit choice, the resolver checks the stored session value followed by the
   `Accept-Language` header before falling back to English.
+- About page strings live under the `about` namespace in `app/i18n/translations/*.json`; `templates/about.html` pulls from these keys.

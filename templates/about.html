@@ -1,28 +1,28 @@
 {% extends "layout.html" %}
 {% block content %}
 <article class="static-page">
-  <h1>About SiplyGo</h1>
-  <p>Built and operated by Siply, a digital studio for web products and cloud infrastructure.</p>
-  <p>We’re building a modern ordering experience that keeps the focus on hospitality while giving guests and teams the tools they need to thrive.</p>
+  <h1>{{ _('about.title', default='About SiplyGo') }}</h1>
+  <p>{{ _('about.intro.built', default='Built and operated by Siply, a digital studio for web products and cloud infrastructure.') }}</p>
+  <p>{{ _("about.intro.focus", default="We're building a modern ordering experience that keeps the focus on hospitality while giving guests and teams the tools they need to thrive.") }}</p>
   <section>
-    <h2>Our mission</h2>
-    <p>SiplyGo makes it effortless for people to discover bars, order from their table, and enjoy their time without waiting in line. We partner closely with local venues to streamline service, reduce friction, and keep every order moving.</p>
+    <h2>{{ _('about.mission.title', default='Our mission') }}</h2>
+    <p>{{ _('about.mission.body', default='SiplyGo makes it effortless for people to discover bars, order from their table, and enjoy their time without waiting in line. We partner closely with local venues to streamline service, reduce friction, and keep every order moving.') }}</p>
   </section>
   <section>
-    <h2>What we value</h2>
+    <h2>{{ _('about.values.title', default='What we value') }}</h2>
     <ul>
-      <li><strong>Delightful guest journeys</strong> – intuitive menus, real-time order tracking, and secure payments from any device.</li>
-      <li><strong>Empowered teams</strong> – dashboards that help bartenders stay on top of tickets and respond to guests faster.</li>
-      <li><strong>Operational insight</strong> – revenue, payout, and menu analytics that turn nightly service into actionable data.</li>
+      <li><strong>{{ _('about.values.delight.title', default='Delightful guest journeys') }}</strong> – {{ _('about.values.delight.body', default='intuitive menus, real-time order tracking, and secure payments from any device.') }}</li>
+      <li><strong>{{ _('about.values.empowered.title', default='Empowered teams') }}</strong> – {{ _('about.values.empowered.body', default='dashboards that help bartenders stay on top of tickets and respond to guests faster.') }}</li>
+      <li><strong>{{ _('about.values.insight.title', default='Operational insight') }}</strong> – {{ _('about.values.insight.body', default='revenue, payout, and menu analytics that turn nightly service into actionable data.') }}</li>
     </ul>
   </section>
   <section>
-    <h2>Where we are headed</h2>
-    <p>We continue to expand the platform with richer loyalty tools, flexible payouts, and integrations that help bars focus on hospitality, not hardware. New releases are rolled out frequently and shared in our Help Center so teams can adopt them with confidence.</p>
+    <h2>{{ _('about.future.title', default='Where we are headed') }}</h2>
+    <p>{{ _('about.future.body', default='We continue to expand the platform with richer loyalty tools, flexible payouts, and integrations that help bars focus on hospitality, not hardware. New releases are rolled out frequently and shared in our Help Center so teams can adopt them with confidence.') }}</p>
   </section>
   <section>
-    <h2>Stay in touch</h2>
-    <p>Questions about the roadmap or partnerships? Reach out at <a href="mailto:{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a> and we will be happy to connect.</p>
+    <h2>{{ _('about.contact.title', default='Stay in touch') }}</h2>
+    <p>{{ _('about.contact.body', email=SUPPORT_EMAIL, default='Questions about the roadmap or partnerships? Reach out at <a href="mailto:{email}">{email}</a> and we will be happy to connect.')|safe }}</p>
   </section>
 </article>
 {% endblock %}

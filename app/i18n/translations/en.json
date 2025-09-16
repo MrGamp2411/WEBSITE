@@ -96,5 +96,39 @@
       "wallet": "<strong>Wallet/Credits:</strong> Top-ups, bonuses, and quicker reorders.",
       "multilingual": "<strong>Multilingual:</strong> Ideal for locals and tourists."
     }
+  },
+  "about": {
+    "title": "About SiplyGo",
+    "intro": {
+      "built": "Built and operated by Siply, a digital studio for web products and cloud infrastructure.",
+      "focus": "We're building a modern ordering experience that keeps the focus on hospitality while giving guests and teams the tools they need to thrive."
+    },
+    "mission": {
+      "title": "Our mission",
+      "body": "SiplyGo makes it effortless for people to discover bars, order from their table, and enjoy their time without waiting in line. We partner closely with local venues to streamline service, reduce friction, and keep every order moving."
+    },
+    "values": {
+      "title": "What we value",
+      "delight": {
+        "title": "Delightful guest journeys",
+        "body": "intuitive menus, real-time order tracking, and secure payments from any device."
+      },
+      "empowered": {
+        "title": "Empowered teams",
+        "body": "dashboards that help bartenders stay on top of tickets and respond to guests faster."
+      },
+      "insight": {
+        "title": "Operational insight",
+        "body": "revenue, payout, and menu analytics that turn nightly service into actionable data."
+      }
+    },
+    "future": {
+      "title": "Where we are headed",
+      "body": "We continue to expand the platform with richer loyalty tools, flexible payouts, and integrations that help bars focus on hospitality, not hardware. New releases are rolled out frequently and shared in our Help Center so teams can adopt them with confidence."
+    },
+    "contact": {
+      "title": "Stay in touch",
+      "body": "Questions about the roadmap or partnerships? Reach out at <a href=\"mailto:{email}\">{email}</a> and we will be happy to connect."
+    }
   }
 }

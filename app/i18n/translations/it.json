@@ -96,5 +96,39 @@
       "wallet": "<strong>Portafoglio/Crediti:</strong> Ricariche, bonus e riordini più veloci.",
       "multilingual": "<strong>Multilingue:</strong> Ideale per residenti e turisti."
     }
+  },
+  "about": {
+    "title": "Informazioni su SiplyGo",
+    "intro": {
+      "built": "Creato e gestito da Siply, uno studio digitale specializzato in prodotti web e infrastrutture cloud.",
+      "focus": "Stiamo costruendo un'esperienza di ordinazione moderna che mantiene l'attenzione sull'ospitalità offrendo a ospiti e team gli strumenti di cui hanno bisogno per prosperare."
+    },
+    "mission": {
+      "title": "La nostra missione",
+      "body": "SiplyGo rende semplice per tutti scoprire nuovi bar, ordinare direttamente dal tavolo e godersi il tempo senza aspettare in fila. Collaboriamo a stretto contatto con i locali per snellire il servizio, ridurre gli attriti e tenere ogni ordine in movimento."
+    },
+    "values": {
+      "title": "I nostri valori",
+      "delight": {
+        "title": "Esperienze memorabili per gli ospiti",
+        "body": "menù intuitivi, monitoraggio degli ordini in tempo reale e pagamenti sicuri da qualsiasi dispositivo."
+      },
+      "empowered": {
+        "title": "Team responsabilizzati",
+        "body": "dashboard che aiutano i bartender a restare al passo con le comande e a rispondere più velocemente agli ospiti."
+      },
+      "insight": {
+        "title": "Visione operativa",
+        "body": "analisi su ricavi, pagamenti e menù che trasformano il servizio serale in dati utili."
+      }
+    },
+    "future": {
+      "title": "Dove stiamo andando",
+      "body": "Continuiamo ad ampliare la piattaforma con strumenti di fidelizzazione più ricchi, pagamenti flessibili e integrazioni che aiutano i bar a concentrarsi sull'ospitalità, non sull'hardware. Rilasciamo spesso nuove funzionalità e le condividiamo nel nostro Help Center, così i team possono adottarle con fiducia."
+    },
+    "contact": {
+      "title": "Rimaniamo in contatto",
+      "body": "Domande sulla roadmap o sulle partnership? Scrivici a <a href=\"mailto:{email}\">{email}</a> e saremo felici di metterci in contatto."
+    }
   }
 }
