@@ -18,6 +18,7 @@
     <label for="phone">Phone Number
       <input id="phone" type="tel" name="phone" required autocomplete="tel-national" inputmode="tel" enterkeyhint="done" pattern="[0-9]{9,10}" minlength="9" maxlength="10" title="Phone number must be 9 to 10 digits" value="{{ phone|default('') }}">
     </label>
+    <p class="auth-card__disclaimer">By finishing your registration you accept our <a href="/terms">Terms of Service</a>.</p>
     <button class="btn btn--primary" type="submit">Finish</button>
   </form>
 </div>
