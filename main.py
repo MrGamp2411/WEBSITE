@@ -1585,6 +1585,34 @@ async def home(request: Request, db: Session = Depends(get_db)):
     return render_template("home.html", request=request, bars=db_bars)
 
 
+@app.get("/about", response_class=HTMLResponse)
+async def about(request: Request):
+    """Public overview of the SiplyGo platform."""
+
+    return render_template("about.html", request=request)
+
+
+@app.get("/help-center", response_class=HTMLResponse)
+async def help_center(request: Request):
+    """Frequently asked questions and support resources."""
+
+    return render_template("help_center.html", request=request)
+
+
+@app.get("/for-bars", response_class=HTMLResponse)
+async def for_bars(request: Request):
+    """Information for bar owners evaluating SiplyGo."""
+
+    return render_template("for_bars.html", request=request)
+
+
+@app.get("/terms", response_class=HTMLResponse)
+async def terms(request: Request):
+    """Terms of service for using SiplyGo."""
+
+    return render_template("terms.html", request=request)
+
+
 def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """Calculate distance in kilometers between two lat/lon points."""
     from math import asin, cos, radians, sin, sqrt
