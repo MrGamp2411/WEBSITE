@@ -1,25 +1,25 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="auth-card">
-  <h1>Complete Registration</h1>
+  <h1>{{ _('register.title', default='Complete Registration') }}</h1>
   {% if error %}<p class="alert">{{ error }}</p>{% endif %}
   <form method="post" action="/register/details">
-    <label for="username">Username
-      <input id="username" type="text" name="username" required autocomplete="username" inputmode="text" enterkeyhint="next" minlength="3" maxlength="24" pattern="(?![._-])(?!.*[._-]{2})(?!.*[._-]$)[a-z0-9._-]{3,24}" title="3–24 characters, lowercase letters, numbers, dot, hyphen or underscore. No spaces." value="{{ username|default('') }}">
+    <label for="username">{{ _('register.fields.username.label', default='Username') }}
+      <input id="username" type="text" name="username" required autocomplete="username" inputmode="text" enterkeyhint="next" minlength="3" maxlength="24" pattern="(?![._-])(?!.*[._-]{2})(?!.*[._-]$)[a-z0-9._-]{3,24}" title="{{ _('register.fields.username.title', default='3–24 characters, lowercase letters, numbers, dot, hyphen or underscore. No spaces.') }}" value="{{ username|default('') }}">
     </label>
-    <label for="prefix">Phone Prefix
+    <label for="prefix">{{ _('register.fields.prefix.label', default='Phone Prefix') }}
       <select id="prefix" name="prefix" required autocomplete="tel-country-code">
-        <option value="+41" {% if prefix == "+41" %}selected{% endif %}>+41 (Switzerland)</option>
-        <option value="+39" {% if prefix == "+39" %}selected{% endif %}>+39 (Italy)</option>
-        <option value="+49" {% if prefix == "+49" %}selected{% endif %}>+49 (Germany)</option>
-        <option value="+33" {% if prefix == "+33" %}selected{% endif %}>+33 (France)</option>
+        <option value="+41" {% if prefix == "+41" %}selected{% endif %}>{{ _('register.options.ch', default='+41 (Switzerland)') }}</option>
+        <option value="+39" {% if prefix == "+39" %}selected{% endif %}>{{ _('register.options.it', default='+39 (Italy)') }}</option>
+        <option value="+49" {% if prefix == "+49" %}selected{% endif %}>{{ _('register.options.de', default='+49 (Germany)') }}</option>
+        <option value="+33" {% if prefix == "+33" %}selected{% endif %}>{{ _('register.options.fr', default='+33 (France)') }}</option>
       </select>
     </label>
-    <label for="phone">Phone Number
-      <input id="phone" type="tel" name="phone" required autocomplete="tel-national" inputmode="tel" enterkeyhint="done" pattern="[0-9]{9,10}" minlength="9" maxlength="10" title="Phone number must be 9 to 10 digits" value="{{ phone|default('') }}">
+    <label for="phone">{{ _('register.fields.phone.label', default='Phone Number') }}
+      <input id="phone" type="tel" name="phone" required autocomplete="tel-national" inputmode="tel" enterkeyhint="done" pattern="[0-9]{9,10}" minlength="9" maxlength="10" title="{{ _('register.fields.phone.title', default='Phone number must be 9 to 10 digits') }}" value="{{ phone|default('') }}">
     </label>
-    <p class="auth-card__disclaimer">By finishing your registration you accept our <a href="/terms">Terms of Service</a>.</p>
-    <button class="btn btn--primary" type="submit">Finish</button>
+    <p class="auth-card__disclaimer">{{ _('register.disclaimer', default="By finishing your registration you accept our <a href=\"/terms\">Terms of Service</a>.")|safe }}</p>
+    <button class="btn btn--primary" type="submit">{{ _('register.actions.submit', default='Finish') }}</button>
   </form>
 </div>
 {% endblock %}
