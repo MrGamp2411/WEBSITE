@@ -20,6 +20,7 @@
 - Mobile layout lowers the hero art an extra 100px so the mobile offset is `bottom:calc(-8rem - 200px)`.
 - Hero art displays at a fixed 819x819 size (20% smaller) regardless of screen width.
 - Hero art uses `z-index:-1` to sit behind cards.
+- Header sits at `z-index:1050` so it renders above mobile menu blur backdrops.
 - Bar and info sections use `position:relative;z-index:1` so the hero image remains behind "Nearby Open Bars" and later content.
 - Hero art styles live in `static/css/components.css` under `.home-hero .hero-art`.
 - Homepage hero no longer hides overflow, letting the image extend beyond the hero section.
