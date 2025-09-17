@@ -1,16 +1,78 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>{{ _('bar_categories.edit.title', bar=bar.name, default='Edit Category for {bar}') }}</h1>
+{% set name_map = category.name_translations or {} %}
+{% set description_map = category.description_translations or {} %}
 <form class="form" method="post">
-  <label for="name">{{ _('bar_categories.form.name', default='Name') }}
-    <input id="name" name="name" value="{{ category.name }}" required>
-  </label>
-  <label for="description">{{ _('bar_categories.form.description', default='Description') }}
-    <textarea id="description" name="description" required>{{ category.description }}</textarea>
-  </label>
+  <div class="field-group translation-control">
+    <label for="name">{{ _('bar_categories.form.name', default='Name') }}
+      <input id="name" name="name" value="{{ name_map.get(language_code, category.name) }}" required>
+    </label>
+    <button type="button" class="btn-outline translation-toggle" data-translation-target="nameTranslations" aria-expanded="false">{{ _('bar_categories.form.name_translate_button', default='Translate name') }}</button>
+  </div>
+  <div id="nameTranslations" class="translation-panel" hidden>
+    <p class="translation-help">{{ _('bar_categories.form.translation_help', default='Provide a name for each supported language.') }}</p>
+    {% for lang in available_languages %}
+    <label for="name_{{ lang.code }}">{{ _('bar_categories.form.language_name_label', language=lang.name, default='{language} name') }}
+      <input id="name_{{ lang.code }}" name="name_{{ lang.code }}" value="{{ name_map.get(lang.code, category.name) }}">
+    </label>
+    {% endfor %}
+  </div>
+  <div class="field-group translation-control">
+    <label for="description">{{ _('bar_categories.form.description', default='Description') }}
+      <textarea id="description" name="description" required>{{ description_map.get(language_code, category.description) }}</textarea>
+    </label>
+    <button type="button" class="btn-outline translation-toggle" data-translation-target="descriptionTranslations" aria-expanded="false">{{ _('bar_categories.form.description_translate_button', default='Translate description') }}</button>
+  </div>
+  <div id="descriptionTranslations" class="translation-panel" hidden>
+    <p class="translation-help">{{ _('bar_categories.form.translation_help_description', default='Write a description for every supported language.') }}</p>
+    {% for lang in available_languages %}
+    <label for="description_{{ lang.code }}">{{ _('bar_categories.form.language_description_label', language=lang.name, default='{language} description') }}
+      <textarea id="description_{{ lang.code }}" name="description_{{ lang.code }}">{{ description_map.get(lang.code, category.description) }}</textarea>
+    </label>
+    {% endfor %}
+  </div>
   <label for="display_order">{{ _('bar_categories.form.display_order', default='Display Order') }}
     <input id="display_order" type="number" name="display_order" value="{{ category.display_order }}">
   </label>
   <button class="btn btn--primary" type="submit">{{ _('bar_categories.form.save', default='Save') }}</button>
 </form>
+<style>
+.translation-control{display:flex;flex-direction:column;gap:8px;margin-bottom:var(--space-3,12px);}
+.translation-control label{flex:1;}
+.translation-toggle{align-self:flex-start;margin-top:auto;}
+.translation-panel{border:1px dashed rgba(15,23,42,.25);border-radius:12px;padding:16px;margin-bottom:var(--space-3,12px);display:flex;flex-direction:column;gap:12px;}
+.translation-panel label{display:flex;flex-direction:column;font-weight:500;gap:6px;}
+.translation-panel input,.translation-panel textarea{width:100%;}
+.translation-panel textarea{min-height:96px;}
+.translation-help{margin:0;font-size:.9rem;opacity:.75;}
+@media (min-width:600px){
+  .translation-control{flex-direction:row;align-items:flex-end;}
+  .translation-control label{flex:1;}
+  .translation-toggle{margin-left:16px;}
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.translation-toggle').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-translation-target');
+        const target = targetId ? document.getElementById(targetId) : null;
+        if (!target) return;
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        const next = !expanded;
+        btn.setAttribute('aria-expanded', String(next));
+        if (next) {
+          target.removeAttribute('hidden');
+        } else {
+          target.setAttribute('hidden', '');
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}

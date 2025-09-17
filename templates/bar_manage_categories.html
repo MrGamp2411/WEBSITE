@@ -32,9 +32,11 @@
       <tbody>
         {% for category in categories %}
         <tr>
+          {% set display_name = category_name(category) %}
+          {% set display_description = category_description(category) %}
           <td>{{ loop.index }}</td>
-          <td>{{ category.name }}</td>
-          <td>{{ category.description }}</td>
+          <td>{{ display_name }}</td>
+          <td>{{ display_description }}</td>
           <td class="actions">
             <div class="actions-group">
               <a href="/bar/{{ bar.id }}/categories/{{ category.id }}/products" class="btn-outline">{{ _('bar_categories.manage.actions.products', default='Products') }}</a>

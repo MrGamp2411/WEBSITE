@@ -1,10 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
 {% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
+{% set category_title = category_name(category) %}
 <section class="menu-page">
   <header class="menu-toolbar">
     <div class="title-wrap">
-      <h1>{{ _('bar_products.manage.title', category=category.name, bar=bar.name, default='Products in {category} for {bar}') }}</h1>
+      <h1>{{ _('bar_products.manage.title', category=category_title, bar=bar.name, default='Products in {category} for {bar}') }}</h1>
       <p class="subtitle">{{ _('bar_products.manage.subtitle', default='Add, edit and organize products for this category.') }}</p>
     </div>
     <div class="toolbar-actions">

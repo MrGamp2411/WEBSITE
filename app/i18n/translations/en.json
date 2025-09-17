@@ -1455,6 +1455,12 @@
       "name": "Name",
       "description": "Description",
       "display_order": "Display Order",
+      "name_translate_button": "Translate name",
+      "description_translate_button": "Translate description",
+      "translation_help": "Provide a name for each supported language.",
+      "translation_help_description": "Write a description for every supported language.",
+      "language_name_label": "{language} name",
+      "language_description_label": "{language} description",
       "create": "Create",
       "save": "Save"
     },

@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>{{ _('bar_products.new.title', category=category.name, default='Add Product to {category}') }}</h1>
+{% set category_title = category_name(category) %}
+<h1>{{ _('bar_products.new.title', category=category_title, default='Add Product to {category}') }}</h1>
 {% if error %}<p class="error">{{ error }}</p>{% endif %}
 <form class="form" method="post" enctype="multipart/form-data">
   <label for="name">{{ _('bar_products.form.name', default='Name') }}

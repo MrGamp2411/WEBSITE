@@ -47,15 +47,17 @@
 <p class="error">{{ error }}</p>
 {% endif %}
 {% for category, products in products_by_category %}
+  {% set category_title = category_name(category) %}
+  {% set category_summary = category_description(category) %}
   <section class="category product-section">
     <div class="section-head">
-      <h2>{{ category.name }}</h2>
+      <h2>{{ category_title }}</h2>
       <div class="scroller-nav">
         <button class="scroll-btn prev" aria-label="{{ _('common.previous', default='Previous') }}">‹</button>
         <button class="scroll-btn next" aria-label="{{ _('common.next', default='Next') }}">›</button>
       </div>
     </div>
-    <p>{{ category.description }}</p>
+    <p>{{ category_summary }}</p>
     <ul class="products scroller">
       {% for product in products %}
       <li>

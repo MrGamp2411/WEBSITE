@@ -169,6 +169,49 @@ BAR_CATEGORIES = [
 # -----------------------------------------------------------------------------
 
 
+def normalise_translation_map(
+    translations: Optional[Dict[str, str]],
+    fallback: Optional[str] = None,
+) -> Dict[str, str]:
+    data: Dict[str, str] = {}
+    source: Any = translations
+    if isinstance(source, str):
+        try:
+            decoded = json.loads(source)
+        except json.JSONDecodeError:
+            decoded = {}
+        source = decoded if isinstance(decoded, dict) else {}
+    if isinstance(source, dict):
+        for code, value in source.items():
+            if isinstance(code, str) and isinstance(value, str):
+                data[code] = value
+    base = fallback or data.get(DEFAULT_LANGUAGE) or ""
+    if base and not data:
+        data = {code: base for code in LANGUAGES}
+    else:
+        for code in LANGUAGES:
+            data.setdefault(code, base)
+    return data
+
+
+def resolve_translated_value(
+    translations: Dict[str, str],
+    fallback: Optional[str],
+    language_code: str,
+) -> str:
+    value = translations.get(language_code)
+    if not value:
+        value = translations.get(DEFAULT_LANGUAGE)
+    if not value:
+        for candidate in translations.values():
+            if candidate:
+                value = candidate
+                break
+    if not value:
+        value = fallback or ""
+    return value
+
+
 class Category:
     def __init__(
         self,
@@ -177,10 +220,22 @@ class Category:
         description: str,
         display_order: int = 0,
         photo_url: Optional[str] = None,
+        name_translations: Optional[Dict[str, str]] = None,
+        description_translations: Optional[Dict[str, str]] = None,
     ):
         self.id = id
-        self.name = name
-        self.description = description
+        self.name_translations = normalise_translation_map(
+            name_translations, name
+        )
+        self.description_translations = normalise_translation_map(
+            description_translations, description
+        )
+        self.name = resolve_translated_value(
+            self.name_translations, name, DEFAULT_LANGUAGE
+        )
+        self.description = resolve_translated_value(
+            self.description_translations, description, DEFAULT_LANGUAGE
+        )
         self.display_order = display_order
         self.photo_url = photo_url
 
@@ -296,6 +351,24 @@ def get_bar_description_for_language(bar: Any, language_code: str) -> str:
     if not description:
         description = getattr(bar, "description", "") or ""
     return description
+
+
+def get_category_name_for_language(category: Any, language_code: str) -> str:
+    if category is None:
+        return ""
+    raw = getattr(category, "name_translations", None)
+    base = getattr(category, "name", "")
+    translations = normalise_translation_map(raw, base)
+    return resolve_translated_value(translations, base, language_code)
+
+
+def get_category_description_for_language(category: Any, language_code: str) -> str:
+    if category is None:
+        return ""
+    raw = getattr(category, "description_translations", None)
+    base = getattr(category, "description", "")
+    translations = normalise_translation_map(raw, base)
+    return resolve_translated_value(translations, base, language_code)
 
 
 class DemoUser:
@@ -789,7 +862,12 @@ def ensure_category_columns() -> None:
     """Ensure expected columns exist on the categories table."""
     inspector = inspect(engine)
     columns = {col["name"] for col in inspector.get_columns("categories")}
-    required = {"description": "TEXT", "photo_url": "VARCHAR(255)"}
+    required = {
+        "description": "TEXT",
+        "photo_url": "VARCHAR(255)",
+        "name_translations": "JSON",
+        "description_translations": "JSON",
+    }
     missing = {name: ddl for name, ddl in required.items() if name not in columns}
     if missing:
         with engine.begin() as conn:
@@ -799,6 +877,41 @@ def ensure_category_columns() -> None:
                         f"ALTER TABLE categories ADD COLUMN IF NOT EXISTS {name} {ddl}"
                     )
                 )
+    with SessionLocal() as db:
+        updated = False
+        for category in db.query(CategoryModel).all():
+            name_translations = category.name_translations or {}
+            base_name = name_translations.get(DEFAULT_LANGUAGE) or category.name or ""
+            if not name_translations and base_name:
+                name_translations = {code: base_name for code in LANGUAGES}
+            else:
+                for code in LANGUAGES:
+                    name_translations.setdefault(code, base_name)
+            description_translations = category.description_translations or {}
+            base_description = (
+                description_translations.get(DEFAULT_LANGUAGE)
+                or category.description
+                or ""
+            )
+            if not description_translations and base_description:
+                description_translations = {code: base_description for code in LANGUAGES}
+            else:
+                for code in LANGUAGES:
+                    description_translations.setdefault(code, base_description)
+            if name_translations != (category.name_translations or {}):
+                category.name_translations = name_translations
+                updated = True
+            if description_translations != (category.description_translations or {}):
+                category.description_translations = description_translations
+                updated = True
+            if base_name and (category.name or "") != base_name:
+                category.name = base_name
+                updated = True
+            if base_description and (category.description or "") != base_description:
+                category.description = base_description
+                updated = True
+        if updated:
+            db.commit()
 
 
 def ensure_menu_item_columns() -> None:
@@ -1409,12 +1522,26 @@ def load_bars_from_db() -> None:
             )
             # Load categories for the bar
             for c in b.categories:
+                name_translations = normalise_translation_map(
+                    c.name_translations, c.name or ""
+                )
+                description_translations = normalise_translation_map(
+                    c.description_translations, c.description or ""
+                )
+                base_name = resolve_translated_value(
+                    name_translations, c.name or "", DEFAULT_LANGUAGE
+                )
+                base_description = resolve_translated_value(
+                    description_translations, c.description or "", DEFAULT_LANGUAGE
+                )
                 bar.categories[c.id] = Category(
                     id=c.id,
-                    name=c.name,
-                    description=c.description or "",
+                    name=base_name,
+                    description=base_description,
                     display_order=c.sort_order if c.sort_order is not None else 0,
                     photo_url=c.photo_url,
+                    name_translations=name_translations,
+                    description_translations=description_translations,
                 )
             # Load products for the bar
             for item in b.menu_items:
@@ -1528,12 +1655,26 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
         bar.products.clear()
         bar.tables.clear()
     for c in b.categories:
+        name_translations = normalise_translation_map(
+            c.name_translations, c.name or ""
+        )
+        description_translations = normalise_translation_map(
+            c.description_translations, c.description or ""
+        )
+        base_name = resolve_translated_value(
+            name_translations, c.name or "", DEFAULT_LANGUAGE
+        )
+        base_description = resolve_translated_value(
+            description_translations, c.description or "", DEFAULT_LANGUAGE
+        )
         bar.categories[c.id] = Category(
             id=c.id,
-            name=c.name,
-            description=c.description or "",
+            name=base_name,
+            description=base_description,
             display_order=c.sort_order if c.sort_order is not None else 0,
             photo_url=c.photo_url,
+            name_translations=name_translations,
+            description_translations=description_translations,
         )
     for item in b.menu_items:
         bar.products[item.id] = Product(
@@ -1668,6 +1809,25 @@ def render_template(template_name: str, **context) -> HTMLResponse:
         return get_bar_description_for_language(bar_obj, code)
 
     context.setdefault("bar_description", _bar_description_helper)
+
+    def _category_name_helper(
+        category_obj: Any, language: Optional[str] = None
+    ) -> str:
+        code = normalize_language(language) if language else language_code
+        if not code:
+            code = language_code
+        return get_category_name_for_language(category_obj, code)
+
+    def _category_description_helper(
+        category_obj: Any, language: Optional[str] = None
+    ) -> str:
+        code = normalize_language(language) if language else language_code
+        if not code:
+            code = language_code
+        return get_category_description_for_language(category_obj, code)
+
+    context.setdefault("category_name", _category_name_helper)
+    context.setdefault("category_description", _category_description_helper)
 
     template = templates_env.get_template(template_name)
     return HTMLResponse(template.render(**context), status_code=status_code)
@@ -5685,34 +5845,71 @@ async def bar_new_category(
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
-    name = form.get("name")
-    description = form.get("description")
+    base_name = (form.get("name") or "").strip()
+    base_description = (form.get("description") or "").strip()
     display_order = form.get("display_order") or 0
-    if not name or not description:
+    name_translations: Dict[str, str] = {}
+    description_translations: Dict[str, str] = {}
+    for code in LANGUAGES:
+        name_value = (form.get(f"name_{code}") or "").strip()
+        desc_value = (form.get(f"description_{code}") or "").strip()
+        if not name_value:
+            name_value = base_name
+        if not desc_value:
+            desc_value = base_description
+        name_translations[code] = name_value
+        description_translations[code] = desc_value
+    primary_name = resolve_translated_value(
+        normalise_translation_map(name_translations, base_name),
+        base_name,
+        DEFAULT_LANGUAGE,
+    )
+    primary_description = resolve_translated_value(
+        normalise_translation_map(description_translations, base_description),
+        base_description,
+        DEFAULT_LANGUAGE,
+    )
+    if not primary_name or not primary_description:
+        form_values = {
+            "name": base_name,
+            "description": base_description,
+            "display_order": display_order,
+            "name_translations": name_translations,
+            "description_translations": description_translations,
+        }
         return render_template(
             "bar_new_category.html",
             request=request,
             bar=bar,
             error="Name and description are required",
+            form_values=form_values,
         )
     try:
         order_val = int(display_order)
     except ValueError:
         order_val = 0
+    normalised_names = normalise_translation_map(name_translations, primary_name)
+    normalised_descriptions = normalise_translation_map(
+        description_translations, primary_description
+    )
     db_category = CategoryModel(
         bar_id=bar_id,
-        name=name,
-        description=description,
+        name=primary_name,
+        description=primary_description,
         sort_order=order_val,
+        name_translations=normalised_names,
+        description_translations=normalised_descriptions,
     )
     db.add(db_category)
     db.commit()
     db.refresh(db_category)
     category = Category(
         id=db_category.id,
-        name=name,
-        description=description,
+        name=primary_name,
+        description=primary_description,
         display_order=order_val,
+        name_translations=normalised_names,
+        description_translations=normalised_descriptions,
     )
     bar.categories[category.id] = category
     return RedirectResponse(
@@ -6063,18 +6260,50 @@ async def bar_edit_category(
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
-    name = form.get("name")
-    description = form.get("description")
+    base_name = (form.get("name") or "").strip()
+    base_description = (form.get("description") or "").strip()
     display_order = form.get("display_order") or category.display_order
     db_category = db.get(CategoryModel, category_id)
-    if name:
-        category.name = name
-        if db_category:
-            db_category.name = name
-    if description:
-        category.description = description
-        if db_category:
-            db_category.description = description
+    existing_name_translations = (
+        dict(category.name_translations) if getattr(category, "name_translations", None) else {}
+    )
+    existing_description_translations = (
+        dict(category.description_translations)
+        if getattr(category, "description_translations", None)
+        else {}
+    )
+    name_inputs: Dict[str, str] = {}
+    description_inputs: Dict[str, str] = {}
+    name_fallback = base_name or category.name or ""
+    description_fallback = base_description or category.description or ""
+    for code in LANGUAGES:
+        raw_name = (form.get(f"name_{code}") or "").strip()
+        raw_desc = (form.get(f"description_{code}") or "").strip()
+        if not raw_name:
+            raw_name = existing_name_translations.get(code, name_fallback)
+        if not raw_desc:
+            raw_desc = existing_description_translations.get(code, description_fallback)
+        name_inputs[code] = raw_name
+        description_inputs[code] = raw_desc
+    normalised_names = normalise_translation_map(name_inputs, name_fallback)
+    normalised_descriptions = normalise_translation_map(
+        description_inputs, description_fallback
+    )
+    primary_name = resolve_translated_value(
+        normalised_names, name_fallback, DEFAULT_LANGUAGE
+    )
+    primary_description = resolve_translated_value(
+        normalised_descriptions, description_fallback, DEFAULT_LANGUAGE
+    )
+    category.name = primary_name
+    category.description = primary_description
+    category.name_translations = normalised_names
+    category.description_translations = normalised_descriptions
+    if db_category:
+        db_category.name = primary_name
+        db_category.description = primary_description
+        db_category.name_translations = normalised_names
+        db_category.description_translations = normalised_descriptions
     try:
         order_val = int(display_order)
         category.display_order = order_val
