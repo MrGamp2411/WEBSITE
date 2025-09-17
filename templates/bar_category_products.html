@@ -4,11 +4,11 @@
 <section class="menu-page">
   <header class="menu-toolbar">
     <div class="title-wrap">
-      <h1>Products in {{ category.name }} for {{ bar.name }}</h1>
-      <p class="subtitle">Add, edit and organize products for this category.</p>
+      <h1>{{ _('bar_products.manage.title', category=category.name, bar=bar.name, default='Products in {category} for {bar}') }}</h1>
+      <p class="subtitle">{{ _('bar_products.manage.subtitle', default='Add, edit and organize products for this category.') }}</p>
     </div>
     <div class="toolbar-actions">
-      <a class="btn btn--primary" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products/new">Add Product</a>
+      <a class="btn btn--primary" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products/new">{{ _('bar_products.manage.actions.add', default='Add Product') }}</a>
     </div>
   </header>
 
@@ -17,12 +17,12 @@
     <table class="menu-table">
       <thead>
         <tr>
-          <th>Order</th>
-          <th>Photo</th>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Price (CHF)</th>
-          <th class="actions">Actions</th>
+          <th>{{ _('bar_products.manage.table.headers.order', default='Order') }}</th>
+          <th>{{ _('bar_products.manage.table.headers.photo', default='Photo') }}</th>
+          <th>{{ _('bar_products.manage.table.headers.name', default='Name') }}</th>
+          <th>{{ _('bar_products.manage.table.headers.description', default='Description') }}</th>
+          <th>{{ _('bar_products.manage.table.headers.price', default='Price (CHF)') }}</th>
+          <th class="actions">{{ _('bar_products.manage.table.headers.actions', default='Actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -37,10 +37,10 @@
           <td>{{ "%.2f"|format(product.price) }}</td>
           <td class="actions">
             <div class="actions-group">
-              <a class="btn-outline" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/edit">Edit</a>
-              <button type="submit" form="delete_{{ product.id }}" class="btn-danger-soft">Delete</button>
+              <a class="btn-outline" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/edit">{{ _('bar_products.manage.actions.edit', default='Edit') }}</a>
+              <button type="submit" form="delete_{{ product.id }}" class="btn-danger-soft">{{ _('bar_products.manage.actions.delete', default='Delete') }}</button>
             </div>
-            <form id="delete_{{ product.id }}" method="post" action="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/delete" style="display:none" onsubmit="return confirm('Are you sure you want to delete this product?');"></form>
+            <form id="delete_{{ product.id }}" method="post" action="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/delete" style="display:none" onsubmit="return confirm(&quot;{{ _('bar_products.manage.confirm_delete', default='Are you sure you want to delete this product?')|replace('"', '\\"') }}&quot;);"></form>
           </td>
         </tr>
         {% endfor %}
@@ -48,7 +48,7 @@
     </table>
   </div>
   {% else %}
-  <p>No products in this category.</p>
+  <p>{{ _('bar_products.manage.empty', default='No products in this category.') }}</p>
   {% endif %}
 </section>
 

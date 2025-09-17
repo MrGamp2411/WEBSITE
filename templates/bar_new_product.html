@@ -1,24 +1,24 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Add Product to {{ category.name }}</h1>
+<h1>{{ _('bar_products.new.title', category=category.name, default='Add Product to {category}') }}</h1>
 {% if error %}<p class="error">{{ error }}</p>{% endif %}
 <form class="form" method="post" enctype="multipart/form-data">
-  <label for="name">Name
+  <label for="name">{{ _('bar_products.form.name', default='Name') }}
     <input id="name" name="name" required>
   </label>
-  <label for="price">Price (CHF)
+  <label for="price">{{ _('bar_products.form.price', default='Price (CHF)') }}
     <input id="price" type="number" step="0.01" name="price" required>
   </label>
-  <label for="description">Description
+  <label for="description">{{ _('bar_products.form.description', default='Description') }}
     <textarea id="description" name="description" maxlength="190" required></textarea>
   </label>
-  <label for="display_order">Display Order
+  <label for="display_order">{{ _('bar_products.form.display_order', default='Display Order') }}
     <input id="display_order" type="number" name="display_order" value="0">
   </label>
-  <label for="photo">Photo
+  <label for="photo">{{ _('bar_products.form.photo', default='Photo') }}
     <input id="photo" type="file" name="photo">
   </label>
-  <button class="btn btn--primary" type="submit">Create</button>
+  <button class="btn btn--primary" type="submit">{{ _('bar_products.form.create', default='Create') }}</button>
 </form>
 {% endblock %}
 

@@ -1,16 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Edit Category for {{ bar.name }}</h1>
+<h1>{{ _('bar_categories.edit.title', bar=bar.name, default='Edit Category for {bar}') }}</h1>
 <form class="form" method="post">
-  <label for="name">Name
+  <label for="name">{{ _('bar_categories.form.name', default='Name') }}
     <input id="name" name="name" value="{{ category.name }}" required>
   </label>
-  <label for="description">Description
+  <label for="description">{{ _('bar_categories.form.description', default='Description') }}
     <textarea id="description" name="description" required>{{ category.description }}</textarea>
   </label>
-  <label for="display_order">Display Order
+  <label for="display_order">{{ _('bar_categories.form.display_order', default='Display Order') }}
     <input id="display_order" type="number" name="display_order" value="{{ category.display_order }}">
   </label>
-  <button class="btn btn--primary" type="submit">Save</button>
+  <button class="btn btn--primary" type="submit">{{ _('bar_categories.form.save', default='Save') }}</button>
 </form>
 {% endblock %}

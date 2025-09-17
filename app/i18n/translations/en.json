@@ -602,6 +602,112 @@
       "ready": "Ready"
     }
   },
+  "bar_admin_history": {
+    "title": "{bar} - Order History & Revenue",
+    "month_title": "{bar} - {month}",
+    "orders_title": "{bar} - Orders for {date}",
+    "actions": {
+      "view": "View",
+      "confirm": "Confirm Payment"
+    },
+    "metrics": {
+      "total_collected": "Total collected",
+      "total_earned": "Total earned",
+      "commission": "Siplygo commission (5%)",
+      "payout": "Amount to pay to bar"
+    },
+    "breakdown": {
+      "title": "Payment breakdown:"
+    },
+    "empty": {
+      "history": "No order history yet.",
+      "orders": "No orders."
+    }
+  },
+  "bar_admin_orders": {
+    "title": "{bar} Orders",
+    "actions": {
+      "history": "Order History & Revenue"
+    }
+  },
+  "bar_categories": {
+    "manage": {
+      "title": "Manage Categories for {bar}",
+      "subtitle": "Create, edit and organize menu categories for this venue.",
+      "search": {
+        "aria": "Search categories",
+        "placeholder": "Search categories…",
+        "input_aria": "Search categories by name",
+        "clear": "Clear search"
+      },
+      "actions": {
+        "add": "Add Category",
+        "products": "Products",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "table": {
+        "headers": {
+          "name": "Name",
+          "description": "Description",
+          "actions": "Actions"
+        }
+      },
+      "confirm_delete": "Are you sure you want to delete this category?",
+      "empty": "No categories yet."
+    },
+    "form": {
+      "name": "Name",
+      "description": "Description",
+      "display_order": "Display Order",
+      "create": "Create",
+      "save": "Save"
+    },
+    "new": {
+      "title": "Add Category for {bar}"
+    },
+    "edit": {
+      "title": "Edit Category for {bar}"
+    }
+  },
+  "bar_products": {
+    "edit": {
+      "title": "Edit Product {product}"
+    },
+    "new": {
+      "title": "Add Product to {category}"
+    },
+    "form": {
+      "name": "Name",
+      "price": "Price (CHF)",
+      "description": "Description",
+      "display_order": "Display Order",
+      "photo": "Photo",
+      "create": "Create",
+      "update": "Update"
+    },
+    "manage": {
+      "title": "Products in {category} for {bar}",
+      "subtitle": "Add, edit and organize products for this category.",
+      "actions": {
+        "add": "Add Product",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "table": {
+        "headers": {
+          "order": "Order",
+          "photo": "Photo",
+          "name": "Name",
+          "description": "Description",
+          "price": "Price (CHF)",
+          "actions": "Actions"
+        }
+      },
+      "confirm_delete": "Are you sure you want to delete this product?",
+      "empty": "No products in this category."
+    }
+  },
   "order_success": {
     "title": "Order Placed",
     "body": {

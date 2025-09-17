@@ -388,3 +388,7 @@
 - Bar admin dashboard strings live under the `bar_admin_dashboard` namespace in `app/i18n/translations/*.json`; `templates/bar_admin_dashboard.html` references them.
 - Bartender confirmation strings live under the `bartender_confirm` namespace in `app/i18n/translations/*.json`; `templates/bartender_confirm.html` references them.
 - Display orders screen strings live under the `display_orders` namespace in `app/i18n/translations/*.json`; `templates/display_orders.html` references them.
+- Bar admin revenue history pages use the `bar_admin_history` namespace in `app/i18n/translations/*.json`; `templates/bar_admin_month_history.html`, `templates/bar_admin_order_history.html`, and `templates/bar_admin_order_history_view.html` reference these keys.
+- Bar admin live orders strings live under the `bar_admin_orders` namespace in `app/i18n/translations/*.json`; `templates/bar_admin_orders.html` pulls from these keys.
+- Bar category management pages use the `bar_categories` namespace in `app/i18n/translations/*.json`; see `templates/bar_manage_categories.html`, `templates/bar_new_category.html`, and `templates/bar_edit_category.html`.
+- Bar product management pages use the `bar_products` namespace in `app/i18n/translations/*.json`; `templates/bar_category_products.html`, `templates/bar_new_product.html`, and `templates/bar_edit_product.html` reference them.

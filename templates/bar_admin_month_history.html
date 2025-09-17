@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>{{ bar.name }} - {{ month_label }}</h1>
+<h1>{{ _('bar_admin_history.month_title', bar=bar.name, month=month_label, default='{bar} - {month}') }}</h1>
 {% if closings %}
 <ul class="closing-list">
   {% for closing in closings %}
@@ -9,31 +9,31 @@
       <div class="revenue-card rc">
         <div class="rc-header">
           <h3 class="rc-title">{{ closing.closed_at|format_time }}</h3>
-          <a class="rc-view" href="/dashboard/bar/{{ bar.id }}/orders/history/{{ closing.id }}">View</a>
+          <a class="rc-view" href="/dashboard/bar/{{ bar.id }}/orders/history/{{ closing.id }}">{{ _('bar_admin_history.actions.view', default='View') }}</a>
         </div>
 
         <div class="rc-kpis">
           <div class="rc-kpi">
-            <span class="label">Total collected</span>
+            <span class="label">{{ _('bar_admin_history.metrics.total_collected', default='Total collected') }}</span>
             <span class="value">CHF {{ "%.2f"|format(closing.total_revenue) }}</span>
           </div>
           <div class="rc-kpi">
-            <span class="label">Total earned</span>
+            <span class="label">{{ _('bar_admin_history.metrics.total_earned', default='Total earned') }}</span>
             <span class="value">CHF {{ "%.2f"|format(closing.total_earned) }}</span>
           </div>
           <div class="rc-kpi">
-            <span class="label">Siplygo commission (5%)</span>
+            <span class="label">{{ _('bar_admin_history.metrics.commission', default='Siplygo commission (5%)') }}</span>
             <span class="value rc-negative">CHF {{ "%.2f"|format(closing.siplygo_commission) }}</span>
           </div>
           <div class="rc-kpi rc-emph">
-            <span class="label">Amount to pay to bar</span>
+            <span class="label">{{ _('bar_admin_history.metrics.payout', default='Amount to pay to bar') }}</span>
             <span class="value">CHF {{ "%.2f"|format(closing.bar_payout) }}</span>
           </div>
         </div>
 
         {% if closing.payment_totals %}
         <div class="rc-breakdown">
-          <h4 class="rc-subtitle">Payment breakdown:</h4>
+          <h4 class="rc-subtitle">{{ _('bar_admin_history.breakdown.title', default='Payment breakdown:') }}</h4>
           <ul class="rc-list">
             {% for method, amount in closing.payment_totals.items() %}
             <li><span class="item">{{ method }}</span><span class="amount">CHF {{ '%.2f'|format(amount) }}</span></li>
@@ -47,6 +47,6 @@
   {% endfor %}
 </ul>
 {% else %}
-<p>No order history yet.</p>
+<p>{{ _('bar_admin_history.empty.history', default='No order history yet.') }}</p>
 {% endif %}
 {% endblock %}
