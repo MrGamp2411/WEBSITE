@@ -153,7 +153,12 @@ body.dark-mode .language-option__meta i{color:#ede9fe;}
 }
 
 .home-hero{position:relative;overflow-y:visible;overflow-x:visible;border-radius:0;z-index:0;}
-.home-hero .hero__content{position:relative;z-index:2;}
+.home-hero .hero__content{
+  position:relative;
+  z-index:2;
+  margin-inline:auto;
+  text-align:center;
+}
 
 .home-hero .hero-art{
   position:absolute;
