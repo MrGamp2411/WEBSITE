@@ -12,6 +12,7 @@
 - Homepage image stored in photo/homepage.png.
 - `/photo` static path serves the homepage image.
 - Homepage hero displays the artwork as a single `<img class="hero-art">` absolutely positioned under the content with pointer-events disabled.
+- Homepage hero copy is centered via `.home-hero .hero__content` using `margin-inline:auto` and `text-align:center`.
 - Hero image is non-draggable (`draggable="false"` and `user-select:none`) so it can't shift text or cards.
 - Hero art is centered and rotated via `transform:translateX(-50%) rotate(70deg)`.
 - Hero art is positioned 450px to the left via `left:calc(50% - 450px)`.
