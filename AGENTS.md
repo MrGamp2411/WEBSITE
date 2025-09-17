@@ -385,3 +385,6 @@
 - Cart, Search, and bar detail pages use the `cart`, `search`, and `bar_detail` namespaces in `app/i18n/translations/*.json` and their respective templates.
 - The "All bars" directory view localises via the `all_bars` namespace in `app/i18n/translations/*.json`; strings surface in `templates/all_bars.html` and supporting scripts.
 - Bartender dashboard copy pulls from the `bartender_dashboard` namespace, and bartender order management strings use the `bartender_orders` namespace.
+- Bar admin dashboard strings live under the `bar_admin_dashboard` namespace in `app/i18n/translations/*.json`; `templates/bar_admin_dashboard.html` references them.
+- Bartender confirmation strings live under the `bartender_confirm` namespace in `app/i18n/translations/*.json`; `templates/bartender_confirm.html` references them.
+- Display orders screen strings live under the `display_orders` namespace in `app/i18n/translations/*.json`; `templates/display_orders.html` references them.
