@@ -3,32 +3,32 @@
 <section class="users-page">
   <header class="users-toolbar">
     <div class="title-wrap">
-      <h1>Manage Users for {{ bar.name }}</h1>
-      <p class="subtitle">Add or assign staff to this venue.</p>
+      <h1>{{ _('admin_bar_users.title', bar=bar.name, default='Manage Users for {bar}') }}</h1>
+      <p class="subtitle">{{ _('admin_bar_users.subtitle', default='Add or assign staff to this venue.') }}</p>
     </div>
     <details>
-      <summary>Add Existing User</summary>
+      <summary>{{ _('admin_bar_users.add_existing.summary', default='Add Existing User') }}</summary>
       <form class="form" method="post">
         <input type="hidden" name="action" value="existing">
-        <label for="existing_email">Email
+        <label for="existing_email">{{ _('admin_bar_users.add_existing.email', default='Email') }}
           <input id="existing_email" name="email" type="email" required>
         </label>
-        <label for="existing_role">Role
+        <label for="existing_role">{{ _('admin_bar_users.add_existing.role', default='Role') }}
           <select id="existing_role" name="role">
-            <option value="bar_admin">Bar Admin</option>
-            <option value="bartender">Bartender</option>
+            <option value="bar_admin">{{ _('admin_bar_users.roles.bar_admin', default='Bar Admin') }}</option>
+            <option value="bartender">{{ _('admin_bar_users.roles.bartender', default='Bartender') }}</option>
           </select>
         </label>
-        <p>Assigning to {{ bar.name }}</p>
-        <button class="btn btn--primary" type="submit">Add</button>
+        <p>{{ _('admin_bar_users.add_existing.assigning', bar=bar.name, default='Assigning to {bar}') }}</p>
+        <button class="btn btn--primary" type="submit">{{ _('admin_bar_users.add_existing.submit', default='Add') }}</button>
       </form>
     </details>
     <div class="toolbar-actions">
-      <form class="users-search" role="search" aria-label="Search users" onsubmit="return false">
+      <form class="users-search" role="search" aria-label="{{ _('admin_bar_users.search.aria', default='Search users') }}" onsubmit="return false">
         <i class="bi bi-search" aria-hidden="true"></i>
         <input id="userSearch" type="search" inputmode="search" autocomplete="off"
-               placeholder="Search users by name or email…" aria-label="Search users by name or email">
-        <button class="clear" type="button" aria-label="Clear search">
+               placeholder="{{ _('admin_bar_users.search.placeholder', default='Search users by name or email…') }}" aria-label="{{ _('admin_bar_users.search.input_aria', default='Search users by name or email') }}">
+        <button class="clear" type="button" aria-label="{{ _('admin_bar_users.search.clear', default='Clear search') }}">
           <i class="bi bi-x-circle" aria-hidden="true"></i>
         </button>
       </form>
@@ -38,15 +38,15 @@
   {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
   {% if message %}<div class="alert alert-success">{{ message }}</div>{% endif %}
 
-  <h2>Current Staff</h2>
+  <h2>{{ _('admin_bar_users.sections.current_staff', default='Current Staff') }}</h2>
   <div class="table-card">
     <table class="users-table">
       <thead>
         <tr>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th class="actions">Actions</th>
+          <th>{{ _('admin_bar_users.table.headers.username', default='Username') }}</th>
+          <th>{{ _('admin_bar_users.table.headers.email', default='Email') }}</th>
+          <th>{{ _('admin_bar_users.table.headers.role', default='Role') }}</th>
+          <th class="actions">{{ _('admin_bar_users.table.headers.actions', default='Actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -57,7 +57,7 @@
           <td>{{ u.role }}</td>
           <td class="actions">
             <div class="actions-group">
-              <button type="button" class="btn-danger-soft js-remove-user" data-user-id="{{ u.id }}">Remove</button>
+              <button type="button" class="btn-danger-soft js-remove-user" data-user-id="{{ u.id }}">{{ _('admin_bar_users.actions.remove', default='Remove') }}</button>
             </div>
             <form id="remove_{{ u.id }}" method="post" action="/admin/bars/{{ bar.id }}/users" style="display:none">
               <input type="hidden" name="action" value="remove">
@@ -73,10 +73,10 @@
 
 <div id="removeBlocker" class="cart-blocker" hidden>
   <div class="cart-popup">
-    <p>Are you sure you want to remove this user?</p>
+    <p>{{ _('admin_bar_users.confirm_remove', default='Are you sure you want to remove this user?') }}</p>
     <div class="cart-popup-actions">
-      <button type="button" class="btn btn--secondary js-cancel-remove">Cancel</button>
-      <button type="button" class="btn btn--primary js-confirm-remove">Remove</button>
+      <button type="button" class="btn btn--secondary js-cancel-remove">{{ _('admin_bar_users.dialog.cancel', default='Cancel') }}</button>
+      <button type="button" class="btn btn--primary js-confirm-remove">{{ _('admin_bar_users.dialog.remove', default='Remove') }}</button>
     </div>
   </div>
 </div>

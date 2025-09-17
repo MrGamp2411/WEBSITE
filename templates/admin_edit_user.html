@@ -1,53 +1,53 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Edit User {{ user.username }}</h1>
+<h1>{{ _('admin_edit_user.title', user=user.username, default='Edit User {user}') }}</h1>
 {% if error %}
 <div id="errorBlocker" class="cart-blocker">
   <div class="cart-popup">
     <p>{{ error }}</p>
     <div class="cart-popup-actions">
-      <button type="button" class="btn btn--primary js-close-error">OK</button>
+      <button type="button" class="btn btn--primary js-close-error">{{ _('admin_edit_user.dialog.ok', default='OK') }}</button>
     </div>
   </div>
 </div>
 {% endif %}
 <form class="form" method="post" action="/admin/users/edit/{{ user.id }}">
-  <label for="username">Username</label>
+  <label for="username">{{ _('admin_edit_user.form.username', default='Username') }}</label>
   <input id="username" name="username" type="text" value="{{ user.username }}" required>
 
-  <a class="btn-outline" href="/admin/users/{{ user.id }}/password">Edit Password</a>
+  <a class="btn-outline" href="/admin/users/{{ user.id }}/password">{{ _('admin_edit_user.actions.edit_password', default='Edit Password') }}</a>
 
-  <label for="email">Email</label>
+  <label for="email">{{ _('admin_edit_user.form.email', default='Email') }}</label>
   <input id="email" name="email" type="email" value="{{ user.email }}" required>
 
-  <label for="prefix">Prefix</label>
+  <label for="prefix">{{ _('admin_edit_user.form.prefix', default='Prefix') }}</label>
   <select id="prefix" name="prefix" autocomplete="tel-country-code">
-    <option value="+41" {% if user.prefix == "+41" %}selected{% endif %}>+41 (Switzerland)</option>
-    <option value="+39" {% if user.prefix == "+39" %}selected{% endif %}>+39 (Italy)</option>
-    <option value="+49" {% if user.prefix == "+49" %}selected{% endif %}>+49 (Germany)</option>
-    <option value="+33" {% if user.prefix == "+33" %}selected{% endif %}>+33 (France)</option>
+    <option value="+41" {% if user.prefix == "+41" %}selected{% endif %}>{{ _('admin_edit_user.prefixes.ch', default='+41 (Switzerland)') }}</option>
+    <option value="+39" {% if user.prefix == "+39" %}selected{% endif %}>{{ _('admin_edit_user.prefixes.it', default='+39 (Italy)') }}</option>
+    <option value="+49" {% if user.prefix == "+49" %}selected{% endif %}>{{ _('admin_edit_user.prefixes.de', default='+49 (Germany)') }}</option>
+    <option value="+33" {% if user.prefix == "+33" %}selected{% endif %}>{{ _('admin_edit_user.prefixes.fr', default='+33 (France)') }}</option>
   </select>
 
-  <label for="phone">Phone</label>
+  <label for="phone">{{ _('admin_edit_user.form.phone', default='Phone') }}</label>
   <input id="phone" name="phone" type="tel" value="{{ user.phone }}">
 
-  <label for="role">Role</label>
+  <label for="role">{{ _('admin_edit_user.form.role', default='Role') }}</label>
   {% if current.is_super_admin %}
   <select id="role" name="role">
-    <option value="super_admin" {% if user.role=='super_admin' %}selected{% endif %}>Super Admin</option>
-    <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>Bar Admin</option>
-    <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>Bartender</option>
-    <option value="display" {% if user.role=='display' %}selected{% endif %}>Display</option>
-    <option value="customer" {% if user.role=='customer' %}selected{% endif %}>Customer</option>
+    <option value="super_admin" {% if user.role=='super_admin' %}selected{% endif %}>{{ _('admin_edit_user.roles.super_admin', default='Super Admin') }}</option>
+    <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>{{ _('admin_edit_user.roles.bar_admin', default='Bar Admin') }}</option>
+    <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>{{ _('admin_edit_user.roles.bartender', default='Bartender') }}</option>
+    <option value="display" {% if user.role=='display' %}selected{% endif %}>{{ _('admin_edit_user.roles.display', default='Display') }}</option>
+    <option value="customer" {% if user.role=='customer' %}selected{% endif %}>{{ _('admin_edit_user.roles.customer', default='Customer') }}</option>
   </select>
 
-  <h2>Assigned Bars</h2>
+  <h2>{{ _('admin_edit_user.sections.assigned', default='Assigned Bars') }}</h2>
   <div class="toolbar-actions">
-    <div class="bars-search" role="search" aria-label="Search assigned bars" onsubmit="return false">
+    <div class="bars-search" role="search" aria-label="{{ _('admin_edit_user.assigned_search.aria', default='Search assigned bars') }}" onsubmit="return false">
       <i class="bi bi-search" aria-hidden="true"></i>
       <input id="assignedBarSearch" type="search" inputmode="search" autocomplete="off"
-             placeholder="Search bars by name…" aria-label="Search assigned bars by name">
-      <button class="clear" type="button" aria-label="Clear search">
+             placeholder="{{ _('admin_edit_user.assigned_search.placeholder', default='Search bars by name…') }}" aria-label="{{ _('admin_edit_user.assigned_search.input_aria', default='Search assigned bars by name') }}">
+      <button class="clear" type="button" aria-label="{{ _('admin_edit_user.assigned_search.clear', default='Clear search') }}">
         <i class="bi bi-x-circle" aria-hidden="true"></i>
       </button>
     </div>
@@ -56,10 +56,10 @@
     <table class="bars-table">
       <thead>
         <tr>
-          <th>No.</th>
-          <th>Name</th>
-          <th>City</th>
-          <th class="actions">Actions</th>
+          <th>{{ _('admin_edit_user.table.headers.number', default='No.') }}</th>
+          <th>{{ _('admin_edit_user.table.headers.name', default='Name') }}</th>
+          <th>{{ _('admin_edit_user.table.headers.city', default='City') }}</th>
+          <th class="actions">{{ _('admin_edit_user.table.headers.actions', default='Actions') }}</th>
         </tr>
       </thead>
       <tbody id="assignedBars">
@@ -70,7 +70,7 @@
           <td>{{ b.city }}</td>
           <td class="actions">
             <div class="actions-group">
-              <button type="button" class="btn-danger-soft js-remove-bar" data-bar-id="{{ b.id }}">Remove</button>
+              <button type="button" class="btn-danger-soft js-remove-bar" data-bar-id="{{ b.id }}">{{ _('admin_edit_user.actions.remove', default='Remove') }}</button>
             </div>
             <input type="checkbox" name="bar_ids" value="{{ b.id }}" checked hidden>
           </td>
@@ -80,13 +80,13 @@
     </table>
   </div>
 
-  <h2>Assign a Bar</h2>
+  <h2>{{ _('admin_edit_user.sections.assign', default='Assign a Bar') }}</h2>
   <div class="toolbar-actions">
-    <div class="bars-search" role="search" aria-label="Search available bars" onsubmit="return false">
+    <div class="bars-search" role="search" aria-label="{{ _('admin_edit_user.available_search.aria', default='Search available bars') }}" onsubmit="return false">
       <i class="bi bi-search" aria-hidden="true"></i>
       <input id="availableBarSearch" type="search" inputmode="search" autocomplete="off"
-             placeholder="Search bars by name…" aria-label="Search available bars by name">
-      <button class="clear" type="button" aria-label="Clear search">
+             placeholder="{{ _('admin_edit_user.available_search.placeholder', default='Search bars by name…') }}" aria-label="{{ _('admin_edit_user.available_search.input_aria', default='Search available bars by name') }}">
+      <button class="clear" type="button" aria-label="{{ _('admin_edit_user.available_search.clear', default='Clear search') }}">
         <i class="bi bi-x-circle" aria-hidden="true"></i>
       </button>
     </div>
@@ -109,7 +109,7 @@
           <td>{{ b.city }}</td>
           <td class="actions">
             <div class="actions-group">
-              <button type="button" class="btn-outline js-add-bar" data-bar-id="{{ b.id }}">Add</button>
+              <button type="button" class="btn-outline js-add-bar" data-bar-id="{{ b.id }}">{{ _('admin_edit_user.actions.add', default='Add') }}</button>
             </div>
             <input type="checkbox" name="bar_ids" value="{{ b.id }}" hidden>
           </td>
@@ -119,40 +119,44 @@
     </table>
   </div>
 
-  <label for="add_credit">Add Credit</label>
+  <label for="add_credit">{{ _('admin_edit_user.form.add_credit', default='Add Credit') }}</label>
   <input id="add_credit" name="add_credit" type="number" step="0.01" value="0">
 
-  <label for="remove_credit">Remove Credit</label>
+  <label for="remove_credit">{{ _('admin_edit_user.form.remove_credit', default='Remove Credit') }}</label>
   <input id="remove_credit" name="remove_credit" type="number" step="0.01" value="0">
   {% else %}
   <select id="role" name="role">
-    <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>Bar Admin</option>
-    <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>Bartender</option>
+    <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>{{ _('admin_edit_user.roles.bar_admin', default='Bar Admin') }}</option>
+    <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>{{ _('admin_edit_user.roles.bartender', default='Bartender') }}</option>
   </select>
   <input type="hidden" name="add_credit" value="0">
   <input type="hidden" name="remove_credit" value="0">
   {% endif %}
 
-  <button class="btn btn--primary" type="submit">Save</button>
+  <button class="btn btn--primary" type="submit">{{ _('admin_edit_user.actions.save', default='Save') }}</button>
 </form>
 
 {% if current.is_super_admin %}
 <div class="actions-group" style="margin-top:var(--space-3)">
-  <button type="button" class="btn-danger-soft js-delete-user" data-user-id="{{ user.id }}">Delete</button>
+  <button type="button" class="btn-danger-soft js-delete-user" data-user-id="{{ user.id }}">{{ _('admin_edit_user.actions.delete', default='Delete') }}</button>
   <form id="delete-user-{{ user.id }}" method="post" action="{{ request.url_for('delete_user', user_id=user.id) }}" style="display:none;"></form>
 </div>
 <div id="deleteBlocker" class="cart-blocker" hidden>
   <div class="cart-popup">
-    <p>Are you sure you want to delete this user?</p>
+    <p>{{ _('admin_edit_user.confirm_delete', default='Are you sure you want to delete this user?') }}</p>
     <div class="cart-popup-actions">
-      <button type="button" class="btn btn--secondary js-cancel-delete">Cancel</button>
-      <button type="button" class="btn btn--primary js-confirm-delete">Delete</button>
+      <button type="button" class="btn btn--secondary js-cancel-delete">{{ _('admin_edit_user.dialog.cancel', default='Cancel') }}</button>
+      <button type="button" class="btn btn--primary js-confirm-delete">{{ _('admin_edit_user.dialog.delete', default='Delete') }}</button>
     </div>
   </div>
 </div>
 {% endif %}
 
 <script>
+{% set admin_edit_user_labels = {
+  'add': _('admin_edit_user.actions.add', default='Add'),
+  'remove': _('admin_edit_user.actions.remove', default='Remove')
+} %}
 (function(){
   const assignedSearch = document.getElementById('assignedBarSearch');
   const availableSearch = document.getElementById('availableBarSearch');
@@ -185,14 +189,14 @@
     const btn = tr.querySelector('button');
     if(toAssigned){
       checkbox.checked = true;
-      btn.textContent = 'Remove';
+      btn.textContent = {{ admin_edit_user_labels.remove|tojson }};
       btn.classList.remove('btn-outline');
       btn.classList.add('btn-danger-soft','js-remove-bar');
       btn.classList.remove('js-add-bar');
       assigned.appendChild(tr);
     } else {
       checkbox.checked = false;
-      btn.textContent = 'Add';
+      btn.textContent = {{ admin_edit_user_labels.add|tojson }};
       btn.classList.remove('btn-danger-soft');
       btn.classList.add('btn-outline','js-add-bar');
       btn.classList.remove('js-remove-bar');
