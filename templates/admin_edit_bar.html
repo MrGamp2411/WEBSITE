@@ -38,7 +38,7 @@
 
         <div class="field-group description-field">
           <label>{{ _('admin_edit_bar.fields.description', default='Description') }}</label>
-          <p class="description-preview">{{ bar.description or _('admin_edit_bar.description.none', default='No description yet') }}</p>
+          <p class="description-preview">{{ bar_description(bar) or _('admin_edit_bar.description.none', default='No description yet') }}</p>
           <a class="btn btn--secondary" href="/admin/bars/edit/{{ bar.id }}/description">{{ _('admin_edit_bar.actions.edit_description', default='Edit description') }}</a>
           <small class="help">{{ _('admin_edit_bar.help.description', default='Short, clear description. Links will be ignored.') }}</small>
         </div>
