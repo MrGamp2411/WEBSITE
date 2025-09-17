@@ -3,5 +3,1499 @@
     "language": "Deutsch",
     "code": "de",
     "fallback": "en"
+  },
+  "common": {
+    "menu": "Menü",
+    "close": "Schließen",
+    "browse_bars": "Bars entdecken",
+    "dashboard": "Dashboard",
+    "wallet": "Wallet",
+    "orders": "Bestellungen",
+    "notifications": "Benachrichtigungen",
+    "profile": "Profil",
+    "logout": "Abmelden",
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "credits": "Guthaben",
+    "cart": "Warenkorb",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "search": "Suchen",
+    "weekdays": {
+      "monday": "Montag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch",
+      "thursday": "Donnerstag",
+      "friday": "Freitag",
+      "saturday": "Samstag",
+      "sunday": "Sonntag"
+    }
+  },
+  "layout": {
+    "meta": {
+      "title": "SiplyGo Prototype",
+      "description": "SiplyGo hilft dir, Bars in deiner Nähe zu entdecken und Bestellungen mühelos zu verwalten.",
+      "og_description": "Entdecke Bars in der Nähe und verwalte deine Bestellungen mit SiplyGo."
+    },
+    "header": {
+      "menu_button_aria": "Menü",
+      "close_menu_aria": "Menü schließen",
+      "credit_aria": "Kredite",
+      "cart_aria": "Warenkorb ({count} Artikel)"
+    },
+    "location": {
+      "change": "Standort ändern",
+      "detecting": "Ort ermitteln...",
+      "input_placeholder": "Stadt oder ZIP eingeben",
+      "input_label": "Aktueller Standort"
+    },
+    "search": {
+      "button_aria": "Suchen",
+      "input_placeholder": "Durchsuchen von Balken...",
+      "input_aria": "Suchbalken",
+      "overlay_close": "Schließen"
+    },
+    "footer": {
+      "copyright": "SiplyGo © 2025",
+      "about": "Über uns",
+      "help_center": "Hilfecenter",
+      "for_bars": "Für Bars",
+      "terms": "AGB"
+    },
+    "cart_blocker": {
+      "message": "Du hast noch Produkte im Warenkorb von <strong>{bar_name}</strong>.",
+      "remove": "Produkte entfernen",
+      "go_to_menu": "Zum Menü der Bar"
+    },
+    "service_paused": {
+      "message": "Bestellungen für <strong>{bar_name}</strong> sind aktuell pausiert. Bitte kontaktiere das Team für weitere Informationen.",
+      "close": "Schließen",
+      "back": "Zurück zum Menü"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Bestelle Drinks sofort, direkt von deinem Tisch.",
+      "subtitle": "Überspringe die Wartezeit. Entdecke Bars in der Nähe und bestelle mit einem Tippen.",
+      "greeting": "Hallo {name}",
+      "greeting_subtitle": "Bereit für den nächsten Drink?"
+    },
+    "recent": {
+      "title": "Kürzlich besucht"
+    },
+    "bar_card": {
+      "open_label": "{bar_name} öffnen",
+      "status_open": "Jetzt geöffnet",
+      "status_closed": "Jetzt geschlossen"
+    },
+    "bars": {
+      "title": "Offene Bars in der Nähe",
+      "no_bars": "Leider sind gerade alle Bars geschlossen."
+    },
+    "how": {
+      "title": "Wie es funktioniert",
+      "body": "Finde eine Bar, die du liebst, nimm Platz, bestelle und bezahle direkt in der App – kein Warten, kein Chaos."
+    },
+    "benefits": {
+      "title": "Vorteile",
+      "order": "<strong>Per App/Web bestellen:</strong> Öffnen, wählen und direkt im Browser bezahlen.",
+      "faster": "<strong>Schnellerer Service:</strong> Überspringe die Schlange am Tresen und verfolge deine Bestellung in Echtzeit.",
+      "menu": "<strong>Immer aktuelles Menü:</strong> Varianten, Allergene und Verfügbarkeit in Echtzeit.",
+      "payments": "<strong>Moderne Zahlungen: </strong> Unterstützt Gateways wie Twint, Apple Pay, Google Pay und viele mehr.",
+      "wallet": "<strong>Wallet/Guthaben:</strong> Aufladungen, Boni und schnellere Nachbestellungen.",
+      "multilingual": "<strong>Mehrsprachig:</strong> Ideal für Einheimische und Touristen."
+    }
+  },
+  "about": {
+    "title": "Über SiplyGo",
+    "intro": {
+      "built": "Gebaut und betrieben von Siply, einem digitalen Studio für Web-Produkte und Cloud-Infrastruktur.",
+      "focus": "Wir bauen ein modernes Order-Erlebnis, das den Fokus auf Gastfreundschaft hält und den Gästen und Teams die Werkzeuge gibt, die sie brauchen, um zu gedeihen."
+    },
+    "mission": {
+      "title": "Unsere Mission",
+      "body": "SiplyGo macht es den Menschen mühelos, Bars zu entdecken, von ihrem Tisch aus zu bestellen und ihre Zeit ohne Wartezeiten zu genießen. Wir arbeiten eng mit lokalen Lokalen zusammen, um den Service zu optimieren, Reibung zu reduzieren und jede Bestellung in Bewegung zu halten."
+    },
+    "values": {
+      "title": "Was wir schätzen",
+      "delight": {
+        "title": "Begeisternde Gästeerlebnisse",
+        "body": "Intuitive Menüs, Echtzeitverfolgung und sichere Zahlungen auf jedem Gerät."
+      },
+      "empowered": {
+        "title": "Starkes Team",
+        "body": "Dashboards helfen Barkeepern, Bestellungen im Blick zu behalten und schneller zu reagieren."
+      },
+      "insight": {
+        "title": "Operative Einblicke",
+        "body": "Umsatz-, Auszahlungs- und Menü-Analysen verwandeln jede Schicht in verwertbare Daten."
+      }
+    },
+    "future": {
+      "title": "Wohin wir gehen",
+      "body": "Wir erweitern die Plattform kontinuierlich um Treueprogramme, flexible Auszahlungen und Integrationen, damit sich Bars auf Gastfreundschaft statt auf Hardware konzentrieren können. Neue Releases werden regelmäßig veröffentlicht und im Help Center geteilt, damit Teams sie sicher einsetzen können."
+    },
+    "contact": {
+      "title": "Bleiben Sie in Kontakt",
+      "body": "Fragen zu Roadmap oder Partnerschaften? Schreib an <a href=\"mailto:{email}\">{email}</a>, wir melden uns gerne."
+    }
+  },
+  "help_center": {
+    "title": "Hilfe-Center",
+    "intro": "Finden Sie Antworten auf die häufigsten Fragen über das Surfen Bars, die Bestellung, und die Verwaltung Ihres Kontos. Diese Anleitungen gelten sowohl für die Web-App und die mobile Erfahrung.",
+    "getting_started": {
+      "title": "Erste Schritte",
+      "steps": {
+        "one": "Erstellen Sie ein Konto oder melden Sie sich mit Ihren vorhandenen Anmeldeinformationen an.",
+        "two": "Teile Ihren Standort oder suchen Sie nach einer Stadt, um in der Nähe Lokale zu finden.",
+        "three": "Wählen Sie eine Bar, wählen Sie Ihre Tabelle und fügen Sie Artikel in den Warenkorb.",
+        "four": "Überprüfen Sie Ihre Bestellung, wählen Sie eine Zahlungsmethode, und senden."
+      },
+      "after": "Nach der Bestellung können Sie den Live-Status von der Bestellseite aus verfolgen oder über Benachrichtigungen Updates erhalten."
+    },
+    "account": {
+      "title": "Verwaltung Ihres Kontos",
+      "profile": "Aktualisierung von Profildetails, Telefonnummer und Passwort auf der Seite <a href=\"/profile\">Profil </a>.",
+      "wallet": "Aufladen von Krediten, Überprüfungstransaktionen und Herunterladen von Belegen in der <a href=\"/wallet\">Wallet </a>.",
+      "notifications": "Ungelesene Nachrichten von Barbediensteten oder Administratoren in <a href=\"/notifications\"> Benachrichtigungen </a> überprüfen."
+    },
+    "support": {
+      "title": "Brauchst du noch Hilfe?",
+      "contact": "Schicken Sie uns eine Notiz unter <a href=\"mailto:{email}\">{email}</a>. Fügen Sie den Barcode, den Bestellcode und eine kurze Beschreibung ein, damit wir Ihnen schnell helfen können.",
+      "hours": "Wir antworten Montag bis Freitag, 9:00-18:00 Uhr MEZ."
+    }
+  },
+  "for_bars": {
+    "title": "Für Bars",
+    "intro": "SiplyGo hilft den Lokalen, schnelleren Service zu bieten, den Auftragswert zu erhöhen und den Mitarbeitern klarere Sicht in das zu geben, was die Gäste als nächstes benötigen.",
+    "why": {
+      "title": "Warum Orte SiplyGo wählen",
+      "items": {
+        "menus": "<strong>Digitale Menüs, die frisch bleiben </strong> – markieren Sie Specials, markieren Sie Artikel ausverkauft und teilen Sie Allergen-Details sofort.",
+        "fulfilment": "<strong>Schnellere Erfüllung </strong> – Balken-Dashboards zeigen eingehende Bestellungen, Prep-Status und fertige Zeiten an einem Ort.",
+        "payments": "<strong>Flexible Zahlungen </strong> – akzeptieren Walletnkredite, Karten oder Pay-at-Bar, während Transaktionsgebühren vorhersehbar bleiben.",
+        "insights": "<strong>Insights that matter </strong> – verfolgen nächtliche Einnahmen, Auszahlungen und wiederholen Gäste ohne Tabellenkalkulationen."
+      }
+    },
+    "onboarding": {
+      "title": "Wie funktioniert das Onboarding?",
+      "steps": {
+        "one": "Wir kartieren Ihr Menü, Ihre Kategorien und Preise in einem gemeinsamen Arbeitsbereich.",
+        "two": "Die Mitarbeiter erhalten einen Durchlauf, der Live-Bestellungen, Benachrichtigungen und Best Practices für den Service umfasst.",
+        "three": "Gehen Sie live mit Marketing-Assets, QR-Codes und unterstützen Sie Ressourcen, die auf Ihre Bar zugeschnitten sind."
+      }
+    },
+    "requirements": {
+      "title": "Was du brauchst",
+      "items": {
+        "device": "Ein Tablet oder Laptop hinter der Bar, um Aufträge zu überwachen.",
+        "wifi": "Zuverlässiges WLAN für Personalgeräte und optionales QR-Scanning für Gäste.",
+        "contact": "Eine Anlaufstelle, um Auszahlungen und Menü-Updates zu verwalten."
+      }
+    },
+    "demo": {
+      "title": "Eine Demo planen",
+      "cta": "Email <a href=\"mailto:{email}\">{email}</a> oder rufen Sie {phone} an, um zu erfahren, wie SiplyGo Ihr Servicemodell unterstützen kann."
+    }
+  },
+  "terms": {
+    "title": "Nutzungsbedingungen",
+    "meta": "Version {version} · Effektiv {effective} · Nächste Bewertung {next_review}",
+    "intro": "Diese Begriffe erklären, wie SiplyGo Dienstleistungen für Gäste und Bar-Partner. Durch die Erstellung eines Kontos oder eine Bestellung, die Sie mit den folgenden Regeln.",
+    "sections": {
+      "eligibility": {
+        "title": "1. Förderfähigkeit und Rechnungslegung",
+        "items": {
+          "age": "Sie müssen mindestens 18 Jahre alt sein und in der Lage sein, eine verbindliche Vereinbarung zu bilden.",
+          "credentials": "Halten Sie Ihre Login-Anmeldeinformationen sicher und benachrichtigen Sie uns unverzüglich, wenn Sie einen nicht autorisierten Zugriff vermuten.",
+          "suspend": "Wir können Konten aussetzen oder schließen, die gegen diese Bedingungen oder lokale Vorschriften verstoßen."
+        }
+      },
+      "ordering": {
+        "title": "2. Bestellung und Zahlungen",
+        "items": {
+          "fulfilment": "Durch SiplyGo platzierte Bestellungen werden direkt von der von Ihnen gewählten Bar erfüllt.",
+          "pricing": "Angezeigte Preise enthalten alle anwendbaren Steuern oder Servicegebühren. Der endgültige Empfang wird in Ihrer Wallet Geschichte verfügbar sein.",
+          "refunds": "Rückerstattungen für Stornierungen oder Bestellprobleme werden gemeinsam von SiplyGo und dem Lokal verwaltet."
+        }
+      },
+      "use": {
+        "title": "3. Zulässige Verwendung",
+        "items": {
+          "responsible": "Nutze die Plattform verantwortungsvoll und vermeiden Sie Aktivitäten, die Service stören, Betrug versuchen oder anderen Gästen und Mitarbeitern schaden.",
+          "content": "Inhalte, die Sie einreichen, wie z.B. Bestellscheine, müssen respektvoll und genau sein.",
+          "monitoring": "Wir überwachen die Nutzung, um die Erfahrung sicher zu halten und können bei Bedarf Inhalte entfernen oder den Zugriff einschränken."
+        }
+      }
+    },
+    "contact": {
+      "title": "4. Ansprechpartner",
+      "body": "Für Fragen zu diesen Bedingungen oder um ein Problem zu melden, E-Mail <a href=\"mailto:{email}\">{email}</a> oder rufen Sie <a href=\"tel:{phone_tel}\">{phone}</a> an.",
+      "update": "Wir aktualisieren diese Seite, wenn sich die Richtlinien ändern. Die fortgesetzte Verwendung von SiplyGo nach Updates bedeutet, dass Sie die überarbeiteten Bedingungen akzeptieren."
+    }
+  },
+  "wallet": {
+    "title": "Wallet",
+    "subtitle": "Verwalte dein Guthaben, lade sofort auf und sieh dir deine letzten Aktivitäten an.",
+    "balance": {
+      "label": "Aktuelles Guthaben",
+      "available": "Verfügbar"
+    },
+    "actions": {
+      "top_up": "Aufladen"
+    },
+    "activity": {
+      "title": "Letzte Aktivitäten"
+    },
+    "tx": {
+      "topup": "Aufladung",
+      "refund": "Rückerstattung",
+      "refund_with_order": "Rückerstattung · Bestellung #{order_id}",
+      "order": "Bestellung aufgegeben",
+      "order_with_bar": "Bestellung aufgegeben · {bar}"
+    },
+    "empty": {
+      "title": "Noch keine Transaktionen",
+      "body": "Deine Aufladungen und Zahlungen erscheinen hier.",
+      "cta": "Starte deine erste Aufladung"
+    },
+    "status": {
+      "completed": "Abgeschlossen",
+      "processing": "In Bearbeitung",
+      "pending": "Ausstehend",
+      "refunded": "Erstattet",
+      "canceled": "Storniert",
+      "cancelled": "Storniert",
+      "failed": "Fehlgeschlagen"
+    }
+  },
+  "auth": {
+    "password_toggle": {
+      "show": "Passwort anzeigen",
+      "hide": "Passwort ausblenden"
+    },
+    "caps_warning": "Caps Lock ist eingeschaltet",
+    "password_mismatch": "Passwörter müssen übereinstimmen"
+  },
+  "login": {
+    "title": "Anmelden",
+    "fields": {
+      "email": {
+        "label": "E-Mail"
+      },
+      "password": {
+        "label": "Passwort"
+      }
+    },
+    "actions": {
+      "submit": "Anmelden",
+      "register_prompt": "Noch kein Konto? <a href=\"/register\">Registrieren</a>"
+    }
+  },
+  "register_step1": {
+    "title": "Registrieren",
+    "fields": {
+      "email": {
+        "label": "E-Mail",
+        "title": "E-Mail muss dem Format text@text.text entsprechen"
+      },
+      "password": {
+        "label": "Passwort",
+        "title": "Passwort muss zwischen 8 und 128 Zeichen lang sein"
+      },
+      "confirm_password": {
+        "label": "Passwort bestätigen"
+      }
+    },
+    "disclaimer": "Mit der Registrierung akzeptierst du unsere <a href=\"/terms\">Nutzungsbedingungen</a>.",
+    "actions": {
+      "submit": "Weiter",
+      "login_prompt": "Bereits registriert? <a href=\"/login\">Anmelden</a>"
+    }
+  },
+  "register": {
+    "title": "Registrierung abschließen",
+    "fields": {
+      "username": {
+        "label": "Benutzername",
+        "title": "3–24 Zeichen, Kleinbuchstaben, Zahlen, Punkt, Bindestrich oder Unterstrich. Keine Leerzeichen."
+      },
+      "prefix": {
+        "label": "Ländervorwahl"
+      },
+      "phone": {
+        "label": "Telefonnummer",
+        "title": "Telefonnummer muss 9 bis 10 Ziffern haben"
+      }
+    },
+    "options": {
+      "ch": "+41 (Schweiz)",
+      "it": "+39 (Italien)",
+      "de": "+49 (Deutschland)",
+      "fr": "+33 (Frankreich)"
+    },
+    "disclaimer": "Mit Abschluss der Registrierung akzeptierst du unsere <a href=\"/terms\">Nutzungsbedingungen</a>.",
+    "actions": {
+      "submit": "Fertig"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Aktualisiere deine Kontodaten.",
+    "alerts": {
+      "success": "Profil erfolgreich aktualisiert."
+    },
+    "fields": {
+      "username": {
+        "label": "Benutzername",
+        "title": "3–24 Zeichen, Kleinbuchstaben, Zahlen, Punkt, Bindestrich oder Unterstrich. Keine Leerzeichen."
+      },
+      "email": {
+        "label": "E-Mail-Adresse",
+        "title": "E-Mail muss im Format text@text.text sein"
+      },
+      "prefix": {
+        "label": "Telefon-Präfix"
+      },
+      "phone": {
+        "label": "Nummer des Telefons",
+        "title": "Die Telefonnummer muss 9 bis 10 Ziffern betragen."
+      }
+    },
+    "help": {
+      "phone": "Nutze das Mobilformat deines Landes."
+    },
+    "actions": {
+      "change_password": "Passwort ändern",
+      "save": "Speichern"
+    },
+    "aria": {
+      "edit_username": "Benutzername bearbeiten",
+      "edit_email": "E-Mail bearbeiten",
+      "edit_prefix": "Telefonpräfix bearbeiten",
+      "edit_phone": "Telefonnummer bearbeiten"
+    }
+  },
+  "change_password": {
+    "title": "Passwort ändern",
+    "subtitle": "Aktualisiere dein Konto-Passwort.",
+    "alerts": {
+      "success": "Passwort erfolgreich aktualisiert."
+    },
+    "fields": {
+      "current_password": {
+        "label": "Aktuelles Passwort",
+        "title": "Passwort muss zwischen 8 und 128 Zeichen sein"
+      },
+      "new_password": {
+        "label": "Neues Passwort",
+        "title": "Passwort muss zwischen 8 und 128 Zeichen sein"
+      },
+      "confirm_password": {
+        "label": "Passwort bestätigen",
+        "title": "Passwörter müssen übereinstimmen"
+      }
+    },
+    "help": {
+      "strength": "Nutze mindestens 8 Zeichen mit Buchstaben und Zahlen."
+    },
+    "actions": {
+      "save": "Speichern"
+    }
+  },
+  "order_history": {
+    "title": "Bestellverlauf",
+    "subtitle": "Sieh dir deine vergangenen Bestellungen an und finde Details schneller.",
+    "sections": {
+      "pending": {
+        "title": "Laufende Bestellungen",
+        "actions": {
+          "cancel": "Abbrechen"
+        },
+        "empty": {
+          "title": "Keine laufenden Bestellungen",
+          "body": "Neue Bestellungen erscheinen hier in Echtzeit."
+        }
+      },
+      "completed": {
+        "title": "Abgeschlossene Bestellungen",
+        "actions": {
+          "reorder": "Erneut bestellen"
+        },
+        "empty": {
+          "title": "Noch keine abgeschlossenen Bestellungen",
+          "body": "Sobald eine Bestellung abgeschlossen ist, erscheint sie hier."
+        }
+      }
+    },
+    "card": {
+      "title": "Bestellung {code}",
+      "status_aria": "Bestellstatus: {status}",
+      "status_label": "{status}",
+      "fields": {
+        "total": "Gesamt",
+        "refunded": "Erstattet",
+        "placed": "Bestellt",
+        "customer": "Gast",
+        "bar": "Bar",
+        "table": "Tisch",
+        "payment": "Zahlung",
+        "notes": "Notizen",
+        "prep_time": "Vorbereitungszeit"
+      },
+      "unknown_customer": "Unbekannt",
+      "unknown_item": "Unbekannter Artikel",
+      "prep_minutes": "{minutes} Min"
+    }
+  },
+  "orders": {
+    "statuses": {
+      "placed": "Aufgegeben",
+      "accepted": "Angenommen",
+      "ready": "Bereit",
+      "completed": "Abgeschlossen",
+      "canceled": "Storniert",
+      "rejected": "Abgelehnt"
+    },
+    "payment_methods": {
+      "card": "Karte",
+      "credit_card": "Kreditkarte",
+      "wallet": "Wallet",
+      "bar": "An der Bar bezahlen"
+    }
+  },
+  "notices": {
+    "payment_failed": {
+      "title": "Zahlung fehlgeschlagen",
+      "body": "Die Zahlung war nicht erfolgreich. Bitte versuche es erneut oder kontaktiere unser Team, wenn das Problem bestehen bleibt."
+    },
+    "payment_success": {
+      "title": "Zahlung erfolgreich",
+      "body": "Dein Wallet wurde gutgeschrieben."
+    }
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "subtitle": "Ihre Nachrichten.",
+    "empty": "Keine Meldungen."
+  },
+  "notification_detail": {
+    "subtitle": "Details der Benachrichtigung.",
+    "back": "Zurück",
+    "download": "Anhang herunterladen",
+    "image_alt": "Benachrichtigungsbild"
+  },
+  "cart": {
+    "title": "Dein Warenkorb",
+    "subtitle": "Überprüfe deine Bestellung, wähle deinen Tisch und bestätige die Zahlung.",
+    "wallet": {
+      "label": "Wallet:",
+      "add_funds": "Guthaben aufladen"
+    },
+    "table": {
+      "headers": {
+        "item": "Artikel",
+        "quantity": "Anzahl",
+        "price": "Preis",
+        "total": "Gesamt",
+        "actions": "Aktionen"
+      },
+      "update": "Aktualisieren",
+      "remove": "Entfernen"
+    },
+    "form": {
+      "table": {
+        "label": "Tisch",
+        "placeholder": "Tisch wählen"
+      },
+      "notes": {
+        "label": "Nachricht an die Bar",
+        "placeholder": "Füge eine Notiz für das Barteam hinzu"
+      }
+    },
+    "payment": {
+      "title": "Zahlungsmethode",
+      "options": {
+        "card": {
+          "title": "Kreditkarte",
+          "note": "Jetzt mit Karte bezahlen"
+        },
+        "wallet": {
+          "title": "Wallet-Guthaben",
+          "note": "Nutze dein Guthaben"
+        },
+        "bar": {
+          "title": "In der Bar bezahlen",
+          "note": "Am Tresen bezahlen"
+        }
+      }
+    },
+    "summary": {
+      "title": "Bestellübersicht",
+      "subtotal": "Zwischensumme",
+      "fees": "Gebühren",
+      "total": "Gesamt",
+      "submit": "Bestellung aufgeben",
+      "fee_note": "Bestellungen unter CHF 10 enthalten eine Gebühr von CHF 0.20.",
+      "secure": "Deine Zahlung wird sicher verarbeitet."
+    },
+    "empty": {
+      "message": "Dein Warenkorb ist leer."
+    },
+    "errors": {
+      "other_bar": "Leere deinen Warenkorb, bevor du bei einer anderen Bar bestellst."
+    }
+  },
+  "search": {
+    "view_all": "Alle anzeigen",
+    "view_all_recent_aria": "Alle anzeigen: Kürzlich besuchte Bars",
+    "sections": {
+      "recent": "Kürzlich besuchte Bars",
+      "nearby": "In deiner Nähe",
+      "top": "Bestbewertet",
+      "popular": "Empfohlen"
+    },
+    "empty": "Keine Bars gefunden."
+  },
+  "bar_detail": {
+    "status": {
+      "open": "Jetzt geöffnet",
+      "closed": "Jetzt geschlossen"
+    },
+    "hours": {
+      "title": "Öffnungszeiten",
+      "closed": "Geschlossen"
+    },
+    "add_to_cart": "Zum Warenkorb hinzufügen",
+    "login_to_order": "Zum Bestellen anmelden"
+  },
+  "all_bars": {
+    "title": "Alle Bars",
+    "filters": {
+      "toggle_show": "Filter anzeigen",
+      "toggle_hide": "Filter ausblenden",
+      "name": {
+        "label": "Barname",
+        "placeholder": "z. B. Central Bar"
+      },
+      "city": {
+        "label": "Stadt",
+        "placeholder": "z. B. Bellinzona"
+      },
+      "distance": {
+        "label": "Maximale Entfernung (km)"
+      },
+      "rating": {
+        "label": "Mindestbewertung",
+        "help": "Nur Bars mit einer Bewertung ≥ Auswahl anzeigen"
+      },
+      "categories": {
+        "label": "Kategorien"
+      },
+      "clear": "Filter zurücksetzen"
+    }
+  },
+  "admin_analytics": {
+    "title": "Analyse",
+    "tabs": {
+      "overview": "Überblick",
+      "revenue": "Einnahmen & Gebühren",
+      "orders": "Bestellungen & Operationen",
+      "products": "Produkte / Menü",
+      "clients": "Kunden & Credits",
+      "finance": "Finanzen",
+      "refunds": "Erstattungsbetrag",
+      "exports": "Ausfuhr"
+    },
+    "overview": {
+      "metrics": {
+        "orders": "Bestellungen",
+        "orders_tooltip": "Gesamtzahl der Bestellungen im ausgewählten Zeitraum",
+        "gmv_gross": "Brutto GMV",
+        "gmv_gross_tooltip": "Gesamtauftragswert vor Steuern und Gebühren",
+        "gmv_net": "Netto-GMV",
+        "gmv_net_tooltip": "Gesamtauftragswert nach Steuern und Gebühren",
+        "aov": "AOV",
+        "aov_tooltip": "Durchschnittlicher Auftragswert",
+        "fees": "SiplyGo-Gebühren",
+        "fees_tooltip": "Von SiplyGo einbehaltener Betrag und Prozentsatz der Kommission",
+        "net_to_bar": "Netto-Bar",
+        "net_to_bar_tooltip": "Betrag an die Bar nach Gebühren und Steuern",
+        "tips": "Tipps",
+        "tips_tooltip": "Insgesamt gesammelte Tipps über die Plattform",
+        "cancel_rate": "Annullierungssatz",
+        "cancel_rate_tooltip": "Prozentualer Anteil der stornierten Aufträge an der Gesamtzahl"
+      },
+      "highlights": {
+        "peak_hour": "Höchststunde",
+        "peak_hour_tooltip": "Zeitfenster mit der höchsten Anzahl von Aufträgen",
+        "top_category": "Höchste Kategorie",
+        "top_category_tooltip": "Produktkategorie mit höchsten Einnahmen",
+        "top_bar": "Oberer Balken",
+        "top_bar_tooltip": "Bar mit dem höchsten Verkaufsvolumen"
+      }
+    },
+    "revenue": {
+      "headers": {
+        "bar": "Balken",
+        "gmv": "GMV",
+        "vat": "MwSt.",
+        "commission": "Kommission",
+        "take_rate": "Übernahmequote",
+        "net": "Netto"
+      }
+    },
+    "orders": {
+      "total_cancellations": "Gesamtstornierungen: {count}"
+    },
+    "products": {
+      "headers": {
+        "product": "Erzeugnis",
+        "quantity": "Anzahl",
+        "revenue": "Einnahmen"
+      }
+    },
+    "clients": {
+      "metrics": {
+        "new": "Neu",
+        "new_tooltip": "Kunden, die ihre erste Bestellung aufgegeben haben",
+        "returning": "Zurückkehren",
+        "returning_tooltip": "Kunden, die mehr als eine Bestellung aufgegeben haben"
+      },
+      "headers": {
+        "customer": "Abnehmer",
+        "orders": "# Befehle",
+        "spend": "Ausgaben",
+        "last_purchase": "Letzter Kauf"
+      }
+    },
+    "finance": {
+      "headers": {
+        "period": "Zeitraum",
+        "amount": "Betrag",
+        "status": "Status"
+      },
+      "total_vat": "MwSt. insgesamt: CHF {amount}"
+    },
+    "refunds": {
+      "total": "Gesamtbetrag der Erstattungen: CHF {amount} ({count} Bestellungen)"
+    },
+    "exports": {
+      "message": "CSV-Exporte und geplante Berichte werden in Kürze verfügbar sein."
+    },
+    "charts": {
+      "gmv": "GMV",
+      "orders": "♪ Befehle",
+      "commission": "Kommission",
+      "net": "Netto",
+      "orders_per_hour": "Bestellungen/Stunde"
+    }
+  },
+  "admin_audit_logs": {
+    "title": "Prüfprotokolle",
+    "subtitle": "Überprüfung der Tätigkeit des Systems.",
+    "filters": {
+      "username": "Benutzer",
+      "bar": "Balken",
+      "all_actions": "Alle Aktionen"
+    },
+    "table": {
+      "headers": {
+        "time": "Zeit",
+        "user": "Benutzer",
+        "credit": "Einnahmen",
+        "action": "Aktionen",
+        "entity": "Rechtsträger",
+        "entity_id": "Kennnummer des Unternehmens",
+        "bar": "Balken",
+        "details": "Einzelheiten"
+      }
+    }
+  },
+  "admin_tables": {
+    "edit": {
+      "title": "Tabelle bearbeiten für {bar}"
+    },
+    "new": {
+      "title": "Tabelle hinzufügen für {bar}"
+    },
+    "form": {
+      "labels": {
+        "name": "Bezeichnung",
+        "description": "Warenbezeichnung"
+      },
+      "actions": {
+        "save": "Speichern",
+        "create": "Erstellen"
+      }
+    },
+    "manage": {
+      "title": "Tabellen verwalten für {bar}",
+      "subtitle": "Tabellen für diesen Lokal hinzufügen, bearbeiten und organisieren.",
+      "search": {
+        "aria": "Suchtabellen",
+        "placeholder": "Tabellen durchsuchen...",
+        "input_aria": "Tabellen nach Name oder Beschreibung suchen",
+        "clear": "Suche löschen"
+      },
+      "actions": {
+        "add": "Tabelle hinzufügen",
+        "edit": "Bearbeiten",
+        "delete": "Löschen"
+      },
+      "table": {
+        "headers": {
+          "name": "Bezeichnung",
+          "description": "Warenbezeichnung",
+          "actions": "Aktionen"
+        }
+      },
+      "empty": "Noch keine Tische.",
+      "confirm_delete": "Sind Sie sicher, dass Sie diese Tabelle löschen möchten?",
+      "dialog": {
+        "cancel": "Abbrechen",
+        "delete": "Löschen"
+      }
+    }
+  },
+  "admin_bar_users": {
+    "title": "Benutzer verwalten für {bar}",
+    "subtitle": "Hinzufügen oder Zuweisen von Mitarbeitern zu diesem Lokal.",
+    "add_existing": {
+      "summary": "Bestehende Benutzer hinzufügen",
+      "email": "E-Mail-Adresse",
+      "role": "Rolle",
+      "assigning": "Zuweisen an {bar}",
+      "submit": "Hinzufügen"
+    },
+    "roles": {
+      "bar_admin": "Verwaltungsleiste",
+      "bartender": "Barkeeper"
+    },
+    "search": {
+      "aria": "Benutzer suchen",
+      "placeholder": "Benutzer nach Namen oder E-Mail suchen...",
+      "input_aria": "Benutzer nach Name oder E-Mail suchen",
+      "clear": "Suche löschen"
+    },
+    "sections": {
+      "current_staff": "Laufendes Personal"
+    },
+    "table": {
+      "headers": {
+        "username": "Benutzername",
+        "email": "E-Mail-Adresse",
+        "role": "Rolle",
+        "actions": "Aktionen"
+      }
+    },
+    "actions": {
+      "remove": "Entfernen"
+    },
+    "confirm_remove": "Sind Sie sicher, dass Sie diesen Benutzer entfernen möchten?",
+    "dialog": {
+      "cancel": "Abbrechen",
+      "remove": "Entfernen"
+    }
+  },
+  "admin_bars": {
+    "title": "Bars",
+    "subtitle": "Erstellen, Bearbeiten und Verwalten von Lokalen auf der Plattform.",
+    "search": {
+      "aria": "Suchbalken",
+      "placeholder": "Balken nach Namen suchen...",
+      "input_aria": "Balken nach Namen suchen",
+      "clear": "Suche löschen"
+    },
+    "actions": {
+      "add": "Balken hinzufügen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
+    },
+    "table": {
+      "headers": {
+        "number": "Nein.",
+        "name": "Bezeichnung",
+        "address": "Anschrift",
+        "city": "Stadt",
+        "canton": "Kanton",
+        "actions": "Aktionen"
+      }
+    },
+    "confirm_delete": "Sind Sie sicher, dass Sie diese Bar löschen möchten?",
+    "dialog": {
+      "cancel": "Abbrechen",
+      "delete": "Löschen"
+    }
+  },
+  "admin_change_user_password": {
+    "title": "Passwort für {user} bearbeiten",
+    "form": {
+      "new_password": "Neues Passwort",
+      "confirm_password": "Passwort bestätigen",
+      "save": "Speichern"
+    }
+  },
+  "admin_dashboard": {
+    "title": "Admin Dashboard",
+    "subtitle": "Ihre Leitstelle zur Verwaltung von Lokalen, Benutzern, Zahlungen und Analysen.",
+    "sections": {
+      "management": {
+        "aria": "Verwaltung",
+        "title": "Verwaltung"
+      },
+      "insights": {
+        "aria": "Einsichten",
+        "title": "Einsichten"
+      },
+      "account": {
+        "aria": "Konto",
+        "title": "Konto"
+      },
+      "danger": {
+        "aria": "Gefahrenzone",
+        "title": "Gefahrenzone"
+      }
+    },
+    "cards": {
+      "bars": {
+        "title": "Bars",
+        "description": "Erstellen und Verwalten von Lokalen.",
+        "action": "Balken verwalten"
+      },
+      "users": {
+        "title": "Verwender",
+        "description": "Verwalten Sie Plattform-Benutzer und Rollen.",
+        "action": "Benutzer verwalten"
+      },
+      "notifications": {
+        "title": "Benachrichtigungen",
+        "description": "Nachrichten an Benutzer senden.",
+        "action": "Benachrichtigungen verwalten"
+      },
+      "payments": {
+        "title": "Zahlungen",
+        "description": "Überprüfen Sie Auszahlungen, Rechnungen und Bestelleinnahmen.",
+        "action": "Zahlungen verwalten"
+      },
+      "analytics": {
+        "title": "Analyse",
+        "description": "Verfolgen Sie Aufträge, Einnahmen und Aktivitäten.",
+        "action": "Analyse anzeigen"
+      },
+      "audit": {
+        "title": "Prüfprotokolle",
+        "description": "Überprüfung der Benutzeraktivität.",
+        "action": "Prüfprotokolle anzeigen"
+      },
+      "profile": {
+        "title": "Profil",
+        "description": "Aktualisieren Sie Ihr Admin-Profil und Ihre Sicherheitseinstellungen.",
+        "action": "Profil anzeigen"
+      },
+      "danger": {
+        "title": "Gefahrenzone",
+        "description": "Löschen Sie alle Bestellungen für eine saubere Schiefer.",
+        "action": "Alle Bestellungen löschen"
+      }
+    },
+    "danger": {
+      "confirm": "Alle Bestellungen löschen?"
+    }
+  },
+  "admin_edit_user": {
+    "title": "Benutzer bearbeiten {user}",
+    "dialog": {
+      "ok": "In Ordnung.",
+      "cancel": "Abbrechen",
+      "delete": "Löschen"
+    },
+    "form": {
+      "username": "Benutzername",
+      "email": "E-Mail-Adresse",
+      "prefix": "Präfix",
+      "phone": "Telefon",
+      "role": "Rolle",
+      "add_credit": "Gutschrift hinzufügen",
+      "remove_credit": "Gutschrift entfernen"
+    },
+    "actions": {
+      "edit_password": "Passwort bearbeiten",
+      "remove": "Entfernen",
+      "add": "Hinzufügen",
+      "save": "Speichern",
+      "delete": "Löschen"
+    },
+    "prefixes": {
+      "ch": "+41 (Schweiz)",
+      "it": "+39 (Italien)",
+      "de": "+49 (Deutschland)",
+      "fr": "+33 (Frankreich)"
+    },
+    "roles": {
+      "super_admin": "Super Admin",
+      "bar_admin": "Verwaltungsleiste",
+      "bartender": "Barkeeper",
+      "display": "Anzeige",
+      "customer": "Abnehmer"
+    },
+    "sections": {
+      "assigned": "Zugeordnete Balken",
+      "assign": "Einen Balken zuweisen"
+    },
+    "assigned_search": {
+      "aria": "Zugehörige Balken suchen",
+      "placeholder": "Balken nach Namen suchen...",
+      "input_aria": "Nach dem Namen zugewiesene Balken suchen",
+      "clear": "Suche löschen"
+    },
+    "available_search": {
+      "aria": "Verfügbare Balken suchen",
+      "placeholder": "Balken nach Namen suchen...",
+      "input_aria": "Suche verfügbare Balken nach Namen",
+      "clear": "Suche löschen"
+    },
+    "table": {
+      "headers": {
+        "number": "Nein.",
+        "name": "Bezeichnung",
+        "city": "Stadt",
+        "actions": "Aktionen"
+      }
+    },
+    "confirm_delete": "Sind Sie sicher, dass Sie diesen Benutzer löschen möchten?"
+  },
+  "admin_users": {
+    "title": "Verwender",
+    "subtitle": "Verwalten Sie Plattformkonten.",
+    "create": {
+      "email_placeholder": "E-Mail-Adresse",
+      "password_placeholder": "Passwort",
+      "submit": "Benutzer hinzufügen"
+    },
+    "search": {
+      "aria": "Benutzer suchen",
+      "placeholder": "Benutzer nach Namen oder E-Mail suchen...",
+      "input_aria": "Benutzer nach Name oder E-Mail suchen",
+      "clear": "Suche löschen"
+    },
+    "table": {
+      "headers": {
+        "username": "Benutzername",
+        "email": "E-Mail-Adresse",
+        "phone": "Telefon",
+        "role": "Rolle",
+        "bar": "Balken",
+        "credit": "Einnahmen",
+        "actions": "Aktionen"
+      }
+    },
+    "actions": {
+      "view": "Ansicht",
+      "edit": "Bearbeiten"
+    }
+  },
+  "admin_profile": {
+    "title": "Profil",
+    "fields": {
+      "username": "Benutzername:",
+      "email": "E-Mail:",
+      "phone": "Tel.: (EN) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: Nr: (FR) Nr: (FR) Nr: (FR) Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr"
+    }
+  },
+  "admin_edit_bar": {
+    "title": "Balken bearbeiten",
+    "cards": {
+      "details": {
+        "title": "Einzelheiten"
+      },
+      "media": {
+        "title": "Medien & Amp; Stunden"
+      }
+    },
+    "fields": {
+      "name": "Bezeichnung",
+      "address": "Anschrift",
+      "city": "Stadt",
+      "state": "Kanton",
+      "description": "Warenbezeichnung",
+      "categories": "Kategorien",
+      "photo": "Foto",
+      "rating": "Bewertung",
+      "manual_closed": "Balken manuell schließen"
+    },
+    "help": {
+      "description": "Kurze, klare Beschreibung. Links werden ignoriert.",
+      "categories": "Klicken Sie zum Auswählen/Abwählen. Ausgewählte Elemente werden hervorgehoben."
+    },
+    "categories": {
+      "count": "{selected}/{max} ausgewählt"
+    },
+    "media": {
+      "photo_alt": "{bar} Foto"
+    },
+    "days": {
+      "monday": "Montag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch",
+      "thursday": "Donnerstag",
+      "friday": "Freitag",
+      "saturday": "Samstag",
+      "sunday": "Sonntag"
+    },
+    "hours": {
+      "day": "Tag",
+      "open": "Öffnen",
+      "close": "Schließen"
+    },
+    "actions": {
+      "save": "Speichern"
+    }
+  },
+  "admin_edit_bar_options": {
+    "back": "Zurück zu Bars",
+    "title": "Bearbeiten {bar}",
+    "subtitle": "Wählen Sie einen Abschnitt, der für diesen Lokal verwaltet werden soll.",
+    "cards": {
+      "info": {
+        "title": "Grundlegende Informationen",
+        "body": "Bearbeiten Sie Name, Adresse, Kontakt und Öffnungszeiten.",
+        "cta": "Bearbeiten"
+      },
+      "menu": {
+        "title": "Menü &amp; Kategorien",
+        "body": "Organisieren Sie Kategorien und verwalten Sie Menüpunkte.",
+        "cta": "Verwaltung"
+      },
+      "users": {
+        "title": "Verwender",
+        "body": "Mitarbeiter einladen oder entfernen und Rollen festlegen.",
+        "cta": "Verwaltung"
+      },
+      "tables": {
+        "title": "Tabellen",
+        "body": "Erstellen, umbenennen und arrangieren Sie Tabellennummern.",
+        "cta": "Verwaltung"
+      }
+    }
+  },
+  "admin_notifications": {
+    "title": "Benachrichtigungen",
+    "subtitle": "Nachrichten an Benutzer senden.",
+    "actions": {
+      "new": "Neue Nachricht",
+      "edit_welcome": "Willkommen bearbeiten"
+    },
+    "sent": {
+      "title": "Zustellungen",
+      "headers": {
+        "id": "ID",
+        "recipient": "Empfänger",
+        "subject": "Gegenstand",
+        "message": "Nachricht",
+        "sent": "Gesendet",
+        "sender": "Absender",
+        "actions": "Aktionen"
+      },
+      "actions": {
+        "view": "Ansicht",
+        "delete": "Löschen"
+      }
+    },
+    "recipient": {
+      "all": "Alle Benutzer"
+    },
+    "dialog": {
+      "prompt": "Sind Sie sicher, dass Sie diese Benachrichtigung löschen möchten?",
+      "cancel": "Abbrechen",
+      "confirm": "Löschen"
+    }
+  },
+  "admin_new_notification": {
+    "title": "Neue Benachrichtigung",
+    "subtitle": "Sende eine Nachricht an Benutzer.",
+    "form": {
+      "target": {
+        "label": "Ziel",
+        "options": {
+          "all": "Alle Benutzer",
+          "user": "Spezifischer Benutzer",
+          "bar": "Benutzer von Bar"
+        }
+      },
+      "subject": "Gegenstand",
+      "message": "Nachricht",
+      "link_url": "Verknüpfungs-URL",
+      "image": "Bild",
+      "attachment": "Anlage",
+      "submit": "Senden"
+    },
+    "user_section": {
+      "title": "Benutzer auswählen",
+      "search": {
+        "aria": "Benutzer suchen",
+        "placeholder": "Benutzer suchen...",
+        "input_aria": "Benutzer suchen",
+        "clear": "Suche löschen"
+      },
+      "table": {
+        "headers": {
+          "id": "ID",
+          "username": "Benutzername",
+          "email": "E-Mail-Adresse",
+          "actions": "Aktionen"
+        }
+      }
+    },
+    "bar_section": {
+      "title": "Balken auswählen",
+      "search": {
+        "aria": "Suchbalken",
+        "placeholder": "Durchsuchen von Balken...",
+        "input_aria": "Suchbalken",
+        "clear": "Suche löschen"
+      },
+      "table": {
+        "headers": {
+          "id": "ID",
+          "name": "Bezeichnung",
+          "city": "Stadt",
+          "actions": "Aktionen"
+        }
+      }
+    },
+    "actions": {
+      "select": "Wählen",
+      "selected": "Ausgewählt"
+    },
+    "alerts": {
+      "select_user": "Bitte wählen Sie einen Benutzer aus.",
+      "select_bar": "Bitte wählen Sie eine Bar aus."
+    }
+  },
+  "admin_new_bar": {
+    "title": "Neue Balken erstellen",
+    "form": {
+      "name": "Bezeichnung",
+      "address": "Anschrift",
+      "city": "Stadt",
+      "state": "Mitgliedstaat",
+      "description": "Warenbezeichnung",
+      "photo": "Foto",
+      "categories": "Kategorien",
+      "manual_closed": "Balken manuell schließen",
+      "hours": {
+        "day": "Tag",
+        "open": "Öffnen",
+        "close": "Schließen"
+      },
+      "submit": "Balken erstellen"
+    },
+    "days": {
+      "monday": "Montag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch",
+      "thursday": "Donnerstag",
+      "friday": "Freitag",
+      "saturday": "Samstag",
+      "sunday": "Sonntag"
+    },
+    "alerts": {
+      "max_categories": "Wählen Sie bis zu 5 Kategorien"
+    }
+  },
+  "admin_edit_welcome": {
+    "title": "Begrüßungsnachricht bearbeiten",
+    "form": {
+      "subject": "Gegenstand",
+      "message": "Nachricht",
+      "save": "Speichern"
+    }
+  },
+  "admin_notification_view": {
+    "title": "Meldung {id}",
+    "subtitle": "Details und Empfänger.",
+    "actions": {
+      "back": "Zurück",
+      "back_to_list": "Zurück zur Liste"
+    },
+    "details": {
+      "recipient_target": "Empfängerziel",
+      "subject": "Gegenstand",
+      "message": "Nachricht",
+      "link": "Verknüpfung",
+      "sent": "Gesendet",
+      "sender": "Absender"
+    },
+    "recipients": {
+      "title": "Empfänger",
+      "headers": {
+        "id": "ID",
+        "username": "Benutzername",
+        "email": "E-Mail-Adresse",
+        "read": "Lesen"
+      },
+      "read_yes": "Nein",
+      "read_no": "Nein"
+    }
+  },
+  "admin_payments": {
+    "title": "Zahlungen",
+    "subtitle": "Bewertung Bar Einnahmen und Schließungen.",
+    "search": {
+      "aria": "Suchbalken",
+      "placeholder": "Balken nach Namen suchen...",
+      "input_aria": "Balken nach Namen suchen",
+      "clear": "Suche löschen"
+    },
+    "table": {
+      "headers": {
+        "name": "Bezeichnung",
+        "actions": "Aktionen"
+      }
+    },
+    "actions": {
+      "view": "Ansicht",
+      "add_test": "Test schließen hinzufügen",
+      "delete_test": "Test schließen löschen"
+    }
+  },
+  "admin_view_user": {
+    "title": "Benutzer: {user}",
+    "subtitle": "Kontodetails und Aktivitäten.",
+    "profile": {
+      "title": "Profil",
+      "email": "E-Mail:",
+      "phone": "Tel.: (EN) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr.: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: (FR) Nr: Nr: (FR) Nr: (FR) Nr: (FR) Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr: Nr",
+      "role": "Rolle:",
+      "credit": "Einnahmen",
+      "bars": "Bars:"
+    },
+    "orders": {
+      "title": "Bestellungen",
+      "subtitle": "Zuletzt zuerst. Scrollen, um ältere Bestellungen anzuzeigen.",
+      "table": {
+        "headers": {
+          "id": "ID",
+          "bar": "Balken",
+          "total": "Insgesamt",
+          "status": "Status",
+          "placed": "Angegeben",
+          "actions": "Aktionen"
+        }
+      },
+      "actions": {
+        "view": "Ansicht"
+      },
+      "empty": "Keine Befehle gefunden."
+    },
+    "logins": {
+      "title": "Login-Aktivität",
+      "subtitle": "Zuletzt zuerst. Scrollen, um ältere Logins anzuzeigen.",
+      "table": {
+        "headers": {
+          "ip": "L 347 vom 20.12.2013, S. 671.",
+          "user_agent": "Benutzerbetreuer",
+          "location": "Standort",
+          "date": "Zeitpunkt"
+        }
+      },
+      "empty": "Keine Logins gefunden."
+    },
+    "audit": {
+      "title": "Prüfprotokolle",
+      "subtitle": "Zuletzt zuerst. Scrollen, um ältere Protokolle anzuzeigen.",
+      "table": {
+        "headers": {
+          "action": "Aktionen",
+          "date": "Zeitpunkt"
+        }
+      },
+      "empty": "Keine Aktivität gefunden."
+    }
+  },
+  "bartender_dashboard": {
+    "title": "Bartender Dashboard",
+    "sections": {
+      "bars": {
+        "title": "Ihre Bars",
+        "aria": "Bars"
+      }
+    },
+    "empty": "Keine Bar zugewiesen."
+  },
+  "bartender_orders": {
+    "title": "{bar} Bestellungen",
+    "pause": "Anhalten der Bestellung",
+    "sections": {
+      "incoming": "Eingehende Aufträge",
+      "preparing": "Vorbereitung",
+      "ready": "Fertig",
+      "completed": "Abgeschlossen"
+    },
+    "actions": {
+      "accept": "Akzeptieren",
+      "cancel": "Abbrechen",
+      "ready": "Fertig",
+      "complete": "Vollständig"
+    }
+  },
+  "bar_admin_dashboard": {
+    "title": "Bar Admin Dashboard",
+    "sections": {
+      "bars": {
+        "title": "Ihre Bars",
+        "aria": "Bars"
+      }
+    },
+    "actions": {
+      "edit": "Balken bearbeiten",
+      "orders": "Aufträge verwalten"
+    },
+    "empty": "Keine Bar zugewiesen."
+  },
+  "bartender_confirm": {
+    "title": "Bartender-Registrierung",
+    "body": "Sie sind jetzt als Barkeeper für {bar} registriert.",
+    "cta": "Gehen Sie zum Dashboard"
+  },
+  "display_orders": {
+    "sections": {
+      "preparing": "Vorbereitung",
+      "ready": "Fertig"
+    },
+    "card": {
+      "title": "Reihenfolge {code}"
+    }
+  },
+  "bar_admin_history": {
+    "title": "{bar} - Bestellhistorie & Einnahmen",
+    "month_title": "{bar} - {month}",
+    "orders_title": "{bar} - Bestellungen für {date}",
+    "actions": {
+      "view": "Ansicht",
+      "confirm": "Zahlung bestätigen"
+    },
+    "metrics": {
+      "total_collected": "Gesammelt",
+      "total_earned": "Gesamtverdient",
+      "commission": "Siplygo-Kommission (5%)",
+      "payout": "Betrag, der an die Bar zu zahlen ist"
+    },
+    "breakdown": {
+      "title": "Aufgliederung der Zahlungen"
+    },
+    "empty": {
+      "history": "Noch keine Ordnungsgeschichte.",
+      "orders": "Keine Befehle."
+    }
+  },
+  "bar_admin_orders": {
+    "title": "{bar} Bestellungen",
+    "actions": {
+      "history": "Bestellen Sie Geschichte & Einnahmen"
+    }
+  },
+  "bar_categories": {
+    "manage": {
+      "title": "Kategorien verwalten für {bar}",
+      "subtitle": "Erstellen, bearbeiten und organisieren Sie Menükategorien für diesen Lokal.",
+      "search": {
+        "aria": "Suchkategorien",
+        "placeholder": "Kategorien suchen...",
+        "input_aria": "Kategorien nach Namen suchen",
+        "clear": "Suche löschen"
+      },
+      "actions": {
+        "add": "Kategorie hinzufügen",
+        "products": "Erzeugnisse",
+        "edit": "Bearbeiten",
+        "delete": "Löschen"
+      },
+      "table": {
+        "headers": {
+          "name": "Bezeichnung",
+          "description": "Warenbezeichnung",
+          "actions": "Aktionen"
+        }
+      },
+      "confirm_delete": "Sind Sie sicher, dass Sie diese Kategorie löschen möchten?",
+      "empty": "Noch keine Kategorien."
+    },
+    "form": {
+      "name": "Bezeichnung",
+      "description": "Warenbezeichnung",
+      "display_order": "Reihenfolge anzeigen",
+      "create": "Erstellen",
+      "save": "Speichern"
+    },
+    "new": {
+      "title": "Kategorie hinzufügen für {bar}"
+    },
+    "edit": {
+      "title": "Kategorie bearbeiten für {bar}"
+    }
+  },
+  "bar_products": {
+    "edit": {
+      "title": "Produkt bearbeiten {product}"
+    },
+    "new": {
+      "title": "Produkt in {category} hinzufügen"
+    },
+    "form": {
+      "name": "Bezeichnung",
+      "price": "Preis (CHF)",
+      "description": "Warenbezeichnung",
+      "display_order": "Reihenfolge anzeigen",
+      "photo": "Foto",
+      "create": "Erstellen",
+      "update": "Aktualisieren"
+    },
+    "manage": {
+      "title": "Produkte in {category} für {bar}",
+      "subtitle": "Hinzufügen, Bearbeiten und Organisieren von Produkten für diese Kategorie.",
+      "actions": {
+        "add": "Produkt hinzufügen",
+        "edit": "Bearbeiten",
+        "delete": "Löschen"
+      },
+      "table": {
+        "headers": {
+          "order": "Reihenfolge",
+          "photo": "Foto",
+          "name": "Bezeichnung",
+          "description": "Warenbezeichnung",
+          "price": "Preis (CHF)",
+          "actions": "Aktionen"
+        }
+      },
+      "confirm_delete": "Sind Sie sicher, dass Sie dieses Produkt löschen möchten?",
+      "empty": "Keine Artikel in dieser Kategorie."
+    }
+  },
+  "topup": {
+    "title": "Guthaben aufladen",
+    "form": {
+      "amount_label": "Betrag",
+      "submit": "Mit Karte aufladen"
+    },
+    "alerts": {
+      "invalid_amount": "Ungültiger Betrag",
+      "failed": "Aufladung konnte nicht gestartet werden"
+    }
+  },
+  "order_success": {
+    "title": "Bestellung aufgegeben",
+    "body": {
+      "success": "Deine Bestellung wurde erfolgreich aufgegeben!",
+      "total": "Bezahlter Betrag: CHF {total}",
+      "payment_method": "Zahlungsmethode: {method}",
+      "remaining": "Verbleibendes Guthaben: CHF {remaining}",
+      "thanks": "Danke, dass du mit SiplyGo bestellst."
+    },
+    "actions": {
+      "home": "Zur Startseite"
+    }
   }
 }
