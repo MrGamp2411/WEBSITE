@@ -1,13 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Add Table for {{ bar.name }}</h1>
+<h1>{{ _('admin_tables.new.title', bar=bar.name, default='Add Table for {bar}') }}</h1>
 <form class="form" method="post">
-  <label for="name">Name
+  <label for="name">{{ _('admin_tables.form.labels.name', default='Name') }}
     <input id="name" name="name" required>
   </label>
-  <label for="description">Description
+  <label for="description">{{ _('admin_tables.form.labels.description', default='Description') }}
     <textarea id="description" name="description" maxlength="190"></textarea>
   </label>
-  <button class="btn btn--primary" type="submit">Create</button>
+  <button class="btn btn--primary" type="submit">{{ _('admin_tables.form.actions.create', default='Create') }}</button>
 </form>
 {% endblock %}

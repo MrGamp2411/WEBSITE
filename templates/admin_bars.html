@@ -3,19 +3,19 @@
 <section class="bars-page"> <!-- CHANGED -->
   <header class="bars-toolbar"> <!-- CHANGED -->
     <div class="title-wrap">
-      <h1>Bars</h1> <!-- CHANGED -->
-      <p class="subtitle">Create, edit and manage venues on the platform.</p> <!-- CHANGED -->
+      <h1>{{ _('admin_bars.title', default='Bars') }}</h1> <!-- CHANGED -->
+      <p class="subtitle">{{ _('admin_bars.subtitle', default='Create, edit and manage venues on the platform.') }}</p> <!-- CHANGED -->
     </div>
     <div class="toolbar-actions"> <!-- CHANGED -->
-      <form class="bars-search" role="search" aria-label="Search bars" onsubmit="return false"> <!-- CHANGED -->
+      <form class="bars-search" role="search" aria-label="{{ _('admin_bars.search.aria', default='Search bars') }}" onsubmit="return false"> <!-- CHANGED -->
         <i class="bi bi-search" aria-hidden="true"></i>
         <input id="barsSearch" type="search" inputmode="search" autocomplete="off"
-               placeholder="Search bars by name…" aria-label="Search bars by name">
-        <button class="clear" type="button" aria-label="Clear search">
+               placeholder="{{ _('admin_bars.search.placeholder', default='Search bars by name…') }}" aria-label="{{ _('admin_bars.search.input_aria', default='Search bars by name') }}">
+        <button class="clear" type="button" aria-label="{{ _('admin_bars.search.clear', default='Clear search') }}">
           <i class="bi bi-x-circle" aria-hidden="true"></i>
         </button>
       </form>
-      <a class="btn btn--primary" href="/admin/bars/new">Add Bar</a> <!-- CHANGED -->
+      <a class="btn btn--primary" href="/admin/bars/new">{{ _('admin_bars.actions.add', default='Add Bar') }}</a> <!-- CHANGED -->
     </div>
   </header>
 
@@ -23,12 +23,12 @@
     <table class="bars-table table">
       <thead>
         <tr>
-          <th>No.</th>
-          <th>Name</th>
-          <th>Address</th>
-          <th>City</th>
-          <th>Canton</th> <!-- CHANGED -->
-          <th class="actions">Actions</th> <!-- CHANGED -->
+          <th>{{ _('admin_bars.table.headers.number', default='No.') }}</th>
+          <th>{{ _('admin_bars.table.headers.name', default='Name') }}</th>
+          <th>{{ _('admin_bars.table.headers.address', default='Address') }}</th>
+          <th>{{ _('admin_bars.table.headers.city', default='City') }}</th>
+          <th>{{ _('admin_bars.table.headers.canton', default='Canton') }}</th> <!-- CHANGED -->
+          <th class="actions">{{ _('admin_bars.table.headers.actions', default='Actions') }}</th> <!-- CHANGED -->
         </tr>
       </thead>
       <tbody>
@@ -41,8 +41,8 @@
           <td>{{ bar.state }}</td>
           <td class="actions">
             <div class="actions-group">
-              <a href="/admin/bars/edit/{{ bar.id }}" class="btn-outline">Edit</a>
-              <button type="button" class="btn-danger-soft js-delete-bar" data-bar-id="{{ bar.id }}">Delete</button>
+              <a href="/admin/bars/edit/{{ bar.id }}" class="btn-outline">{{ _('admin_bars.actions.edit', default='Edit') }}</a>
+              <button type="button" class="btn-danger-soft js-delete-bar" data-bar-id="{{ bar.id }}">{{ _('admin_bars.actions.delete', default='Delete') }}</button>
             </div>
             <form
               id="delete-bar-{{ bar.id }}"
@@ -59,10 +59,10 @@
 </section>
 <div id="deleteBlocker" class="cart-blocker" hidden>
   <div class="cart-popup">
-    <p>Are you sure you want to delete this bar?</p>
+    <p>{{ _('admin_bars.confirm_delete', default='Are you sure you want to delete this bar?') }}</p>
     <div class="cart-popup-actions">
-      <button type="button" class="btn btn--secondary js-cancel-delete">Cancel</button>
-      <button type="button" class="btn btn--primary js-confirm-delete">Delete</button>
+      <button type="button" class="btn btn--secondary js-cancel-delete">{{ _('admin_bars.dialog.cancel', default='Cancel') }}</button>
+      <button type="button" class="btn btn--primary js-confirm-delete">{{ _('admin_bars.dialog.delete', default='Delete') }}</button>
     </div>
   </div>
 </div>

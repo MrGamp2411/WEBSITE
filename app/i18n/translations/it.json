@@ -557,6 +557,376 @@
       "clear": "Azzera filtri"
     }
   },
+  "admin_analytics": {
+    "title": "Analisi",
+    "tabs": {
+      "overview": "Panoramica",
+      "revenue": "Ricavi e commissioni",
+      "orders": "Ordini e operazioni",
+      "products": "Prodotti / Menu",
+      "clients": "Clienti e crediti",
+      "finance": "Finanza",
+      "refunds": "Rimborsi",
+      "exports": "Esportazioni"
+    },
+    "overview": {
+      "metrics": {
+        "orders": "Ordini",
+        "orders_tooltip": "Numero totale di ordini nel periodo selezionato",
+        "gmv_gross": "GMV lordo",
+        "gmv_gross_tooltip": "Valore totale degli ordini prima di tasse e commissioni",
+        "gmv_net": "GMV netto",
+        "gmv_net_tooltip": "Valore totale degli ordini dopo tasse e commissioni",
+        "aov": "AOV",
+        "aov_tooltip": "Valore medio dell'ordine",
+        "fees": "Commissioni SiplyGo",
+        "fees_tooltip": "Importo e percentuale di commissioni trattenute da SiplyGo",
+        "net_to_bar": "Netto al locale",
+        "net_to_bar_tooltip": "Importo dovuto al locale dopo tasse e commissioni",
+        "tips": "Mance",
+        "tips_tooltip": "Totale delle mance raccolte tramite la piattaforma",
+        "cancel_rate": "Tasso di annullamento",
+        "cancel_rate_tooltip": "Percentuale di ordini annullati sul totale"
+      },
+      "highlights": {
+        "peak_hour": "Ora di punta",
+        "peak_hour_tooltip": "Fascia oraria con il maggior numero di ordini",
+        "top_category": "Categoria principale",
+        "top_category_tooltip": "Categoria di prodotto con il maggior fatturato",
+        "top_bar": "Locale migliore",
+        "top_bar_tooltip": "Locale con il maggior volume di vendite"
+      }
+    },
+    "revenue": {
+      "headers": {
+        "bar": "Locale",
+        "gmv": "GMV",
+        "vat": "IVA",
+        "commission": "Commissioni",
+        "take_rate": "Percentuale trattenuta",
+        "net": "Netto"
+      }
+    },
+    "orders": {
+      "total_cancellations": "Annullamenti totali: {count}"
+    },
+    "products": {
+      "headers": {
+        "product": "Prodotto",
+        "quantity": "Quantità",
+        "revenue": "Ricavi"
+      }
+    },
+    "clients": {
+      "metrics": {
+        "new": "Nuovi",
+        "new_tooltip": "Clienti che hanno effettuato il primo ordine",
+        "returning": "Ricorrenti",
+        "returning_tooltip": "Clienti che hanno effettuato più di un ordine"
+      },
+      "headers": {
+        "customer": "Cliente",
+        "orders": "# ordini",
+        "spend": "Spesa",
+        "last_purchase": "Ultimo acquisto"
+      }
+    },
+    "finance": {
+      "headers": {
+        "period": "Periodo",
+        "amount": "Importo",
+        "status": "Stato"
+      },
+      "total_vat": "IVA totale: CHF {amount}"
+    },
+    "refunds": {
+      "total": "Totale rimborsi: CHF {amount} ({count} ordini)"
+    },
+    "exports": {
+      "message": "Esportazioni CSV e report pianificati saranno disponibili a breve."
+    },
+    "charts": {
+      "gmv": "GMV",
+      "orders": "# ordini",
+      "commission": "Commissioni",
+      "net": "Netto",
+      "orders_per_hour": "Ordini/ora"
+    }
+  },
+  "admin_audit_logs": {
+    "title": "Log di audit",
+    "subtitle": "Rivedi l'attività di sistema.",
+    "filters": {
+      "username": "Utente",
+      "bar": "Locale",
+      "all_actions": "Tutte le azioni"
+    },
+    "table": {
+      "headers": {
+        "time": "Ora",
+        "user": "Utente",
+        "credit": "Credito",
+        "action": "Azione",
+        "entity": "Entità",
+        "entity_id": "ID entità",
+        "bar": "Locale",
+        "details": "Dettagli"
+      }
+    }
+  },
+  "admin_tables": {
+    "edit": {
+      "title": "Modifica tavolo per {bar}"
+    },
+    "new": {
+      "title": "Aggiungi tavolo per {bar}"
+    },
+    "form": {
+      "labels": {
+        "name": "Nome",
+        "description": "Descrizione"
+      },
+      "actions": {
+        "save": "Salva",
+        "create": "Crea"
+      }
+    },
+    "manage": {
+      "title": "Gestisci tavoli per {bar}",
+      "subtitle": "Aggiungi, modifica e organizza i tavoli per questo locale.",
+      "search": {
+        "aria": "Cerca tavoli",
+        "placeholder": "Cerca tavoli…",
+        "input_aria": "Cerca tavoli per nome o descrizione",
+        "clear": "Pulisci ricerca"
+      },
+      "actions": {
+        "add": "Aggiungi tavolo",
+        "edit": "Modifica",
+        "delete": "Elimina"
+      },
+      "table": {
+        "headers": {
+          "name": "Nome",
+          "description": "Descrizione",
+          "actions": "Azioni"
+        }
+      },
+      "empty": "Nessun tavolo al momento.",
+      "confirm_delete": "Sei sicuro di voler eliminare questo tavolo?",
+      "dialog": {
+        "cancel": "Annulla",
+        "delete": "Elimina"
+      }
+    }
+  },
+  "admin_bar_users": {
+    "title": "Gestisci utenti per {bar}",
+    "subtitle": "Aggiungi o assegna lo staff a questo locale.",
+    "add_existing": {
+      "summary": "Aggiungi utente esistente",
+      "email": "Email",
+      "role": "Ruolo",
+      "assigning": "Assegnazione a {bar}",
+      "submit": "Aggiungi"
+    },
+    "roles": {
+      "bar_admin": "Amministratore del locale",
+      "bartender": "Bartender"
+    },
+    "search": {
+      "aria": "Cerca utenti",
+      "placeholder": "Cerca utenti per nome o email…",
+      "input_aria": "Cerca utenti per nome o email",
+      "clear": "Pulisci ricerca"
+    },
+    "sections": {
+      "current_staff": "Staff attuale"
+    },
+    "table": {
+      "headers": {
+        "username": "Nome utente",
+        "email": "Email",
+        "role": "Ruolo",
+        "actions": "Azioni"
+      }
+    },
+    "actions": {
+      "remove": "Rimuovi"
+    },
+    "confirm_remove": "Sei sicuro di voler rimuovere questo utente?",
+    "dialog": {
+      "cancel": "Annulla",
+      "remove": "Rimuovi"
+    }
+  },
+  "admin_bars": {
+    "title": "Locali",
+    "subtitle": "Crea, modifica e gestisci i locali sulla piattaforma.",
+    "search": {
+      "aria": "Cerca locali",
+      "placeholder": "Cerca locali per nome…",
+      "input_aria": "Cerca locali per nome",
+      "clear": "Pulisci ricerca"
+    },
+    "actions": {
+      "add": "Aggiungi locale",
+      "edit": "Modifica",
+      "delete": "Elimina"
+    },
+    "table": {
+      "headers": {
+        "number": "N.",
+        "name": "Nome",
+        "address": "Indirizzo",
+        "city": "Città",
+        "canton": "Cantone",
+        "actions": "Azioni"
+      }
+    },
+    "confirm_delete": "Sei sicuro di voler eliminare questo locale?",
+    "dialog": {
+      "cancel": "Annulla",
+      "delete": "Elimina"
+    }
+  },
+  "admin_change_user_password": {
+    "title": "Modifica password per {user}",
+    "form": {
+      "new_password": "Nuova password",
+      "confirm_password": "Conferma password",
+      "save": "Salva"
+    }
+  },
+  "admin_dashboard": {
+    "title": "Dashboard amministratore",
+    "subtitle": "Il tuo centro di controllo per gestire locali, utenti, pagamenti e analisi.",
+    "sections": {
+      "management": {
+        "aria": "Gestione",
+        "title": "Gestione"
+      },
+      "insights": {
+        "aria": "Approfondimenti",
+        "title": "Approfondimenti"
+      },
+      "account": {
+        "aria": "Account",
+        "title": "Account"
+      },
+      "danger": {
+        "aria": "Zona di pericolo",
+        "title": "Zona di pericolo"
+      }
+    },
+    "cards": {
+      "bars": {
+        "title": "Locali",
+        "description": "Crea e gestisci i locali.",
+        "action": "Gestisci locali"
+      },
+      "users": {
+        "title": "Utenti",
+        "description": "Gestisci gli account e i ruoli della piattaforma.",
+        "action": "Gestisci utenti"
+      },
+      "notifications": {
+        "title": "Notifiche",
+        "description": "Invia messaggi agli utenti.",
+        "action": "Gestisci notifiche"
+      },
+      "payments": {
+        "title": "Pagamenti",
+        "description": "Rivedi pagamenti, fatture e ricavi degli ordini.",
+        "action": "Gestisci pagamenti"
+      },
+      "analytics": {
+        "title": "Analisi",
+        "description": "Monitora ordini, ricavi e attività.",
+        "action": "Vedi analisi"
+      },
+      "audit": {
+        "title": "Log di audit",
+        "description": "Rivedi l'attività degli utenti.",
+        "action": "Vedi log di audit"
+      },
+      "profile": {
+        "title": "Profilo",
+        "description": "Aggiorna profilo amministratore e impostazioni di sicurezza.",
+        "action": "Vai al profilo"
+      },
+      "danger": {
+        "title": "Zona di pericolo",
+        "description": "Elimina tutti gli ordini per ripartire da zero.",
+        "action": "Elimina tutti gli ordini"
+      }
+    },
+    "danger": {
+      "confirm": "Eliminare tutti gli ordini?"
+    }
+  },
+  "admin_edit_user": {
+    "title": "Modifica utente {user}",
+    "dialog": {
+      "ok": "OK",
+      "cancel": "Annulla",
+      "delete": "Elimina"
+    },
+    "form": {
+      "username": "Nome utente",
+      "email": "Email",
+      "prefix": "Prefisso",
+      "phone": "Telefono",
+      "role": "Ruolo",
+      "add_credit": "Aggiungi credito",
+      "remove_credit": "Rimuovi credito"
+    },
+    "actions": {
+      "edit_password": "Modifica password",
+      "remove": "Rimuovi",
+      "add": "Aggiungi",
+      "save": "Salva",
+      "delete": "Elimina"
+    },
+    "prefixes": {
+      "ch": "+41 (Svizzera)",
+      "it": "+39 (Italia)",
+      "de": "+49 (Germania)",
+      "fr": "+33 (Francia)"
+    },
+    "roles": {
+      "super_admin": "Super admin",
+      "bar_admin": "Amministratore del locale",
+      "bartender": "Bartender",
+      "display": "Display",
+      "customer": "Cliente"
+    },
+    "sections": {
+      "assigned": "Locali assegnati",
+      "assign": "Assegna un locale"
+    },
+    "assigned_search": {
+      "aria": "Cerca locali assegnati",
+      "placeholder": "Cerca locali per nome…",
+      "input_aria": "Cerca locali assegnati per nome",
+      "clear": "Pulisci ricerca"
+    },
+    "available_search": {
+      "aria": "Cerca locali disponibili",
+      "placeholder": "Cerca locali per nome…",
+      "input_aria": "Cerca locali disponibili per nome",
+      "clear": "Pulisci ricerca"
+    },
+    "table": {
+      "headers": {
+        "number": "N.",
+        "name": "Nome",
+        "city": "Città",
+        "actions": "Azioni"
+      }
+    },
+    "confirm_delete": "Sei sicuro di voler eliminare questo utente?"
+  },
   "bartender_dashboard": {
     "title": "Dashboard bartender",
     "sections": {

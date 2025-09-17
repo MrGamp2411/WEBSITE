@@ -3,14 +3,14 @@
 <section class="users-page audit-page">
   <header class="users-toolbar">
     <div class="title-wrap">
-      <h1>Audit Logs</h1>
-      <p class="subtitle">Review system activity.</p>
+      <h1>{{ _('admin_audit_logs.title', default='Audit Logs') }}</h1>
+      <p class="subtitle">{{ _('admin_audit_logs.subtitle', default='Review system activity.') }}</p>
     </div>
     <form class="users-search" method="get" id="auditFilters">
-      <input name="username" type="search" placeholder="User" value="{{ filters.username or '' }}" style="min-width:0">
-      <input name="bar" type="search" placeholder="Bar" value="{{ filters.bar or '' }}" style="min-width:0">
+      <input name="username" type="search" placeholder="{{ _('admin_audit_logs.filters.username', default='User') }}" value="{{ filters.username or '' }}" style="min-width:0">
+      <input name="bar" type="search" placeholder="{{ _('admin_audit_logs.filters.bar', default='Bar') }}" value="{{ filters.bar or '' }}" style="min-width:0">
       <select name="action" style="min-width:0">
-        <option value="">All actions</option>
+        <option value="">{{ _('admin_audit_logs.filters.all_actions', default='All actions') }}</option>
         {% for a in actions %}
           <option value="{{ a }}" {% if filters.action == a %}selected{% endif %}>{{ a }}</option>
         {% endfor %}
@@ -21,14 +21,14 @@
     <table class="users-table audit-table">
       <thead>
         <tr>
-          <th>Time</th>
-          <th>User</th>
-          <th>Credit</th>
-          <th>Action</th>
-          <th>Entity</th>
-          <th>Entity ID</th>
-          <th>Bar</th>
-          <th>Details</th>
+          <th>{{ _('admin_audit_logs.table.headers.time', default='Time') }}</th>
+          <th>{{ _('admin_audit_logs.table.headers.user', default='User') }}</th>
+          <th>{{ _('admin_audit_logs.table.headers.credit', default='Credit') }}</th>
+          <th>{{ _('admin_audit_logs.table.headers.action', default='Action') }}</th>
+          <th>{{ _('admin_audit_logs.table.headers.entity', default='Entity') }}</th>
+          <th>{{ _('admin_audit_logs.table.headers.entity_id', default='Entity ID') }}</th>
+          <th>{{ _('admin_audit_logs.table.headers.bar', default='Bar') }}</th>
+          <th>{{ _('admin_audit_logs.table.headers.details', default='Details') }}</th>
         </tr>
       </thead>
       <tbody>

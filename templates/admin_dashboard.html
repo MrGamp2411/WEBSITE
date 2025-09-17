@@ -2,8 +2,8 @@
 {% block content %}
 <section class="admin-dashboard editbar"><!-- CHANGED -->
   <header class="admin-header"><!-- CHANGED -->
-    <h1>Admin Dashboard</h1>
-    <p class="admin-subtitle">Your control center to manage venues, users, payments and analytics.</p><!-- CHANGED -->
+    <h1>{{ _('admin_dashboard.title', default='Admin Dashboard') }}</h1>
+    <p class="admin-subtitle">{{ _('admin_dashboard.subtitle', default='Your control center to manage venues, users, payments and analytics.') }}</p><!-- CHANGED -->
     <div class="admin-identity card"><!-- CHANGED -->
       <div class="identity-row"><!-- CHANGED -->
         <span class="identity-name">{{ user.username }}</span>
@@ -13,67 +13,67 @@
     </div>
   </header>
 
-  <section class="admin-section" aria-label="Management"><!-- CHANGED -->
-    <h2 class="section-title"><i class="bi bi-gear-fill"></i> Management</h2><!-- CHANGED -->
+  <section class="admin-section" aria-label="{{ _('admin_dashboard.sections.management.aria', default='Management') }}"><!-- CHANGED -->
+    <h2 class="section-title"><i class="bi bi-gear-fill"></i> {{ _('admin_dashboard.sections.management.title', default='Management') }}</h2><!-- CHANGED -->
     <div class="admin-grid"><!-- CHANGED -->
       <article class="card quick-card"><!-- CHANGED -->
-        <h3 class="card-title"><i class="bi bi-shop"></i> Bars</h3>
-        <p>Create and manage venues.</p><!-- CHANGED -->
-        <a class="btn btn--primary" href="/admin/bars">Manage Bars</a><!-- CHANGED -->
+        <h3 class="card-title"><i class="bi bi-shop"></i> {{ _('admin_dashboard.cards.bars.title', default='Bars') }}</h3>
+        <p>{{ _('admin_dashboard.cards.bars.description', default='Create and manage venues.') }}</p><!-- CHANGED -->
+        <a class="btn btn--primary" href="/admin/bars">{{ _('admin_dashboard.cards.bars.action', default='Manage Bars') }}</a><!-- CHANGED -->
       </article>
       <article class="card quick-card"><!-- CHANGED -->
-        <h3 class="card-title"><i class="bi bi-people"></i> Users</h3>
-        <p>Manage platform users and roles.</p><!-- CHANGED -->
-        <a class="btn btn--primary" href="/admin/users">Manage Users</a><!-- CHANGED -->
+        <h3 class="card-title"><i class="bi bi-people"></i> {{ _('admin_dashboard.cards.users.title', default='Users') }}</h3>
+        <p>{{ _('admin_dashboard.cards.users.description', default='Manage platform users and roles.') }}</p><!-- CHANGED -->
+        <a class="btn btn--primary" href="/admin/users">{{ _('admin_dashboard.cards.users.action', default='Manage Users') }}</a><!-- CHANGED -->
       </article>
       <article class="card quick-card">
-        <h3 class="card-title"><i class="bi bi-bell"></i> Notifications</h3>
-        <p>Send messages to users.</p>
-        <a class="btn btn--primary" href="/admin/notifications">Manage Notifications</a>
+        <h3 class="card-title"><i class="bi bi-bell"></i> {{ _('admin_dashboard.cards.notifications.title', default='Notifications') }}</h3>
+        <p>{{ _('admin_dashboard.cards.notifications.description', default='Send messages to users.') }}</p>
+        <a class="btn btn--primary" href="/admin/notifications">{{ _('admin_dashboard.cards.notifications.action', default='Manage Notifications') }}</a>
       </article>
       <article class="card quick-card"><!-- CHANGED -->
-        <h3 class="card-title"><i class="bi bi-credit-card"></i> Payments</h3><!-- CHANGED -->
-        <p>Review payouts, invoices, and order revenue.</p><!-- CHANGED -->
-        <a class="btn btn--primary" href="/admin/payments">Manage Payments</a><!-- CHANGED -->
+        <h3 class="card-title"><i class="bi bi-credit-card"></i> {{ _('admin_dashboard.cards.payments.title', default='Payments') }}</h3><!-- CHANGED -->
+        <p>{{ _('admin_dashboard.cards.payments.description', default='Review payouts, invoices, and order revenue.') }}</p><!-- CHANGED -->
+        <a class="btn btn--primary" href="/admin/payments">{{ _('admin_dashboard.cards.payments.action', default='Manage Payments') }}</a><!-- CHANGED -->
       </article>
     </div>
   </section>
 
-  <section class="admin-section" aria-label="Insights"><!-- CHANGED -->
-    <h2 class="section-title"><i class="bi bi-bar-chart"></i> Insights</h2><!-- CHANGED -->
+  <section class="admin-section" aria-label="{{ _('admin_dashboard.sections.insights.aria', default='Insights') }}"><!-- CHANGED -->
+    <h2 class="section-title"><i class="bi bi-bar-chart"></i> {{ _('admin_dashboard.sections.insights.title', default='Insights') }}</h2><!-- CHANGED -->
     <div class="admin-grid"><!-- CHANGED -->
       <article class="card quick-card"><!-- CHANGED -->
-        <h3 class="card-title"><i class="bi bi-graph-up"></i> Analytics</h3>
-        <p>Track orders, revenue and activity.</p><!-- CHANGED -->
-        <a class="btn btn--primary" href="/admin/analytics">View Analytics</a><!-- CHANGED -->
+        <h3 class="card-title"><i class="bi bi-graph-up"></i> {{ _('admin_dashboard.cards.analytics.title', default='Analytics') }}</h3>
+        <p>{{ _('admin_dashboard.cards.analytics.description', default='Track orders, revenue and activity.') }}</p><!-- CHANGED -->
+        <a class="btn btn--primary" href="/admin/analytics">{{ _('admin_dashboard.cards.analytics.action', default='View Analytics') }}</a><!-- CHANGED -->
       </article>
       <article class="card quick-card">
-        <h3 class="card-title"><i class="bi bi-clipboard-data"></i> Audit Logs</h3>
-        <p>Review user activity.</p>
-        <a class="btn btn--primary" href="/admin/audit">View Audit Logs</a>
+        <h3 class="card-title"><i class="bi bi-clipboard-data"></i> {{ _('admin_dashboard.cards.audit.title', default='Audit Logs') }}</h3>
+        <p>{{ _('admin_dashboard.cards.audit.description', default='Review user activity.') }}</p>
+        <a class="btn btn--primary" href="/admin/audit">{{ _('admin_dashboard.cards.audit.action', default='View Audit Logs') }}</a>
       </article>
     </div>
   </section>
 
-  <section class="admin-section" aria-label="Account"><!-- CHANGED -->
-    <h2 class="section-title"><i class="bi bi-person-circle"></i> Account</h2><!-- CHANGED -->
+  <section class="admin-section" aria-label="{{ _('admin_dashboard.sections.account.aria', default='Account') }}"><!-- CHANGED -->
+    <h2 class="section-title"><i class="bi bi-person-circle"></i> {{ _('admin_dashboard.sections.account.title', default='Account') }}</h2><!-- CHANGED -->
     <div class="admin-grid"><!-- CHANGED -->
       <article class="card quick-card"><!-- CHANGED -->
-        <h3 class="card-title"><i class="bi bi-person"></i> Profile</h3>
-        <p>Update your admin profile and security settings.</p><!-- CHANGED -->
-        <a class="btn btn--primary" href="/admin/profile">View Profile</a><!-- CHANGED -->
+        <h3 class="card-title"><i class="bi bi-person"></i> {{ _('admin_dashboard.cards.profile.title', default='Profile') }}</h3>
+        <p>{{ _('admin_dashboard.cards.profile.description', default='Update your admin profile and security settings.') }}</p><!-- CHANGED -->
+        <a class="btn btn--primary" href="/admin/profile">{{ _('admin_dashboard.cards.profile.action', default='View Profile') }}</a><!-- CHANGED -->
       </article>
     </div>
   </section>
 
-  <section class="admin-section danger" aria-label="Danger Zone"><!-- CHANGED -->
-    <h2 class="section-title"><i class="bi bi-exclamation-triangle"></i> Danger Zone</h2><!-- CHANGED -->
+  <section class="admin-section danger" aria-label="{{ _('admin_dashboard.sections.danger.aria', default='Danger Zone') }}"><!-- CHANGED -->
+    <h2 class="section-title"><i class="bi bi-exclamation-triangle"></i> {{ _('admin_dashboard.sections.danger.title', default='Danger Zone') }}</h2><!-- CHANGED -->
     <div class="admin-grid"><!-- CHANGED -->
       <article class="card quick-card danger"><!-- CHANGED -->
-        <h3 class="card-title"><i class="bi bi-exclamation-octagon"></i> Danger Zone</h3>
-        <p>Delete all orders for a clean slate.</p><!-- CHANGED -->
-        <form method="post" action="/admin/orders/clear" onsubmit="return confirm('Delete all orders?');">
-          <button class="btn btn--danger" type="submit">Delete All Orders</button>
+        <h3 class="card-title"><i class="bi bi-exclamation-octagon"></i> {{ _('admin_dashboard.cards.danger.title', default='Danger Zone') }}</h3>
+        <p>{{ _('admin_dashboard.cards.danger.description', default='Delete all orders for a clean slate.') }}</p><!-- CHANGED -->
+        <form method="post" action="/admin/orders/clear" onsubmit="return confirm({{ _('admin_dashboard.danger.confirm', default='Delete all orders?')|tojson }});">
+          <button class="btn btn--danger" type="submit">{{ _('admin_dashboard.cards.danger.action', default='Delete All Orders') }}</button>
         </form>
       </article>
     </div>
