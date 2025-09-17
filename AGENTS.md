@@ -376,3 +376,6 @@
 - Registration step one page strings live under the `register_step1` namespace in `app/i18n/translations/*.json`; `templates/register_step1.html` pulls from these keys.
 - Registration details page strings live under the `register` namespace in `app/i18n/translations/*.json`; `templates/register.html` pulls from these keys.
 - Shared authentication UI strings (password toggles, caps lock warning) live under the `auth` namespace in `app/i18n/translations/*.json`.
+- Profile page strings live under the `profile` namespace in `app/i18n/translations/*.json`; `templates/profile.html` pulls from these keys and reuses the registration phone prefix options.
+- Change Password page strings live under the `change_password` namespace in `app/i18n/translations/*.json`; `templates/change_password.html` also uses shared `auth` password toggle labels.
+- Order confirmation copy in `templates/order_success.html` localises through the `order_success` namespace in `app/i18n/translations/*.json`.

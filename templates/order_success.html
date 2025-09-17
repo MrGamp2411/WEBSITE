@@ -1,14 +1,17 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="text-center">
-  <h1>Order Placed</h1>
-  <p>Your order has been placed successfully!</p>
-  <p>Total paid: CHF {{ "%.2f"|format(total) }}</p>
-  <p>Payment method: {{ payment_method.replace('_', ' ')|title }}</p>
+  {% set formatted_total = "%.2f"|format(total) %}
+  {% set method_label = payment_method.replace('_', ' ')|title %}
+  <h1>{{ _('order_success.title', default='Order Placed') }}</h1>
+  <p>{{ _('order_success.body.success', default='Your order has been placed successfully!') }}</p>
+  <p>{{ _('order_success.body.total', total=formatted_total, default='Total paid: CHF {total}') }}</p>
+  <p>{{ _('order_success.body.payment_method', method=method_label, default='Payment method: {method}') }}</p>
   {% if payment_method == 'wallet' %}
-  <p>Remaining credit: CHF {{ "%.2f"|format(remaining) }}</p>
+  {% set formatted_remaining = "%.2f"|format(remaining) %}
+  <p>{{ _('order_success.body.remaining', remaining=formatted_remaining, default='Remaining credit: CHF {remaining}') }}</p>
   {% endif %}
-  <p>Thank you for ordering with SiplyGo.</p>
-  <a class="btn btn--primary" href="/">Return to home</a>
+  <p>{{ _('order_success.body.thanks', default='Thank you for ordering with SiplyGo.') }}</p>
+  <a class="btn btn--primary" href="/">{{ _('order_success.actions.home', default='Return to home') }}</a>
 </div>
 {% endblock %}

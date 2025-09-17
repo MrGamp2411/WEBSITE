@@ -329,5 +329,82 @@
     "actions": {
       "submit": "Finish"
     }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your account, security, and phone number.",
+    "alerts": {
+      "success": "Profile updated successfully."
+    },
+    "fields": {
+      "username": {
+        "label": "Username",
+        "title": "3–24 characters, lowercase letters, numbers, dot, hyphen or underscore. No spaces."
+      },
+      "email": {
+        "label": "Email",
+        "title": "Email must be in the format text@text.text"
+      },
+      "prefix": {
+        "label": "Phone Prefix"
+      },
+      "phone": {
+        "label": "Phone Number",
+        "title": "Phone number must be 9 to 10 digits"
+      }
+    },
+    "help": {
+      "phone": "Use mobile format for your country."
+    },
+    "actions": {
+      "change_password": "Change Password",
+      "save": "Save"
+    },
+    "aria": {
+      "edit_username": "Edit username",
+      "edit_email": "Edit email",
+      "edit_prefix": "Edit phone prefix",
+      "edit_phone": "Edit phone number"
+    }
+  },
+  "change_password": {
+    "title": "Change Password",
+    "subtitle": "Update your account password.",
+    "alerts": {
+      "success": "Password updated successfully."
+    },
+    "fields": {
+      "current_password": {
+        "label": "Current Password",
+        "title": "Password must be between 8 and 128 characters"
+      },
+      "new_password": {
+        "label": "New Password",
+        "title": "Password must be between 8 and 128 characters"
+      },
+      "confirm_password": {
+        "label": "Confirm Password",
+        "title": "Passwords must match"
+      }
+    },
+    "help": {
+      "strength": "Use 8+ characters with letters & numbers."
+    },
+    "actions": {
+      "save": "Save"
+    }
+  },
+  "order_success": {
+    "title": "Order Placed",
+    "body": {
+      "success": "Your order has been placed successfully!",
+      "total": "Total paid: CHF {total}",
+      "payment_method": "Payment method: {method}",
+      "remaining": "Remaining credit: CHF {remaining}",
+      "thanks": "Thank you for ordering with SiplyGo."
+    },
+    "actions": {
+      "home": "Return to home"
+    }
   }
 }
