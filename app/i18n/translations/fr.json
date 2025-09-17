@@ -1478,6 +1478,7 @@
     "form": {
       "name": "Nom",
       "description": "Description",
+      "description_help": "Utilisez l'éditeur de traductions pour mettre à jour les descriptions.",
       "display_order": "Commande d'affichage",
       "name_translate_button": "Traduire le nom",
       "description_translate_button": "Traduire la description",

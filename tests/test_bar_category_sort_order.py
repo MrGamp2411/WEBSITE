@@ -86,3 +86,56 @@ def test_menu_handles_missing_category_sort_order():
         assert "NoOrder" in resp.text
         assert "WithOrder" in resp.text
 
+
+def test_category_edit_form_does_not_change_description():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    bars.clear()
+    users.clear()
+    users_by_email.clear()
+    users_by_username.clear()
+
+    db = SessionLocal()
+    bar = BarModel(name="LockBar", slug="lockbar")
+    db.add(bar)
+    db.commit()
+    db.refresh(bar)
+    bar_id = bar.id
+
+    category = CategoryModel(
+        bar_id=bar.id,
+        name="Snacks",
+        description="Original description",
+        description_translations={
+            "en": "Original description",
+            "it": "Descrizione originale",
+            "fr": "Description d'origine",
+            "de": "Ursprüngliche Beschreibung",
+        },
+    )
+    db.add(category)
+    db.commit()
+    db.refresh(category)
+    category_id = category.id
+    db.close()
+
+    load_bars_from_db()
+
+    with TestClient(app) as client:
+        _login(client)
+        resp = client.post(
+            f"/bar/{bar_id}/categories/{category_id}/edit",
+            data={
+                "name": "Snacks",
+                "description": "Hacked description",
+                "display_order": "7",
+            },
+            follow_redirects=False,
+        )
+        assert resp.status_code == 303
+
+    db = SessionLocal()
+    db_category = db.get(CategoryModel, category_id)
+    assert db_category.description == "Original description"
+    assert db_category.description_translations["en"] == "Original description"
+    db.close()

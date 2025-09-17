@@ -1454,6 +1454,7 @@
     "form": {
       "name": "Bezeichnung",
       "description": "Warenbezeichnung",
+      "description_help": "Verwenden Sie den Übersetzungs-Editor, um Beschreibungen zu aktualisieren.",
       "display_order": "Reihenfolge anzeigen",
       "name_translate_button": "Name übersetzen",
       "description_translate_button": "Beschreibung übersetzen",

@@ -6261,8 +6261,13 @@ async def bar_edit_category(
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
     base_name = (form.get("name") or "").strip()
-    base_description = (form.get("description") or "").strip()
     display_order = form.get("display_order") or category.display_order
+    description_translations = getattr(category, "description_translations", None)
+    base_description = (
+        (description_translations or {}).get(DEFAULT_LANGUAGE)
+        or category.description
+        or ""
+    )
     db_category = db.get(CategoryModel, category_id)
     if not base_name:
         base_name = category.name or ""
@@ -6272,7 +6277,7 @@ async def bar_edit_category(
         getattr(category, "name_translations", None), base_name
     )
     existing_description_translations = normalise_translation_map(
-        getattr(category, "description_translations", None), base_description
+        description_translations, base_description
     )
     existing_name_translations[DEFAULT_LANGUAGE] = base_name
     existing_description_translations[DEFAULT_LANGUAGE] = base_description
