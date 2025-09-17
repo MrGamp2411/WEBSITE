@@ -12,7 +12,7 @@
   <h1 class="bar-title" itemprop="name">{{ bar.name }}</h1>
   <div class="bar-meta">
     <span class="bar-status">
-      <span class="status {% if bar.is_open_now %}status-open{% else %}status-closed{% endif %}">{% if bar.is_open_now %}Open now{% else %}Closed now{% endif %}</span>
+      <span class="status {% if bar.is_open_now %}status-open{% else %}status-closed{% endif %}">{% if bar.is_open_now %}{{ _('bar_detail.status.open', default='Open now') }}{% else %}{{ _('bar_detail.status.closed', default='Closed now') }}{% endif %}</span>
     </span>
     {% if bar.rating %}<span class="bar-rating"><i class="bi bi-star-fill" aria-hidden="true"></i> {{ '%.1f'|format(bar.rating) }}</span>{% endif %}
     <span class="bar-distance" data-has-distance="true" hidden><i class="bi bi-geo-alt" aria-hidden="true"></i> <span class="distance-value"></span></span>
@@ -21,13 +21,13 @@
   <p class="bar-desc clamp" itemprop="description">{{ bar.description }}</p>
   {% if opening_hours %}
   <section class="bar-hours-card">
-    <h2 class="bar-hours-title">Opening hours</h2>
+    <h2 class="bar-hours-title">{{ _('bar_detail.hours.title', default='Opening hours') }}</h2>
     <div class="hours">
       <div class="hours-col">
         {% for h in opening_hours[:4] %}
         <div class="hour-row">
           <span>{{ h.day }}</span>
-          <span>{% if h.open and h.close %}{{ h.open }} - {{ h.close }}{% else %}Closed{% endif %}</span>
+          <span>{% if h.open and h.close %}{{ h.open }} - {{ h.close }}{% else %}{{ _('bar_detail.hours.closed', default='Closed') }}{% endif %}</span>
         </div>
         {% endfor %}
       </div>
@@ -35,7 +35,7 @@
         {% for h in opening_hours[4:] %}
         <div class="hour-row">
           <span>{{ h.day }}</span>
-          <span>{% if h.open and h.close %}{{ h.open }} - {{ h.close }}{% else %}Closed{% endif %}</span>
+          <span>{% if h.open and h.close %}{{ h.open }} - {{ h.close }}{% else %}{{ _('bar_detail.hours.closed', default='Closed') }}{% endif %}</span>
         </div>
         {% endfor %}
       </div>
@@ -51,8 +51,8 @@
     <div class="section-head">
       <h2>{{ category.name }}</h2>
       <div class="scroller-nav">
-        <button class="scroll-btn prev" aria-label="Previous">‹</button>
-        <button class="scroll-btn next" aria-label="Next">›</button>
+        <button class="scroll-btn prev" aria-label="{{ _('common.previous', default='Previous') }}">‹</button>
+        <button class="scroll-btn next" aria-label="{{ _('common.next', default='Next') }}">›</button>
       </div>
     </div>
     <p>{{ category.description }}</p>
@@ -70,11 +70,11 @@
             {% if user %}
             <form class="form form--inline add-to-cart-form" method="post" action="/bars/{{ bar.id }}/add_to_cart">
               <input type="hidden" name="product_id" value="{{ product.id }}">
-              <button class="btn btn--primary btn--small add-to-cart" type="submit">Add to Cart</button>
-            </form>
-            {% else %}
-            <a class="btn add-to-cart" href="/login">Login to order</a>
-            {% endif %}
+        <button class="btn btn--primary btn--small add-to-cart" type="submit">{{ _('bar_detail.add_to_cart', default='Add to Cart') }}</button>
+        </form>
+        {% else %}
+        <a class="btn add-to-cart" href="/login">{{ _('bar_detail.login_to_order', default='Login to order') }}</a>
+        {% endif %}
           </div>
         </article>
       </li>

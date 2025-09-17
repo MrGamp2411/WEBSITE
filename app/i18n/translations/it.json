@@ -450,6 +450,87 @@
     "download": "Scarica allegato",
     "image_alt": "Immagine della notifica"
   },
+  "cart": {
+    "title": "Il tuo carrello",
+    "subtitle": "Controlla il tuo ordine, scegli il tavolo e conferma il pagamento.",
+    "wallet": {
+      "label": "Portafoglio:",
+      "add_funds": "Ricarica"
+    },
+    "table": {
+      "headers": {
+        "item": "Articolo",
+        "quantity": "Quantità",
+        "price": "Prezzo",
+        "total": "Totale",
+        "actions": "Azioni"
+      },
+      "update": "Aggiorna",
+      "remove": "Rimuovi"
+    },
+    "form": {
+      "table": {
+        "label": "Tavolo",
+        "placeholder": "Seleziona il tavolo"
+      },
+      "notes": {
+        "label": "Messaggio al barista",
+        "placeholder": "Aggiungi una nota per il barista"
+      }
+    },
+    "payment": {
+      "title": "Metodo di pagamento",
+      "options": {
+        "card": {
+          "title": "Carta di credito",
+          "note": "Paga ora con carta"
+        },
+        "wallet": {
+          "title": "Credito portafoglio",
+          "note": "Usa il tuo credito"
+        },
+        "bar": {
+          "title": "Paga al bancone",
+          "note": "Paga direttamente al bancone"
+        }
+      }
+    },
+    "summary": {
+      "title": "Riepilogo ordine",
+      "subtotal": "Subtotale",
+      "fees": "Commissioni",
+      "total": "Totale",
+      "submit": "Invia ordine",
+      "fee_note": "Gli ordini inferiori a 10 CHF includono una commissione di 0,20 CHF.",
+      "secure": "Il tuo pagamento sarà elaborato in modo sicuro."
+    },
+    "empty": {
+      "message": "Il tuo carrello è vuoto."
+    }
+  },
+  "search": {
+    "view_all": "Vedi tutto",
+    "view_all_recent_aria": "Vedi tutto: Bar visitati di recente",
+    "sections": {
+      "recent": "Bar visitati di recente",
+      "nearby": "Più vicini a te",
+      "top": "Più votati",
+      "popular": "Consigliati"
+    },
+    "empty": "Nessun bar trovato."
+  },
+  "bar_detail": {
+    "status": {
+      "open": "Aperto ora",
+      "closed": "Chiuso ora"
+    },
+    "hours": {
+      "title": "Orari di apertura",
+      "closed": "Chiuso"
+    },
+    "add_to_cart": "Aggiungi al carrello",
+    "login_to_order": "Accedi per ordinare"
+  },
   "order_success": {
     "title": "Ordine inviato",
     "body": {
