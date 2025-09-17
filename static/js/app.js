@@ -324,7 +324,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const menuToggles = document.querySelectorAll('.js-open-menu');
   const mobileMenu = document.getElementById('mobileMenu');
-  const backdrop = document.querySelector('.menu-backdrop:not(.language-backdrop)');
+  let backdrop;
+  for (const el of document.querySelectorAll('.menu-backdrop')) {
+    if (!el.classList.contains('language-backdrop')) {
+      backdrop = el;
+      break;
+    }
+  }
   const closeBtn = mobileMenu?.querySelector('.js-close-menu');
   const contentEls = document.querySelectorAll('main, .hdr-sub, footer');
   let activeToggle;
@@ -333,6 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const handleKeydown = (e) => { if (e.key === 'Escape') closeMenu(); };
 
   function openMenu(btn) {
+    if (!mobileMenu || !backdrop) return;
     activeToggle = btn;
     lastFocused = document.activeElement;
     activeToggle.setAttribute('aria-expanded', 'true');
@@ -352,6 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function closeMenu() {
+    if (!mobileMenu || !backdrop) return;
     activeToggle && activeToggle.setAttribute('aria-expanded', 'false');
     mobileMenu.classList.remove('is-open');
     backdrop.classList.remove('is-open');
