@@ -1454,6 +1454,7 @@
     "form": {
       "name": "Nome",
       "description": "Descrizione",
+      "description_help": "Usa l'editor di traduzione per aggiornare le descrizioni.",
       "display_order": "Ordine di visualizzazione",
       "name_translate_button": "Traduci nome",
       "description_translate_button": "Traduci descrizione",

@@ -1454,6 +1454,7 @@
     "form": {
       "name": "Name",
       "description": "Description",
+      "description_help": "Use the translation editor to update descriptions.",
       "display_order": "Display Order",
       "name_translate_button": "Translate name",
       "description_translate_button": "Translate description",
