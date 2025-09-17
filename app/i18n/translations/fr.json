@@ -4,14 +4,625 @@
     "code": "fr",
     "fallback": "en"
   },
+  "common": {
+    "menu": "Menu",
+    "close": "Fermer",
+    "browse_bars": "Explorer les bars",
+    "dashboard": "Tableau de bord",
+    "wallet": "Portefeuille",
+    "orders": "Commandes",
+    "notifications": "Notifications",
+    "profile": "Profil",
+    "logout": "Se déconnecter",
+    "login": "Se connecter",
+    "register": "S'inscrire",
+    "credits": "Crédits",
+    "cart": "Panier",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "search": "Rechercher",
+    "weekdays": {
+      "monday": "Lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "friday": "Vendredi",
+      "saturday": "Samedi",
+      "sunday": "Dimanche"
+    }
+  },
   "layout": {
+    "meta": {
+      "title": "Prototype SiplyGo",
+      "description": "SiplyGo vous aide à découvrir les bars à proximité et à gérer vos commandes facilement.",
+      "og_description": "Découvrez les bars près de chez vous et gérez vos commandes avec SiplyGo."
+    },
     "header": {
+      "menu_button_aria": "Menu",
+      "close_menu_aria": "Fermer le menu",
+      "credit_aria": "Crédits",
+      "cart_aria": "Panier ({count} articles)",
       "language": "Langue"
+    },
+    "location": {
+      "change": "Changer de lieu",
+      "detecting": "Détection de la localisation...",
+      "input_placeholder": "Saisir ville ou code postal",
+      "input_label": "Localisation actuelle"
+    },
+    "search": {
+      "button_aria": "Rechercher",
+      "input_placeholder": "Rechercher des bars...",
+      "input_aria": "Rechercher des bars",
+      "overlay_close": "Fermer"
+    },
+    "footer": {
+      "copyright": "SiplyGo © 2025",
+      "about": "À propos",
+      "help_center": "Centre d'aide",
+      "for_bars": "Pour les bars",
+      "terms": "Conditions"
+    },
+    "cart_blocker": {
+      "message": "Vous avez encore des produits dans votre panier chez <strong>{bar_name}</strong>.",
+      "remove": "Retirer les produits",
+      "go_to_menu": "Aller au menu du bar"
+    },
+    "service_paused": {
+      "message": "La prise de commandes est suspendue pour <strong>{bar_name}</strong>. Veuillez contacter un membre du personnel pour plus d'informations.",
+      "close": "Fermer",
+      "back": "Retour au menu"
     },
     "language": {
       "title": "Choisir la langue",
       "subtitle": "Sélectionnez votre langue préférée pour l'application.",
       "current": "Langue actuelle"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Commandez vos boissons instantanément, directement depuis votre table.",
+      "subtitle": "Évitez l'attente. Découvrez les bars à proximité et commandez en un tap.",
+      "greeting": "Salut {name} 👋",
+      "greeting_subtitle": "Prêt pour votre prochaine boisson ?"
+    },
+    "recent": {
+      "title": "Récemment visités"
+    },
+    "bar_card": {
+      "open_label": "Ouvrir {bar_name}",
+      "status_open": "Ouvert",
+      "status_closed": "Fermé"
+    },
+    "bars": {
+      "title": "Bars ouverts à proximité",
+      "no_bars": "Désolé, tous les bars sont fermés pour le moment"
+    },
+    "how": {
+      "title": "Comment ça marche",
+      "body": "Trouvez un bar que vous aimez, installez-vous, commandez et payez directement dans l'app—plus d'attente ni de confusion."
+    },
+    "benefits": {
+      "title": "Avantages",
+      "order": "<strong>Commander via l'app/web :</strong> Ouvrez, choisissez et payez directement depuis le navigateur.",
+      "faster": "<strong>Service plus rapide :</strong> Évitez la file au comptoir et suivez votre commande en temps réel.",
+      "menu": "<strong>Menu toujours à jour :</strong> Variantes, allergènes et disponibilité en direct.",
+      "payments": "<strong>Paiements modernes :</strong> Compatible avec Twint, Apple Pay, Google Pay et bien d'autres.",
+      "wallet": "<strong>Portefeuille/Crédits :</strong> Recharges, bonus et répétitions de commande plus rapides.",
+      "multilingual": "<strong>Multilingue :</strong> Idéal pour les locaux et les touristes."
+    }
+  },
+  "about": {
+    "title": "À propos de SiplyGo",
+    "intro": {
+      "built": "Conçu et exploité par Siply, un studio numérique spécialisé dans les produits web et l'infrastructure cloud.",
+      "focus": "Nous créons une expérience de commande moderne qui garde l'accent sur l'hospitalité tout en offrant aux invités et aux équipes les outils dont ils ont besoin pour prospérer."
+    },
+    "mission": {
+      "title": "Notre mission",
+      "body": "SiplyGo permet aux gens de découvrir des bars, de commander depuis leur table et de profiter de leur moment sans faire la queue. Nous travaillons main dans la main avec les établissements locaux pour fluidifier le service, réduire les frictions et faire avancer chaque commande."
+    },
+    "values": {
+      "title": "Ce qui compte pour nous",
+      "delight": {
+        "title": "Des parcours invités enthousiasmants",
+        "body": "des menus intuitifs, un suivi de commande en temps réel et des paiements sécurisés depuis n'importe quel appareil."
+      },
+      "empowered": {
+        "title": "Des équipes autonomes",
+        "body": "des tableaux de bord qui aident les barmen à rester au courant des tickets et à répondre plus vite aux invités."
+      },
+      "insight": {
+        "title": "Des informations opérationnelles",
+        "body": "des analyses de revenus, de versements et de menu qui transforment chaque service en données exploitables."
+      }
+    },
+    "future": {
+      "title": "Notre trajectoire",
+      "body": "Nous continuons d'enrichir la plateforme avec des outils de fidélité avancés, des versements flexibles et des intégrations qui permettent aux bars de se concentrer sur l'hospitalité, pas sur le matériel. Les nouveautés sont déployées régulièrement et partagées dans notre Centre d'aide pour une adoption en toute confiance."
+    },
+    "contact": {
+      "title": "Restez en contact",
+      "body": "Des questions sur la feuille de route ou des partenariats ? Écrivez-nous à <a href=\"mailto:{email}\">{email}</a> et nous serons ravis d'échanger."
+    }
+  },
+  "help_center": {
+    "title": "Centre d'aide",
+    "intro": "Trouvez les réponses aux questions les plus fréquentes sur la découverte de bars, le passage de commandes et la gestion de votre compte. Ces guides s'appliquent à l'application web comme à l'expérience mobile.",
+    "getting_started": {
+      "title": "Premiers pas",
+      "steps": {
+        "one": "Créez un compte ou connectez-vous avec vos identifiants existants.",
+        "two": "Partagez votre localisation ou recherchez une ville pour trouver des établissements à proximité.",
+        "three": "Choisissez un bar, sélectionnez votre table et ajoutez des articles au panier.",
+        "four": "Vérifiez votre commande, choisissez un mode de paiement et validez."
+      },
+      "after": "Après avoir passé une commande, vous pouvez suivre son statut en direct depuis la page Commandes ou recevoir des mises à jour via les notifications."
+    },
+    "account": {
+      "title": "Gérer votre compte",
+      "profile": "Mettez à jour vos informations, votre numéro de téléphone et votre mot de passe depuis la page <a href=\"/profile\">Profil</a>.",
+      "wallet": "Rechargez vos crédits, consultez vos transactions et téléchargez vos reçus dans le <a href=\"/wallet\">Portefeuille</a>.",
+      "notifications": "Consultez les messages non lus du personnel ou des administrateurs dans <a href=\"/notifications\">Notifications</a>."
+    },
+    "support": {
+      "title": "Besoin d'aide ?",
+      "contact": "Envoyez-nous un message à <a href=\"mailto:{email}\">{email}</a>. Indiquez le nom du bar, le code commande et un bref descriptif pour que nous puissions vous aider rapidement.",
+      "hours": "Nous répondons du lundi au vendredi, de 9h00 à 18h00 CET."
+    }
+  },
+  "for_bars": {
+    "title": "Pour les bars",
+    "intro": "SiplyGo aide les établissements à offrir un service plus rapide, à augmenter la valeur des commandes et à donner au personnel une visibilité claire sur les besoins des clients.",
+    "why": {
+      "title": "Pourquoi les établissements choisissent SiplyGo",
+      "items": {
+        "menus": "<strong>Des menus numériques toujours à jour</strong> – mettez en avant les suggestions, marquez les ruptures et partagez instantanément les informations sur les allergènes.",
+        "fulfilment": "<strong>Une exécution plus rapide</strong> – les tableaux de bord du bar affichent commandes entrantes, préparation et prêts en un seul endroit.",
+        "payments": "<strong>Des paiements flexibles</strong> – acceptez crédits portefeuille, cartes ou paiement au bar tout en gardant des frais prévisibles.",
+        "insights": "<strong>Des insights utiles</strong> – suivez revenus, versements et clients fidèles sans tableurs."
+      }
+    },
+    "onboarding": {
+      "title": "Comment se déroule l'intégration",
+      "steps": {
+        "one": "Nous cartographions votre menu, vos catégories et vos prix dans un espace de travail partagé.",
+        "two": "Le personnel reçoit une présentation couvrant commandes en direct, notifications et bonnes pratiques de service.",
+        "three": "Mise en ligne avec supports marketing, QR codes et ressources d'assistance adaptés à votre bar."
+      }
+    },
+    "requirements": {
+      "title": "Ce qu'il vous faut",
+      "items": {
+        "device": "Une tablette ou un ordinateur derrière le bar pour suivre les commandes.",
+        "wifi": "Un Wi-Fi fiable pour les appareils du personnel et, si besoin, le scan QR des invités.",
+        "contact": "Un interlocuteur pour gérer les versements et les mises à jour du menu."
+      }
+    },
+    "demo": {
+      "title": "Planifier une démo",
+      "cta": "Envoyez un email à <a href=\"mailto:{email}\">{email}</a> ou appelez {phone} pour découvrir comment SiplyGo peut soutenir votre modèle de service."
+    }
+  },
+  "terms": {
+    "title": "Conditions d'utilisation",
+    "meta": "Version {version} · En vigueur le {effective} · Prochaine révision {next_review}",
+    "intro": "Ces conditions expliquent comment SiplyGo fournit ses services aux invités et aux bars partenaires. En créant un compte ou en passant une commande, vous acceptez les règles ci-dessous.",
+    "sections": {
+      "eligibility": {
+        "title": "1. Éligibilité et comptes",
+        "items": {
+          "age": "Vous devez avoir au moins 18 ans et être en mesure de conclure un accord contraignant.",
+          "credentials": "Gardez vos identifiants en sécurité et prévenez-nous immédiatement si vous suspectez un accès non autorisé.",
+          "suspend": "Nous pouvons suspendre ou fermer les comptes qui enfreignent ces conditions ou la réglementation locale."
+        }
+      },
+      "ordering": {
+        "title": "2. Commandes et paiements",
+        "items": {
+          "fulfilment": "Les commandes passées via SiplyGo sont préparées directement par le bar que vous sélectionnez.",
+          "pricing": "Les prix affichés incluent toutes les taxes ou frais de service applicables. Le reçu final sera disponible dans l'historique de votre portefeuille.",
+          "refunds": "Les remboursements liés aux annulations ou aux problèmes de commande sont gérés conjointement par SiplyGo et l'établissement."
+        }
+      },
+      "use": {
+        "title": "3. Utilisation acceptable",
+        "items": {
+          "responsible": "Utilisez la plateforme de manière responsable et évitez toute activité perturbant le service, tentant de frauder ou nuisant aux autres invités et au personnel.",
+          "content": "Le contenu que vous soumettez, comme les notes de commande, doit être respectueux et exact.",
+          "monitoring": "Nous surveillons l'utilisation pour garantir la sécurité de l'expérience et pouvons retirer du contenu ou limiter l'accès si nécessaire."
+        }
+      }
+    },
+    "contact": {
+      "title": "4. Contact",
+      "body": "Pour toute question concernant ces conditions ou pour signaler un problème, écrivez à <a href=\"mailto:{email}\">{email}</a> ou appelez <a href=\"tel:{phone_tel}\">{phone}</a>.",
+      "update": "Nous mettons à jour cette page à chaque évolution des politiques. En continuant d'utiliser SiplyGo après une mise à jour, vous acceptez les nouvelles conditions."
+    }
+  },
+  "wallet": {
+    "title": "Portefeuille",
+    "subtitle": "Gérez votre solde, rechargez instantanément et consultez votre activité récente.",
+    "balance": {
+      "label": "Solde actuel",
+      "available": "Disponible"
+    },
+    "actions": {
+      "top_up": "Recharger"
+    },
+    "activity": {
+      "title": "Activité récente"
+    },
+    "tx": {
+      "topup": "Recharge",
+      "refund": "Remboursement",
+      "refund_with_order": "Remboursement · Commande #{order_id}",
+      "order": "Commande passée",
+      "order_with_bar": "Commande passée · {bar}"
+    },
+    "empty": {
+      "title": "Aucune transaction pour le moment",
+      "body": "Vos recharges et paiements apparaîtront ici.",
+      "cta": "Effectuer votre première recharge"
+    },
+    "status": {
+      "completed": "Terminé",
+      "processing": "En cours",
+      "pending": "En attente",
+      "refunded": "Remboursé",
+      "canceled": "Annulé",
+      "cancelled": "Annulé",
+      "failed": "Échec"
+    }
+  },
+  "auth": {
+    "password_toggle": {
+      "show": "Afficher le mot de passe",
+      "hide": "Masquer le mot de passe"
+    },
+    "caps_warning": "Verr. Maj. est activé",
+    "password_mismatch": "Les mots de passe doivent correspondre"
+  },
+  "login": {
+    "title": "Connexion",
+    "fields": {
+      "email": {
+        "label": "E-mail"
+      },
+      "password": {
+        "label": "Mot de passe"
+      }
+    },
+    "actions": {
+      "submit": "Se connecter",
+      "register_prompt": "Pas encore inscrit ? <a href=\"/register\">Inscrivez-vous</a>"
+    }
+  },
+  "register_step1": {
+    "title": "Inscription",
+    "fields": {
+      "email": {
+        "label": "E-mail",
+        "title": "L'e-mail doit être au format texte@texte.texte"
+      },
+      "password": {
+        "label": "Mot de passe",
+        "title": "Le mot de passe doit contenir entre 8 et 128 caractères"
+      },
+      "confirm_password": {
+        "label": "Confirmez le mot de passe"
+      }
+    },
+    "disclaimer": "En vous inscrivant, vous acceptez nos <a href=\"/terms\">Conditions d'utilisation</a>.",
+    "actions": {
+      "submit": "Suivant",
+      "login_prompt": "Déjà inscrit ? <a href=\"/login\">Connectez-vous</a>"
+    }
+  },
+  "register": {
+    "title": "Finaliser l'inscription",
+    "fields": {
+      "username": {
+        "label": "Nom d'utilisateur",
+        "title": "3–24 caractères, lettres minuscules, chiffres, point, tiret ou soulignement. Pas d'espaces."
+      },
+      "prefix": {
+        "label": "Préfixe téléphonique"
+      },
+      "phone": {
+        "label": "Numéro de téléphone",
+        "title": "Le numéro de téléphone doit comporter de 9 à 10 chiffres"
+      }
+    },
+    "options": {
+      "ch": "+41 (Suisse)",
+      "it": "+39 (Italie)",
+      "de": "+49 (Allemagne)",
+      "fr": "+33 (France)"
+    },
+    "disclaimer": "En terminant votre inscription, vous acceptez nos <a href=\"/terms\">Conditions d'utilisation</a>.",
+    "actions": {
+      "submit": "Terminer"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Gérez votre compte, votre sécurité et votre numéro de téléphone.",
+    "alerts": {
+      "success": "Profil mis à jour avec succès."
+    },
+    "fields": {
+      "username": {
+        "label": "Nom d'utilisateur",
+        "title": "3–24 caractères, lettres minuscules, chiffres, point, tiret ou soulignement. Pas d'espaces."
+      },
+      "email": {
+        "label": "E-mail",
+        "title": "L'e-mail doit être au format texte@texte.texte"
+      },
+      "prefix": {
+        "label": "Préfixe téléphonique"
+      },
+      "phone": {
+        "label": "Numéro de téléphone",
+        "title": "Le numéro de téléphone doit comporter de 9 à 10 chiffres"
+      }
+    },
+    "help": {
+      "phone": "Utilisez le format mobile de votre pays."
+    },
+    "actions": {
+      "change_password": "Changer le mot de passe",
+      "save": "Enregistrer"
+    },
+    "aria": {
+      "edit_username": "Modifier le nom d'utilisateur",
+      "edit_email": "Modifier l'e-mail",
+      "edit_prefix": "Modifier le préfixe téléphonique",
+      "edit_phone": "Modifier le numéro de téléphone"
+    }
+  },
+  "change_password": {
+    "title": "Changer le mot de passe",
+    "subtitle": "Mettre à jour le mot de passe de votre compte.",
+    "alerts": {
+      "success": "Mot de passe mis à jour avec succès."
+    },
+    "fields": {
+      "current_password": {
+        "label": "Mot de passe actuel",
+        "title": "Le mot de passe doit contenir entre 8 et 128 caractères"
+      },
+      "new_password": {
+        "label": "Nouveau mot de passe",
+        "title": "Le mot de passe doit contenir entre 8 et 128 caractères"
+      },
+      "confirm_password": {
+        "label": "Confirmez le mot de passe",
+        "title": "Les mots de passe doivent correspondre"
+      }
+    },
+    "help": {
+      "strength": "Utilisez au moins 8 caractères avec des lettres et des chiffres."
+    },
+    "actions": {
+      "save": "Enregistrer"
+    }
+  },
+  "order_history": {
+    "title": "Historique des commandes",
+    "subtitle": "Consultez vos commandes passées et retrouvez-les plus facilement.",
+    "sections": {
+      "pending": {
+        "title": "Commandes en attente",
+        "actions": {
+          "cancel": "Annuler"
+        },
+        "empty": {
+          "title": "Aucune commande en attente",
+          "body": "Les nouvelles commandes apparaîtront ici en temps réel."
+        }
+      },
+      "completed": {
+        "title": "Commandes terminées",
+        "actions": {
+          "reorder": "Commander à nouveau"
+        },
+        "empty": {
+          "title": "Aucune commande terminée",
+          "body": "Une fois votre commande finalisée, elle apparaîtra ici."
+        }
+      }
+    },
+    "card": {
+      "title": "Commande {code}",
+      "status_aria": "Statut de la commande : {status}",
+      "status_label": "{status}",
+      "fields": {
+        "total": "Total",
+        "refunded": "Remboursé",
+        "placed": "Créée",
+        "customer": "Client",
+        "bar": "Bar",
+        "table": "Table",
+        "payment": "Paiement",
+        "notes": "Notes",
+        "prep_time": "Temps de préparation"
+      },
+      "unknown_customer": "Inconnu",
+      "unknown_item": "Article inconnu",
+      "prep_minutes": "{minutes} min"
+    }
+  },
+  "orders": {
+    "statuses": {
+      "placed": "Créée",
+      "accepted": "Acceptée",
+      "ready": "Prête",
+      "completed": "Terminée",
+      "canceled": "Annulée",
+      "rejected": "Refusée"
+    },
+    "payment_methods": {
+      "card": "Carte",
+      "credit_card": "Carte de crédit",
+      "wallet": "Portefeuille",
+      "bar": "Payer au bar"
+    }
+  },
+  "notices": {
+    "payment_failed": {
+      "title": "Paiement échoué",
+      "body": "Le paiement n'a pas abouti. Veuillez réessayer ou contacter notre équipe si le problème persiste."
+    },
+    "payment_success": {
+      "title": "Paiement réussi",
+      "body": "Votre portefeuille a été crédité."
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Vos messages.",
+    "empty": "Aucune notification."
+  },
+  "notification_detail": {
+    "subtitle": "Détails de la notification.",
+    "back": "Retour",
+    "download": "Télécharger la pièce jointe",
+    "image_alt": "Image de la notification"
+  },
+  "cart": {
+    "title": "Votre panier",
+    "subtitle": "Vérifiez votre commande, choisissez votre table et confirmez le paiement.",
+    "wallet": {
+      "label": "Portefeuille :",
+      "add_funds": "Ajouter des fonds"
+    },
+    "table": {
+      "headers": {
+        "item": "Article",
+        "quantity": "Quantité",
+        "price": "Prix",
+        "total": "Total",
+        "actions": "Actions"
+      },
+      "update": "Mettre à jour",
+      "remove": "Retirer"
+    },
+    "form": {
+      "table": {
+        "label": "Table",
+        "placeholder": "Sélectionner une table"
+      },
+      "notes": {
+        "label": "Message au barman",
+        "placeholder": "Ajouter une note pour le barman"
+      }
+    },
+    "payment": {
+      "title": "Mode de paiement",
+      "options": {
+        "card": {
+          "title": "Carte de crédit",
+          "note": "Payer maintenant par carte"
+        },
+        "wallet": {
+          "title": "Crédit portefeuille",
+          "note": "Utiliser votre crédit"
+        },
+        "bar": {
+          "title": "Payer au bar",
+          "note": "Payer au comptoir"
+        }
+      }
+    },
+    "summary": {
+      "title": "Récapitulatif de la commande",
+      "subtotal": "Sous-total",
+      "fees": "Frais",
+      "total": "Total",
+      "submit": "Passer la commande",
+      "fee_note": "Les commandes de moins de 10 CHF incluent des frais de 0,20 CHF.",
+      "secure": "Votre paiement sera traité en toute sécurité."
+    },
+    "empty": {
+      "message": "Votre panier est vide."
+    },
+    "errors": {
+      "other_bar": "Veuillez vider votre panier avant de commander dans un autre bar."
+    }
+  },
+  "search": {
+    "view_all": "Tout afficher",
+    "view_all_recent_aria": "Tout afficher : bars récemment visités",
+    "sections": {
+      "recent": "Bars récemment visités",
+      "nearby": "Les plus proches de vous",
+      "top": "Les mieux notés",
+      "popular": "Recommandés"
+    },
+    "empty": "Aucun bar trouvé."
+  },
+  "bar_detail": {
+    "status": {
+      "open": "Ouvert",
+      "closed": "Fermé"
+    },
+    "hours": {
+      "title": "Horaires d'ouverture",
+      "closed": "Fermé"
+    },
+    "add_to_cart": "Ajouter au panier",
+    "login_to_order": "Connectez-vous pour commander"
+  },
+  "all_bars": {
+    "title": "Tous les bars",
+    "filters": {
+      "toggle_show": "Afficher les filtres",
+      "toggle_hide": "Masquer les filtres",
+      "name": {
+        "label": "Nom du bar",
+        "placeholder": "ex. Central Bar"
+      },
+      "city": {
+        "label": "Ville",
+        "placeholder": "ex. Bellinzona"
+      },
+      "distance": {
+        "label": "Distance max (km)"
+      },
+      "rating": {
+        "label": "Note minimale",
+        "help": "Afficher uniquement les bars avec une note ≥ à la valeur sélectionnée"
+      },
+      "categories": {
+        "label": "Catégories"
+      },
+      "clear": "Réinitialiser les filtres"
+    }
+  },
+  "topup": {
+    "title": "Recharger le crédit",
+    "form": {
+      "amount_label": "Montant",
+      "submit": "Recharger par carte"
+    },
+    "alerts": {
+      "invalid_amount": "Montant invalide",
+      "failed": "Impossible de lancer la recharge"
+    }
+  },
+  "order_success": {
+    "title": "Commande passée",
+    "body": {
+      "success": "Votre commande a été enregistrée avec succès !",
+      "total": "Total payé : CHF {total}",
+      "payment_method": "Mode de paiement : {method}",
+      "remaining": "Crédit restant : CHF {remaining}",
+      "thanks": "Merci d'avoir commandé avec SiplyGo."
+    },
+    "actions": {
+      "home": "Retour à l'accueil"
     }
   }
 }
