@@ -399,3 +399,8 @@
   - `admin_edit_bar` covers the bar info form, including category chips and opening hours labels.
   - `admin_new_notification` drives the broadcast form, search controls, and selection prompts.
   - `admin_payments` defines the payouts list header, search inputs, and action buttons.
+- Shared live order widgets read translations from new namespaces in `app/i18n/translations/*.json`:
+  - `orders.statuses` and `orders.payment_methods` supply status and payment method labels for JS renderers.
+  - `bartender_orders.actions` now covers Accept, Cancel, Ready, and Complete buttons.
+  - `display_orders.card.title` localises the display screen order heading.
+  - `notices.payment_failed` provides the payment failure notice copy for global alerts.

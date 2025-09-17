@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
+  const APP_I18N = window.APP_I18N || {};
+  const noticeTexts = (APP_I18N.notices && APP_I18N.notices.payment_failed) || {};
+  const appTexts = APP_I18N.app || {};
+  function formatTemplate(template, values){
+    if(typeof template !== 'string') return '';
+    return template.replace(/\{(\w+)\}/g, (_, key) => Object.prototype.hasOwnProperty.call(values, key) ? values[key] : '');
+  }
   const FALLBACK_IMG = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+";
   const nav = document.querySelector('.site-header');
   if (nav) {
@@ -21,13 +28,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const params = new URLSearchParams(window.location.search);
   const notice = params.get('notice');
   if (['topup_failed', 'payment_failed'].includes(notice)) {
-    const title = params.get('noticeTitle') || 'Payment failed';
-    const body = params.get('noticeBody') || 'Payment was not successful. Please try again or contact our staff if the problem persists.';
+    const title = params.get('noticeTitle') || noticeTexts.title || 'Payment failed';
+    const body = params.get('noticeBody') || noticeTexts.body || 'Payment was not successful. Please try again or contact our staff if the problem persists.';
+    const closeLabel = noticeTexts.close || 'Close';
     const blocker = document.createElement('div');
     blocker.className = 'cart-blocker';
     const popup = document.createElement('div');
     popup.className = 'cart-popup';
-    popup.innerHTML = `<p><strong>${title}</strong></p><p>${body}</p><div class="cart-popup-actions"><button type="button" class="btn btn--primary notice-close">Close</button></div>`;
+    popup.innerHTML = `<p><strong>${title}</strong></p><p>${body}</p><div class="cart-popup-actions"><button type="button" class="btn btn--primary notice-close">${closeLabel}</button></div>`;
     blocker.appendChild(popup);
     document.body.appendChild(blocker);
     blocker.querySelector('.notice-close').addEventListener('click', () => blocker.remove());
@@ -104,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     const items = bars.map(bar => `
       <li data-bar-id="${bar.id}">
-        <a class="bar-card" href="/bars/${bar.id}" aria-label="Open ${bar.name}">
+        <a class="bar-card" href="/bars/${bar.id}" aria-label="${formatTemplate(appTexts.open_label, { bar: bar.name }) || `Open ${bar.name}`}">
           <div class="thumb-wrapper"><img class="thumb" src="${bar.photo_url || FALLBACK_IMG}" alt="${bar.name} photo" loading="lazy" decoding="async" width="400" height="225" srcset="${bar.photo_url || FALLBACK_IMG} 400w, ${bar.photo_url || FALLBACK_IMG} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='${FALLBACK_IMG}';this.onerror=null;"></div>
           <h3 class="title">${bar.name}</h3>
           <div class="bar-meta">

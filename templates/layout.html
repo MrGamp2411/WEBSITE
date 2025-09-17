@@ -154,6 +154,67 @@
       window.showServicePausedOnLoad = {{ 'true' if show_service_paused|default(False) else 'false' }};
     </script>
     {% endif %}
+  <script>
+    window.APP_I18N = {
+      notices: {
+        payment_failed: {
+          title: {{ _('notices.payment_failed.title', default='Payment failed')|tojson }},
+          body: {{ _('notices.payment_failed.body', default='Payment was not successful. Please try again or contact our staff if the problem persists.')|tojson }},
+          close: {{ _('common.close', default='Close')|tojson }}
+        }
+      },
+      app: {
+        open_label: {{ _('home.bar_card.open_label', bar_name='{bar}', default='Open {bar}')|tojson }}
+      },
+      orders: {
+        card: {
+          title: {{ _('order_history.card.title', code='{code}', default='Order {code}')|tojson }},
+          status_aria: {{ _('order_history.card.status_aria', status='{status}', default='Order status: {status}')|tojson }},
+          fields: {
+            total: {{ _('order_history.card.fields.total', default='Total')|tojson }},
+            refunded: {{ _('order_history.card.fields.refunded', default='Refunded')|tojson }},
+            placed: {{ _('order_history.card.fields.placed', default='Placed')|tojson }},
+            customer: {{ _('order_history.card.fields.customer', default='Customer')|tojson }},
+            bar: {{ _('order_history.card.fields.bar', default='Bar')|tojson }},
+            table: {{ _('order_history.card.fields.table', default='Table')|tojson }},
+            payment: {{ _('order_history.card.fields.payment', default='Payment')|tojson }},
+            notes: {{ _('order_history.card.fields.notes', default='Notes')|tojson }},
+            prep_time: {{ _('order_history.card.fields.prep_time', default='Prep time')|tojson }}
+          },
+          unknown_customer: {{ _('order_history.card.unknown_customer', default='Unknown')|tojson }},
+          prep_minutes: {{ _('order_history.card.prep_minutes', minutes='{minutes}', default='{minutes} min')|tojson }}
+        },
+        actions: {
+          accept: {{ _('bartender_orders.actions.accept', default='Accept')|tojson }},
+          cancel: {{ _('order_history.sections.pending.actions.cancel', default='Cancel')|tojson }},
+          ready: {{ _('bartender_orders.actions.ready', default='Ready')|tojson }},
+          complete: {{ _('bartender_orders.actions.complete', default='Complete')|tojson }},
+          reorder: {{ _('order_history.sections.completed.actions.reorder', default='Reorder')|tojson }}
+        },
+        statuses: {
+{% if not (user and user.is_display) %}
+          PLACED: {{ _('orders.statuses.placed', default='Placed')|tojson }},
+          ACCEPTED: {{ _('orders.statuses.accepted', default='Accepted')|tojson }},
+          READY: {{ _('orders.statuses.ready', default='Ready')|tojson }},
+          COMPLETED: {{ _('orders.statuses.completed', default='Completed')|tojson }},
+          CANCELED: {{ _('orders.statuses.canceled', default='Canceled')|tojson }},
+          REJECTED: {{ _('orders.statuses.rejected', default='Rejected')|tojson }}
+{% endif %}
+        },
+        payment_methods: {
+{% if not (user and user.is_display) %}
+          card: {{ _('orders.payment_methods.card', default='Card')|tojson }},
+          credit_card: {{ _('orders.payment_methods.credit_card', default='Credit Card')|tojson }},
+          wallet: {{ _('orders.payment_methods.wallet', default='Wallet')|tojson }},
+          bar: {{ _('orders.payment_methods.bar', default='Pay at bar')|tojson }}
+{% endif %}
+        }
+      },
+      display: {
+        card_title: {{ _('display_orders.card.title', code='{code}', default='Order {code}')|tojson }}
+      }
+    };
+  </script>
   <script src="/static/js/app.min.js" defer></script>
   {% block scripts %}{% endblock %}
 </body>

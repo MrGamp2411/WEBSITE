@@ -1,6 +1,12 @@
 function initDisplay(barId) {
   const preparing = document.getElementById('preparing-orders');
   const ready = document.getElementById('ready-orders');
+  const APP_I18N = window.APP_I18N || {};
+  const displayTexts = APP_I18N.display || {};
+  function formatTemplate(template, values){
+    if(typeof template !== 'string') return '';
+    return template.replace(/\{(\w+)\}/g, (_, key) => Object.prototype.hasOwnProperty.call(values, key) ? values[key] : '');
+  }
 
   function render(order) {
     let el = document.getElementById('order-' + order.id);
@@ -9,7 +15,9 @@ function initDisplay(barId) {
       el.id = 'order-' + order.id;
     }
     el.className = 'order-card card card--' + order.status.toLowerCase();
-    el.innerHTML = `<header class="order-card__header"><h3>Order ${order.public_order_code || ('#' + order.id)}</h3></header>`;
+    const code = order.public_order_code || ('#' + order.id);
+    const title = formatTemplate(displayTexts.card_title, { code }) || `Order ${code}`;
+    el.innerHTML = `<header class="order-card__header"><h3>${title}</h3></header>`;
     if (order.status === 'ACCEPTED') {
       preparing.appendChild(el);
     } else if (order.status === 'READY') {

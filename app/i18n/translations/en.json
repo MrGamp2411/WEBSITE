@@ -439,6 +439,28 @@
       "prep_minutes": "{minutes} min"
     }
   },
+  "orders": {
+    "statuses": {
+      "placed": "Placed",
+      "accepted": "Accepted",
+      "ready": "Ready",
+      "completed": "Completed",
+      "canceled": "Canceled",
+      "rejected": "Rejected"
+    },
+    "payment_methods": {
+      "card": "Card",
+      "credit_card": "Credit Card",
+      "wallet": "Wallet",
+      "bar": "Pay at bar"
+    }
+  },
+  "notices": {
+    "payment_failed": {
+      "title": "Payment failed",
+      "body": "Payment was not successful. Please try again or contact our staff if the problem persists."
+    }
+  },
   "notifications": {
     "title": "Notifications",
     "subtitle": "Your messages.",
@@ -1294,6 +1316,12 @@
       "preparing": "Preparing",
       "ready": "Ready",
       "completed": "Completed"
+    },
+    "actions": {
+      "accept": "Accept",
+      "cancel": "Cancel",
+      "ready": "Ready",
+      "complete": "Complete"
     }
   },
   "bar_admin_dashboard": {
@@ -1319,6 +1347,9 @@
     "sections": {
       "preparing": "Preparing",
       "ready": "Ready"
+    },
+    "card": {
+      "title": "Order {code}"
     }
   },
   "bar_admin_history": {
