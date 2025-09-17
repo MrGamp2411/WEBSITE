@@ -22,6 +22,7 @@
 - Hero art uses `z-index:-1` to sit behind cards.
 - Header sits at `z-index:1050` so it renders above mobile menu blur backdrops.
 - Bar and info sections use `position:relative;z-index:1` so the hero image remains behind "Nearby Open Bars" and later content.
+- Mobile menu panel anchors 114px below the header on small screens (122px on viewports ≥ 769px).
 - Hero art styles live in `static/css/components.css` under `.home-hero .hero-art`.
 - Homepage hero no longer hides overflow, letting the image extend beyond the hero section.
 - Homepage hero only shows a Browse Bars button linking to `/search`; Search and How it works buttons and promo chips were removed.
