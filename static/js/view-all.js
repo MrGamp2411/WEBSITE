@@ -83,6 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const filterLabel = filtersToggle?.querySelector('.label');
   const distanceValue = document.getElementById('distanceValue');
   const activeCategories = new Set();
+  const labelShow = filterLabel?.dataset.showLabel || 'Show filters';
+  const labelHide = filterLabel?.dataset.hideLabel || 'Hide filters';
 
   if (distInput) {
     distInput.value = distInput.max || '30';
@@ -115,11 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (open) {
       filterPanel.removeAttribute('hidden');
       filtersToggle.setAttribute('aria-expanded', 'true');
-      filterLabel.textContent = 'Hide filters';
+      filterLabel.textContent = labelHide;
     } else {
       filterPanel.setAttribute('hidden', '');
       filtersToggle.setAttribute('aria-expanded', 'false');
-      filterLabel.textContent = 'Show filters';
+      filterLabel.textContent = labelShow;
     }
     localStorage.setItem('isOpen', String(open));
   }

@@ -4,12 +4,13 @@
 <section class="bar-section">
     <div class="section-track">
       <div class="section-head">
-        <h2>All bars</h2>
+        <h2>{{ _('all_bars.title', default='All bars') }}</h2>
       </div>
       <div class="filters-toolbar">
         <button type="button" id="filters-toggle" class="btn-filter" aria-expanded="false" aria-controls="filters-panel">
           <i class="bi bi-sliders" aria-hidden="true"></i>
-          <span class="label">Show filters</span>
+          {% set show_label = _('all_bars.filters.toggle_show', default='Show filters') %}
+          <span class="label" data-show-label="{{ show_label }}" data-hide-label="{{ _('all_bars.filters.toggle_hide', default='Hide filters') }}">{{ show_label }}</span>
           <span class="badge" hidden>0</span>
           <i class="bi bi-chevron-down chevron" aria-hidden="true"></i>
         </button>
@@ -17,21 +18,21 @@
       <div class="bar-filters" id="filters-panel" hidden>
         <div class="filter-grid">
           <div class="filter-group">
-            <label for="searchName">Bar name</label>
+            <label for="searchName">{{ _('all_bars.filters.name.label', default='Bar name') }}</label>
             <div class="input-wrap">
               <i class="bi bi-search" aria-hidden="true"></i>
-                <input type="search" id="searchName" placeholder="e.g. Central Bar">
+                <input type="search" id="searchName" placeholder="{{ _('all_bars.filters.name.placeholder', default='e.g. Central Bar') }}">
             </div>
           </div>
           <div class="filter-group">
-            <label for="searchCity">City</label>
+            <label for="searchCity">{{ _('all_bars.filters.city.label', default='City') }}</label>
             <div class="input-wrap">
               <i class="bi bi-geo-alt" aria-hidden="true"></i>
-                <input type="search" id="searchCity" placeholder="e.g. Bellinzona">
+                <input type="search" id="searchCity" placeholder="{{ _('all_bars.filters.city.placeholder', default='e.g. Bellinzona') }}">
             </div>
           </div>
           <div class="filter-group">
-            <label for="filterDistance">Max distance (km)</label>
+            <label for="filterDistance">{{ _('all_bars.filters.distance.label', default='Max distance (km)') }}</label>
             <div class="range-wrap">
               <input type="range" id="filterDistance" min="0" max="30" step="1" list="distTicks" aria-live="polite">
               <datalist id="distTicks">
@@ -47,21 +48,21 @@
             </div>
           </div>
           <div class="filter-group rating-group">
-              <label for="filterRating">Minimum rating <i class="bi bi-info-circle" title="Show only bars with rating ≥ selected value" aria-hidden="true"></i></label>
+              <label for="filterRating">{{ _('all_bars.filters.rating.label', default='Minimum rating') }} <i class="bi bi-info-circle" title="{{ _('all_bars.filters.rating.help', default='Show only bars with rating ≥ selected value') }}" aria-hidden="true"></i></label>
             <div class="rating-stars" id="ratingStars" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"></div>
             <span class="value" id="ratingValue"></span>
             <input type="hidden" id="filterRating">
           </div>
           <div class="filter-group check-group">
-            <label><input type="checkbox" id="filterOpen"> Open now</label>
-            <label><input type="checkbox" id="filterClosed"> Closed now</label>
+            <label><input type="checkbox" id="filterOpen"> {{ _('home.bar_card.status_open', default='Open now') }}</label>
+            <label><input type="checkbox" id="filterClosed"> {{ _('home.bar_card.status_closed', default='Closed now') }}</label>
           </div>
           <div class="filter-group categories">
-            <label>Categories</label>
+            <label>{{ _('all_bars.filters.categories.label', default='Categories') }}</label>
             <div class="chips" id="categoryChips"></div>
           </div>
           <div class="actions">
-            <button type="button" id="clearFilters" class="btn-link">Clear filters</button>
+            <button type="button" id="clearFilters" class="btn-link">{{ _('all_bars.filters.clear', default='Clear filters') }}</button>
           </div>
         </div>
       </div>
@@ -69,7 +70,7 @@
       <ul class="bars all-bars" id="allBarList">
         {% for bar in bars %}
         <li>
-        <a class="bar-card{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="Open {{ bar.name }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" itemscope itemtype="https://schema.org/BarOrPub">
+        <a class="bar-card{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="{{ _('home.bar_card.open_label', bar_name=bar.name, default='Open {bar_name}') }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" itemscope itemtype="https://schema.org/BarOrPub">
           <div class="thumb-wrapper">
             {% if bar.photo_url %}
             <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
@@ -78,9 +79,9 @@
             {% endif %}
           </div>
           {% if bar.is_open_now %}
-          <span class="status status-open">Open now</span>
+          <span class="status status-open">{{ _('home.bar_card.status_open', default='Open now') }}</span>
           {% else %}
-          <span class="status status-closed">Closed now</span>
+          <span class="status status-closed">{{ _('home.bar_card.status_closed', default='Closed now') }}</span>
           {% endif %}
           <h3 class="title" itemprop="name">{{ bar.name }}</h3>
           <div class="bar-meta">

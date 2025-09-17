@@ -383,3 +383,5 @@
 - Notifications list strings use the `notifications` namespace in `app/i18n/translations/*.json`; `templates/notifications.html` references them.
 - Notification detail view strings use the `notification_detail` namespace in `app/i18n/translations/*.json`; `templates/notification_detail.html` uses these keys.
 - Cart, Search, and bar detail pages use the `cart`, `search`, and `bar_detail` namespaces in `app/i18n/translations/*.json` and their respective templates.
+- The "All bars" directory view localises via the `all_bars` namespace in `app/i18n/translations/*.json`; strings surface in `templates/all_bars.html` and supporting scripts.
+- Bartender dashboard copy pulls from the `bartender_dashboard` namespace, and bartender order management strings use the `bartender_orders` namespace.

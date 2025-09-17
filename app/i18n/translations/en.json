@@ -531,6 +531,52 @@
     "add_to_cart": "Add to Cart",
     "login_to_order": "Login to order"
   },
+  "all_bars": {
+    "title": "All bars",
+    "filters": {
+      "toggle_show": "Show filters",
+      "toggle_hide": "Hide filters",
+      "name": {
+        "label": "Bar name",
+        "placeholder": "e.g. Central Bar"
+      },
+      "city": {
+        "label": "City",
+        "placeholder": "e.g. Bellinzona"
+      },
+      "distance": {
+        "label": "Max distance (km)"
+      },
+      "rating": {
+        "label": "Minimum rating",
+        "help": "Show only bars with rating ≥ selected value"
+      },
+      "categories": {
+        "label": "Categories"
+      },
+      "clear": "Clear filters"
+    }
+  },
+  "bartender_dashboard": {
+    "title": "Bartender Dashboard",
+    "sections": {
+      "bars": {
+        "title": "Your Bars",
+        "aria": "Bars"
+      }
+    },
+    "empty": "No bar assigned."
+  },
+  "bartender_orders": {
+    "title": "{bar} Orders",
+    "pause": "Pause ordering",
+    "sections": {
+      "incoming": "Incoming Orders",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "completed": "Completed"
+    }
+  },
   "order_success": {
     "title": "Order Placed",
     "body": {
