@@ -1455,6 +1455,12 @@
       "name": "Bezeichnung",
       "description": "Warenbezeichnung",
       "display_order": "Reihenfolge anzeigen",
+      "name_translate_button": "Name übersetzen",
+      "description_translate_button": "Beschreibung übersetzen",
+      "translation_help": "Geben Sie für jede unterstützte Sprache einen Namen an.",
+      "translation_help_description": "Schreiben Sie für jede unterstützte Sprache eine Beschreibung.",
+      "language_name_label": "{language} Name",
+      "language_description_label": "{language} Beschreibung",
       "create": "Erstellen",
       "save": "Speichern"
     },

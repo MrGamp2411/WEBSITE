@@ -117,6 +117,8 @@ class Category(Base):
     bar_id = Column(Integer, ForeignKey("bars.id"), nullable=False)
     name = Column(String(100), nullable=False)
     description = Column(Text)
+    name_translations = Column(JSON)
+    description_translations = Column(JSON)
     photo_url = Column(String(255))
     sort_order = Column(Integer, default=0)
     active = Column(Boolean, default=True)

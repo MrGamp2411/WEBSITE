@@ -1479,6 +1479,12 @@
       "name": "Nom",
       "description": "Description",
       "display_order": "Commande d'affichage",
+      "name_translate_button": "Traduire le nom",
+      "description_translate_button": "Traduire la description",
+      "translation_help": "Saisissez un nom pour chaque langue prise en charge.",
+      "translation_help_description": "Rédigez une description pour chaque langue prise en charge.",
+      "language_name_label": "Nom {language}",
+      "language_description_label": "Description {language}",
       "create": "Créer",
       "save": "Sauvegarder"
     },
