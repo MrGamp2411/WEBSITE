@@ -121,6 +121,7 @@ from wallee.rest import ApiException
 from app.phone import normalize_phone_or_raise
 from app.i18n import (
     DEFAULT_LANGUAGE,
+    LANGUAGES,
     available_languages,
     create_translator,
     load_translations,
@@ -222,6 +223,7 @@ class Bar:
         latitude: float,
         longitude: float,
         description: str = "",
+        description_translations: Optional[Dict[str, str]] = None,
         photo_url: Optional[str] = None,
         rating: float = 0.0,
         is_open_now: bool = False,
@@ -238,6 +240,7 @@ class Bar:
         self.latitude = latitude
         self.longitude = longitude
         self.description = description
+        self.description_translations = description_translations or {}
         self.photo_url = photo_url
         self.rating = rating
         self.is_open_now = is_open_now
@@ -703,6 +706,7 @@ def ensure_bar_columns() -> None:
         "city": "VARCHAR(100)",
         "state": "VARCHAR(100)",
         "description": "TEXT",
+        "description_translations": "JSON",
         "rating": "FLOAT",
         "is_open_now": "BOOLEAN",
         "manual_closed": "BOOLEAN",
@@ -717,6 +721,28 @@ def ensure_bar_columns() -> None:
                 conn.execute(
                     text(f"ALTER TABLE bars ADD COLUMN IF NOT EXISTS {name} {ddl}")
                 )
+    # Backfill description translations when missing.
+    with SessionLocal() as db:
+        updated = False
+        for bar in db.query(BarModel).filter(
+            (BarModel.description != None)  # noqa: E711
+        ).all():
+            translations = bar.description_translations or {}
+            if not translations:
+                base = bar.description or ""
+                translations = {code: base for code in LANGUAGES}
+            else:
+                base = translations.get(DEFAULT_LANGUAGE) or bar.description or ""
+                for code in LANGUAGES:
+                    translations.setdefault(code, base)
+            if translations != (bar.description_translations or {}):
+                bar.description_translations = translations
+                updated = True
+            if base and (bar.description or "") != base:
+                bar.description = base
+                updated = True
+        if updated:
+            db.commit()
 
 
 def ensure_category_columns() -> None:
@@ -1314,6 +1340,14 @@ def load_bars_from_db() -> None:
                     hours = {}
             except Exception:
                 hours = {}
+            translations = dict(b.description_translations or {})
+            base_description = (
+                translations.get(DEFAULT_LANGUAGE)
+                or b.description
+                or ""
+            )
+            if not translations and base_description != "":
+                translations = {code: base_description for code in LANGUAGES}
             bar = Bar(
                 id=b.id,
                 name=b.name,
@@ -1322,7 +1356,8 @@ def load_bars_from_db() -> None:
                 state=b.state or "",
                 latitude=float(b.latitude) if b.latitude is not None else 0.0,
                 longitude=float(b.longitude) if b.longitude is not None else 0.0,
-                description=b.description or "",
+                description=base_description,
+                description_translations=translations,
                 photo_url=b.photo_url,
                 rating=b.rating or 0.0,
                 is_open_now=is_open_now_from_hours(hours)
@@ -1393,6 +1428,14 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
                 hours = {}
         except Exception:
             hours = {}
+        translations = dict(b.description_translations or {})
+        base_description = (
+            translations.get(DEFAULT_LANGUAGE)
+            or b.description
+            or ""
+        )
+        if not translations and base_description != "":
+            translations = {code: base_description for code in LANGUAGES}
         bar = Bar(
             id=b.id,
             name=b.name,
@@ -1401,7 +1444,8 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
             state=b.state or "",
             latitude=float(b.latitude) if b.latitude is not None else 0.0,
             longitude=float(b.longitude) if b.longitude is not None else 0.0,
-            description=b.description or "",
+            description=base_description,
+            description_translations=translations,
             photo_url=b.photo_url,
             rating=b.rating or 0.0,
             is_open_now=is_open_now_from_hours(hours)
@@ -1418,7 +1462,16 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
         bar.state = b.state or ""
         bar.latitude = float(b.latitude) if b.latitude is not None else 0.0
         bar.longitude = float(b.longitude) if b.longitude is not None else 0.0
-        bar.description = b.description or ""
+        translations = dict(b.description_translations or {})
+        base_description = (
+            translations.get(DEFAULT_LANGUAGE)
+            or b.description
+            or ""
+        )
+        if not translations and base_description != "":
+            translations = {code: base_description for code in LANGUAGES}
+        bar.description = base_description
+        bar.description_translations = translations
         bar.photo_url = b.photo_url
         bar.rating = b.rating or 0.0
         try:
@@ -1808,6 +1861,7 @@ class BarCreate(BaseModel):
     city: Optional[str] = None
     state: Optional[str] = None
     description: Optional[constr(max_length=120)] = None
+    description_translations: Optional[Dict[str, str]] = None
     photo_url: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
@@ -1827,6 +1881,7 @@ class BarRead(BaseModel):
     city: Optional[str] = None
     state: Optional[str] = None
     description: Optional[str] = None
+    description_translations: Optional[Dict[str, str]] = None
     photo_url: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
@@ -1933,7 +1988,22 @@ def list_bars(db: Session = Depends(get_db)):
 @app.post("/api/bars", response_model=BarRead, status_code=status.HTTP_201_CREATED)
 def create_bar(data: BarCreate, db: Session = Depends(get_db)):
     """Create a new bar in the database."""
-    bar = BarModel(**data.dict())
+    payload = data.dict()
+    translations = payload.get("description_translations") or {}
+    description = payload.get("description")
+    if description and not translations:
+        translations = {code: description for code in LANGUAGES}
+    if translations:
+        base = translations.get(DEFAULT_LANGUAGE) or description or ""
+        normalised: Dict[str, str] = {}
+        for code in LANGUAGES:
+            value = translations.get(code, base) or base
+            if len(value) > 120:
+                value = value[:120]
+            normalised[code] = value
+        payload["description_translations"] = normalised
+        payload["description"] = normalised.get(DEFAULT_LANGUAGE) or base
+    bar = BarModel(**payload)
     db.add(bar)
     db.commit()
     db.refresh(bar)
@@ -3623,6 +3693,9 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
     description = form.get("description")
     if description:
         description = description[:120]
+    translations = None
+    if description is not None:
+        translations = {code: description for code in LANGUAGES}
     rating = form.get("rating")
     manual_closed = form.get("manual_closed") == "on"
     hours = {}
@@ -3675,6 +3748,7 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
         latitude=lat,
         longitude=lon,
         description=description,
+        description_translations=translations,
         photo_url=photo_url,
         rating=float(rating) if rating else 0.0,
         is_open_now=is_open_now_from_hours(hours) and not manual_closed,
@@ -3694,6 +3768,7 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
         latitude=lat,
         longitude=lon,
         description=description,
+        description_translations=translations,
         photo_url=photo_url,
         rating=float(rating) if rating else 0.0,
         is_open_now=is_open_now_from_hours(hours) and not manual_closed,
@@ -3764,9 +3839,6 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
     state = form.get("state")
     latitude = form.get("latitude")
     longitude = form.get("longitude")
-    description = form.get("description")
-    if description:
-        description = description[:120]
     rating = form.get("rating") if user.is_super_admin else None
     manual_closed = form.get("manual_closed") == "on"
     try:
@@ -3812,7 +3884,7 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
         with open(file_path, "wb") as f:
             f.write(await photo_file.read())
         photo_url = f"/static/uploads/{filename}"
-    if all([name, address, city, state, latitude, longitude, description]):
+    if all([name, address, city, state, latitude, longitude]):
         try:
             lat = float(latitude)
             lon = float(longitude)
@@ -3824,7 +3896,6 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
         bar.state = state
         bar.latitude = lat
         bar.longitude = lon
-        bar.description = description
         bar.photo_url = photo_url
         if user.is_super_admin:
             bar.rating = float(rating) if rating else 0.0
@@ -3841,7 +3912,6 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
             mem_bar.state = state
             mem_bar.latitude = lat
             mem_bar.longitude = lon
-            mem_bar.description = description
             mem_bar.photo_url = photo_url
             if user.is_super_admin:
                 mem_bar.rating = float(rating) if rating else 0.0
@@ -3863,6 +3933,85 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
         selected_categories=categories,
         error="All fields are required",
     )
+
+
+@app.get("/admin/bars/edit/{bar_id}/description", response_class=HTMLResponse)
+async def edit_bar_description_form(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = db.get(BarModel, bar_id)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    if not user or not (
+        user.is_super_admin or (user.is_bar_admin and bar_id in user.bar_ids)
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    translations = dict(bar.description_translations or {})
+    base_description = (
+        translations.get(DEFAULT_LANGUAGE)
+        or bar.description
+        or ""
+    )
+    for code in LANGUAGES:
+        translations.setdefault(code, base_description)
+    return render_template(
+        "admin_edit_bar_description.html",
+        request=request,
+        bar=bar,
+        descriptions=translations,
+        languages=[{"code": code, "name": name} for code, name in LANGUAGES.items()],
+    )
+
+
+@app.post("/admin/bars/edit/{bar_id}/description")
+async def edit_bar_description_post(
+    request: Request, bar_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = db.get(BarModel, bar_id)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    if not user or not (
+        user.is_super_admin or (user.is_bar_admin and bar_id in user.bar_ids)
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    translations: Dict[str, str] = {}
+    error_code: Optional[str] = None
+    for code in LANGUAGES:
+        value = form.get(f"description_{code}") or ""
+        value = value.strip()
+        if not value:
+            error_code = "required"
+        if len(value) > 120:
+            value = value[:120]
+        translations[code] = value
+    if error_code:
+        return render_template(
+            "admin_edit_bar_description.html",
+            request=request,
+            bar=bar,
+            descriptions=translations,
+            languages=[{"code": code, "name": name} for code, name in LANGUAGES.items()],
+            error_code=error_code,
+        )
+    primary_description = (
+        translations.get(DEFAULT_LANGUAGE)
+        or next((text for text in translations.values() if text), "")
+    )
+    bar.description_translations = translations
+    bar.description = primary_description
+    db.commit()
+    mem_bar = bars.get(bar_id)
+    if mem_bar:
+        mem_bar.description_translations = dict(translations)
+        mem_bar.description = primary_description
+    if user.is_super_admin:
+        return RedirectResponse(
+            url=f"/admin/bars/edit/{bar_id}/info", status_code=status.HTTP_303_SEE_OTHER
+        )
+    return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.post("/admin/bars/{bar_id}/delete")

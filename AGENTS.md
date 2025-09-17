@@ -408,6 +408,7 @@
   - `admin_edit_bar` covers the bar info form, including category chips and opening hours labels.
   - `admin_new_notification` drives the broadcast form, search controls, and selection prompts.
   - `admin_payments` defines the payouts list header, search inputs, and action buttons.
+- Bar descriptions now persist per language via the `description_translations` JSON column. The create flow seeds all languages with the initial copy and `/admin/bars/edit/{id}/description` provides a four-language editor linked from the info form.
 - Shared live order widgets read translations from new namespaces in `app/i18n/translations/*.json`:
   - `orders.statuses` and `orders.payment_methods` supply status and payment method labels for JS renderers.
   - `bartender_orders.actions` now covers Accept, Cancel, Ready, and Complete buttons.

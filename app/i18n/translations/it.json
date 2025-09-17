@@ -1036,6 +1036,9 @@
       "description": "Descrizione breve e chiara. I link verranno ignorati.",
       "categories": "Clicca per selezionare/deselezionare. Gli elementi selezionati sono evidenziati."
     },
+    "description": {
+      "none": "Nessuna descrizione"
+    },
     "categories": {
       "count": "{selected}/{max} selezionate"
     },
@@ -1057,7 +1060,25 @@
       "close": "Chiusura"
     },
     "actions": {
-      "save": "Salva"
+      "save": "Salva",
+      "edit_description": "Modifica descrizione"
+    }
+  },
+  "admin_edit_bar_description": {
+    "back": "Torna alle info del bar",
+    "title": "Modifica descrizioni per {bar}",
+    "intro": "Inserisci un breve riassunto per ogni lingua supportata. Il testo viene mostrato nella pagina del bar e negli elenchi.",
+    "errors": {
+      "required": "Tutti i campi della descrizione sono obbligatori."
+    },
+    "fields": {
+      "language": "Descrizione {language}"
+    },
+    "help": {
+      "limit": "Massimo 120 caratteri."
+    },
+    "actions": {
+      "save": "Salva descrizioni"
     }
   },
   "admin_edit_bar_options": {

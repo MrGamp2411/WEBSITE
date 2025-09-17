@@ -81,6 +81,7 @@ class Bar(Base):
     city = Column(String(100))
     state = Column(String(100))
     description = Column(Text)
+    description_translations = Column(JSON)
     latitude = Column(Numeric(9, 6))
     longitude = Column(Numeric(9, 6))
     opening_hours = Column(Text)
