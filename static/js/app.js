@@ -325,12 +325,31 @@ document.addEventListener('DOMContentLoaded', function() {
   const menuToggles = document.querySelectorAll('.js-open-menu');
   const mobileMenu = document.getElementById('mobileMenu');
   let backdrop;
-  for (const el of document.querySelectorAll('.menu-backdrop')) {
-    if (!el.classList.contains('language-backdrop')) {
-      backdrop = el;
-      break;
+
+  function ensureMenuBackdrop() {
+    if (backdrop && document.body.contains(backdrop)) {
+      return backdrop;
     }
+
+    backdrop = null;
+    for (const el of document.querySelectorAll('.menu-backdrop')) {
+      if (!el.classList.contains('language-backdrop')) {
+        backdrop = el;
+        break;
+      }
+    }
+
+    if (!backdrop && mobileMenu) {
+      backdrop = document.createElement('div');
+      backdrop.className = 'menu-backdrop';
+      backdrop.hidden = true;
+      mobileMenu.insertAdjacentElement('afterend', backdrop);
+    }
+
+    return backdrop;
   }
+
+  ensureMenuBackdrop();
   const closeBtn = mobileMenu?.querySelector('.js-close-menu');
   const contentEls = document.querySelectorAll('main, .hdr-sub, footer');
   let activeToggle;
@@ -339,36 +358,38 @@ document.addEventListener('DOMContentLoaded', function() {
   const handleKeydown = (e) => { if (e.key === 'Escape') closeMenu(); };
 
   function openMenu(btn) {
-    if (!mobileMenu || !backdrop) return;
+    const overlay = ensureMenuBackdrop();
+    if (!mobileMenu || !overlay) return;
     activeToggle = btn;
     lastFocused = document.activeElement;
     activeToggle.setAttribute('aria-expanded', 'true');
     mobileMenu.hidden = false;
-    backdrop.hidden = false;
+    overlay.hidden = false;
     requestAnimationFrame(() => {
       mobileMenu.classList.add('is-open');
-      backdrop.classList.add('is-open');
+      overlay.classList.add('is-open');
     });
     document.body.style.overflow = 'hidden';
     contentEls.forEach(el => el.setAttribute('aria-hidden','true'));
     document.addEventListener('keydown', handleKeydown);
-    backdrop.addEventListener('click', closeMenu);
+    overlay.addEventListener('click', closeMenu);
     closeBtn?.addEventListener('click', closeMenu);
     const firstItem = mobileMenu.querySelector('[role="menuitem"]');
     firstItem && firstItem.focus();
   }
 
   function closeMenu() {
-    if (!mobileMenu || !backdrop) return;
+    const overlay = ensureMenuBackdrop();
+    if (!mobileMenu || !overlay) return;
     activeToggle && activeToggle.setAttribute('aria-expanded', 'false');
     mobileMenu.classList.remove('is-open');
-    backdrop.classList.remove('is-open');
+    overlay.classList.remove('is-open');
     document.body.style.overflow = '';
     mobileMenu.hidden = true;
-    backdrop.hidden = true;
+    overlay.hidden = true;
     contentEls.forEach(el => el.removeAttribute('aria-hidden'));
     document.removeEventListener('keydown', handleKeydown);
-    backdrop.removeEventListener('click', closeMenu);
+    overlay.removeEventListener('click', closeMenu);
     closeBtn?.removeEventListener('click', closeMenu);
     lastFocused && lastFocused.focus();
   }
