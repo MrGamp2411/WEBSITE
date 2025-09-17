@@ -531,6 +531,52 @@
     "add_to_cart": "Aggiungi al carrello",
     "login_to_order": "Accedi per ordinare"
   },
+  "all_bars": {
+    "title": "Tutti i locali",
+    "filters": {
+      "toggle_show": "Mostra filtri",
+      "toggle_hide": "Nascondi filtri",
+      "name": {
+        "label": "Nome locale",
+        "placeholder": "es. Central Bar"
+      },
+      "city": {
+        "label": "Città",
+        "placeholder": "es. Bellinzona"
+      },
+      "distance": {
+        "label": "Distanza massima (km)"
+      },
+      "rating": {
+        "label": "Valutazione minima",
+        "help": "Mostra solo i locali con valutazione ≥ valore selezionato"
+      },
+      "categories": {
+        "label": "Categorie"
+      },
+      "clear": "Azzera filtri"
+    }
+  },
+  "bartender_dashboard": {
+    "title": "Dashboard bartender",
+    "sections": {
+      "bars": {
+        "title": "I tuoi locali",
+        "aria": "Locali"
+      }
+    },
+    "empty": "Nessun locale assegnato."
+  },
+  "bartender_orders": {
+    "title": "Ordini {bar}",
+    "pause": "Metti in pausa gli ordini",
+    "sections": {
+      "incoming": "Ordini in arrivo",
+      "preparing": "In preparazione",
+      "ready": "Pronti",
+      "completed": "Completati"
+    }
+  },
   "order_success": {
     "title": "Ordine inviato",
     "body": {

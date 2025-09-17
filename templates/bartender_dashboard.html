@@ -2,7 +2,7 @@
 {% block content %}
 <section class="admin-dashboard editbar">
   <header class="admin-header">
-    <h1>Bartender Dashboard</h1>
+    <h1>{{ _('bartender_dashboard.title', default='Bartender Dashboard') }}</h1>
     <div class="admin-identity card">
       <div class="identity-row">
         <span class="identity-name">{{ user.username }}</span>
@@ -12,8 +12,8 @@
     </div>
   </header>
   {% if bars %}
-  <section class="admin-section" aria-label="Bars">
-    <h2 class="section-title"><i class="bi bi-shop"></i> Your Bars</h2>
+  <section class="admin-section" aria-label="{{ _('bartender_dashboard.sections.bars.aria', default='Bars') }}">
+    <h2 class="section-title"><i class="bi bi-shop"></i> {{ _('bartender_dashboard.sections.bars.title', default='Your Bars') }}</h2>
     <ul class="bars">
       {% for bar in bars %}
       <li>
@@ -32,7 +32,7 @@
     </ul>
   </section>
   {% else %}
-  <p>No bar assigned.</p>
+  <p>{{ _('bartender_dashboard.empty', default='No bar assigned.') }}</p>
   {% endif %}
 </section>
 {% endblock %}
