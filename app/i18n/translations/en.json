@@ -394,6 +394,62 @@
       "save": "Save"
     }
   },
+  "order_history": {
+    "title": "Order History",
+    "subtitle": "Review your past orders and find details faster.",
+    "sections": {
+      "pending": {
+        "title": "Pending Orders",
+        "actions": {
+          "cancel": "Cancel"
+        },
+        "empty": {
+          "title": "No pending orders",
+          "body": "New orders will appear here in real time."
+        }
+      },
+      "completed": {
+        "title": "Completed Orders",
+        "actions": {
+          "reorder": "Reorder"
+        },
+        "empty": {
+          "title": "No completed orders yet",
+          "body": "When you finish an order, it will show up here."
+        }
+      }
+    },
+    "card": {
+      "title": "Order {code}",
+      "status_aria": "Order status: {status}",
+      "status_label": "{status}",
+      "fields": {
+        "total": "Total",
+        "refunded": "Refunded",
+        "placed": "Placed",
+        "customer": "Customer",
+        "bar": "Bar",
+        "table": "Table",
+        "payment": "Payment",
+        "notes": "Notes",
+        "prep_time": "Prep time"
+      },
+      "unknown_customer": "Unknown",
+      "unknown_item": "Unknown item",
+      "prep_minutes": "{minutes} min"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Your messages.",
+    "empty": "No notifications."
+  },
+  "notification_detail": {
+    "subtitle": "Notification details.",
+    "back": "Back",
+    "download": "Download attachment",
+    "image_alt": "Notification image"
+  },
   "order_success": {
     "title": "Order Placed",
     "body": {

@@ -3,8 +3,8 @@
 <section class="users-page">
   <header class="users-toolbar">
     <div class="title-wrap">
-      <h1>Notifications</h1>
-      <p class="subtitle">Your messages.</p>
+      <h1>{{ _('notifications.title', default='Notifications') }}</h1>
+      <p class="subtitle">{{ _('notifications.subtitle', default='Your messages.') }}</p>
     </div>
   </header>
   <div class="table-card">
@@ -17,7 +17,7 @@
         </a>
       </li>
     {% else %}
-      <li>No notifications.</li>
+      <li>{{ _('notifications.empty', default='No notifications.') }}</li>
     {% endfor %}
     </ul>
   </div>

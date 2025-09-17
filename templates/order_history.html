@@ -2,51 +2,56 @@
 {% block content %}
 <section class="orders-page">
   <header class="orders-head">
-    <h1 class="orders-title">Order History</h1>
-    <p class="orders-subtitle">Review your past orders and find details faster.</p>
+    <h1 class="orders-title">{{ _('order_history.title', default='Order History') }}</h1>
+    <p class="orders-subtitle">{{ _('order_history.subtitle', default='Review your past orders and find details faster.') }}</p>
   </header>
 
   <!-- Pending -->
   <section class="orders-section" id="pending">
     <div class="section-head">
-      <h2>Pending Orders</h2>
+      <h2>{{ _('order_history.sections.pending.title', default='Pending Orders') }}</h2>
       <span class="count-badge" id="pendingCount">{{ pending_orders|length }}</span>
     </div>
 
     <div class="orders-grid order-list" id="pending-orders">
       {% for order in pending_orders %}
+      {% set order_code = order.public_order_code or ('#' ~ order.id) %}
+      {% set status_label = order.status|replace('_', ' ')|title %}
       <article id="user-order-{{ order.id }}" class="order-card card card--{{ order.status|lower }}" role="article" aria-labelledby="order-{{ order.id }}-title" data-status="{{ order.status }}">
         <header class="order-card__header">
-          <h3 id="order-{{ order.id }}-title">Order {{ order.public_order_code or ('#' ~ order.id) }}</h3>
-          <span class="order-status chip status status-{{ order.status|lower }}" aria-label="Order status: {{ order.status|replace('_', ' ')|title }}">{{ order.status|replace('_', ' ')|title }}</span>
+          <h3 id="order-{{ order.id }}-title">{{ _('order_history.card.title', code=order_code, default='Order {code}') }}</h3>
+          <span class="order-status chip status status-{{ order.status|lower }}" aria-label="{{ _('order_history.card.status_aria', status=status_label, default='Order status: {status}') }}">{{ _('order_history.card.status_label', status=status_label, default=status_label) }}</span>
         </header>
         <div class="order-card__divider"></div>
         <section class="order-card__meta">
           <dl class="order-kv">
-            <div><dt>Total</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.total) }}</dd></div>
-            {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>Refunded</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
-            <div><dt>Placed</dt><dd class="num nowrap">{{ order.created_at|format_time }}</dd></div>
+            <div><dt>{{ _('order_history.card.fields.total', default='Total') }}</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.total) }}</dd></div>
+            {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>{{ _('order_history.card.fields.refunded', default='Refunded') }}</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
+            <div><dt>{{ _('order_history.card.fields.placed', default='Placed') }}</dt><dd class="num nowrap">{{ order.created_at|format_time }}</dd></div>
 
-            <div><dt>Customer</dt><dd>{{ order.customer_name or 'Unknown' }} <a href="tel:{{ (order.customer_prefix or '')|replace(' ', '') }}{{ (order.customer_phone or '')|replace(' ', '') }}">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</a></dd></div>
-            <div><dt>Bar</dt><dd>{{ order.bar_name or '' }}</dd></div>
+            <div><dt>{{ _('order_history.card.fields.customer', default='Customer') }}</dt><dd>{{ order.customer_name or _('order_history.card.unknown_customer', default='Unknown') }} <a href="tel:{{ (order.customer_prefix or '')|replace(' ', '') }}{{ (order.customer_phone or '')|replace(' ', '') }}">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</a></dd></div>
+            <div><dt>{{ _('order_history.card.fields.bar', default='Bar') }}</dt><dd>{{ order.bar_name or '' }}</dd></div>
 
-            <div><dt>Table</dt><dd>{{ order.table_name or '' }}</dd></div>
-            <div><dt>Payment</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
-            {% if order.notes %}<div><dt>Notes</dt><dd>{{ order.notes }}</dd></div>{% endif %}
+            <div><dt>{{ _('order_history.card.fields.table', default='Table') }}</dt><dd>{{ order.table_name or '' }}</dd></div>
+            <div><dt>{{ _('order_history.card.fields.payment', default='Payment') }}</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
+            {% if order.notes %}<div><dt>{{ _('order_history.card.fields.notes', default='Notes') }}</dt><dd>{{ order.notes }}</dd></div>{% endif %}
 
-            {% if order.ready_at %}<div><dt>Prep time</dt><dd class="num">{{ ((order.ready_at - order.created_at).total_seconds() // 60)|int }} min</dd></div>{% endif %}
+            {% if order.ready_at %}
+            {% set prep_minutes = ((order.ready_at - order.created_at).total_seconds() // 60)|int %}
+            <div><dt>{{ _('order_history.card.fields.prep_time', default='Prep time') }}</dt><dd class="num">{{ _('order_history.card.prep_minutes', minutes=prep_minutes, default='{minutes} min') }}</dd></div>
+            {% endif %}
           </dl>
         </section>
         <div class="order-card__divider"></div>
         <section class="order-card__items">
           <ul class="order-items">
             {% for item in order.items %}
-            <li><span class="qty">{{ item.qty }}×</span><span class="name">{{ item.menu_item_name or 'Unknown item' }}</span></li>
+            <li><span class="qty">{{ item.qty }}×</span><span class="name">{{ item.menu_item_name or _('order_history.card.unknown_item', default='Unknown item') }}</span></li>
             {% endfor %}
           </ul>
           {% if order.status == 'PLACED' %}
           <div class="order-actions">
-            <button class="cancel-order" data-order-id="{{ order.id }}" data-status="CANCELED">Cancel</button>
+            <button class="cancel-order" data-order-id="{{ order.id }}" data-status="CANCELED">{{ _('order_history.sections.pending.actions.cancel', default='Cancel') }}</button>
           </div>
           {% endif %}
         </section>
@@ -56,13 +61,13 @@
 
     {% if pending_orders|length == 0 %}
     <div class="empty show" id="pendingEmpty" aria-live="polite">
-      <h3>No pending orders</h3>
-      <p>New orders will appear here in real time.</p>
+      <h3>{{ _('order_history.sections.pending.empty.title', default='No pending orders') }}</h3>
+      <p>{{ _('order_history.sections.pending.empty.body', default='New orders will appear here in real time.') }}</p>
     </div>
     {% else %}
     <div class="empty" id="pendingEmpty" aria-live="polite">
-      <h3>No pending orders</h3>
-      <p>New orders will appear here in real time.</p>
+      <h3>{{ _('order_history.sections.pending.empty.title', default='No pending orders') }}</h3>
+      <p>{{ _('order_history.sections.pending.empty.body', default='New orders will appear here in real time.') }}</p>
     </div>
     {% endif %}
   </section>
@@ -70,44 +75,49 @@
   <!-- Completed -->
   <section class="orders-section" id="completed">
     <div class="section-head">
-      <h2>Completed Orders</h2>
+      <h2>{{ _('order_history.sections.completed.title', default='Completed Orders') }}</h2>
       <span class="count-badge" id="completedCount">{{ completed_orders|length }}</span>
     </div>
 
     <div class="orders-grid order-list" id="completed-orders">
       {% for order in completed_orders %}
+      {% set order_code = order.public_order_code or ('#' ~ order.id) %}
+      {% set status_label = order.status|replace('_', ' ')|title %}
       <article id="user-order-{{ order.id }}" class="order-card card card--{{ order.status|lower }}" role="article" aria-labelledby="order-{{ order.id }}-title" data-status="{{ order.status }}">
         <header class="order-card__header">
-          <h3 id="order-{{ order.id }}-title">Order {{ order.public_order_code or ('#' ~ order.id) }}</h3>
-          <span class="order-status chip status status-{{ order.status|lower }}" aria-label="Order status: {{ order.status|replace('_', ' ')|title }}">{{ order.status|replace('_', ' ')|title }}</span>
+          <h3 id="order-{{ order.id }}-title">{{ _('order_history.card.title', code=order_code, default='Order {code}') }}</h3>
+          <span class="order-status chip status status-{{ order.status|lower }}" aria-label="{{ _('order_history.card.status_aria', status=status_label, default='Order status: {status}') }}">{{ _('order_history.card.status_label', status=status_label, default=status_label) }}</span>
         </header>
         <div class="order-card__divider"></div>
         <section class="order-card__meta">
           <dl class="order-kv">
-            <div><dt>Total</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.total) }}</dd></div>
-            {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>Refunded</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
-            <div><dt>Placed</dt><dd class="num nowrap">{{ order.created_at|format_time }}</dd></div>
+            <div><dt>{{ _('order_history.card.fields.total', default='Total') }}</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.total) }}</dd></div>
+            {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>{{ _('order_history.card.fields.refunded', default='Refunded') }}</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
+            <div><dt>{{ _('order_history.card.fields.placed', default='Placed') }}</dt><dd class="num nowrap">{{ order.created_at|format_time }}</dd></div>
 
-            <div><dt>Customer</dt><dd>{{ order.customer_name or 'Unknown' }} <a href="tel:{{ (order.customer_prefix or '')|replace(' ', '') }}{{ (order.customer_phone or '')|replace(' ', '') }}">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</a></dd></div>
-            <div><dt>Bar</dt><dd>{{ order.bar_name or '' }}</dd></div>
+            <div><dt>{{ _('order_history.card.fields.customer', default='Customer') }}</dt><dd>{{ order.customer_name or _('order_history.card.unknown_customer', default='Unknown') }} <a href="tel:{{ (order.customer_prefix or '')|replace(' ', '') }}{{ (order.customer_phone or '')|replace(' ', '') }}">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</a></dd></div>
+            <div><dt>{{ _('order_history.card.fields.bar', default='Bar') }}</dt><dd>{{ order.bar_name or '' }}</dd></div>
 
-            <div><dt>Table</dt><dd>{{ order.table_name or '' }}</dd></div>
-            <div><dt>Payment</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
-            {% if order.notes %}<div><dt>Notes</dt><dd>{{ order.notes }}</dd></div>{% endif %}
+            <div><dt>{{ _('order_history.card.fields.table', default='Table') }}</dt><dd>{{ order.table_name or '' }}</dd></div>
+            <div><dt>{{ _('order_history.card.fields.payment', default='Payment') }}</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
+            {% if order.notes %}<div><dt>{{ _('order_history.card.fields.notes', default='Notes') }}</dt><dd>{{ order.notes }}</dd></div>{% endif %}
 
-            {% if order.ready_at %}<div><dt>Prep time</dt><dd class="num">{{ ((order.ready_at - order.created_at).total_seconds() // 60)|int }} min</dd></div>{% endif %}
+            {% if order.ready_at %}
+            {% set prep_minutes = ((order.ready_at - order.created_at).total_seconds() // 60)|int %}
+            <div><dt>{{ _('order_history.card.fields.prep_time', default='Prep time') }}</dt><dd class="num">{{ _('order_history.card.prep_minutes', minutes=prep_minutes, default='{minutes} min') }}</dd></div>
+            {% endif %}
           </dl>
         </section>
         <div class="order-card__divider"></div>
         <section class="order-card__items">
           <ul class="order-items">
             {% for item in order.items %}
-            <li><span class="qty">{{ item.qty }}×</span><span class="name">{{ item.menu_item_name or 'Unknown item' }}</span></li>
+            <li><span class="qty">{{ item.qty }}×</span><span class="name">{{ item.menu_item_name or _('order_history.card.unknown_item', default='Unknown item') }}</span></li>
             {% endfor %}
           </ul>
           {% if order.status in ('COMPLETED', 'CANCELED') %}
           <div class="order-actions">
-            <button class="reorder-order" data-order-id="{{ order.id }}" type="button">Reorder</button>
+            <button class="reorder-order" data-order-id="{{ order.id }}" type="button">{{ _('order_history.sections.completed.actions.reorder', default='Reorder') }}</button>
           </div>
           {% endif %}
         </section>
@@ -117,13 +127,13 @@
 
     {% if completed_orders|length == 0 %}
     <div class="empty show" id="completedEmpty" aria-live="polite">
-      <h3>No completed orders yet</h3>
-      <p>When you finish an order, it will show up here.</p>
+      <h3>{{ _('order_history.sections.completed.empty.title', default='No completed orders yet') }}</h3>
+      <p>{{ _('order_history.sections.completed.empty.body', default='When you finish an order, it will show up here.') }}</p>
     </div>
     {% else %}
     <div class="empty" id="completedEmpty" aria-live="polite">
-      <h3>No completed orders yet</h3>
-      <p>When you finish an order, it will show up here.</p>
+      <h3>{{ _('order_history.sections.completed.empty.title', default='No completed orders yet') }}</h3>
+      <p>{{ _('order_history.sections.completed.empty.body', default='When you finish an order, it will show up here.') }}</p>
     </div>
     {% endif %}
 

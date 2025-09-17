@@ -394,6 +394,62 @@
       "save": "Salva"
     }
   },
+  "order_history": {
+    "title": "Storico ordini",
+    "subtitle": "Rivedi i tuoi ordini passati e trova i dettagli più rapidamente.",
+    "sections": {
+      "pending": {
+        "title": "Ordini in attesa",
+        "actions": {
+          "cancel": "Annulla"
+        },
+        "empty": {
+          "title": "Nessun ordine in attesa",
+          "body": "I nuovi ordini appariranno qui in tempo reale."
+        }
+      },
+      "completed": {
+        "title": "Ordini completati",
+        "actions": {
+          "reorder": "Riordina"
+        },
+        "empty": {
+          "title": "Nessun ordine completato",
+          "body": "Quando concludi un ordine, verrà mostrato qui."
+        }
+      }
+    },
+    "card": {
+      "title": "Ordine {code}",
+      "status_aria": "Stato ordine: {status}",
+      "status_label": "{status}",
+      "fields": {
+        "total": "Totale",
+        "refunded": "Rimborsato",
+        "placed": "Inviato",
+        "customer": "Cliente",
+        "bar": "Bar",
+        "table": "Tavolo",
+        "payment": "Pagamento",
+        "notes": "Note",
+        "prep_time": "Tempo di preparazione"
+      },
+      "unknown_customer": "Sconosciuto",
+      "unknown_item": "Articolo sconosciuto",
+      "prep_minutes": "{minutes} min"
+    }
+  },
+  "notifications": {
+    "title": "Notifiche",
+    "subtitle": "I tuoi messaggi.",
+    "empty": "Nessuna notifica."
+  },
+  "notification_detail": {
+    "subtitle": "Dettagli della notifica.",
+    "back": "Indietro",
+    "download": "Scarica allegato",
+    "image_alt": "Immagine della notifica"
+  },
   "order_success": {
     "title": "Ordine inviato",
     "body": {

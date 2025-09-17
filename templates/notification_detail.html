@@ -4,9 +4,9 @@
   <header class="users-toolbar">
     <div class="title-wrap">
       <h1>{{ note.subject }}</h1>
-      <p class="subtitle">Notification details.</p>
+      <p class="subtitle">{{ _('notification_detail.subtitle', default='Notification details.') }}</p>
     </div>
-    <a href="/notifications" class="btn-outline">Back</a>
+    <a href="/notifications" class="btn-outline">{{ _('notification_detail.back', default='Back') }}</a>
   </header>
   <div class="table-card">
     <p class="notification-body">{{ note.body }}</p>
@@ -14,10 +14,10 @@
     <p><a href="{{ note.link_url }}">{{ note.link_url }}</a></p>
     {% endif %}
     {% if note.image %}
-    <p><img src="/notifications/{{ note.id }}/image" alt="image"></p>
+    <p><img src="/notifications/{{ note.id }}/image" alt="{{ _('notification_detail.image_alt', default='Notification image') }}"></p>
     {% endif %}
     {% if note.attachment %}
-    <p><a href="/notifications/{{ note.id }}/attachment">Download attachment</a></p>
+    <p><a href="/notifications/{{ note.id }}/attachment">{{ _('notification_detail.download', default='Download attachment') }}</a></p>
     {% endif %}
   </div>
 </section>

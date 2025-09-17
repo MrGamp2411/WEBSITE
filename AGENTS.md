@@ -379,3 +379,6 @@
 - Profile page strings live under the `profile` namespace in `app/i18n/translations/*.json`; `templates/profile.html` pulls from these keys and reuses the registration phone prefix options.
 - Change Password page strings live under the `change_password` namespace in `app/i18n/translations/*.json`; `templates/change_password.html` also uses shared `auth` password toggle labels.
 - Order confirmation copy in `templates/order_success.html` localises through the `order_success` namespace in `app/i18n/translations/*.json`.
+- Order history UI strings live under the `order_history` namespace in `app/i18n/translations/*.json`; `templates/order_history.html` pulls from these keys.
+- Notifications list strings use the `notifications` namespace in `app/i18n/translations/*.json`; `templates/notifications.html` references them.
+- Notification detail view strings use the `notification_detail` namespace in `app/i18n/translations/*.json`; `templates/notification_detail.html` uses these keys.
