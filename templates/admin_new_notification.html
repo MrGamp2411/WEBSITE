@@ -3,28 +3,28 @@
 <section class="users-page">
   <header class="users-toolbar">
     <div class="title-wrap">
-      <h1>New Notification</h1>
-      <p class="subtitle">Send a message to users.</p>
+      <h1>{{ _('admin_new_notification.title', default='New Notification') }}</h1>
+      <p class="subtitle">{{ _('admin_new_notification.subtitle', default='Send a message to users.') }}</p>
     </div>
   </header>
   {% if error %}
   <p class="alert-danger">{{ error }}</p>
   {% endif %}
   <form class="form" method="post" action="/admin/notifications" enctype="multipart/form-data">
-    <label>Target
+    <label>{{ _('admin_new_notification.form.target.label', default='Target') }}
       <select name="target" id="target" required>
-        <option value="all">All Users</option>
-        <option value="user">Specific User</option>
-        <option value="bar">Users of Bar</option>
+        <option value="all">{{ _('admin_new_notification.form.target.options.all', default='All Users') }}</option>
+        <option value="user">{{ _('admin_new_notification.form.target.options.user', default='Specific User') }}</option>
+        <option value="bar">{{ _('admin_new_notification.form.target.options.bar', default='Users of Bar') }}</option>
       </select>
     </label>
 
     <section id="userSection" hidden>
-      <h2>Select User</h2>
-      <div class="users-search" role="search" aria-label="Search users" onsubmit="return false">
+      <h2>{{ _('admin_new_notification.user_section.title', default='Select User') }}</h2>
+      <div class="users-search" role="search" aria-label="{{ _('admin_new_notification.user_section.search.aria', default='Search users') }}" onsubmit="return false">
         <i class="bi bi-search" aria-hidden="true"></i>
-        <input id="userSearch" type="search" inputmode="search" autocomplete="off" placeholder="Search users…" aria-label="Search users">
-        <button class="clear" type="button" aria-label="Clear search">
+        <input id="userSearch" type="search" inputmode="search" autocomplete="off" placeholder="{{ _('admin_new_notification.user_section.search.placeholder', default='Search users…') }}" aria-label="{{ _('admin_new_notification.user_section.search.input_aria', default='Search users') }}">
+        <button class="clear" type="button" aria-label="{{ _('admin_new_notification.user_section.search.clear', default='Clear search') }}">
           <i class="bi bi-x-circle" aria-hidden="true"></i>
         </button>
       </div>
@@ -32,10 +32,10 @@
         <table class="users-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th class="actions">Actions</th>
+              <th>{{ _('admin_new_notification.user_section.table.headers.id', default='ID') }}</th>
+              <th>{{ _('admin_new_notification.user_section.table.headers.username', default='Username') }}</th>
+              <th>{{ _('admin_new_notification.user_section.table.headers.email', default='Email') }}</th>
+              <th class="actions">{{ _('admin_new_notification.user_section.table.headers.actions', default='Actions') }}</th>
             </tr>
           </thead>
           <tbody id="userRows">
@@ -45,7 +45,7 @@
               <td>{{ u.username }}</td>
               <td>{{ u.email }}</td>
               <td class="actions">
-                <button type="button" class="btn-outline js-pick-user" data-user-id="{{ u.id }}">Select</button>
+                <button type="button" class="btn-outline js-pick-user" data-user-id="{{ u.id }}">{{ _('admin_new_notification.actions.select', default='Select') }}</button>
               </td>
             </tr>
             {% endfor %}
@@ -56,11 +56,11 @@
     </section>
 
     <section id="barSection" hidden>
-      <h2>Select Bar</h2>
-      <div class="bars-search" role="search" aria-label="Search bars" onsubmit="return false">
+      <h2>{{ _('admin_new_notification.bar_section.title', default='Select Bar') }}</h2>
+      <div class="bars-search" role="search" aria-label="{{ _('admin_new_notification.bar_section.search.aria', default='Search bars') }}" onsubmit="return false">
         <i class="bi bi-search" aria-hidden="true"></i>
-        <input id="barSearch" type="search" inputmode="search" autocomplete="off" placeholder="Search bars…" aria-label="Search bars">
-        <button class="clear" type="button" aria-label="Clear search">
+        <input id="barSearch" type="search" inputmode="search" autocomplete="off" placeholder="{{ _('admin_new_notification.bar_section.search.placeholder', default='Search bars…') }}" aria-label="{{ _('admin_new_notification.bar_section.search.input_aria', default='Search bars') }}">
+        <button class="clear" type="button" aria-label="{{ _('admin_new_notification.bar_section.search.clear', default='Clear search') }}">
           <i class="bi bi-x-circle" aria-hidden="true"></i>
         </button>
       </div>
@@ -68,10 +68,10 @@
         <table class="bars-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>City</th>
-              <th class="actions">Actions</th>
+              <th>{{ _('admin_new_notification.bar_section.table.headers.id', default='ID') }}</th>
+              <th>{{ _('admin_new_notification.bar_section.table.headers.name', default='Name') }}</th>
+              <th>{{ _('admin_new_notification.bar_section.table.headers.city', default='City') }}</th>
+              <th class="actions">{{ _('admin_new_notification.bar_section.table.headers.actions', default='Actions') }}</th>
             </tr>
           </thead>
           <tbody id="barRows">
@@ -81,7 +81,7 @@
               <td>{{ b.name }}</td>
               <td>{{ b.city }}</td>
               <td class="actions">
-                <button type="button" class="btn-outline js-pick-bar" data-bar-id="{{ b.id }}">Select</button>
+                <button type="button" class="btn-outline js-pick-bar" data-bar-id="{{ b.id }}">{{ _('admin_new_notification.actions.select', default='Select') }}</button>
               </td>
             </tr>
             {% endfor %}
@@ -91,22 +91,22 @@
       <input type="hidden" name="bar_id" id="bar_id">
     </section>
 
-    <label>Subject
+    <label>{{ _('admin_new_notification.form.subject', default='Subject') }}
       <input type="text" name="subject" maxlength="30">
     </label>
-    <label>Message
+    <label>{{ _('admin_new_notification.form.message', default='Message') }}
       <textarea name="body" rows="4"></textarea>
     </label>
-    <label>Link URL
+    <label>{{ _('admin_new_notification.form.link_url', default='Link URL') }}
       <input type="url" name="link_url">
     </label>
-    <label>Image
+    <label>{{ _('admin_new_notification.form.image', default='Image') }}
       <input type="file" name="image" accept="image/*">
     </label>
-    <label>Attachment
+    <label>{{ _('admin_new_notification.form.attachment', default='Attachment') }}
       <input type="file" name="attachment">
     </label>
-    <button class="btn btn--primary" type="submit">Send</button>
+    <button class="btn btn--primary" type="submit">{{ _('admin_new_notification.form.submit', default='Send') }}</button>
   </form>
 </section>
 
@@ -118,6 +118,12 @@
   const userInput = document.getElementById('user_id');
   const barInput = document.getElementById('bar_id');
   const form = document.querySelector('form');
+  const texts = {{ {
+    'select_user': _('admin_new_notification.alerts.select_user', default='Please select a user.'),
+    'select_bar': _('admin_new_notification.alerts.select_bar', default='Please select a bar.'),
+    'select': _('admin_new_notification.actions.select', default='Select'),
+    'selected': _('admin_new_notification.actions.selected', default='Selected')
+  }|tojson }};
   function updateTarget(){
     const val = target.value;
     userSection.hidden = val !== 'user';
@@ -133,7 +139,7 @@
     const val = target.value;
     if((val === 'user' && !userInput.value) || (val === 'bar' && !barInput.value)){
       e.preventDefault();
-      alert('Please select a ' + (val === 'user' ? 'user' : 'bar'));
+      alert(val === 'user' ? texts.select_user : texts.select_bar);
     }
   });
   const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
@@ -159,16 +165,16 @@
     if(!btn) return;
     e.preventDefault();
     userInput.value = btn.dataset.userId;
-    document.querySelectorAll('.js-pick-user').forEach(b=>b.textContent='Select');
-    btn.textContent='Selected';
+    document.querySelectorAll('.js-pick-user').forEach(b=>b.textContent=texts.select);
+    btn.textContent=texts.selected;
   });
   document.getElementById('barRows')?.addEventListener('click', e => {
     const btn = e.target.closest('.js-pick-bar');
     if(!btn) return;
     e.preventDefault();
     barInput.value = btn.dataset.barId;
-    document.querySelectorAll('.js-pick-bar').forEach(b=>b.textContent='Select');
-    btn.textContent='Selected';
+    document.querySelectorAll('.js-pick-bar').forEach(b=>b.textContent=texts.select);
+    btn.textContent=texts.selected;
   });
 })();
 </script>

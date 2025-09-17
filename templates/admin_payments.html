@@ -3,21 +3,21 @@
 <section class="payments-page users-page">
   <header class="payments-toolbar users-toolbar">
     <div class="title-wrap">
-      <h1>Payments</h1>
-      <p class="subtitle">Review bar revenue and closings.</p>
+      <h1>{{ _('admin_payments.title', default='Payments') }}</h1>
+      <p class="subtitle">{{ _('admin_payments.subtitle', default='Review bar revenue and closings.') }}</p>
     </div>
     <div class="toolbar-actions">
-      <form class="payments-search users-search" role="search" aria-label="Search bars" onsubmit="return false">
+      <form class="payments-search users-search" role="search" aria-label="{{ _('admin_payments.search.aria', default='Search bars') }}" onsubmit="return false">
         <i class="bi bi-search" aria-hidden="true"></i>
         <input
           id="paymentsSearch"
           type="search"
           inputmode="search"
           autocomplete="off"
-          placeholder="Search bars by name…"
-          aria-label="Search bars by name"
+          placeholder="{{ _('admin_payments.search.placeholder', default='Search bars by name…') }}"
+          aria-label="{{ _('admin_payments.search.input_aria', default='Search bars by name') }}"
         >
-        <button class="clear" type="button" aria-label="Clear search">
+        <button class="clear" type="button" aria-label="{{ _('admin_payments.search.clear', default='Clear search') }}">
           <i class="bi bi-x-circle" aria-hidden="true"></i>
         </button>
       </form>
@@ -28,8 +28,8 @@
     <table class="payments-table users-table">
       <thead>
         <tr>
-          <th>Name</th>
-          <th class="actions">Actions</th>
+          <th>{{ _('admin_payments.table.headers.name', default='Name') }}</th>
+          <th class="actions">{{ _('admin_payments.table.headers.actions', default='Actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -38,9 +38,9 @@
           <td>{{ bar.name }}</td>
           <td class="actions">
             <div class="actions-group">
-              <a class="btn-outline" href="/dashboard/bar/{{ bar.id }}/orders">View</a>
-              <button type="submit" form="add_test_{{ bar.id }}" class="btn-outline">Add Test Closing</button>
-              <button type="submit" form="delete_test_{{ bar.id }}" class="btn-danger-soft">Delete Test Closing</button>
+              <a class="btn-outline" href="/dashboard/bar/{{ bar.id }}/orders">{{ _('admin_payments.actions.view', default='View') }}</a>
+              <button type="submit" form="add_test_{{ bar.id }}" class="btn-outline">{{ _('admin_payments.actions.add_test', default='Add Test Closing') }}</button>
+              <button type="submit" form="delete_test_{{ bar.id }}" class="btn-danger-soft">{{ _('admin_payments.actions.delete_test', default='Delete Test Closing') }}</button>
             </div>
             <form id="add_test_{{ bar.id }}" method="post" action="/admin/payments/{{ bar.id }}/test_closing" style="display:none"></form>
             <form id="delete_test_{{ bar.id }}" method="post" action="/admin/payments/{{ bar.id }}/test_closing/delete" style="display:none"></form>

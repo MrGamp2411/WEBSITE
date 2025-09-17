@@ -2,7 +2,7 @@
 {% block content %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <section class="editbar">
-  <h1>Edit Bar</h1>
+  <h1>{{ _('admin_edit_bar.title', default='Edit Bar') }}</h1>
   {% if error %}<p class="error">{{ error }}</p>{% endif %}
 
   <div class="card map-card">
@@ -13,41 +13,50 @@
     <div class="grid-2">
 
       <div class="card form-card">
-        <h2 class="card-title"><i class="bi bi-geo-alt"></i> Details</h2>
+        <h2 class="card-title"><i class="bi bi-geo-alt"></i> {{ _('admin_edit_bar.cards.details.title', default='Details') }}</h2>
 
         <div class="field-group">
-          <label for="name">Name</label>
+          <label for="name">{{ _('admin_edit_bar.fields.name', default='Name') }}</label>
           <input id="name" name="name" class="input-pill" value="{{ bar.name }}">
         </div>
 
         <div class="field-group">
-          <label for="address">Address</label>
+          <label for="address">{{ _('admin_edit_bar.fields.address', default='Address') }}</label>
           <input id="address" name="address" class="input-pill" value="{{ bar.address }}">
         </div>
 
         <div class="field-row">
           <div class="field-group">
-              <label for="city">City</label>
+              <label for="city">{{ _('admin_edit_bar.fields.city', default='City') }}</label>
               <input id="city" name="city" class="input-pill" value="{{ bar.city }}">
           </div>
           <div class="field-group">
-              <label for="state">Canton</label>
+              <label for="state">{{ _('admin_edit_bar.fields.state', default='Canton') }}</label>
               <input id="state" name="state" class="input-pill" value="{{ bar.state }}">
           </div>
         </div>
 
         <div class="field-group">
-          <label for="description">Description</label>
+          <label for="description">{{ _('admin_edit_bar.fields.description', default='Description') }}</label>
           <textarea id="description" name="description" maxlength="120">{{ bar.description }}</textarea>
-          <small class="help">Short, clear description. Links will be ignored.</small>
+          <small class="help">{{ _('admin_edit_bar.help.description', default='Short, clear description. Links will be ignored.') }}</small>
         </div>
 
         <div class="field-group">
-          <label>Categories</label>
+          <label>{{ _('admin_edit_bar.fields.categories', default='Categories') }}</label>
           <div id="categoriesChips" class="chips-grid" aria-describedby="catHelp"></div>
           <div class="chips-meta">
-            <small id="catCount" class="count">0/5 selected</small>
-            <small id="catHelp">Click to select/deselect. Selected items are highlighted.</small>
+            {% set max_categories = 5 %}
+            {% set selected_count = selected_categories|length if selected_categories else 0 %}
+            <small
+              id="catCount"
+              class="count"
+              data-template="{{ _('admin_edit_bar.categories.count', default='{selected}/{max} selected') }}"
+              data-max="{{ max_categories }}"
+            >
+              {{ _('admin_edit_bar.categories.count', default='{selected}/{max} selected', selected=selected_count, max=max_categories) }}
+            </small>
+            <small id="catHelp">{{ _('admin_edit_bar.help.categories', default='Click to select/deselect. Selected items are highlighted.') }}</small>
           </div>
           <select id="categoriesNative" name="categories" multiple hidden>
             {% for c in bar_categories %}
@@ -58,37 +67,49 @@
       </div>
 
       <div class="card form-card">
-        <h2 class="card-title"><i class="bi bi-card-image"></i> Media &amp; Hours</h2>
+        <h2 class="card-title"><i class="bi bi-card-image"></i> {{ _('admin_edit_bar.cards.media.title', default='Media &amp; Hours')|safe }}</h2>
 
         {% if bar.photo_url %}
         <div class="field-group">
-          <img src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" style="max-width:200px;"/>
+          <img src="{{ bar.photo_url }}" alt="{{ _('admin_edit_bar.media.photo_alt', bar=bar.name, default='{bar} photo') }}" style="max-width:200px;"/>
         </div>
         {% endif %}
 
         <div class="field-group">
-          <label for="photo">Photo</label>
+          <label for="photo">{{ _('admin_edit_bar.fields.photo', default='Photo') }}</label>
           <input id="photo" name="photo" type="file">
         </div>
 
         {% if user.is_super_admin %}
         <div class="field-group">
-          <label for="rating">Rating</label>
+          <label for="rating">{{ _('admin_edit_bar.fields.rating', default='Rating') }}</label>
           <input id="rating" name="rating" class="input-pill" type="number" min="0" max="5" step="0.1" value="{{ bar.rating or 0 }}">
         </div>
         {% endif %}
 
         <div class="field-group">
           <label class="switch-label">
-            <input id="manual_closed" name="manual_closed" type="checkbox" {% if bar.manual_closed %}checked{% endif %}> Close bar manually
+            <input id="manual_closed" name="manual_closed" type="checkbox" {% if bar.manual_closed %}checked{% endif %}> {{ _('admin_edit_bar.fields.manual_closed', default='Close bar manually') }}
           </label>
         </div>
 
         <div class="field-group hours-table-wrap">
-          {% set days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] %}
+          {% set days = [
+            _('admin_edit_bar.days.monday', default='Monday'),
+            _('admin_edit_bar.days.tuesday', default='Tuesday'),
+            _('admin_edit_bar.days.wednesday', default='Wednesday'),
+            _('admin_edit_bar.days.thursday', default='Thursday'),
+            _('admin_edit_bar.days.friday', default='Friday'),
+            _('admin_edit_bar.days.saturday', default='Saturday'),
+            _('admin_edit_bar.days.sunday', default='Sunday')
+          ] %}
           <table class="hours-table">
             <thead>
-              <tr><th>Day</th><th>Open</th><th>Close</th></tr>
+              <tr>
+                <th>{{ _('admin_edit_bar.hours.day', default='Day') }}</th>
+                <th>{{ _('admin_edit_bar.hours.open', default='Open') }}</th>
+                <th>{{ _('admin_edit_bar.hours.close', default='Close') }}</th>
+              </tr>
             </thead>
             <tbody>
             {% for day in days %}
@@ -113,7 +134,7 @@
     <input type="hidden" name="tags" value="">
 
     <div class="form-actions save-inline">
-      <button type="submit" class="btn btn--primary">Save</button>
+      <button type="submit" class="btn btn--primary">{{ _('admin_edit_bar.actions.save', default='Save') }}</button>
     </div>
   </form>
 </section>
@@ -141,8 +162,10 @@
   const select = document.getElementById('categoriesNative');
   const mount  = document.getElementById('categoriesChips');
   const countEl= document.getElementById('catCount');
+  const countTemplate = countEl?.dataset.template || '{selected}/{max}';
+  const countMax = Number(countEl?.dataset.max || 5);
   if(select && mount){
-    const MAX = 5;
+    const MAX = countMax || 5;
     const all = Array.from(select.options).map(o=>({ value:o.value, label:o.text, selected:o.selected }));
     const selectedCount = ()=> all.filter(i=>i.selected).length;
 
@@ -155,7 +178,7 @@
     function render(){
       mount.innerHTML = '';
       const cnt = selectedCount();
-      if(countEl) countEl.textContent = `${cnt}/${MAX} selected`;
+      if(countEl) countEl.textContent = countTemplate.replace('{selected}', cnt).replace('{max}', MAX);
       const limitReached = cnt >= MAX;
 
       all.forEach(item=>{

@@ -965,6 +965,55 @@
       "phone": "Phone:"
     }
   },
+  "admin_edit_bar": {
+    "title": "Edit Bar",
+    "cards": {
+      "details": {
+        "title": "Details"
+      },
+      "media": {
+        "title": "Media &amp; Hours"
+      }
+    },
+    "fields": {
+      "name": "Name",
+      "address": "Address",
+      "city": "City",
+      "state": "Canton",
+      "description": "Description",
+      "categories": "Categories",
+      "photo": "Photo",
+      "rating": "Rating",
+      "manual_closed": "Close bar manually"
+    },
+    "help": {
+      "description": "Short, clear description. Links will be ignored.",
+      "categories": "Click to select/deselect. Selected items are highlighted."
+    },
+    "categories": {
+      "count": "{selected}/{max} selected"
+    },
+    "media": {
+      "photo_alt": "{bar} photo"
+    },
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "hours": {
+      "day": "Day",
+      "open": "Open",
+      "close": "Close"
+    },
+    "actions": {
+      "save": "Save"
+    }
+  },
   "admin_edit_bar_options": {
     "back": "Back to Bars",
     "title": "Edit {bar}",
@@ -1022,6 +1071,68 @@
       "prompt": "Are you sure you want to delete this notification?",
       "cancel": "Cancel",
       "confirm": "Delete"
+    }
+  },
+  "admin_new_notification": {
+    "title": "New Notification",
+    "subtitle": "Send a message to users.",
+    "form": {
+      "target": {
+        "label": "Target",
+        "options": {
+          "all": "All Users",
+          "user": "Specific User",
+          "bar": "Users of Bar"
+        }
+      },
+      "subject": "Subject",
+      "message": "Message",
+      "link_url": "Link URL",
+      "image": "Image",
+      "attachment": "Attachment",
+      "submit": "Send"
+    },
+    "user_section": {
+      "title": "Select User",
+      "search": {
+        "aria": "Search users",
+        "placeholder": "Search users…",
+        "input_aria": "Search users",
+        "clear": "Clear search"
+      },
+      "table": {
+        "headers": {
+          "id": "ID",
+          "username": "Username",
+          "email": "Email",
+          "actions": "Actions"
+        }
+      }
+    },
+    "bar_section": {
+      "title": "Select Bar",
+      "search": {
+        "aria": "Search bars",
+        "placeholder": "Search bars…",
+        "input_aria": "Search bars",
+        "clear": "Clear search"
+      },
+      "table": {
+        "headers": {
+          "id": "ID",
+          "name": "Name",
+          "city": "City",
+          "actions": "Actions"
+        }
+      }
+    },
+    "actions": {
+      "select": "Select",
+      "selected": "Selected"
+    },
+    "alerts": {
+      "select_user": "Please select a user.",
+      "select_bar": "Please select a bar."
     }
   },
   "admin_new_bar": {
@@ -1088,6 +1199,27 @@
       },
       "read_yes": "Yes",
       "read_no": "No"
+    }
+  },
+  "admin_payments": {
+    "title": "Payments",
+    "subtitle": "Review bar revenue and closings.",
+    "search": {
+      "aria": "Search bars",
+      "placeholder": "Search bars by name…",
+      "input_aria": "Search bars by name",
+      "clear": "Clear search"
+    },
+    "table": {
+      "headers": {
+        "name": "Name",
+        "actions": "Actions"
+      }
+    },
+    "actions": {
+      "view": "View",
+      "add_test": "Add Test Closing",
+      "delete_test": "Delete Test Closing"
     }
   },
   "admin_view_user": {

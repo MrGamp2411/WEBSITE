@@ -395,3 +395,7 @@
 - Admin analytics, audit logs, table management, bar user management, admin bar listings, admin change password, admin dashboard, and admin user edit pages localise through the `admin_analytics`, `admin_audit_logs`, `admin_tables`, `admin_bar_users`, `admin_bars`, `admin_change_user_password`, `admin_dashboard`, and `admin_edit_user` namespaces in `app/i18n/translations/*.json`.
 - Admin users, profile summary, bar option chooser, notifications list, bar creation, welcome message editor, notification detail, and admin user overview pages localise through the `admin_users`, `admin_profile`, `admin_edit_bar_options`, `admin_notifications`, `admin_new_bar`, `admin_edit_welcome`, `admin_notification_view`, and `admin_view_user` namespaces in `app/i18n/translations/*.json`.
 - The `/topup` standalone page uses the `topup` namespace for headings, form labels, and alerts.
+- Admin bar editing and notification workflows use new namespaces in `app/i18n/translations/*.json`:
+  - `admin_edit_bar` covers the bar info form, including category chips and opening hours labels.
+  - `admin_new_notification` drives the broadcast form, search controls, and selection prompts.
+  - `admin_payments` defines the payouts list header, search inputs, and action buttons.
