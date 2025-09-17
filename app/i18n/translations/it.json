@@ -1468,7 +1468,40 @@
       "title": "Aggiungi categoria per {bar}"
     },
     "edit": {
-      "title": "Modifica categoria per {bar}"
+      "title": "Modifica categoria per {bar}",
+      "translation_note": "Devi aggiornare le traduzioni? Usa i pulsanti qui sotto per modificare nomi e descrizioni in tutte le lingue.",
+      "actions": {
+        "edit_name": "Modifica nome",
+        "edit_description": "Modifica descrizione"
+      }
+    },
+    "edit_name": {
+      "back": "Torna alla categoria",
+      "title": "Modifica i nomi per {category}",
+      "intro": "Inserisci un nome per ogni lingua supportata. La lingua selezionata viene mostrata ai clienti mentre consultano il menu.",
+      "fields": {
+        "language": "Nome in {language}"
+      },
+      "actions": {
+        "save": "Salva nomi"
+      },
+      "errors": {
+        "required": "Tutti i campi sono obbligatori."
+      }
+    },
+    "edit_description": {
+      "back": "Torna alla categoria",
+      "title": "Modifica le descrizioni per {category}",
+      "intro": "Scrivi una descrizione per ogni lingua supportata. Le descrizioni vengono mostrate nel menu clienti.",
+      "fields": {
+        "language": "Descrizione in {language}"
+      },
+      "actions": {
+        "save": "Salva descrizioni"
+      },
+      "errors": {
+        "required": "Tutti i campi sono obbligatori."
+      }
     }
   },
   "bar_products": {

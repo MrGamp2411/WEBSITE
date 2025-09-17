@@ -6264,36 +6264,29 @@ async def bar_edit_category(
     base_description = (form.get("description") or "").strip()
     display_order = form.get("display_order") or category.display_order
     db_category = db.get(CategoryModel, category_id)
-    existing_name_translations = (
-        dict(category.name_translations) if getattr(category, "name_translations", None) else {}
+    if not base_name:
+        base_name = category.name or ""
+    if not base_description:
+        base_description = category.description or ""
+    existing_name_translations = normalise_translation_map(
+        getattr(category, "name_translations", None), base_name
     )
-    existing_description_translations = (
-        dict(category.description_translations)
-        if getattr(category, "description_translations", None)
-        else {}
+    existing_description_translations = normalise_translation_map(
+        getattr(category, "description_translations", None), base_description
     )
-    name_inputs: Dict[str, str] = {}
-    description_inputs: Dict[str, str] = {}
-    name_fallback = base_name or category.name or ""
-    description_fallback = base_description or category.description or ""
-    for code in LANGUAGES:
-        raw_name = (form.get(f"name_{code}") or "").strip()
-        raw_desc = (form.get(f"description_{code}") or "").strip()
-        if not raw_name:
-            raw_name = existing_name_translations.get(code, name_fallback)
-        if not raw_desc:
-            raw_desc = existing_description_translations.get(code, description_fallback)
-        name_inputs[code] = raw_name
-        description_inputs[code] = raw_desc
-    normalised_names = normalise_translation_map(name_inputs, name_fallback)
+    existing_name_translations[DEFAULT_LANGUAGE] = base_name
+    existing_description_translations[DEFAULT_LANGUAGE] = base_description
+    normalised_names = normalise_translation_map(
+        existing_name_translations, base_name
+    )
     normalised_descriptions = normalise_translation_map(
-        description_inputs, description_fallback
+        existing_description_translations, base_description
     )
     primary_name = resolve_translated_value(
-        normalised_names, name_fallback, DEFAULT_LANGUAGE
+        normalised_names, base_name, DEFAULT_LANGUAGE
     )
     primary_description = resolve_translated_value(
-        normalised_descriptions, description_fallback, DEFAULT_LANGUAGE
+        normalised_descriptions, base_description, DEFAULT_LANGUAGE
     )
     category.name = primary_name
     category.description = primary_description
@@ -6315,4 +6308,180 @@ async def bar_edit_category(
         db.commit()
     return RedirectResponse(
         url=f"/bar/{bar_id}/categories", status_code=status.HTTP_303_SEE_OTHER
+    )
+
+
+@app.get(
+    "/bar/{bar_id}/categories/{category_id}/edit/name",
+    response_class=HTMLResponse,
+)
+async def bar_edit_category_name_form(
+    request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    translations = dict(getattr(category, "name_translations", {}) or {})
+    base_name = translations.get(DEFAULT_LANGUAGE) or category.name or ""
+    for code in LANGUAGES:
+        translations.setdefault(code, base_name)
+    return render_template(
+        "bar_edit_category_name.html",
+        request=request,
+        bar=bar,
+        category=category,
+        names=translations,
+        languages=[{"code": code, "name": name} for code, name in LANGUAGES.items()],
+    )
+
+
+@app.post("/bar/{bar_id}/categories/{category_id}/edit/name")
+async def bar_edit_category_name(
+    request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    translations: Dict[str, str] = {}
+    error_code: Optional[str] = None
+    for code in LANGUAGES:
+        value = (form.get(f"name_{code}") or "").strip()
+        if not value:
+            error_code = "required"
+        if len(value) > 80:
+            value = value[:80]
+        translations[code] = value
+    if error_code:
+        return render_template(
+            "bar_edit_category_name.html",
+            request=request,
+            bar=bar,
+            category=category,
+            names=translations,
+            languages=[{"code": code, "name": name} for code, name in LANGUAGES.items()],
+            error_code=error_code,
+        )
+    fallback = translations.get(DEFAULT_LANGUAGE) or category.name or ""
+    normalised = normalise_translation_map(translations, fallback)
+    primary_name = resolve_translated_value(normalised, fallback, DEFAULT_LANGUAGE)
+    category.name = primary_name
+    category.name_translations = normalised
+    db_category = db.get(CategoryModel, category_id)
+    if db_category:
+        db_category.name = primary_name
+        db_category.name_translations = normalised
+        db.commit()
+    refresh_bar_from_db(bar_id, db)
+    return RedirectResponse(
+        url=f"/bar/{bar_id}/categories/{category_id}/edit",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@app.get(
+    "/bar/{bar_id}/categories/{category_id}/edit/description",
+    response_class=HTMLResponse,
+)
+async def bar_edit_category_description_form(
+    request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    translations = dict(getattr(category, "description_translations", {}) or {})
+    base_description = (
+        translations.get(DEFAULT_LANGUAGE)
+        or category.description
+        or ""
+    )
+    for code in LANGUAGES:
+        translations.setdefault(code, base_description)
+    return render_template(
+        "bar_edit_category_description.html",
+        request=request,
+        bar=bar,
+        category=category,
+        descriptions=translations,
+        languages=[{"code": code, "name": name} for code, name in LANGUAGES.items()],
+    )
+
+
+@app.post("/bar/{bar_id}/categories/{category_id}/edit/description")
+async def bar_edit_category_description(
+    request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    translations: Dict[str, str] = {}
+    error_code: Optional[str] = None
+    for code in LANGUAGES:
+        value = (form.get(f"description_{code}") or "").strip()
+        if not value:
+            error_code = "required"
+        translations[code] = value
+    if error_code:
+        return render_template(
+            "bar_edit_category_description.html",
+            request=request,
+            bar=bar,
+            category=category,
+            descriptions=translations,
+            languages=[{"code": code, "name": name} for code, name in LANGUAGES.items()],
+            error_code=error_code,
+        )
+    fallback = translations.get(DEFAULT_LANGUAGE) or category.description or ""
+    normalised = normalise_translation_map(translations, fallback)
+    primary_description = resolve_translated_value(
+        normalised, fallback, DEFAULT_LANGUAGE
+    )
+    category.description = primary_description
+    category.description_translations = normalised
+    db_category = db.get(CategoryModel, category_id)
+    if db_category:
+        db_category.description = primary_description
+        db_category.description_translations = normalised
+        db.commit()
+    refresh_bar_from_db(bar_id, db)
+    return RedirectResponse(
+        url=f"/bar/{bar_id}/categories/{category_id}/edit",
+        status_code=status.HTTP_303_SEE_OTHER,
     )

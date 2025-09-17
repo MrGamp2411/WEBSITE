@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="category-translation-editor">
+  <a class="back-link" href="/bar/{{ bar.id }}/categories/{{ category.id }}/edit"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('bar_categories.edit_name.back', default='Back to category') }}</a>
+  <h1>{{ _('bar_categories.edit_name.title', bar=bar.name, category=category.name, default='Edit names for {category}') }}</h1>
+  <p class="intro">{{ _('bar_categories.edit_name.intro', default='Provide a name for each supported language. The selected language is shown to customers when browsing the menu.') }}</p>
+  {% if error_code %}
+  <div class="alert alert-danger">{{ _('bar_categories.edit_name.errors.' + error_code, default='All fields are required.') }}</div>
+  {% endif %}
+  <form method="post" action="/bar/{{ bar.id }}/categories/{{ category.id }}/edit/name" class="translation-form">
+    {% for lang in languages %}
+    <div class="field-group">
+      <label for="name_{{ lang.code }}">{{ _('bar_categories.edit_name.fields.language', language=lang.name, default='{language} name') }}</label>
+      <input id="name_{{ lang.code }}" name="name_{{ lang.code }}" value="{{ names.get(lang.code, '') }}" required maxlength="80">
+    </div>
+    {% endfor %}
+    <div class="form-actions">
+      <button type="submit" class="btn btn--primary">{{ _('bar_categories.edit_name.actions.save', default='Save names') }}</button>
+    </div>
+  </form>
+</section>
+<style>
+.category-translation-editor{max-width:720px;margin-inline:auto;padding-block:var(--space-6,24px);display:flex;flex-direction:column;gap:var(--space-4,16px);}
+.category-translation-editor .back-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;opacity:.8;}
+.category-translation-editor .back-link:hover{opacity:1;}
+.category-translation-editor .intro{margin:0;opacity:.8;}
+.translation-form{display:flex;flex-direction:column;gap:var(--space-4,16px);}
+.translation-form .field-group{display:flex;flex-direction:column;gap:8px;}
+.translation-form input,.translation-form textarea{padding:12px 14px;border-radius:var(--radius-xl,16px);border:1px solid rgba(15,23,42,.12);font-size:1rem;}
+.translation-form input:focus,.translation-form textarea:focus{outline:2px solid rgba(91,45,238,.25);outline-offset:2px;}
+.translation-form .form-actions{display:flex;justify-content:flex-end;margin-top:var(--space-4,16px);}
+.alert{padding:12px 14px;border-radius:var(--radius-lg,12px);}
+.alert-danger{background:#fee2e2;color:#991b1b;}
+</style>
+{% endblock %}

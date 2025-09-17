@@ -1468,7 +1468,40 @@
       "title": "Kategorie hinzufügen für {bar}"
     },
     "edit": {
-      "title": "Kategorie bearbeiten für {bar}"
+      "title": "Kategorie bearbeiten für {bar}",
+      "translation_note": "Müssen Übersetzungen aktualisiert werden? Verwenden Sie die Schaltflächen unten, um Namen und Beschreibungen in allen Sprachen zu bearbeiten.",
+      "actions": {
+        "edit_name": "Namen bearbeiten",
+        "edit_description": "Beschreibung bearbeiten"
+      }
+    },
+    "edit_name": {
+      "back": "Zurück zur Kategorie",
+      "title": "Namen für {category} bearbeiten",
+      "intro": "Geben Sie für jede unterstützte Sprache einen Namen ein. Die ausgewählte Sprache wird Gästen im Menü angezeigt.",
+      "fields": {
+        "language": "Name auf {language}"
+      },
+      "actions": {
+        "save": "Namen speichern"
+      },
+      "errors": {
+        "required": "Alle Felder sind erforderlich."
+      }
+    },
+    "edit_description": {
+      "back": "Zurück zur Kategorie",
+      "title": "Beschreibungen für {category} bearbeiten",
+      "intro": "Schreiben Sie für jede unterstützte Sprache eine Beschreibung. Die Beschreibungen werden im Gästemenü angezeigt.",
+      "fields": {
+        "language": "Beschreibung auf {language}"
+      },
+      "actions": {
+        "save": "Beschreibungen speichern"
+      },
+      "errors": {
+        "required": "Alle Felder sind erforderlich."
+      }
     }
   },
   "bar_products": {

@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="category-translation-editor">
+  <a class="back-link" href="/bar/{{ bar.id }}/categories/{{ category.id }}/edit"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('bar_categories.edit_description.back', default='Back to category') }}</a>
+  <h1>{{ _('bar_categories.edit_description.title', bar=bar.name, category=category.name, default='Edit descriptions for {category}') }}</h1>
+  <p class="intro">{{ _('bar_categories.edit_description.intro', default='Write a description for each supported language. Descriptions appear on the customer menu.') }}</p>
+  {% if error_code %}
+  <div class="alert alert-danger">{{ _('bar_categories.edit_description.errors.' + error_code, default='All fields are required.') }}</div>
+  {% endif %}
+  <form method="post" action="/bar/{{ bar.id }}/categories/{{ category.id }}/edit/description" class="translation-form">
+    {% for lang in languages %}
+    <div class="field-group">
+      <label for="description_{{ lang.code }}">{{ _('bar_categories.edit_description.fields.language', language=lang.name, default='{language} description') }}</label>
+      <textarea id="description_{{ lang.code }}" name="description_{{ lang.code }}" required>{{ descriptions.get(lang.code, '') }}</textarea>
+    </div>
+    {% endfor %}
+    <div class="form-actions">
+      <button type="submit" class="btn btn--primary">{{ _('bar_categories.edit_description.actions.save', default='Save descriptions') }}</button>
+    </div>
+  </form>
+</section>
+<style>
+.category-translation-editor{max-width:720px;margin-inline:auto;padding-block:var(--space-6,24px);display:flex;flex-direction:column;gap:var(--space-4,16px);}
+.category-translation-editor .back-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;opacity:.8;}
+.category-translation-editor .back-link:hover{opacity:1;}
+.category-translation-editor .intro{margin:0;opacity:.8;}
+.translation-form{display:flex;flex-direction:column;gap:var(--space-4,16px);}
+.translation-form .field-group{display:flex;flex-direction:column;gap:8px;}
+.translation-form textarea{min-height:120px;padding:12px 14px;border-radius:var(--radius-xl,16px);border:1px solid rgba(15,23,42,.12);font-size:1rem;line-height:1.5;}
+.translation-form textarea:focus{outline:2px solid rgba(91,45,238,.25);outline-offset:2px;}
+.translation-form .form-actions{display:flex;justify-content:flex-end;margin-top:var(--space-4,16px);}
+.alert{padding:12px 14px;border-radius:var(--radius-lg,12px);}
+.alert-danger{background:#fee2e2;color:#991b1b;}
+</style>
+{% endblock %}
