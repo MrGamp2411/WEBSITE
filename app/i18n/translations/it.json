@@ -602,6 +602,112 @@
       "ready": "Pronti"
     }
   },
+  "bar_admin_history": {
+    "title": "{bar} - Storico ordini e incassi",
+    "month_title": "{bar} - {month}",
+    "orders_title": "{bar} - Ordini per {date}",
+    "actions": {
+      "view": "Visualizza",
+      "confirm": "Conferma pagamento"
+    },
+    "metrics": {
+      "total_collected": "Totale incassato",
+      "total_earned": "Totale guadagnato",
+      "commission": "Commissione Siplygo (5%)",
+      "payout": "Importo da versare al locale"
+    },
+    "breakdown": {
+      "title": "Dettaglio pagamenti:"
+    },
+    "empty": {
+      "history": "Nessuno storico ordini.",
+      "orders": "Nessun ordine."
+    }
+  },
+  "bar_admin_orders": {
+    "title": "{bar} - Ordini",
+    "actions": {
+      "history": "Storico ordini e incassi"
+    }
+  },
+  "bar_categories": {
+    "manage": {
+      "title": "Gestisci categorie per {bar}",
+      "subtitle": "Crea, modifica e organizza le categorie del menu per questo locale.",
+      "search": {
+        "aria": "Cerca categorie",
+        "placeholder": "Cerca categorie…",
+        "input_aria": "Cerca categorie per nome",
+        "clear": "Pulisci ricerca"
+      },
+      "actions": {
+        "add": "Aggiungi categoria",
+        "products": "Prodotti",
+        "edit": "Modifica",
+        "delete": "Elimina"
+      },
+      "table": {
+        "headers": {
+          "name": "Nome",
+          "description": "Descrizione",
+          "actions": "Azioni"
+        }
+      },
+      "confirm_delete": "Sei sicuro di voler eliminare questa categoria?",
+      "empty": "Nessuna categoria al momento."
+    },
+    "form": {
+      "name": "Nome",
+      "description": "Descrizione",
+      "display_order": "Ordine di visualizzazione",
+      "create": "Crea",
+      "save": "Salva"
+    },
+    "new": {
+      "title": "Aggiungi categoria per {bar}"
+    },
+    "edit": {
+      "title": "Modifica categoria per {bar}"
+    }
+  },
+  "bar_products": {
+    "edit": {
+      "title": "Modifica prodotto {product}"
+    },
+    "new": {
+      "title": "Aggiungi prodotto a {category}"
+    },
+    "form": {
+      "name": "Nome",
+      "price": "Prezzo (CHF)",
+      "description": "Descrizione",
+      "display_order": "Ordine di visualizzazione",
+      "photo": "Foto",
+      "create": "Crea",
+      "update": "Aggiorna"
+    },
+    "manage": {
+      "title": "Prodotti in {category} per {bar}",
+      "subtitle": "Aggiungi, modifica e organizza i prodotti per questa categoria.",
+      "actions": {
+        "add": "Aggiungi prodotto",
+        "edit": "Modifica",
+        "delete": "Elimina"
+      },
+      "table": {
+        "headers": {
+          "order": "Ordine",
+          "photo": "Foto",
+          "name": "Nome",
+          "description": "Descrizione",
+          "price": "Prezzo (CHF)",
+          "actions": "Azioni"
+        }
+      },
+      "confirm_delete": "Sei sicuro di voler eliminare questo prodotto?",
+      "empty": "Nessun prodotto in questa categoria."
+    }
+  },
   "order_success": {
     "title": "Ordine inviato",
     "body": {
