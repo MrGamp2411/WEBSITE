@@ -1492,7 +1492,40 @@
       "title": "Ajouter une catégorie pour {bar}"
     },
     "edit": {
-      "title": "Modifier la catégorie pour {bar}"
+      "title": "Modifier la catégorie pour {bar}",
+      "translation_note": "Besoin de mettre à jour les traductions ? Utilisez les boutons ci-dessous pour modifier les noms et descriptions dans chaque langue.",
+      "actions": {
+        "edit_name": "Modifier le nom",
+        "edit_description": "Modifier la description"
+      }
+    },
+    "edit_name": {
+      "back": "Retour à la catégorie",
+      "title": "Modifier les noms pour {category}",
+      "intro": "Saisissez un nom pour chaque langue prise en charge. La langue sélectionnée est affichée aux clients lorsqu'ils parcourent le menu.",
+      "fields": {
+        "language": "Nom en {language}"
+      },
+      "actions": {
+        "save": "Enregistrer les noms"
+      },
+      "errors": {
+        "required": "Tous les champs sont obligatoires."
+      }
+    },
+    "edit_description": {
+      "back": "Retour à la catégorie",
+      "title": "Modifier les descriptions pour {category}",
+      "intro": "Rédigez une description pour chaque langue prise en charge. Les descriptions apparaissent sur le menu client.",
+      "fields": {
+        "language": "Description en {language}"
+      },
+      "actions": {
+        "save": "Enregistrer les descriptions"
+      },
+      "errors": {
+        "required": "Tous les champs sont obligatoires."
+      }
     }
   },
   "bar_products": {

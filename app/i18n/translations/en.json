@@ -1468,7 +1468,40 @@
       "title": "Add Category for {bar}"
     },
     "edit": {
-      "title": "Edit Category for {bar}"
+      "title": "Edit Category for {bar}",
+      "translation_note": "Need to update translations? Use the buttons below to edit names and descriptions for every language.",
+      "actions": {
+        "edit_name": "Edit name",
+        "edit_description": "Edit description"
+      }
+    },
+    "edit_name": {
+      "back": "Back to category",
+      "title": "Edit names for {category}",
+      "intro": "Provide a name for each supported language. The selected language is shown to customers when browsing the menu.",
+      "fields": {
+        "language": "{language} name"
+      },
+      "actions": {
+        "save": "Save names"
+      },
+      "errors": {
+        "required": "All fields are required."
+      }
+    },
+    "edit_description": {
+      "back": "Back to category",
+      "title": "Edit descriptions for {category}",
+      "intro": "Write a description for each supported language. Descriptions appear on the customer menu.",
+      "fields": {
+        "language": "{language} description"
+      },
+      "actions": {
+        "save": "Save descriptions"
+      },
+      "errors": {
+        "required": "All fields are required."
+      }
     }
   },
   "bar_products": {
