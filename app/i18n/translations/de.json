@@ -1036,6 +1036,9 @@
       "description": "Kurze, klare Beschreibung. Links werden ignoriert.",
       "categories": "Klicken Sie zum Auswählen/Abwählen. Ausgewählte Elemente werden hervorgehoben."
     },
+    "description": {
+      "none": "Noch keine Beschreibung"
+    },
     "categories": {
       "count": "{selected}/{max} ausgewählt"
     },
@@ -1057,7 +1060,25 @@
       "close": "Schließen"
     },
     "actions": {
-      "save": "Speichern"
+      "save": "Speichern",
+      "edit_description": "Beschreibung bearbeiten"
+    }
+  },
+  "admin_edit_bar_description": {
+    "back": "Zurück zu den Bar-Infos",
+    "title": "Beschreibungen für {bar} bearbeiten",
+    "intro": "Geben Sie für jede unterstützte Sprache eine kurze Zusammenfassung ein. Der Text erscheint auf der Barseite und in den Listen.",
+    "errors": {
+      "required": "Alle Beschreibungsfelder sind erforderlich."
+    },
+    "fields": {
+      "language": "{language}-Beschreibung"
+    },
+    "help": {
+      "limit": "Maximal 120 Zeichen."
+    },
+    "actions": {
+      "save": "Beschreibungen speichern"
     }
   },
   "admin_edit_bar_options": {

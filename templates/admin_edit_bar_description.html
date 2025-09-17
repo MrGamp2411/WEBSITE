@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="description-editor">
+  <a class="back-link" href="/admin/bars/edit/{{ bar.id }}/info"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_edit_bar_description.back', default='Back to bar info') }}</a>
+  <h1>{{ _('admin_edit_bar_description.title', bar=bar.name, default='Edit descriptions for {bar}') }}</h1>
+  <p class="intro">{{ _('admin_edit_bar_description.intro', default='Provide a short summary for each supported language. This text appears on the bar detail and listing pages.') }}</p>
+  {% if error_code %}
+  <div class="alert alert-danger">{{ _('admin_edit_bar_description.errors.' + error_code, default='All fields are required.') }}</div>
+  {% endif %}
+  <form method="post" action="/admin/bars/edit/{{ bar.id }}/description" class="description-form">
+    {% for lang in languages %}
+    <div class="field-group">
+      <label for="description_{{ lang.code }}">{{ _('admin_edit_bar_description.fields.language', language=lang.name, default='{language} description') }}</label>
+      <textarea id="description_{{ lang.code }}" name="description_{{ lang.code }}" maxlength="120" required>{{ descriptions.get(lang.code, '') }}</textarea>
+      <small class="help">{{ _('admin_edit_bar_description.help.limit', default='Maximum 120 characters.') }}</small>
+    </div>
+    {% endfor %}
+    <div class="form-actions">
+      <button type="submit" class="btn btn--primary">{{ _('admin_edit_bar_description.actions.save', default='Save descriptions') }}</button>
+    </div>
+  </form>
+</section>
+<style>
+.description-editor{max-width:720px;margin-inline:auto;padding-block:var(--space-6,24px);}
+.description-editor .back-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;opacity:.8;margin-bottom:var(--space-2,8px);}
+.description-editor .back-link:hover{opacity:1;}
+.description-editor .intro{margin:var(--space-2,8px) 0 var(--space-5,20px);opacity:.85;}
+.description-editor .field-group{display:flex;flex-direction:column;margin-bottom:var(--space-4,16px);}
+.description-editor textarea{min-height:110px;padding:12px 14px;border-radius:var(--radius-xl,16px);border:1px solid rgba(15,23,42,.12);font-size:1rem;line-height:1.5;}
+.description-editor textarea:focus{outline:2px solid rgba(91,45,238,.25);outline-offset:2px;}
+.description-editor .help{margin-top:6px;opacity:.7;font-size:.875rem;}
+.description-editor .form-actions{margin-top:var(--space-5,20px);display:flex;justify-content:flex-end;}
+.description-editor .alert{margin-bottom:var(--space-4,16px);padding:12px 14px;border-radius:var(--radius-lg,12px);}
+.alert-danger{background:#fee2e2;color:#991b1b;}
+</style>
+{% endblock %}

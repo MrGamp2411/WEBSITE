@@ -1036,6 +1036,9 @@
       "description": "Short, clear description. Links will be ignored.",
       "categories": "Click to select/deselect. Selected items are highlighted."
     },
+    "description": {
+      "none": "No description yet"
+    },
     "categories": {
       "count": "{selected}/{max} selected"
     },
@@ -1057,7 +1060,25 @@
       "close": "Close"
     },
     "actions": {
-      "save": "Save"
+      "save": "Save",
+      "edit_description": "Edit description"
+    }
+  },
+  "admin_edit_bar_description": {
+    "back": "Back to bar info",
+    "title": "Edit descriptions for {bar}",
+    "intro": "Provide a short summary for each supported language. This text appears on the bar detail and listing pages.",
+    "errors": {
+      "required": "All language fields are required."
+    },
+    "fields": {
+      "language": "{language} description"
+    },
+    "help": {
+      "limit": "Maximum 120 characters."
+    },
+    "actions": {
+      "save": "Save descriptions"
     }
   },
   "admin_edit_bar_options": {

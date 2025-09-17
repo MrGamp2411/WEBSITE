@@ -36,9 +36,10 @@
           </div>
         </div>
 
-        <div class="field-group">
-          <label for="description">{{ _('admin_edit_bar.fields.description', default='Description') }}</label>
-          <textarea id="description" name="description" maxlength="120">{{ bar.description }}</textarea>
+        <div class="field-group description-field">
+          <label>{{ _('admin_edit_bar.fields.description', default='Description') }}</label>
+          <p class="description-preview">{{ bar.description or _('admin_edit_bar.description.none', default='No description yet') }}</p>
+          <a class="btn btn--secondary" href="/admin/bars/edit/{{ bar.id }}/description">{{ _('admin_edit_bar.actions.edit_description', default='Edit description') }}</a>
           <small class="help">{{ _('admin_edit_bar.help.description', default='Short, clear description. Links will be ignored.') }}</small>
         </div>
 
@@ -138,6 +139,19 @@
     </div>
   </form>
 </section>
+<style>
+.description-field .description-preview{
+  margin:0 0 12px;
+  padding:12px 16px;
+  border-radius:var(--radius-xl,16px);
+  background:var(--surface-strong,#f3f4f6);
+  font-size:0.95rem;
+  line-height:1.5;
+}
+.description-field .description-preview:empty::before{
+  content:"";
+}
+</style>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
   const initialLat = {{ bar.latitude }};
