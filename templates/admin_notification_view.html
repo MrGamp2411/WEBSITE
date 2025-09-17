@@ -3,43 +3,43 @@
 <section class="users-page">
   <header class="users-toolbar">
     <div class="title-wrap">
-      <h1>Notification {{ note.id }}</h1>
-      <p class="subtitle">Details and recipients.</p>
+      <h1>{{ _('admin_notification_view.title', id=note.id, default='Notification {id}') }}</h1>
+      <p class="subtitle">{{ _('admin_notification_view.subtitle', default='Details and recipients.') }}</p>
     </div>
-    <a href="/admin/notifications" class="btn-outline">Back</a>
+    <a href="/admin/notifications" class="btn-outline">{{ _('admin_notification_view.actions.back', default='Back') }}</a>
   </header>
 
   <div class="table-card">
     <table class="users-table">
       <tbody>
         <tr>
-          <th>Recipient Target</th>
+          <th>{{ _('admin_notification_view.details.recipient_target', default='Recipient Target') }}</th>
           <td>
-            {% if note.target == 'all' %}All Users{% elif note.target == 'user' %}
+            {% if note.target == 'all' %}{{ _('admin_notifications.recipient.all', default='All Users') }}{% elif note.target == 'user' %}
               {{ note.user.username }} (#{{ note.user_id }})
             {% elif note.target == 'bar' %}
               {{ note.bar.name }} (#{{ "%03d"|format(note.bar_id) }})
             {% endif %}
           </td>
         </tr>
-        <tr><th>Subject</th><td>{{ note.subject }}</td></tr>
-        <tr><th>Message</th><td>{{ note.body }}</td></tr>
-        {% if note.link_url %}<tr><th>Link</th><td><a href="{{ note.link_url }}">{{ note.link_url }}</a></td></tr>{% endif %}
-        <tr><th>Sent</th><td>{{ note.created_at|format_time }}</td></tr>
-        <tr><th>Sender</th><td>{{ note.sender.username }}</td></tr>
+        <tr><th>{{ _('admin_notification_view.details.subject', default='Subject') }}</th><td>{{ note.subject }}</td></tr>
+        <tr><th>{{ _('admin_notification_view.details.message', default='Message') }}</th><td>{{ note.body }}</td></tr>
+        {% if note.link_url %}<tr><th>{{ _('admin_notification_view.details.link', default='Link') }}</th><td><a href="{{ note.link_url }}">{{ note.link_url }}</a></td></tr>{% endif %}
+        <tr><th>{{ _('admin_notification_view.details.sent', default='Sent') }}</th><td>{{ note.created_at|format_time }}</td></tr>
+        <tr><th>{{ _('admin_notification_view.details.sender', default='Sender') }}</th><td>{{ note.sender.username }}</td></tr>
       </tbody>
     </table>
   </div>
 
-  <h2>Recipients</h2>
+  <h2>{{ _('admin_notification_view.recipients.title', default='Recipients') }}</h2>
   <div class="table-card">
     <table class="users-table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Read</th>
+          <th>{{ _('admin_notification_view.recipients.headers.id', default='ID') }}</th>
+          <th>{{ _('admin_notification_view.recipients.headers.username', default='Username') }}</th>
+          <th>{{ _('admin_notification_view.recipients.headers.email', default='Email') }}</th>
+          <th>{{ _('admin_notification_view.recipients.headers.read', default='Read') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -48,7 +48,7 @@
           <td>{{ r.user.id }}</td>
           <td>{{ r.user.username }}</td>
           <td>{{ r.user.email }}</td>
-          <td>{{ 'Yes' if r.read else 'No' }}</td>
+          <td>{{ _('admin_notification_view.recipients.read_yes', default='Yes') if r.read else _('admin_notification_view.recipients.read_no', default='No') }}</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -56,18 +56,18 @@
   </div>
 
   <div class="actions-group" style="margin-top:var(--space-2);">
-    <a href="/admin/notifications" class="btn-outline">Back to list</a>
-    <button type="button" class="btn-danger-soft js-delete-note" data-note-id="{{ note.id }}">Delete</button>
+    <a href="/admin/notifications" class="btn-outline">{{ _('admin_notification_view.actions.back_to_list', default='Back to list') }}</a>
+    <button type="button" class="btn-danger-soft js-delete-note" data-note-id="{{ note.id }}">{{ _('admin_notifications.sent.actions.delete', default='Delete') }}</button>
   </div>
   <form id="delete-note-{{ note.id }}" method="post" action="/admin/notifications/{{ note.id }}/delete" style="display:none;"></form>
 </section>
 
 <div id="deleteBlocker" class="cart-blocker" hidden>
   <div class="cart-popup">
-    <p>Are you sure you want to delete this notification?</p>
+    <p>{{ _('admin_notifications.dialog.prompt', default='Are you sure you want to delete this notification?') }}</p>
     <div class="cart-popup-actions">
-      <button type="button" class="btn btn--secondary js-cancel-delete">Cancel</button>
-      <button type="button" class="btn btn--primary js-confirm-delete">Delete</button>
+      <button type="button" class="btn btn--secondary js-cancel-delete">{{ _('admin_notifications.dialog.cancel', default='Cancel') }}</button>
+      <button type="button" class="btn btn--primary js-confirm-delete">{{ _('admin_notifications.dialog.confirm', default='Delete') }}</button>
     </div>
   </div>
 </div>

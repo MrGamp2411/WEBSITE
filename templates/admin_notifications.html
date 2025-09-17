@@ -3,12 +3,12 @@
 <section class="users-page">
   <header class="users-toolbar">
     <div class="title-wrap">
-      <h1>Notifications</h1>
-      <p class="subtitle">Send messages to users.</p>
+      <h1>{{ _('admin_notifications.title', default='Notifications') }}</h1>
+      <p class="subtitle">{{ _('admin_notifications.subtitle', default='Send messages to users.') }}</p>
     </div>
       <div class="toolbar-actions">
-        <a class="btn btn--primary" href="/admin/notifications/new">New Message</a>
-        <a class="btn btn--secondary" href="/admin/notifications/welcome">Edit Welcome</a>
+        <a class="btn btn--primary" href="/admin/notifications/new">{{ _('admin_notifications.actions.new', default='New Message') }}</a>
+        <a class="btn btn--secondary" href="/admin/notifications/welcome">{{ _('admin_notifications.actions.edit_welcome', default='Edit Welcome') }}</a>
       </div>
   </header>
   {% if message %}
@@ -19,18 +19,18 @@
   {% endif %}
 
   {% if notifications %}
-  <h2>Sent Notifications</h2>
+  <h2>{{ _('admin_notifications.sent.title', default='Sent Notifications') }}</h2>
   <div class="table-card">
     <table class="users-table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Recipient</th>
-          <th>Subject</th>
-          <th>Message</th>
-          <th>Sent</th>
-          <th>Sender</th>
-          <th class="actions">Actions</th>
+          <th>{{ _('admin_notifications.sent.headers.id', default='ID') }}</th>
+          <th>{{ _('admin_notifications.sent.headers.recipient', default='Recipient') }}</th>
+          <th>{{ _('admin_notifications.sent.headers.subject', default='Subject') }}</th>
+          <th>{{ _('admin_notifications.sent.headers.message', default='Message') }}</th>
+          <th>{{ _('admin_notifications.sent.headers.sent', default='Sent') }}</th>
+          <th>{{ _('admin_notifications.sent.headers.sender', default='Sender') }}</th>
+          <th class="actions">{{ _('admin_notifications.sent.headers.actions', default='Actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -39,7 +39,7 @@
           <td>{{ n.id }}</td>
           <td>
             {% if n.target == 'all' %}
-              All Users
+              {{ _('admin_notifications.recipient.all', default='All Users') }}
             {% elif n.target == 'user' %}
               {{ n.user.username }} (#{{ n.user_id }})
             {% elif n.target == 'bar' %}
@@ -52,8 +52,8 @@
           <td>{{ n.sender.username }}</td>
           <td class="actions">
             <div class="actions-group">
-              <a href="/admin/notifications/{{ n.id }}" class="btn-outline">View</a>
-              <button type="button" class="btn-danger-soft js-delete-note" data-note-id="{{ n.id }}">Delete</button>
+              <a href="/admin/notifications/{{ n.id }}" class="btn-outline">{{ _('admin_notifications.sent.actions.view', default='View') }}</a>
+              <button type="button" class="btn-danger-soft js-delete-note" data-note-id="{{ n.id }}">{{ _('admin_notifications.sent.actions.delete', default='Delete') }}</button>
             </div>
             <form id="delete-note-{{ n.id }}" method="post" action="/admin/notifications/{{ n.id }}/delete" style="display:none;"></form>
           </td>
@@ -66,10 +66,10 @@
 </section>
 <div id="deleteBlocker" class="cart-blocker" hidden>
   <div class="cart-popup">
-    <p>Are you sure you want to delete this notification?</p>
+    <p>{{ _('admin_notifications.dialog.prompt', default='Are you sure you want to delete this notification?') }}</p>
     <div class="cart-popup-actions">
-      <button type="button" class="btn btn--secondary js-cancel-delete">Cancel</button>
-      <button type="button" class="btn btn--primary js-confirm-delete">Delete</button>
+      <button type="button" class="btn btn--secondary js-cancel-delete">{{ _('admin_notifications.dialog.cancel', default='Cancel') }}</button>
+      <button type="button" class="btn btn--primary js-confirm-delete">{{ _('admin_notifications.dialog.confirm', default='Delete') }}</button>
     </div>
   </div>
 </div>

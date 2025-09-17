@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="auth-card">
-  <h1>Top Up Credit</h1>
+  <h1>{{ _('topup.title', default='Top Up Credit') }}</h1>
   <form id="topupForm">
-    <label for="amount">Amount
+    <label for="amount">{{ _('topup.form.amount_label', default='Amount') }}
       <input id="amount" name="amount" type="number" min="1" step="0.05" required inputmode="decimal">
     </label>
     <div class="preset-buttons">
@@ -11,7 +11,7 @@
       <button type="button" class="btn" data-amount="20">20 CHF</button>
       <button type="button" class="btn" data-amount="50">50 CHF</button>
     </div>
-    <button class="btn btn--primary" type="submit">Top up with card</button>
+    <button class="btn btn--primary" type="submit">{{ _('topup.form.submit', default='Top up with card') }}</button>
   </form>
 </div>
 <script>
@@ -23,12 +23,14 @@
   });
   const form = document.getElementById('topupForm');
   const submitBtn = form.querySelector('button[type="submit"]');
+  const invalidAmountMessage = {{ _('topup.alerts.invalid_amount', default='Invalid amount')|tojson }};
+  const errorMessage = {{ _('topup.alerts.failed', default='Unable to start top-up')|tojson }};
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (submitBtn.disabled) return;
     const amount = parseFloat(amountInput.value);
     if (!Number.isFinite(amount) || amount < 1) {
-      alert('Invalid amount');
+      alert(invalidAmountMessage);
       return;
     }
     submitBtn.disabled = true;
@@ -46,11 +48,11 @@
           return;
         }
       }
-      alert('Unable to start top-up');
+      alert(errorMessage);
       submitBtn.disabled = false;
       submitBtn.style.display = '';
     } catch {
-      alert('Unable to start top-up');
+      alert(errorMessage);
       submitBtn.disabled = false;
       submitBtn.style.display = '';
     }

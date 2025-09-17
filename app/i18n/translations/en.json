@@ -927,6 +927,223 @@
     },
     "confirm_delete": "Are you sure you want to delete this user?"
   },
+  "admin_users": {
+    "title": "Users",
+    "subtitle": "Manage platform accounts.",
+    "create": {
+      "email_placeholder": "Email",
+      "password_placeholder": "Password",
+      "submit": "Add User"
+    },
+    "search": {
+      "aria": "Search users",
+      "placeholder": "Search users by name or email…",
+      "input_aria": "Search users by name or email",
+      "clear": "Clear search"
+    },
+    "table": {
+      "headers": {
+        "username": "Username",
+        "email": "Email",
+        "phone": "Phone",
+        "role": "Role",
+        "bar": "Bar",
+        "credit": "Credit",
+        "actions": "Actions"
+      }
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit"
+    }
+  },
+  "admin_profile": {
+    "title": "Profile",
+    "fields": {
+      "username": "Username:",
+      "email": "Email:",
+      "phone": "Phone:"
+    }
+  },
+  "admin_edit_bar_options": {
+    "back": "Back to Bars",
+    "title": "Edit {bar}",
+    "subtitle": "Select a section to manage for this venue.",
+    "cards": {
+      "info": {
+        "title": "Basic Info",
+        "body": "Edit name, address, contact and opening hours.",
+        "cta": "Edit"
+      },
+      "menu": {
+        "title": "Menu &amp; Categories",
+        "body": "Organize categories and manage menu items.",
+        "cta": "Manage"
+      },
+      "users": {
+        "title": "Users",
+        "body": "Invite or remove staff and set roles.",
+        "cta": "Manage"
+      },
+      "tables": {
+        "title": "Tables",
+        "body": "Create, rename and arrange table numbers.",
+        "cta": "Manage"
+      }
+    }
+  },
+  "admin_notifications": {
+    "title": "Notifications",
+    "subtitle": "Send messages to users.",
+    "actions": {
+      "new": "New Message",
+      "edit_welcome": "Edit Welcome"
+    },
+    "sent": {
+      "title": "Sent Notifications",
+      "headers": {
+        "id": "ID",
+        "recipient": "Recipient",
+        "subject": "Subject",
+        "message": "Message",
+        "sent": "Sent",
+        "sender": "Sender",
+        "actions": "Actions"
+      },
+      "actions": {
+        "view": "View",
+        "delete": "Delete"
+      }
+    },
+    "recipient": {
+      "all": "All Users"
+    },
+    "dialog": {
+      "prompt": "Are you sure you want to delete this notification?",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    }
+  },
+  "admin_new_bar": {
+    "title": "Create New Bar",
+    "form": {
+      "name": "Name",
+      "address": "Address",
+      "city": "City",
+      "state": "State",
+      "description": "Description",
+      "photo": "Photo",
+      "categories": "Categories",
+      "manual_closed": "Close bar manually",
+      "hours": {
+        "day": "Day",
+        "open": "Open",
+        "close": "Close"
+      },
+      "submit": "Create Bar"
+    },
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "alerts": {
+      "max_categories": "Select up to 5 categories"
+    }
+  },
+  "admin_edit_welcome": {
+    "title": "Edit Welcome Message",
+    "form": {
+      "subject": "Subject",
+      "message": "Message",
+      "save": "Save"
+    }
+  },
+  "admin_notification_view": {
+    "title": "Notification {id}",
+    "subtitle": "Details and recipients.",
+    "actions": {
+      "back": "Back",
+      "back_to_list": "Back to list"
+    },
+    "details": {
+      "recipient_target": "Recipient Target",
+      "subject": "Subject",
+      "message": "Message",
+      "link": "Link",
+      "sent": "Sent",
+      "sender": "Sender"
+    },
+    "recipients": {
+      "title": "Recipients",
+      "headers": {
+        "id": "ID",
+        "username": "Username",
+        "email": "Email",
+        "read": "Read"
+      },
+      "read_yes": "Yes",
+      "read_no": "No"
+    }
+  },
+  "admin_view_user": {
+    "title": "User: {user}",
+    "subtitle": "Account details and activity.",
+    "profile": {
+      "title": "Profile",
+      "email": "Email:",
+      "phone": "Phone:",
+      "role": "Role:",
+      "credit": "Credit:",
+      "bars": "Bars:"
+    },
+    "orders": {
+      "title": "Orders",
+      "subtitle": "Most recent first. Scroll to view older orders.",
+      "table": {
+        "headers": {
+          "id": "ID",
+          "bar": "Bar",
+          "total": "Total",
+          "status": "Status",
+          "placed": "Placed",
+          "actions": "Actions"
+        }
+      },
+      "actions": {
+        "view": "View"
+      },
+      "empty": "No orders found."
+    },
+    "logins": {
+      "title": "Login Activity",
+      "subtitle": "Most recent first. Scroll to view older logins.",
+      "table": {
+        "headers": {
+          "ip": "IP",
+          "user_agent": "User Agent",
+          "location": "Location",
+          "date": "Date"
+        }
+      },
+      "empty": "No logins found."
+    },
+    "audit": {
+      "title": "Audit Logs",
+      "subtitle": "Most recent first. Scroll to view older logs.",
+      "table": {
+        "headers": {
+          "action": "Action",
+          "date": "Date"
+        }
+      },
+      "empty": "No activity found."
+    }
+  },
   "bartender_dashboard": {
     "title": "Bartender Dashboard",
     "sections": {
@@ -1076,6 +1293,17 @@
       },
       "confirm_delete": "Are you sure you want to delete this product?",
       "empty": "No products in this category."
+    }
+  },
+  "topup": {
+    "title": "Top Up Credit",
+    "form": {
+      "amount_label": "Amount",
+      "submit": "Top up with card"
+    },
+    "alerts": {
+      "invalid_amount": "Invalid amount",
+      "failed": "Unable to start top-up"
     }
   },
   "order_success": {

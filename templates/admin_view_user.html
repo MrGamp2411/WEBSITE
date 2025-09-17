@@ -3,34 +3,34 @@
 <section class="users-page">
   <header class="users-toolbar">
     <div class="title-wrap">
-      <h1>User: {{ user.username }}</h1>
-      <p class="subtitle">Account details and activity.</p>
+      <h1>{{ _('admin_view_user.title', user=user.username, default='User: {user}') }}</h1>
+      <p class="subtitle">{{ _('admin_view_user.subtitle', default='Account details and activity.') }}</p>
     </div>
   </header>
 
   <div class="card">
-    <h2>Profile</h2>
+    <h2>{{ _('admin_view_user.profile.title', default='Profile') }}</h2>
     <ul>
-      <li>Email: {{ user.email }}</li>
-      <li>Phone: {{ user.prefix }} {{ user.phone }}</li>
-      <li>Role: {{ user.role }}</li>
-      <li>Credit: CHF {{ "%.2f"|format(user.credit) }}</li>
-      <li>Bars: {% if user.bar_ids %}{% for bid in user.bar_ids %}{{ bars[bid].name }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}-{% endif %}</li>
+      <li>{{ _('admin_view_user.profile.email', default='Email:') }} {{ user.email }}</li>
+      <li>{{ _('admin_view_user.profile.phone', default='Phone:') }} {{ user.prefix }} {{ user.phone }}</li>
+      <li>{{ _('admin_view_user.profile.role', default='Role:') }} {{ user.role }}</li>
+      <li>{{ _('admin_view_user.profile.credit', default='Credit:') }} CHF {{ "%.2f"|format(user.credit) }}</li>
+      <li>{{ _('admin_view_user.profile.bars', default='Bars:') }} {% if user.bar_ids %}{% for bid in user.bar_ids %}{{ bars[bid].name }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}-{% endif %}</li>
     </ul>
   </div>
 
-  <h2>Orders</h2>
-  <p class="subtitle">Most recent first. Scroll to view older orders.</p>
+  <h2>{{ _('admin_view_user.orders.title', default='Orders') }}</h2>
+  <p class="subtitle">{{ _('admin_view_user.orders.subtitle', default='Most recent first. Scroll to view older orders.') }}</p>
   <div class="table-card" style="max-height:300px; overflow-y:auto;">
     <table class="users-table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Bar</th>
-          <th>Total</th>
-          <th>Status</th>
-          <th>Placed</th>
-          <th class="actions">Actions</th>
+          <th>{{ _('admin_view_user.orders.table.headers.id', default='ID') }}</th>
+          <th>{{ _('admin_view_user.orders.table.headers.bar', default='Bar') }}</th>
+          <th>{{ _('admin_view_user.orders.table.headers.total', default='Total') }}</th>
+          <th>{{ _('admin_view_user.orders.table.headers.status', default='Status') }}</th>
+          <th>{{ _('admin_view_user.orders.table.headers.placed', default='Placed') }}</th>
+          <th class="actions">{{ _('admin_view_user.orders.table.headers.actions', default='Actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -43,28 +43,28 @@
           <td>{{ o.created_at|format_time }}</td>
           <td class="actions">
             <div class="actions-group">
-              <a href="/admin/orders/{{ o.id }}" class="btn-outline">View</a>
+              <a href="/admin/orders/{{ o.id }}" class="btn-outline">{{ _('admin_view_user.orders.actions.view', default='View') }}</a>
             </div>
           </td>
         </tr>
         {% endfor %}
         {% if orders|length == 0 %}
-        <tr><td colspan="6">No orders found.</td></tr>
+        <tr><td colspan="6">{{ _('admin_view_user.orders.empty', default='No orders found.') }}</td></tr>
         {% endif %}
       </tbody>
     </table>
   </div>
 
-  <h2>Login Activity</h2>
-  <p class="subtitle">Most recent first. Scroll to view older logins.</p>
+  <h2>{{ _('admin_view_user.logins.title', default='Login Activity') }}</h2>
+  <p class="subtitle">{{ _('admin_view_user.logins.subtitle', default='Most recent first. Scroll to view older logins.') }}</p>
   <div class="table-card" style="max-height:300px; overflow-y:auto;">
     <table class="users-table">
       <thead>
         <tr>
-          <th>IP</th>
-          <th>User Agent</th>
-          <th>Location</th>
-          <th>Date</th>
+          <th>{{ _('admin_view_user.logins.table.headers.ip', default='IP') }}</th>
+          <th>{{ _('admin_view_user.logins.table.headers.user_agent', default='User Agent') }}</th>
+          <th>{{ _('admin_view_user.logins.table.headers.location', default='Location') }}</th>
+          <th>{{ _('admin_view_user.logins.table.headers.date', default='Date') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -77,20 +77,20 @@
         </tr>
         {% endfor %}
         {% if logins|length == 0 %}
-        <tr><td colspan="4">No logins found.</td></tr>
+        <tr><td colspan="4">{{ _('admin_view_user.logins.empty', default='No logins found.') }}</td></tr>
         {% endif %}
       </tbody>
     </table>
   </div>
 
-  <h2>Audit Logs</h2>
-  <p class="subtitle">Most recent first. Scroll to view older logs.</p>
+  <h2>{{ _('admin_view_user.audit.title', default='Audit Logs') }}</h2>
+  <p class="subtitle">{{ _('admin_view_user.audit.subtitle', default='Most recent first. Scroll to view older logs.') }}</p>
   <div class="table-card" style="max-height:300px; overflow-y:auto;">
     <table class="users-table">
       <thead>
         <tr>
-          <th>Action</th>
-          <th>Date</th>
+          <th>{{ _('admin_view_user.audit.table.headers.action', default='Action') }}</th>
+          <th>{{ _('admin_view_user.audit.table.headers.date', default='Date') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -101,7 +101,7 @@
         </tr>
         {% endfor %}
         {% if logs|length == 0 %}
-        <tr><td colspan="2">No activity found.</td></tr>
+        <tr><td colspan="2">{{ _('admin_view_user.audit.empty', default='No activity found.') }}</td></tr>
         {% endif %}
       </tbody>
     </table>

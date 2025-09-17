@@ -2,34 +2,34 @@
 {% block content %}
 <section class="bar-edit-page">
   <header class="bar-edit-header">
-    <a href="/admin/bars" class="back-link"><i class="bi bi-chevron-left" aria-hidden="true"></i> Back to Bars</a>
-    <h1>Edit {{ bar.name }}</h1>
-    <p class="subtitle">Select a section to manage for this venue.</p>
+    <a href="/admin/bars" class="back-link"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_edit_bar_options.back', default='Back to Bars') }}</a>
+    <h1>{{ _('admin_edit_bar_options.title', bar=bar.name, default='Edit {bar}') }}</h1>
+    <p class="subtitle">{{ _('admin_edit_bar_options.subtitle', default='Select a section to manage for this venue.') }}</p>
   </header>
   <div class="action-grid">
     <a href="/admin/bars/edit/{{ bar.id }}/info" class="action-card">
       <i class="bi bi-pencil-square" aria-hidden="true"></i>
-      <h3>Basic Info</h3>
-      <p>Edit name, address, contact and opening hours.</p>
-      <span class="cta">Edit</span>
+      <h3>{{ _('admin_edit_bar_options.cards.info.title', default='Basic Info') }}</h3>
+      <p>{{ _('admin_edit_bar_options.cards.info.body', default='Edit name, address, contact and opening hours.') }}</p>
+      <span class="cta">{{ _('admin_edit_bar_options.cards.info.cta', default='Edit') }}</span>
     </a>
     <a href="/bar/{{ bar.id }}/categories" class="action-card">
       <i class="bi bi-ui-checks-grid" aria-hidden="true"></i>
-      <h3>Menu &amp; Categories</h3>
-      <p>Organize categories and manage menu items.</p>
-      <span class="cta">Manage</span>
+      <h3>{{ _('admin_edit_bar_options.cards.menu.title', default='Menu &amp; Categories')|safe }}</h3>
+      <p>{{ _('admin_edit_bar_options.cards.menu.body', default='Organize categories and manage menu items.') }}</p>
+      <span class="cta">{{ _('admin_edit_bar_options.cards.menu.cta', default='Manage') }}</span>
     </a>
     <a href="/admin/bars/{{ bar.id }}/users" class="action-card">
       <i class="bi bi-people" aria-hidden="true"></i>
-      <h3>Users</h3>
-      <p>Invite or remove staff and set roles.</p>
-      <span class="cta">Manage</span>
+      <h3>{{ _('admin_edit_bar_options.cards.users.title', default='Users') }}</h3>
+      <p>{{ _('admin_edit_bar_options.cards.users.body', default='Invite or remove staff and set roles.') }}</p>
+      <span class="cta">{{ _('admin_edit_bar_options.cards.users.cta', default='Manage') }}</span>
     </a>
     <a href="/admin/bars/{{ bar.id }}/tables" class="action-card">
       <i class="bi bi-grid-3x3-gap" aria-hidden="true"></i>
-      <h3>Tables</h3>
-      <p>Create, rename and arrange table numbers.</p>
-      <span class="cta">Manage</span>
+      <h3>{{ _('admin_edit_bar_options.cards.tables.title', default='Tables') }}</h3>
+      <p>{{ _('admin_edit_bar_options.cards.tables.body', default='Create, rename and arrange table numbers.') }}</p>
+      <span class="cta">{{ _('admin_edit_bar_options.cards.tables.cta', default='Manage') }}</span>
     </a>
   </div>
 </section>

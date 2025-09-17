@@ -3,20 +3,20 @@
 <section class="users-page">
   <header class="users-toolbar">
     <div class="title-wrap">
-      <h1>Users</h1>
-      <p class="subtitle">Manage platform accounts.</p>
+      <h1>{{ _('admin_users.title', default='Users') }}</h1>
+      <p class="subtitle">{{ _('admin_users.subtitle', default='Manage platform accounts.') }}</p>
     </div>
     <div class="toolbar-actions">
       <form class="add-user" method="post" action="/admin/users/new">
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button class="btn btn--primary" type="submit">Add User</button>
+        <input type="email" name="email" placeholder="{{ _('admin_users.create.email_placeholder', default='Email') }}" required>
+        <input type="password" name="password" placeholder="{{ _('admin_users.create.password_placeholder', default='Password') }}" required>
+        <button class="btn btn--primary" type="submit">{{ _('admin_users.create.submit', default='Add User') }}</button>
       </form>
-      <form class="users-search" role="search" aria-label="Search users" onsubmit="return false">
+      <form class="users-search" role="search" aria-label="{{ _('admin_users.search.aria', default='Search users') }}" onsubmit="return false">
         <i class="bi bi-search" aria-hidden="true"></i>
         <input id="userSearch" type="search" inputmode="search" autocomplete="off"
-               placeholder="Search users by name or email…" aria-label="Search users by name or email">
-        <button class="clear" type="button" aria-label="Clear search">
+               placeholder="{{ _('admin_users.search.placeholder', default='Search users by name or email…') }}" aria-label="{{ _('admin_users.search.input_aria', default='Search users by name or email') }}">
+        <button class="clear" type="button" aria-label="{{ _('admin_users.search.clear', default='Clear search') }}">
           <i class="bi bi-x-circle" aria-hidden="true"></i>
         </button>
       </form>
@@ -30,13 +30,13 @@
     <table class="users-table">
       <thead>
         <tr>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Role</th>
-          <th>Bar</th>
-          <th>Credit</th>
-          <th class="actions">Actions</th>
+          <th>{{ _('admin_users.table.headers.username', default='Username') }}</th>
+          <th>{{ _('admin_users.table.headers.email', default='Email') }}</th>
+          <th>{{ _('admin_users.table.headers.phone', default='Phone') }}</th>
+          <th>{{ _('admin_users.table.headers.role', default='Role') }}</th>
+          <th>{{ _('admin_users.table.headers.bar', default='Bar') }}</th>
+          <th>{{ _('admin_users.table.headers.credit', default='Credit') }}</th>
+          <th class="actions">{{ _('admin_users.table.headers.actions', default='Actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -56,8 +56,8 @@
           <td>CHF {{ "%.2f"|format(u.credit) }}</td>
           <td class="actions">
             <div class="actions-group">
-              <a href="/admin/users/view/{{ u.id }}" class="btn-outline">View</a>
-              <a href="/admin/users/edit/{{ u.id }}" class="btn-outline">Edit</a>
+              <a href="/admin/users/view/{{ u.id }}" class="btn-outline">{{ _('admin_users.actions.view', default='View') }}</a>
+              <a href="/admin/users/edit/{{ u.id }}" class="btn-outline">{{ _('admin_users.actions.edit', default='Edit') }}</a>
             </div>
           </td>
         </tr>
