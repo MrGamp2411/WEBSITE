@@ -126,9 +126,9 @@
         </div>
       </div>
     </div>
-    <div class="menu-backdrop" hidden></div>
     {% endif %}
   </header>
+  <div class="menu-backdrop" hidden></div>
     {% if not user or not user.is_display %}
     <div class="hdr-sub">
       <button class="location-pill location-selector js-open-location" aria-label="{{ _('layout.location.change', default='Change location') }}"><span id="locationDisplay">📍 {{ _('layout.location.detecting', default='Detecting location...') }}</span></button>
