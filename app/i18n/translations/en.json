@@ -577,6 +577,31 @@
       "completed": "Completed"
     }
   },
+  "bar_admin_dashboard": {
+    "title": "Bar Admin Dashboard",
+    "sections": {
+      "bars": {
+        "title": "Your Bars",
+        "aria": "Bars"
+      }
+    },
+    "actions": {
+      "edit": "Edit Bar",
+      "orders": "Manage Orders"
+    },
+    "empty": "No bar assigned."
+  },
+  "bartender_confirm": {
+    "title": "Bartender Registration",
+    "body": "You are now registered as a bartender for {bar}.",
+    "cta": "Go to Dashboard"
+  },
+  "display_orders": {
+    "sections": {
+      "preparing": "Preparing",
+      "ready": "Ready"
+    }
+  },
   "order_success": {
     "title": "Order Placed",
     "body": {

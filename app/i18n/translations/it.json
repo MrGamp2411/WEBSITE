@@ -577,6 +577,31 @@
       "completed": "Completati"
     }
   },
+  "bar_admin_dashboard": {
+    "title": "Dashboard amministratore locale",
+    "sections": {
+      "bars": {
+        "title": "I tuoi locali",
+        "aria": "Locali"
+      }
+    },
+    "actions": {
+      "edit": "Modifica locale",
+      "orders": "Gestisci ordini"
+    },
+    "empty": "Nessun locale assegnato."
+  },
+  "bartender_confirm": {
+    "title": "Registrazione bartender",
+    "body": "Ora sei registrato come bartender per {bar}.",
+    "cta": "Vai alla dashboard"
+  },
+  "display_orders": {
+    "sections": {
+      "preparing": "In preparazione",
+      "ready": "Pronti"
+    }
+  },
   "order_success": {
     "title": "Ordine inviato",
     "body": {
