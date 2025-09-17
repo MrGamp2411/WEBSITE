@@ -965,6 +965,55 @@
       "phone": "Telefono:"
     }
   },
+  "admin_edit_bar": {
+    "title": "Modifica locale",
+    "cards": {
+      "details": {
+        "title": "Dettagli"
+      },
+      "media": {
+        "title": "Media e orari"
+      }
+    },
+    "fields": {
+      "name": "Nome",
+      "address": "Indirizzo",
+      "city": "Città",
+      "state": "Cantone",
+      "description": "Descrizione",
+      "categories": "Categorie",
+      "photo": "Foto",
+      "rating": "Valutazione",
+      "manual_closed": "Chiudi il locale manualmente"
+    },
+    "help": {
+      "description": "Descrizione breve e chiara. I link verranno ignorati.",
+      "categories": "Clicca per selezionare/deselezionare. Gli elementi selezionati sono evidenziati."
+    },
+    "categories": {
+      "count": "{selected}/{max} selezionate"
+    },
+    "media": {
+      "photo_alt": "Foto di {bar}"
+    },
+    "days": {
+      "monday": "Lunedì",
+      "tuesday": "Martedì",
+      "wednesday": "Mercoledì",
+      "thursday": "Giovedì",
+      "friday": "Venerdì",
+      "saturday": "Sabato",
+      "sunday": "Domenica"
+    },
+    "hours": {
+      "day": "Giorno",
+      "open": "Apertura",
+      "close": "Chiusura"
+    },
+    "actions": {
+      "save": "Salva"
+    }
+  },
   "admin_edit_bar_options": {
     "back": "Torna ai locali",
     "title": "Modifica {bar}",
@@ -1022,6 +1071,68 @@
       "prompt": "Sei sicuro di voler eliminare questa notifica?",
       "cancel": "Annulla",
       "confirm": "Elimina"
+    }
+  },
+  "admin_new_notification": {
+    "title": "Nuova notifica",
+    "subtitle": "Invia un messaggio agli utenti.",
+    "form": {
+      "target": {
+        "label": "Destinatari",
+        "options": {
+          "all": "Tutti gli utenti",
+          "user": "Utente specifico",
+          "bar": "Utenti del locale"
+        }
+      },
+      "subject": "Oggetto",
+      "message": "Messaggio",
+      "link_url": "URL del collegamento",
+      "image": "Immagine",
+      "attachment": "Allegato",
+      "submit": "Invia"
+    },
+    "user_section": {
+      "title": "Seleziona utente",
+      "search": {
+        "aria": "Cerca utenti",
+        "placeholder": "Cerca utenti…",
+        "input_aria": "Cerca utenti",
+        "clear": "Cancella ricerca"
+      },
+      "table": {
+        "headers": {
+          "id": "ID",
+          "username": "Nome utente",
+          "email": "Email",
+          "actions": "Azioni"
+        }
+      }
+    },
+    "bar_section": {
+      "title": "Seleziona locale",
+      "search": {
+        "aria": "Cerca locali",
+        "placeholder": "Cerca locali…",
+        "input_aria": "Cerca locali",
+        "clear": "Cancella ricerca"
+      },
+      "table": {
+        "headers": {
+          "id": "ID",
+          "name": "Nome",
+          "city": "Città",
+          "actions": "Azioni"
+        }
+      }
+    },
+    "actions": {
+      "select": "Seleziona",
+      "selected": "Selezionato"
+    },
+    "alerts": {
+      "select_user": "Seleziona un utente.",
+      "select_bar": "Seleziona un locale."
     }
   },
   "admin_new_bar": {
@@ -1088,6 +1199,27 @@
       },
       "read_yes": "Sì",
       "read_no": "No"
+    }
+  },
+  "admin_payments": {
+    "title": "Pagamenti",
+    "subtitle": "Controlla ricavi e chiusure dei locali.",
+    "search": {
+      "aria": "Cerca locali",
+      "placeholder": "Cerca locali per nome…",
+      "input_aria": "Cerca locali per nome",
+      "clear": "Cancella ricerca"
+    },
+    "table": {
+      "headers": {
+        "name": "Nome",
+        "actions": "Azioni"
+      }
+    },
+    "actions": {
+      "view": "Visualizza",
+      "add_test": "Aggiungi chiusura di test",
+      "delete_test": "Elimina chiusura di test"
     }
   },
   "admin_view_user": {
