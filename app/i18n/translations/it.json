@@ -469,6 +469,11 @@
       "title": "Pagamento non riuscito",
       "body": "Il pagamento non è andato a buon fine. Riprova oppure contatta il nostro staff se il problema persiste.",
       "close": "Chiudi"
+    },
+    "payment_success": {
+      "title": "Pagamento riuscito",
+      "body": "Il tuo portafoglio è stato ricaricato.",
+      "close": "Chiudi"
     }
   },
   "notifications": {

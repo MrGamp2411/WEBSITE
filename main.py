@@ -2235,6 +2235,7 @@ async def checkout(
     db: Session = Depends(get_db),
 ):
     user = get_current_user(request)
+    translator = translator_for_request(request)
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     cart = get_cart_for_user(user)
@@ -2267,8 +2268,13 @@ async def checkout(
         base_url = str(request.base_url).rstrip("/")
         failed_params = {
             "notice": "payment_failed",
-            "noticeTitle": "Payment failed",
-            "noticeBody": "Payment was not successful. Please try again or contact our staff if the problem persists.",
+            "noticeTitle": translator(
+                "notices.payment_failed.title", default="Payment failed"
+            ),
+            "noticeBody": translator(
+                "notices.payment_failed.body",
+                default="Payment was not successful. Please try again or contact our staff if the problem persists.",
+            ),
             "noticeType": "error",
         }
         failed_url = f"{base_url}/cart?" + urlencode(failed_params)
@@ -2653,11 +2659,16 @@ async def topup(request: Request):
 
 
 @app.get("/wallet/topup/success")
-async def topup_success(topup: str):
+async def topup_success(request: Request, topup: str):
+    translator = translator_for_request(request)
     params = {
         "notice": "topup_success",
-        "noticeTitle": "Payment successful",
-        "noticeBody": "Your wallet has been credited.",
+        "noticeTitle": translator(
+            "notices.payment_success.title", default="Payment successful"
+        ),
+        "noticeBody": translator(
+            "notices.payment_success.body", default="Your wallet has been credited."
+        ),
         "noticeType": "success",
     }
     url = "/wallet?" + urlencode(params)
@@ -2665,11 +2676,17 @@ async def topup_success(topup: str):
 
 
 @app.get("/wallet/topup/failed")
-async def topup_failed(topup: str):
+async def topup_failed(request: Request, topup: str):
+    translator = translator_for_request(request)
     params = {
         "notice": "topup_failed",
-        "noticeTitle": "Payment failed",
-        "noticeBody": "Payment was not successful. Please try again or contact our staff if the problem persists.",
+        "noticeTitle": translator(
+            "notices.payment_failed.title", default="Payment failed"
+        ),
+        "noticeBody": translator(
+            "notices.payment_failed.body",
+            default="Payment was not successful. Please try again or contact our staff if the problem persists.",
+        ),
         "noticeType": "error",
     }
     url = "/wallet?" + urlencode(params)
