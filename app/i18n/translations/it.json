@@ -329,5 +329,82 @@
     "actions": {
       "submit": "Completa"
     }
+  },
+  "profile": {
+    "title": "Profilo",
+    "subtitle": "Gestisci il tuo account, la sicurezza e il numero di telefono.",
+    "alerts": {
+      "success": "Profilo aggiornato con successo."
+    },
+    "fields": {
+      "username": {
+        "label": "Nome utente",
+        "title": "3-24 caratteri, lettere minuscole, numeri, punto, trattino o underscore. Niente spazi."
+      },
+      "email": {
+        "label": "Email",
+        "title": "L'email deve avere il formato testo@testo.testo"
+      },
+      "prefix": {
+        "label": "Prefisso telefonico"
+      },
+      "phone": {
+        "label": "Numero di telefono",
+        "title": "Il numero di telefono deve contenere da 9 a 10 cifre."
+      }
+    },
+    "help": {
+      "phone": "Usa il formato mobile del tuo paese."
+    },
+    "actions": {
+      "change_password": "Cambia password",
+      "save": "Salva"
+    },
+    "aria": {
+      "edit_username": "Modifica nome utente",
+      "edit_email": "Modifica email",
+      "edit_prefix": "Modifica prefisso telefonico",
+      "edit_phone": "Modifica numero di telefono"
+    }
+  },
+  "change_password": {
+    "title": "Cambia password",
+    "subtitle": "Aggiorna la password del tuo account.",
+    "alerts": {
+      "success": "Password aggiornata con successo."
+    },
+    "fields": {
+      "current_password": {
+        "label": "Password attuale",
+        "title": "La password deve contenere tra 8 e 128 caratteri"
+      },
+      "new_password": {
+        "label": "Nuova password",
+        "title": "La password deve contenere tra 8 e 128 caratteri"
+      },
+      "confirm_password": {
+        "label": "Conferma password",
+        "title": "Le password devono coincidere"
+      }
+    },
+    "help": {
+      "strength": "Usa almeno 8 caratteri con lettere e numeri."
+    },
+    "actions": {
+      "save": "Salva"
+    }
+  },
+  "order_success": {
+    "title": "Ordine inviato",
+    "body": {
+      "success": "Il tuo ordine è stato inviato con successo!",
+      "total": "Totale pagato: CHF {total}",
+      "payment_method": "Metodo di pagamento: {method}",
+      "remaining": "Credito residuo: CHF {remaining}",
+      "thanks": "Grazie per aver ordinato con SiplyGo."
+    },
+    "actions": {
+      "home": "Torna alla home"
+    }
   }
 }
