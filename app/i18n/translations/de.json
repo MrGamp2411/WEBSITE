@@ -473,11 +473,13 @@
   "notices": {
     "payment_failed": {
       "title": "Zahlung fehlgeschlagen",
-      "body": "Die Zahlung war nicht erfolgreich. Bitte versuche es erneut oder kontaktiere unser Team, wenn das Problem bestehen bleibt."
+      "body": "Die Zahlung war nicht erfolgreich. Bitte versuche es erneut oder kontaktiere unser Team, wenn das Problem bestehen bleibt.",
+      "close": "Schließen"
     },
     "payment_success": {
       "title": "Zahlung erfolgreich",
-      "body": "Dein Wallet wurde gutgeschrieben."
+      "body": "Dein Wallet wurde gutgeschrieben.",
+      "close": "Schließen"
     }
   },
   "notifications": {

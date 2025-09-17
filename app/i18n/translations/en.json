@@ -473,11 +473,13 @@
   "notices": {
     "payment_failed": {
       "title": "Payment failed",
-      "body": "Payment was not successful. Please try again or contact our staff if the problem persists."
+      "body": "Payment was not successful. Please try again or contact our staff if the problem persists.",
+      "close": "Close"
     },
     "payment_success": {
       "title": "Payment successful",
-      "body": "Your wallet has been credited."
+      "body": "Your wallet has been credited.",
+      "close": "Close"
     }
   },
   "notifications": {

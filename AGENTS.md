@@ -413,3 +413,4 @@
   - `bartender_orders.actions` now covers Accept, Cancel, Ready, and Complete buttons.
   - `display_orders.card.title` localises the display screen order heading.
   - `notices.payment_failed` provides the payment failure notice copy for global alerts.
+    - Include a `close` label so the wallet notice button renders in every language; reuse the same value for `notices.payment_success.close`.

@@ -473,11 +473,13 @@
   "notices": {
     "payment_failed": {
       "title": "Paiement échoué",
-      "body": "Le paiement n'a pas abouti. Veuillez réessayer ou contacter notre équipe si le problème persiste."
+      "body": "Le paiement n'a pas abouti. Veuillez réessayer ou contacter notre équipe si le problème persiste.",
+      "close": "Fermer"
     },
     "payment_success": {
       "title": "Paiement réussi",
-      "body": "Votre portefeuille a été crédité."
+      "body": "Votre portefeuille a été crédité.",
+      "close": "Fermer"
     }
   },
   "notifications": {
