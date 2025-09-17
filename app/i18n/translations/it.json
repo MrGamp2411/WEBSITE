@@ -439,6 +439,28 @@
       "prep_minutes": "{minutes} min"
     }
   },
+  "orders": {
+    "statuses": {
+      "placed": "Inviato",
+      "accepted": "Accettato",
+      "ready": "Pronto",
+      "completed": "Completato",
+      "canceled": "Annullato",
+      "rejected": "Rifiutato"
+    },
+    "payment_methods": {
+      "card": "Carta",
+      "credit_card": "Carta di credito",
+      "wallet": "Wallet",
+      "bar": "Paga al bancone"
+    }
+  },
+  "notices": {
+    "payment_failed": {
+      "title": "Pagamento non riuscito",
+      "body": "Il pagamento non è andato a buon fine. Riprova oppure contatta il nostro staff se il problema persiste."
+    }
+  },
   "notifications": {
     "title": "Notifiche",
     "subtitle": "I tuoi messaggi.",
@@ -1294,6 +1316,12 @@
       "preparing": "In preparazione",
       "ready": "Pronti",
       "completed": "Completati"
+    },
+    "actions": {
+      "accept": "Accetta",
+      "cancel": "Annulla",
+      "ready": "Pronto",
+      "complete": "Completa"
     }
   },
   "bar_admin_dashboard": {
@@ -1319,6 +1347,9 @@
     "sections": {
       "preparing": "In preparazione",
       "ready": "Pronti"
+    },
+    "card": {
+      "title": "Ordine {code}"
     }
   },
   "bar_admin_history": {
