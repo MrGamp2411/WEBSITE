@@ -125,6 +125,7 @@ from app.i18n import (
     available_languages,
     create_translator,
     load_translations,
+    normalize_language,
     translator_for_request,
 )
 from app.utils.disposable_email import ensure_not_disposable, get_disposable_stats
@@ -256,6 +257,45 @@ class Bar:
         self.bartender_ids: List[int] = []
         # Bartenders that still need to confirm the assignment
         self.pending_bartender_ids: List[int] = []
+
+
+def get_bar_description_for_language(bar: Any, language_code: str) -> str:
+    """Return a bar description localised to ``language_code``."""
+
+    if bar is None:
+        return ""
+
+    translations_raw = getattr(bar, "description_translations", None)
+    translations: Dict[str, str] = {}
+    if isinstance(translations_raw, dict):
+        translations = {
+            code: value
+            for code, value in translations_raw.items()
+            if isinstance(code, str) and isinstance(value, str) and value
+        }
+    elif isinstance(translations_raw, str):
+        try:
+            decoded = json.loads(translations_raw)
+        except json.JSONDecodeError:
+            decoded = {}
+        if isinstance(decoded, dict):
+            translations = {
+                code: value
+                for code, value in decoded.items()
+                if isinstance(code, str) and isinstance(value, str) and value
+            }
+
+    description = translations.get(language_code)
+    if not description:
+        description = translations.get(DEFAULT_LANGUAGE)
+    if not description:
+        for value in translations.values():
+            if value:
+                description = value
+                break
+    if not description:
+        description = getattr(bar, "description", "") or ""
+    return description
 
 
 class DemoUser:
@@ -1620,6 +1660,14 @@ def render_template(template_name: str, **context) -> HTMLResponse:
     context.setdefault("available_languages", available_languages())
     context.setdefault("_", translator)
     context.setdefault("translate", translator)
+
+    def _bar_description_helper(bar_obj: Any, language: Optional[str] = None) -> str:
+        code = normalize_language(language) if language else language_code
+        if not code:
+            code = language_code
+        return get_bar_description_for_language(bar_obj, code)
+
+    context.setdefault("bar_description", _bar_description_helper)
 
     template = templates_env.get_template(template_name)
     return HTMLResponse(template.render(**context), status_code=status_code)

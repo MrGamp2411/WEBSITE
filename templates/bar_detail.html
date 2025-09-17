@@ -18,7 +18,7 @@
     <span class="bar-distance" data-has-distance="true" hidden><i class="bi bi-geo-alt" aria-hidden="true"></i> <span class="distance-value"></span></span>
   </div>
   <p class="bar-address">{{ bar.address }}, {{ bar.city }}{% if bar.state %}, {{ bar.state }}{% endif %}</p>
-  <p class="bar-desc clamp" itemprop="description">{{ bar.description }}</p>
+  <p class="bar-desc clamp" itemprop="description">{{ bar_description(bar) }}</p>
   {% if opening_hours %}
   <section class="bar-hours-card">
     <h2 class="bar-hours-title">{{ _('bar_detail.hours.title', default='Opening hours') }}</h2>
