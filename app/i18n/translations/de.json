@@ -41,7 +41,8 @@
       "menu_button_aria": "Menü",
       "close_menu_aria": "Menü schließen",
       "credit_aria": "Kredite",
-      "cart_aria": "Warenkorb ({count} Artikel)"
+      "cart_aria": "Warenkorb ({count} Artikel)",
+      "language": "Sprache"
     },
     "location": {
       "change": "Standort ändern",
@@ -71,6 +72,11 @@
       "message": "Bestellungen für <strong>{bar_name}</strong> sind aktuell pausiert. Bitte kontaktiere das Team für weitere Informationen.",
       "close": "Schließen",
       "back": "Zurück zum Menü"
+    },
+    "language": {
+      "title": "Sprache wählen",
+      "subtitle": "Wähle deine bevorzugte App-Sprache.",
+      "current": "Aktuelle Sprache"
     }
   },
   "home": {

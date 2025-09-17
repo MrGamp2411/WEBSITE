@@ -82,6 +82,11 @@
     <nav id="mobileMenu" class="mobile-menu" aria-label="Menu" role="dialog" aria-modal="true" hidden>
       <button class="menu-close js-close-menu" aria-label="{{ _('layout.header.close_menu_aria', default='Close menu') }}"><i class="bi bi-x" aria-hidden="true"></i></button>
       <a href="/search" role="menuitem"><i class="bi bi-geo-alt" aria-hidden="true"></i><span>{{ _('common.browse_bars', default='Browse Bars') }}</span></a>
+      <button type="button" class="menu-language js-open-language" role="menuitem" data-keep-menu-open="true">
+        <i class="bi bi-translate" aria-hidden="true"></i>
+        <span>{{ _('layout.header.language', default='Language') }}</span>
+        <span class="menu-language__code" aria-hidden="true">{{ language_code|upper }}</span>
+      </button>
       {% if user and (user.is_super_admin or user.is_bar_admin or user.is_bartender) %}
       <a href="/dashboard" role="menuitem"><i class="bi bi-speedometer2" aria-hidden="true"></i><span>{{ _('common.dashboard', default='Dashboard') }}</span></a>
       {% endif %}
@@ -96,6 +101,31 @@
       <a href="/register" role="menuitem" class="menu-register"><i class="bi bi-person-plus" aria-hidden="true"></i><span>{{ _('common.register', default='Register') }}</span></a>
       {% endif %}
     </nav>
+    <div class="language-backdrop menu-backdrop" hidden></div>
+    <div id="languageDialog" class="language-dialog" role="dialog" aria-modal="true" aria-labelledby="languageDialogTitle" hidden>
+      <div class="language-dialog__panel">
+        <button type="button" class="language-dialog__close js-close-language" aria-label="{{ _('common.close', default='Close') }}">
+          <i class="bi bi-x" aria-hidden="true"></i>
+        </button>
+        <h2 id="languageDialogTitle" class="language-dialog__title">{{ _('layout.language.title', default='Choose language') }}</h2>
+        <p class="language-dialog__subtitle">{{ _('layout.language.subtitle', default='Select your preferred language for the app.') }}</p>
+        <div class="language-dialog__options" role="radiogroup" aria-labelledby="languageDialogTitle">
+          {% for lang in available_languages %}
+          <button type="button" class="language-option" data-lang="{{ lang.code }}" role="radio" aria-checked="{{ 'true' if language_code == lang.code else 'false' }}">
+            <span class="language-option__name">{{ lang.name }}</span>
+            <span class="language-option__meta">
+              {% if language_code == lang.code %}
+              <i class="bi bi-check-lg" aria-hidden="true"></i>
+              <span class="visually-hidden">{{ _('layout.language.current', default='Currently selected') }}</span>
+              {% else %}
+              {{ lang.code|upper }}
+              {% endif %}
+            </span>
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
     <div class="menu-backdrop" hidden></div>
     {% endif %}
   </header>

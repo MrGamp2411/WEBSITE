@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const menuToggles = document.querySelectorAll('.js-open-menu');
   const mobileMenu = document.getElementById('mobileMenu');
-  const backdrop = document.querySelector('.menu-backdrop');
+  const backdrop = document.querySelector('.menu-backdrop:not(.language-backdrop)');
   const closeBtn = mobileMenu?.querySelector('.js-close-menu');
   const contentEls = document.querySelectorAll('main, .hdr-sub, footer');
   let activeToggle;
@@ -373,7 +373,8 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   mobileMenu?.addEventListener('click', (e) => {
-    if (e.target.closest('[role="menuitem"]')) {
+    const item = e.target.closest('[role="menuitem"]');
+    if (item && !item.hasAttribute('data-keep-menu-open')) {
       closeMenu();
     }
   });
@@ -391,6 +392,93 @@ document.addEventListener('DOMContentLoaded', function() {
       e.preventDefault();
       first.focus();
     }
+  });
+
+  const languageDialog = document.getElementById('languageDialog');
+  const languageBackdrop = document.querySelector('.language-backdrop');
+  const languageTrigger = document.querySelector('.js-open-language');
+  const languageClose = languageDialog?.querySelector('.js-close-language');
+  const languageOptions = languageDialog?.querySelectorAll('.language-option');
+  let languageLastFocused;
+
+  const handleLanguageKeydown = (event) => {
+    if (!languageDialog || languageDialog.hidden) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeLanguageDialog();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const focusable = languageDialog.querySelectorAll('.language-dialog__close, .language-option');
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
+  function openLanguageDialog() {
+    if (!languageDialog || !languageBackdrop) return;
+    languageLastFocused = document.activeElement;
+    languageDialog.hidden = false;
+    languageBackdrop.hidden = false;
+    requestAnimationFrame(() => {
+      languageDialog.classList.add('is-open');
+      languageBackdrop.classList.add('is-open');
+    });
+    document.body.style.overflow = 'hidden';
+    contentEls.forEach(el => el.setAttribute('aria-hidden', 'true'));
+    document.addEventListener('keydown', handleLanguageKeydown);
+    languageBackdrop.removeEventListener('click', closeLanguageDialog);
+    languageBackdrop.addEventListener('click', closeLanguageDialog);
+    if (languageClose) {
+      languageClose.removeEventListener('click', closeLanguageDialog);
+      languageClose.addEventListener('click', closeLanguageDialog);
+    }
+    const activeOption = languageDialog.querySelector('.language-option[aria-checked="true"]') || languageDialog.querySelector('.language-option');
+    activeOption?.focus();
+  }
+
+  function closeLanguageDialog() {
+    if (!languageDialog || !languageBackdrop) return;
+    languageDialog.classList.remove('is-open');
+    languageBackdrop.classList.remove('is-open');
+    setTimeout(() => {
+      languageDialog.hidden = true;
+      languageBackdrop.hidden = true;
+    }, 220);
+    if (!mobileMenu?.classList.contains('is-open')) {
+      document.body.style.overflow = '';
+      contentEls.forEach(el => el.removeAttribute('aria-hidden'));
+    }
+    document.removeEventListener('keydown', handleLanguageKeydown);
+    languageBackdrop.removeEventListener('click', closeLanguageDialog);
+    languageClose?.removeEventListener('click', closeLanguageDialog);
+    languageLastFocused && languageLastFocused.focus();
+  }
+
+  function setLanguage(code) {
+    if (!code) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set('lang', code);
+    window.location.href = url.toString();
+  }
+
+  languageTrigger?.addEventListener('click', (event) => {
+    event.preventDefault();
+    closeMenu();
+    openLanguageDialog();
+  });
+
+  languageOptions?.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      setLanguage(btn.getAttribute('data-lang'));
+    });
   });
 
   document.querySelector('.js-open-search')?.addEventListener('click', () => {

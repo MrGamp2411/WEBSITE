@@ -41,7 +41,8 @@
       "menu_button_aria": "Menù",
       "close_menu_aria": "Chiudi menù",
       "credit_aria": "Crediti",
-      "cart_aria": "Carrello ({count} articoli)"
+      "cart_aria": "Carrello ({count} articoli)",
+      "language": "Lingua"
     },
     "location": {
       "change": "Cambia posizione",
@@ -71,6 +72,11 @@
       "message": "Gli ordini per <strong>{bar_name}</strong> sono momentaneamente sospesi. Contatta lo staff per maggiori informazioni.",
       "close": "Chiudi",
       "back": "Torna al menù"
+    },
+    "language": {
+      "title": "Scegli la lingua",
+      "subtitle": "Seleziona la lingua preferita per l'app.",
+      "current": "Lingua attuale"
     }
   },
   "home": {

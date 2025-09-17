@@ -41,7 +41,8 @@
       "menu_button_aria": "Menu",
       "close_menu_aria": "Close menu",
       "credit_aria": "Credits",
-      "cart_aria": "Cart ({count} items)"
+      "cart_aria": "Cart ({count} items)",
+      "language": "Language"
     },
     "location": {
       "change": "Change location",
@@ -71,6 +72,11 @@
       "message": "Ordering is paused for <strong>{bar_name}</strong>. Please contact a staff member for more information.",
       "close": "Close",
       "back": "Back to the menu"
+    },
+    "language": {
+      "title": "Choose language",
+      "subtitle": "Select your preferred language for the app.",
+      "current": "Currently selected"
     }
   },
   "home": {
