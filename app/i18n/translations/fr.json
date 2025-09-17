@@ -3,5 +3,15 @@
     "language": "Français",
     "code": "fr",
     "fallback": "en"
+  },
+  "layout": {
+    "header": {
+      "language": "Langue"
+    },
+    "language": {
+      "title": "Choisir la langue",
+      "subtitle": "Sélectionnez votre langue préférée pour l'application.",
+      "current": "Langue actuelle"
+    }
   }
 }

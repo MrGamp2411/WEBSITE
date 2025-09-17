@@ -357,6 +357,7 @@
 - Mobile menu shows a red notification badge when the user has unread messages.
 - Notifications older than 30 days are purged automatically by `purge_old_notifications_worker`.
 - New users automatically receive the welcome message after completing registration.
+- Mobile menu now includes a **Language** entry (bi-translate icon) that opens an in-app dialog for choosing between English, Italiano, Français, and Deutsch; see `templates/layout.html`, `static/js/app.js`, and related styles in `static/css/components.css`.
 
 ## Internationalization
 
