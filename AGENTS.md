@@ -382,3 +382,4 @@
 - Order history UI strings live under the `order_history` namespace in `app/i18n/translations/*.json`; `templates/order_history.html` pulls from these keys.
 - Notifications list strings use the `notifications` namespace in `app/i18n/translations/*.json`; `templates/notifications.html` references them.
 - Notification detail view strings use the `notification_detail` namespace in `app/i18n/translations/*.json`; `templates/notification_detail.html` uses these keys.
+- Cart, Search, and bar detail pages use the `cart`, `search`, and `bar_detail` namespaces in `app/i18n/translations/*.json` and their respective templates.

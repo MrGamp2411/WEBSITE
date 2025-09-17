@@ -450,6 +450,87 @@
     "download": "Download attachment",
     "image_alt": "Notification image"
   },
+  "cart": {
+    "title": "Your Cart",
+    "subtitle": "Review your order, choose your table, and confirm payment.",
+    "wallet": {
+      "label": "Wallet:",
+      "add_funds": "Add funds"
+    },
+    "table": {
+      "headers": {
+        "item": "Item",
+        "quantity": "Quantity",
+        "price": "Price",
+        "total": "Total",
+        "actions": "Actions"
+      },
+      "update": "Update",
+      "remove": "Remove"
+    },
+    "form": {
+      "table": {
+        "label": "Table",
+        "placeholder": "Select table"
+      },
+      "notes": {
+        "label": "Message to bartender",
+        "placeholder": "Add a note for the bartender"
+      }
+    },
+    "payment": {
+      "title": "Payment Method",
+      "options": {
+        "card": {
+          "title": "Credit Card",
+          "note": "Pay now with card"
+        },
+        "wallet": {
+          "title": "Wallet Credit",
+          "note": "Use your credit"
+        },
+        "bar": {
+          "title": "Pay at Bar",
+          "note": "Pay at the counter"
+        }
+      }
+    },
+    "summary": {
+      "title": "Order Summary",
+      "subtotal": "Subtotal",
+      "fees": "Fees",
+      "total": "Total",
+      "submit": "Place Order",
+      "fee_note": "Orders under CHF 10 include a CHF 0.20 fee.",
+      "secure": "Your payment will be processed securely."
+    },
+    "empty": {
+      "message": "Your cart is empty."
+    }
+  },
+  "search": {
+    "view_all": "View all",
+    "view_all_recent_aria": "View all: Recently visited bars",
+    "sections": {
+      "recent": "Recently visited bars",
+      "nearby": "Closest to you",
+      "top": "Top rated",
+      "popular": "Recommended"
+    },
+    "empty": "No bars found."
+  },
+  "bar_detail": {
+    "status": {
+      "open": "Open now",
+      "closed": "Closed now"
+    },
+    "hours": {
+      "title": "Opening hours",
+      "closed": "Closed"
+    },
+    "add_to_cart": "Add to Cart",
+    "login_to_order": "Login to order"
+  },
   "order_success": {
     "title": "Order Placed",
     "body": {

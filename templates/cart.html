@@ -2,22 +2,28 @@
 {% block content %}
 <section class="cart-page">
   <div class="cart-head">
-    <h1 class="cart-title">Your Cart</h1>
-    <p class="cart-subtitle">Review your order, choose your table, and confirm payment.</p>
+    <h1 class="cart-title">{{ _('cart.title', default='Your Cart') }}</h1>
+    <p class="cart-subtitle">{{ _('cart.subtitle', default='Review your order, choose your table, and confirm payment.') }}</p>
   </div>
   {% if cart.items %}
   <div class="cart-layout">
     <div class="cart-main">
       <div class="wallet-banner">
-        <span class="label">Wallet:</span>
+        <span class="label">{{ _('cart.wallet.label', default='Wallet:') }}</span>
         <strong class="amount">CHF {{ "%.2f"|format(user.credit) }}</strong>
-        <a href="/wallet" class="link-add">Add funds</a>
+        <a href="/wallet" class="link-add">{{ _('cart.wallet.add_funds', default='Add funds') }}</a>
       </div>
       <div class="card cart-table">
         <div class="table-scroll">
         <table class="menu-table">
           <thead>
-            <tr><th>Item</th><th>Quantity</th><th>Price</th><th>Total</th><th class="actions">Actions</th></tr>
+            <tr>
+              <th>{{ _('cart.table.headers.item', default='Item') }}</th>
+              <th>{{ _('cart.table.headers.quantity', default='Quantity') }}</th>
+              <th>{{ _('cart.table.headers.price', default='Price') }}</th>
+              <th>{{ _('cart.table.headers.total', default='Total') }}</th>
+              <th class="actions">{{ _('cart.table.headers.actions', default='Actions') }}</th>
+            </tr>
           </thead>
           <tbody>
             {% for item in cart.items.values() %}
@@ -28,7 +34,7 @@
                   <input type="hidden" name="product_id" value="{{ item.product.id }}">
                   <div class="qty-group">
                     <input type="number" name="quantity" min="0" value="{{ item.quantity }}" inputmode="numeric" enterkeyhint="done">
-                    <button class="btn-outline btn--small" type="submit">Update</button>
+                    <button class="btn-outline btn--small" type="submit">{{ _('cart.table.update', default='Update') }}</button>
                   </div>
                 </form>
               </td>
@@ -39,7 +45,7 @@
                   <form method="post" action="/cart/update" class="form form--inline">
                     <input type="hidden" name="product_id" value="{{ item.product.id }}">
                     <input type="hidden" name="quantity" value="0">
-                    <button class="btn-danger-soft btn--small" type="submit">Remove</button>
+                    <button class="btn-danger-soft btn--small" type="submit">{{ _('cart.table.remove', default='Remove') }}</button>
                   </form>
                 </div>
               </td>
@@ -53,9 +59,9 @@
       <form id="checkoutForm" method="post" action="/cart/checkout">
         <div class="card form-card">
           <div class="field">
-            <label for="table_id">Table</label>
+            <label for="table_id">{{ _('cart.form.table.label', default='Table') }}</label>
             <select id="table_id" name="table_id" required>
-              <option value="" disabled {% if cart.table_id is none %}selected{% endif %}>Select table</option>
+              <option value="" disabled {% if cart.table_id is none %}selected{% endif %}>{{ _('cart.form.table.placeholder', default='Select table') }}</option>
               {% for table in bar.tables.values() %}
                 <option value="{{ table.id }}" {% if cart.table_id == table.id %}selected{% endif %}>{{ table.name }}</option>
               {% endfor %}
@@ -65,32 +71,32 @@
 
         <div class="card form-card">
           <div class="field">
-            <label for="notes">Message to bartender</label>
-            <textarea id="notes" name="notes" rows="3" placeholder="Add a note for the bartender"></textarea>
+            <label for="notes">{{ _('cart.form.notes.label', default='Message to bartender') }}</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="{{ _('cart.form.notes.placeholder', default='Add a note for the bartender') }}"></textarea>
           </div>
         </div>
 
         <div class="card pay-card" id="paymentMethods">
-          <h3 class="section-title">Payment Method</h3>
+          <h3 class="section-title">{{ _('cart.payment.title', default='Payment Method') }}</h3>
           <label class="pay-option">
             <input type="radio" name="payment_method" value="card" required>
             <span class="pay-content">
-              <span class="pay-title">Credit Card</span>
-              <span class="pay-note">Pay now with card</span>
+              <span class="pay-title">{{ _('cart.payment.options.card.title', default='Credit Card') }}</span>
+              <span class="pay-note">{{ _('cart.payment.options.card.note', default='Pay now with card') }}</span>
             </span>
           </label>
           <label class="pay-option">
             <input type="radio" name="payment_method" value="wallet">
             <span class="pay-content">
-              <span class="pay-title">Wallet Credit</span>
-              <span class="pay-note">Use your credit</span>
+              <span class="pay-title">{{ _('cart.payment.options.wallet.title', default='Wallet Credit') }}</span>
+              <span class="pay-note">{{ _('cart.payment.options.wallet.note', default='Use your credit') }}</span>
             </span>
           </label>
           <label class="pay-option">
             <input type="radio" name="payment_method" value="bar">
             <span class="pay-content">
-              <span class="pay-title">Pay at Bar</span>
-              <span class="pay-note">Pay at the counter</span>
+              <span class="pay-title">{{ _('cart.payment.options.bar.title', default='Pay at Bar') }}</span>
+              <span class="pay-note">{{ _('cart.payment.options.bar.note', default='Pay at the counter') }}</span>
             </span>
           </label>
         </div>
@@ -99,22 +105,22 @@
 
     <aside class="summary">
       <div class="card summary-card">
-        <h3 class="section-title">Order Summary</h3>
+        <h3 class="section-title">{{ _('cart.summary.title', default='Order Summary') }}</h3>
         <dl class="sum-rows">
-          <div class="row"><dt>Subtotal</dt><dd>CHF {{ "%.2f"|format(cart.total_price()) }}</dd></div>
-          <div class="row"><dt>Fees</dt><dd>{% if cart.small_order_fee() %}CHF {{ "%.2f"|format(cart.small_order_fee()) }}{% else %}—{% endif %}</dd></div>
-          <div class="row total"><dt>Total</dt><dd>CHF {{ "%.2f"|format(cart.total_with_fee()) }}</dd></div>
+          <div class="row"><dt>{{ _('cart.summary.subtotal', default='Subtotal') }}</dt><dd>CHF {{ "%.2f"|format(cart.total_price()) }}</dd></div>
+          <div class="row"><dt>{{ _('cart.summary.fees', default='Fees') }}</dt><dd>{% if cart.small_order_fee() %}CHF {{ "%.2f"|format(cart.small_order_fee()) }}{% else %}—{% endif %}</dd></div>
+          <div class="row total"><dt>{{ _('cart.summary.total', default='Total') }}</dt><dd>CHF {{ "%.2f"|format(cart.total_with_fee()) }}</dd></div>
         </dl>
-        <button type="submit" class="btn-primary place-order" form="checkoutForm">Place Order</button>
+        <button type="submit" class="btn-primary place-order" form="checkoutForm">{{ _('cart.summary.submit', default='Place Order') }}</button>
         {% if cart.small_order_fee() %}
-        <p class="sum-note">Orders under CHF 10 include a CHF 0.20 fee.</p>
+        <p class="sum-note">{{ _('cart.summary.fee_note', default='Orders under CHF 10 include a CHF 0.20 fee.') }}</p>
         {% endif %}
-        <p class="sum-note">Your payment will be processed securely.</p>
+        <p class="sum-note">{{ _('cart.summary.secure', default='Your payment will be processed securely.') }}</p>
       </div>
     </aside>
   </div>
   {% else %}
-  <p>Your cart is empty.</p>
+  <p>{{ _('cart.empty.message', default='Your cart is empty.') }}</p>
   {% endif %}
 </section>
 <style>
