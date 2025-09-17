@@ -927,6 +927,223 @@
     },
     "confirm_delete": "Sei sicuro di voler eliminare questo utente?"
   },
+  "admin_users": {
+    "title": "Utenti",
+    "subtitle": "Gestisci gli account della piattaforma.",
+    "create": {
+      "email_placeholder": "Email",
+      "password_placeholder": "Password",
+      "submit": "Aggiungi utente"
+    },
+    "search": {
+      "aria": "Cerca utenti",
+      "placeholder": "Cerca utenti per nome o email…",
+      "input_aria": "Cerca utenti per nome o email",
+      "clear": "Pulisci ricerca"
+    },
+    "table": {
+      "headers": {
+        "username": "Nome utente",
+        "email": "Email",
+        "phone": "Telefono",
+        "role": "Ruolo",
+        "bar": "Locale",
+        "credit": "Credito",
+        "actions": "Azioni"
+      }
+    },
+    "actions": {
+      "view": "Dettagli",
+      "edit": "Modifica"
+    }
+  },
+  "admin_profile": {
+    "title": "Profilo",
+    "fields": {
+      "username": "Nome utente:",
+      "email": "Email:",
+      "phone": "Telefono:"
+    }
+  },
+  "admin_edit_bar_options": {
+    "back": "Torna ai locali",
+    "title": "Modifica {bar}",
+    "subtitle": "Seleziona una sezione da gestire per questo locale.",
+    "cards": {
+      "info": {
+        "title": "Informazioni di base",
+        "body": "Modifica nome, indirizzo, contatti e orari di apertura.",
+        "cta": "Modifica"
+      },
+      "menu": {
+        "title": "Menù e categorie",
+        "body": "Organizza le categorie e gestisci gli articoli del menù.",
+        "cta": "Gestisci"
+      },
+      "users": {
+        "title": "Utenti",
+        "body": "Invita o rimuovi lo staff e imposta i ruoli.",
+        "cta": "Gestisci"
+      },
+      "tables": {
+        "title": "Tavoli",
+        "body": "Crea, rinomina e organizza i numeri dei tavoli.",
+        "cta": "Gestisci"
+      }
+    }
+  },
+  "admin_notifications": {
+    "title": "Notifiche",
+    "subtitle": "Invia messaggi agli utenti.",
+    "actions": {
+      "new": "Nuovo messaggio",
+      "edit_welcome": "Modifica messaggio di benvenuto"
+    },
+    "sent": {
+      "title": "Notifiche inviate",
+      "headers": {
+        "id": "ID",
+        "recipient": "Destinatario",
+        "subject": "Oggetto",
+        "message": "Messaggio",
+        "sent": "Inviata",
+        "sender": "Mittente",
+        "actions": "Azioni"
+      },
+      "actions": {
+        "view": "Dettagli",
+        "delete": "Elimina"
+      }
+    },
+    "recipient": {
+      "all": "Tutti gli utenti"
+    },
+    "dialog": {
+      "prompt": "Sei sicuro di voler eliminare questa notifica?",
+      "cancel": "Annulla",
+      "confirm": "Elimina"
+    }
+  },
+  "admin_new_bar": {
+    "title": "Crea nuovo locale",
+    "form": {
+      "name": "Nome",
+      "address": "Indirizzo",
+      "city": "Città",
+      "state": "Cantone",
+      "description": "Descrizione",
+      "photo": "Foto",
+      "categories": "Categorie",
+      "manual_closed": "Chiudi il locale manualmente",
+      "hours": {
+        "day": "Giorno",
+        "open": "Apertura",
+        "close": "Chiusura"
+      },
+      "submit": "Crea locale"
+    },
+    "days": {
+      "monday": "Lunedì",
+      "tuesday": "Martedì",
+      "wednesday": "Mercoledì",
+      "thursday": "Giovedì",
+      "friday": "Venerdì",
+      "saturday": "Sabato",
+      "sunday": "Domenica"
+    },
+    "alerts": {
+      "max_categories": "Seleziona fino a 5 categorie"
+    }
+  },
+  "admin_edit_welcome": {
+    "title": "Modifica messaggio di benvenuto",
+    "form": {
+      "subject": "Oggetto",
+      "message": "Messaggio",
+      "save": "Salva"
+    }
+  },
+  "admin_notification_view": {
+    "title": "Notifica {id}",
+    "subtitle": "Dettagli e destinatari.",
+    "actions": {
+      "back": "Indietro",
+      "back_to_list": "Torna all'elenco"
+    },
+    "details": {
+      "recipient_target": "Destinatari",
+      "subject": "Oggetto",
+      "message": "Messaggio",
+      "link": "Link",
+      "sent": "Inviata",
+      "sender": "Mittente"
+    },
+    "recipients": {
+      "title": "Destinatari",
+      "headers": {
+        "id": "ID",
+        "username": "Nome utente",
+        "email": "Email",
+        "read": "Letta"
+      },
+      "read_yes": "Sì",
+      "read_no": "No"
+    }
+  },
+  "admin_view_user": {
+    "title": "Utente: {user}",
+    "subtitle": "Dettagli account e attività.",
+    "profile": {
+      "title": "Profilo",
+      "email": "Email:",
+      "phone": "Telefono:",
+      "role": "Ruolo:",
+      "credit": "Credito:",
+      "bars": "Locali:"
+    },
+    "orders": {
+      "title": "Ordini",
+      "subtitle": "Dal più recente. Scorri per visualizzare gli ordini più vecchi.",
+      "table": {
+        "headers": {
+          "id": "ID",
+          "bar": "Locale",
+          "total": "Totale",
+          "status": "Stato",
+          "placed": "Inviato",
+          "actions": "Azioni"
+        }
+      },
+      "actions": {
+        "view": "Dettagli"
+      },
+      "empty": "Nessun ordine trovato."
+    },
+    "logins": {
+      "title": "Attività di accesso",
+      "subtitle": "Dal più recente. Scorri per visualizzare gli accessi precedenti.",
+      "table": {
+        "headers": {
+          "ip": "IP",
+          "user_agent": "User agent",
+          "location": "Posizione",
+          "date": "Data"
+        }
+      },
+      "empty": "Nessun accesso trovato."
+    },
+    "audit": {
+      "title": "Log di audit",
+      "subtitle": "Dal più recente. Scorri per visualizzare i log precedenti.",
+      "table": {
+        "headers": {
+          "action": "Azione",
+          "date": "Data"
+        }
+      },
+      "empty": "Nessuna attività trovata."
+    }
+  },
   "bartender_dashboard": {
     "title": "Dashboard bartender",
     "sections": {
@@ -1076,6 +1293,17 @@
       },
       "confirm_delete": "Sei sicuro di voler eliminare questo prodotto?",
       "empty": "Nessun prodotto in questa categoria."
+    }
+  },
+  "topup": {
+    "title": "Ricarica crediti",
+    "form": {
+      "amount_label": "Importo",
+      "submit": "Top up with card"
+    },
+    "alerts": {
+      "invalid_amount": "Importo non valido",
+      "failed": "Impossibile avviare la ricarica"
     }
   },
   "order_success": {

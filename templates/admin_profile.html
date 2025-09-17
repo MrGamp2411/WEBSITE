@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Profile</h1>
+<h1>{{ _('admin_profile.title', default='Profile') }}</h1>
 <div class="card">
   <div class="card__body">
-    <p><strong>Username:</strong> {{ user.username }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Phone:</strong> {{ user.prefix }} {{ user.phone }}</p>
+    <p><strong>{{ _('admin_profile.fields.username', default='Username:') }}</strong> {{ user.username }}</p>
+    <p><strong>{{ _('admin_profile.fields.email', default='Email:') }}</strong> {{ user.email }}</p>
+    <p><strong>{{ _('admin_profile.fields.phone', default='Phone:') }}</strong> {{ user.prefix }} {{ user.phone }}</p>
   </div>
 </div>
 {% endblock %}

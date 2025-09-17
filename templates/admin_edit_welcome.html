@@ -3,20 +3,20 @@
 <section class="users-page">
   <header class="users-toolbar">
     <div class="title-wrap">
-      <h1>Edit Welcome Message</h1>
+      <h1>{{ _('admin_edit_welcome.title', default='Edit Welcome Message') }}</h1>
     </div>
   </header>
   {% if error %}
   <p class="alert-danger">{{ error }}</p>
   {% endif %}
   <form class="form" method="post" action="/admin/notifications/welcome">
-    <label>Subject
+    <label>{{ _('admin_edit_welcome.form.subject', default='Subject') }}
       <input type="text" name="subject" value="{{ subject }}" maxlength="30" required>
     </label>
-    <label>Message
+    <label>{{ _('admin_edit_welcome.form.message', default='Message') }}
       <textarea name="body" required>{{ body }}</textarea>
     </label>
-    <button class="btn btn--primary" type="submit">Save</button>
+    <button class="btn btn--primary" type="submit">{{ _('admin_edit_welcome.form.save', default='Save') }}</button>
   </form>
 </section>
 {% endblock %}
