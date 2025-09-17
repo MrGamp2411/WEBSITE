@@ -624,5 +624,884 @@
     "actions": {
       "home": "Retour à l'accueil"
     }
+  },
+  "admin_analytics": {
+    "title": "Analytique",
+    "tabs": {
+      "overview": "Aperçu",
+      "revenue": "Revenus et frais",
+      "orders": "Commandes et opérations",
+      "products": "Produits / menu",
+      "clients": "Clients et crédits",
+      "finance": "Finance",
+      "refunds": "Remboursement",
+      "exports": "Exportations"
+    },
+    "overview": {
+      "metrics": {
+        "orders": "Ordres",
+        "orders_tooltip": "Nombre total de commandes dans la période sélectionnée",
+        "gmv_gross": "GMV brut",
+        "gmv_gross_tooltip": "Valeur totale de commande avant les taxes et les frais",
+        "gmv_net": "GMV net",
+        "gmv_net_tooltip": "Valeur totale de commande après impôts et frais",
+        "aov": "Aov",
+        "aov_tooltip": "Valeur de commande moyenne",
+        "fees": "Frais de siplygo",
+        "fees_tooltip": "Montant et pourcentage de commission conservés par siplygo",
+        "net_to_bar": "Net à barre",
+        "net_to_bar_tooltip": "Montant dû à la barre après les frais et les taxes",
+        "tips": "Conseils",
+        "tips_tooltip": "Total des conseils collectés via la plate-forme",
+        "cancel_rate": "Taux d'annulation",
+        "cancel_rate_tooltip": "Pourcentage des commandes annulées sur total"
+      },
+      "highlights": {
+        "peak_hour": "Heure de pointe",
+        "peak_hour_tooltip": "Place horaire avec le plus grand nombre de commandes",
+        "top_category": "Catégorie supérieure",
+        "top_category_tooltip": "Catégorie de produits avec des revenus les plus élevés",
+        "top_bar": "Barre supérieure",
+        "top_bar_tooltip": "Bar avec un volume de vente le plus élevé"
+      }
+    },
+    "revenue": {
+      "headers": {
+        "bar": "Bar",
+        "gmv": "GMV",
+        "vat": "T.V.A.",
+        "commission": "Commission",
+        "take_rate": "Prendre le taux",
+        "net": "Filet"
+      }
+    },
+    "orders": {
+      "total_cancellations": "Annulations totales: {count}"
+    },
+    "products": {
+      "headers": {
+        "product": "Produit",
+        "quantity": "Quantité",
+        "revenue": "Revenu"
+      }
+    },
+    "clients": {
+      "metrics": {
+        "new": "Nouveau",
+        "new_tooltip": "Les clients qui ont passé leur première commande",
+        "returning": "Retour",
+        "returning_tooltip": "Les clients qui ont passé plus d'une commande"
+      },
+      "headers": {
+        "customer": "Client",
+        "orders": "# commandes",
+        "spend": "Dépenser",
+        "last_purchase": "Dernier achat"
+      }
+    },
+    "finance": {
+      "headers": {
+        "period": "Période",
+        "amount": "Montant",
+        "status": "Statut"
+      },
+      "total_vat": "TVA totale: CHF {amount}"
+    },
+    "refunds": {
+      "total": "Remboursements totaux : CHF {amount} ({count} commandes)"
+    },
+    "exports": {
+      "message": "Les exportations de CSV et les rapports prévus seront bientôt disponibles."
+    },
+    "charts": {
+      "gmv": "GMV",
+      "orders": "# Commandes",
+      "commission": "Commission",
+      "net": "Filet",
+      "orders_per_hour": "Commandes / heure"
+    }
+  },
+  "admin_audit_logs": {
+    "title": "Journaux d'audit",
+    "subtitle": "Examiner l'activité du système.",
+    "filters": {
+      "username": "Utilisateur",
+      "bar": "Bar",
+      "all_actions": "Toutes les actions"
+    },
+    "table": {
+      "headers": {
+        "time": "Temps",
+        "user": "Utilisateur",
+        "credit": "Crédit",
+        "action": "Action",
+        "entity": "Entité",
+        "entity_id": "ID de l'entité",
+        "bar": "Bar",
+        "details": "Détails"
+      }
+    }
+  },
+  "admin_tables": {
+    "edit": {
+      "title": "Modifier la table pour {bar}"
+    },
+    "new": {
+      "title": "Ajouter une table pour {bar}"
+    },
+    "form": {
+      "labels": {
+        "name": "Nom",
+        "description": "Description"
+      },
+      "actions": {
+        "save": "Sauvegarder",
+        "create": "Créer"
+      }
+    },
+    "manage": {
+      "title": "Gérer les tables pour {bar}",
+      "subtitle": "Ajoutez, modifiez et organisez des tables pour ce lieu.",
+      "search": {
+        "aria": "Tables de recherche",
+        "placeholder": "Tables de recherche…",
+        "input_aria": "Rechercher des tables par nom ou description",
+        "clear": "Recherche claire"
+      },
+      "actions": {
+        "add": "Ajouter la table",
+        "edit": "Modifier",
+        "delete": "Supprimer"
+      },
+      "table": {
+        "headers": {
+          "name": "Nom",
+          "description": "Description",
+          "actions": "Actes"
+        }
+      },
+      "empty": "Pas encore de tables.",
+      "confirm_delete": "Êtes-vous sûr de vouloir supprimer ce tableau?",
+      "dialog": {
+        "cancel": "Annuler",
+        "delete": "Supprimer"
+      }
+    }
+  },
+  "admin_bar_users": {
+    "title": "Gérer les utilisateurs pour {bar}",
+    "subtitle": "Ajouter ou affecter du personnel à ce lieu.",
+    "add_existing": {
+      "summary": "Ajouter l'utilisateur existant",
+      "email": "E-mail",
+      "role": "Rôle",
+      "assigning": "Attribution à {bar}",
+      "submit": "Ajouter"
+    },
+    "roles": {
+      "bar_admin": "Barre",
+      "bartender": "Barman"
+    },
+    "search": {
+      "aria": "Rechercher les utilisateurs",
+      "placeholder": "Recherchez les utilisateurs par nom ou e-mail…",
+      "input_aria": "Recherchez les utilisateurs par nom ou e-mail",
+      "clear": "Recherche claire"
+    },
+    "sections": {
+      "current_staff": "Personnel actuel"
+    },
+    "table": {
+      "headers": {
+        "username": "Nom d'utilisateur",
+        "email": "E-mail",
+        "role": "Rôle",
+        "actions": "Actes"
+      }
+    },
+    "actions": {
+      "remove": "Retirer"
+    },
+    "confirm_remove": "Êtes-vous sûr de vouloir supprimer cet utilisateur?",
+    "dialog": {
+      "cancel": "Annuler",
+      "remove": "Retirer"
+    }
+  },
+  "admin_bars": {
+    "title": "Bars",
+    "subtitle": "Créez, modifiez et gérez des lieux sur la plate-forme.",
+    "search": {
+      "aria": "Barres de recherche",
+      "placeholder": "Recherchez les barres par nom…",
+      "input_aria": "Barres de recherche par nom",
+      "clear": "Recherche claire"
+    },
+    "actions": {
+      "add": "Ajouter une barre",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    },
+    "table": {
+      "headers": {
+        "number": "Non.",
+        "name": "Nom",
+        "address": "Adresse",
+        "city": "Ville",
+        "canton": "Canton",
+        "actions": "Actes"
+      }
+    },
+    "confirm_delete": "Êtes-vous sûr de vouloir supprimer cette barre?",
+    "dialog": {
+      "cancel": "Annuler",
+      "delete": "Supprimer"
+    }
+  },
+  "admin_change_user_password": {
+    "title": "Modifier le mot de passe pour {user}",
+    "form": {
+      "new_password": "Nouveau mot de passe",
+      "confirm_password": "Confirmez le mot de passe",
+      "save": "Sauvegarder"
+    }
+  },
+  "admin_dashboard": {
+    "title": "Tableau de bord administratif",
+    "subtitle": "Votre centre de contrôle pour gérer les lieux, les utilisateurs, les paiements et l'analyse.",
+    "sections": {
+      "management": {
+        "aria": "Gestion",
+        "title": "Gestion"
+      },
+      "insights": {
+        "aria": "Connaissances",
+        "title": "Connaissances"
+      },
+      "account": {
+        "aria": "Compte",
+        "title": "Compte"
+      },
+      "danger": {
+        "aria": "Zone de danger",
+        "title": "Zone de danger"
+      }
+    },
+    "cards": {
+      "bars": {
+        "title": "Bars",
+        "description": "Créez et gérez des lieux.",
+        "action": "Gérer les bars"
+      },
+      "users": {
+        "title": "Utilisateurs",
+        "description": "Gérez les utilisateurs et les rôles de la plate-forme.",
+        "action": "Gérer les utilisateurs"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Envoyer des messages aux utilisateurs.",
+        "action": "Gérer les notifications"
+      },
+      "payments": {
+        "title": "Paiements",
+        "description": "Passez en revue les paiements, les factures et les revenus des commandes.",
+        "action": "Gérer les paiements"
+      },
+      "analytics": {
+        "title": "Analytique",
+        "description": "Suivre les commandes, les revenus et l'activité.",
+        "action": "Voir l'analyse"
+      },
+      "audit": {
+        "title": "Journaux d'audit",
+        "description": "Passez en revue l'activité utilisateur.",
+        "action": "Afficher les journaux d'audit"
+      },
+      "profile": {
+        "title": "Profil",
+        "description": "Mettez à jour votre profil d'administration et vos paramètres de sécurité.",
+        "action": "Afficher le profil"
+      },
+      "danger": {
+        "title": "Zone de danger",
+        "description": "Supprimez toutes les commandes pour une ardoise propre.",
+        "action": "Supprimer toutes les commandes"
+      }
+    },
+    "danger": {
+      "confirm": "Supprimer toutes les commandes?"
+    }
+  },
+  "admin_edit_user": {
+    "title": "Modifier l'utilisateur {user}",
+    "dialog": {
+      "ok": "D'ACCORD",
+      "cancel": "Annuler",
+      "delete": "Supprimer"
+    },
+    "form": {
+      "username": "Nom d'utilisateur",
+      "email": "E-mail",
+      "prefix": "Préfixe",
+      "phone": "Téléphone",
+      "role": "Rôle",
+      "add_credit": "Ajouter du crédit",
+      "remove_credit": "Supprimer le crédit"
+    },
+    "actions": {
+      "edit_password": "Modifier le mot de passe",
+      "remove": "Retirer",
+      "add": "Ajouter",
+      "save": "Sauvegarder",
+      "delete": "Supprimer"
+    },
+    "prefixes": {
+      "ch": "+41 (Suisse)",
+      "it": "+39 (Italie)",
+      "de": "+49 (Allemagne)",
+      "fr": "+33 (France)"
+    },
+    "roles": {
+      "super_admin": "Super administrateur",
+      "bar_admin": "Barre",
+      "bartender": "Barman",
+      "display": "Afficher",
+      "customer": "Client"
+    },
+    "sections": {
+      "assigned": "Barres assignées",
+      "assign": "Attribuer une barre"
+    },
+    "assigned_search": {
+      "aria": "Recherche des barres attribuées",
+      "placeholder": "Recherchez les barres par nom…",
+      "input_aria": "Recherche des barres attribuées par son nom",
+      "clear": "Recherche claire"
+    },
+    "available_search": {
+      "aria": "Recherche de barres disponibles",
+      "placeholder": "Recherchez les barres par nom…",
+      "input_aria": "Recherche des barres disponibles par nom",
+      "clear": "Recherche claire"
+    },
+    "table": {
+      "headers": {
+        "number": "Non.",
+        "name": "Nom",
+        "city": "Ville",
+        "actions": "Actes"
+      }
+    },
+    "confirm_delete": "Êtes-vous sûr de vouloir supprimer cet utilisateur?"
+  },
+  "admin_users": {
+    "title": "Utilisateurs",
+    "subtitle": "Gérer les comptes de plate-forme.",
+    "create": {
+      "email_placeholder": "E-mail",
+      "password_placeholder": "Mot de passe",
+      "submit": "Ajouter l'utilisateur"
+    },
+    "search": {
+      "aria": "Rechercher les utilisateurs",
+      "placeholder": "Recherchez les utilisateurs par nom ou e-mail…",
+      "input_aria": "Recherchez les utilisateurs par nom ou e-mail",
+      "clear": "Recherche claire"
+    },
+    "table": {
+      "headers": {
+        "username": "Nom d'utilisateur",
+        "email": "E-mail",
+        "phone": "Téléphone",
+        "role": "Rôle",
+        "bar": "Bar",
+        "credit": "Crédit",
+        "actions": "Actes"
+      }
+    },
+    "actions": {
+      "view": "Voir",
+      "edit": "Modifier"
+    }
+  },
+  "admin_profile": {
+    "title": "Profil",
+    "fields": {
+      "username": "Nom d'utilisateur:",
+      "email": "E-mail:",
+      "phone": "Téléphone:"
+    }
+  },
+  "admin_edit_bar": {
+    "title": "Éditer la barre",
+    "cards": {
+      "details": {
+        "title": "Détails"
+      },
+      "media": {
+        "title": "Média & amp; Heures"
+      }
+    },
+    "fields": {
+      "name": "Nom",
+      "address": "Adresse",
+      "city": "Ville",
+      "state": "Canton",
+      "description": "Description",
+      "categories": "Catégories",
+      "photo": "Photo",
+      "rating": "Notation",
+      "manual_closed": "Fermer le bar manuellement"
+    },
+    "help": {
+      "description": "Description courte et claire. Les liens seront ignorés.",
+      "categories": "Cliquez pour sélectionner / désélectionner. Les éléments sélectionnés sont mis en évidence."
+    },
+    "categories": {
+      "count": "{selected}/{max} sélectionnés"
+    },
+    "media": {
+      "photo_alt": "{bar} Photo"
+    },
+    "days": {
+      "monday": "Lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "friday": "Vendredi",
+      "saturday": "Samedi",
+      "sunday": "Dimanche"
+    },
+    "hours": {
+      "day": "Jour",
+      "open": "Ouvrir",
+      "close": "Fermer"
+    },
+    "actions": {
+      "save": "Sauvegarder"
+    }
+  },
+  "admin_edit_bar_options": {
+    "back": "Retour aux bars",
+    "title": "Modifier {bar}",
+    "subtitle": "Sélectionnez une section à gérer pour ce lieu.",
+    "cards": {
+      "info": {
+        "title": "Informations de base",
+        "body": "Modifier le nom, l'adresse, les heures de contact et d'ouverture.",
+        "cta": "Modifier"
+      },
+      "menu": {
+        "title": "Menu & amp; Catégories",
+        "body": "Organisez les catégories et gérez les éléments de menu.",
+        "cta": "Gérer"
+      },
+      "users": {
+        "title": "Utilisateurs",
+        "body": "Inviter ou supprimer le personnel et définir des rôles.",
+        "cta": "Gérer"
+      },
+      "tables": {
+        "title": "Tables",
+        "body": "Créer, renommer et organiser des numéros de table.",
+        "cta": "Gérer"
+      }
+    }
+  },
+  "admin_notifications": {
+    "title": "Notifications",
+    "subtitle": "Envoyer des messages aux utilisateurs.",
+    "actions": {
+      "new": "Nouveau message",
+      "edit_welcome": "Modifier la bienvenue"
+    },
+    "sent": {
+      "title": "Notifications envoyées",
+      "headers": {
+        "id": "IDENTIFIANT",
+        "recipient": "Destinataire",
+        "subject": "Sujet",
+        "message": "Message",
+        "sent": "Envoyé",
+        "sender": "Expéditeur",
+        "actions": "Actes"
+      },
+      "actions": {
+        "view": "Voir",
+        "delete": "Supprimer"
+      }
+    },
+    "recipient": {
+      "all": "Tous les utilisateurs"
+    },
+    "dialog": {
+      "prompt": "Êtes-vous sûr de vouloir supprimer cette notification?",
+      "cancel": "Annuler",
+      "confirm": "Supprimer"
+    }
+  },
+  "admin_new_notification": {
+    "title": "Nouvelle notification",
+    "subtitle": "Envoyer un message aux utilisateurs.",
+    "form": {
+      "target": {
+        "label": "Cible",
+        "options": {
+          "all": "Tous les utilisateurs",
+          "user": "Utilisateur spécifique",
+          "bar": "Utilisateurs de Bar"
+        }
+      },
+      "subject": "Sujet",
+      "message": "Message",
+      "link_url": "URL de liaison",
+      "image": "Image",
+      "attachment": "Pièce jointe",
+      "submit": "Envoyer"
+    },
+    "user_section": {
+      "title": "Sélectionner l'utilisateur",
+      "search": {
+        "aria": "Rechercher les utilisateurs",
+        "placeholder": "Recherchez les utilisateurs…",
+        "input_aria": "Rechercher les utilisateurs",
+        "clear": "Recherche claire"
+      },
+      "table": {
+        "headers": {
+          "id": "IDENTIFIANT",
+          "username": "Nom d'utilisateur",
+          "email": "E-mail",
+          "actions": "Actes"
+        }
+      }
+    },
+    "bar_section": {
+      "title": "Sélectionner la barre",
+      "search": {
+        "aria": "Barres de recherche",
+        "placeholder": "Barres de recherche…",
+        "input_aria": "Barres de recherche",
+        "clear": "Recherche claire"
+      },
+      "table": {
+        "headers": {
+          "id": "IDENTIFIANT",
+          "name": "Nom",
+          "city": "Ville",
+          "actions": "Actes"
+        }
+      }
+    },
+    "actions": {
+      "select": "Sélectionner",
+      "selected": "Choisi"
+    },
+    "alerts": {
+      "select_user": "Veuillez sélectionner un utilisateur.",
+      "select_bar": "Veuillez sélectionner une barre."
+    }
+  },
+  "admin_new_bar": {
+    "title": "Créer une nouvelle barre",
+    "form": {
+      "name": "Nom",
+      "address": "Adresse",
+      "city": "Ville",
+      "state": "État",
+      "description": "Description",
+      "photo": "Photo",
+      "categories": "Catégories",
+      "manual_closed": "Fermer le bar manuellement",
+      "hours": {
+        "day": "Jour",
+        "open": "Ouvrir",
+        "close": "Fermer"
+      },
+      "submit": "Créer une barre"
+    },
+    "days": {
+      "monday": "Lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "friday": "Vendredi",
+      "saturday": "Samedi",
+      "sunday": "Dimanche"
+    },
+    "alerts": {
+      "max_categories": "Sélectionnez jusqu'à 5 catégories"
+    }
+  },
+  "admin_edit_welcome": {
+    "title": "Modifier le message de bienvenue",
+    "form": {
+      "subject": "Sujet",
+      "message": "Message",
+      "save": "Sauvegarder"
+    }
+  },
+  "admin_notification_view": {
+    "title": "Notification {id}",
+    "subtitle": "Détails et destinataires.",
+    "actions": {
+      "back": "Dos",
+      "back_to_list": "Retour à la liste"
+    },
+    "details": {
+      "recipient_target": "Cible bénéficiaire",
+      "subject": "Sujet",
+      "message": "Message",
+      "link": "Lien",
+      "sent": "Envoyé",
+      "sender": "Expéditeur"
+    },
+    "recipients": {
+      "title": "Récipiendaire",
+      "headers": {
+        "id": "IDENTIFIANT",
+        "username": "Nom d'utilisateur",
+        "email": "E-mail",
+        "read": "Lire"
+      },
+      "read_yes": "Oui",
+      "read_no": "Non"
+    }
+  },
+  "admin_payments": {
+    "title": "Paiements",
+    "subtitle": "Examiner les revenus et les fermetures du barreau.",
+    "search": {
+      "aria": "Barres de recherche",
+      "placeholder": "Recherchez les barres par nom…",
+      "input_aria": "Barres de recherche par nom",
+      "clear": "Recherche claire"
+    },
+    "table": {
+      "headers": {
+        "name": "Nom",
+        "actions": "Actes"
+      }
+    },
+    "actions": {
+      "view": "Voir",
+      "add_test": "Ajouter la fermeture du test",
+      "delete_test": "Supprimer la fermeture du test"
+    }
+  },
+  "admin_view_user": {
+    "title": "Utilisateur: {user}",
+    "subtitle": "Détails et activité du compte.",
+    "profile": {
+      "title": "Profil",
+      "email": "E-mail:",
+      "phone": "Téléphone:",
+      "role": "Rôle:",
+      "credit": "Crédit:",
+      "bars": "Bars:"
+    },
+    "orders": {
+      "title": "Ordres",
+      "subtitle": "Le plus récent en premier. Faites défiler pour afficher les commandes plus anciennes.",
+      "table": {
+        "headers": {
+          "id": "IDENTIFIANT",
+          "bar": "Bar",
+          "total": "Total",
+          "status": "Statut",
+          "placed": "Mis",
+          "actions": "Actes"
+        }
+      },
+      "actions": {
+        "view": "Voir"
+      },
+      "empty": "Aucune commande trouvée."
+    },
+    "logins": {
+      "title": "Activité de connexion",
+      "subtitle": "Le plus récent en premier. Faites défiler pour afficher les connexions plus anciennes.",
+      "table": {
+        "headers": {
+          "ip": "IP",
+          "user_agent": "Agent utilisateur",
+          "location": "Emplacement",
+          "date": "Date"
+        }
+      },
+      "empty": "Aucune connexion trouvée."
+    },
+    "audit": {
+      "title": "Journaux d'audit",
+      "subtitle": "Le plus récent en premier. Faites défiler pour afficher les anciens journaux.",
+      "table": {
+        "headers": {
+          "action": "Action",
+          "date": "Date"
+        }
+      },
+      "empty": "Aucune activité trouvée."
+    }
+  },
+  "bartender_dashboard": {
+    "title": "Tableau de bord barman",
+    "sections": {
+      "bars": {
+        "title": "Vos bars",
+        "aria": "Bars"
+      }
+    },
+    "empty": "Aucune barre affectée."
+  },
+  "bartender_orders": {
+    "title": "{bar} ORDERS",
+    "pause": "Commande de pause",
+    "sections": {
+      "incoming": "Ordres entrants",
+      "preparing": "Préparation",
+      "ready": "Prêt",
+      "completed": "Complété"
+    },
+    "actions": {
+      "accept": "Accepter",
+      "cancel": "Annuler",
+      "ready": "Prêt",
+      "complete": "Complet"
+    }
+  },
+  "bar_admin_dashboard": {
+    "title": "Tableau de bord d'administration du bar",
+    "sections": {
+      "bars": {
+        "title": "Vos bars",
+        "aria": "Bars"
+      }
+    },
+    "actions": {
+      "edit": "Éditer la barre",
+      "orders": "Gérer les commandes"
+    },
+    "empty": "Aucune barre affectée."
+  },
+  "bartender_confirm": {
+    "title": "Enregistrement du barman",
+    "body": "Vous êtes maintenant enregistré en tant que barman pour {bar}.",
+    "cta": "Aller au tableau de bord"
+  },
+  "display_orders": {
+    "sections": {
+      "preparing": "Préparation",
+      "ready": "Prêt"
+    },
+    "card": {
+      "title": "Commande {code}"
+    }
+  },
+  "bar_admin_history": {
+    "title": "{bar} - Historique et revenus de commande",
+    "month_title": "{bar} - {month}",
+    "orders_title": "{bar} - Ordres de {date}",
+    "actions": {
+      "view": "Voir",
+      "confirm": "Confirmer le paiement"
+    },
+    "metrics": {
+      "total_collected": "Total collecté",
+      "total_earned": "Total mérité",
+      "commission": "Commission Siplygo (5%)",
+      "payout": "Montant à payer à Bar"
+    },
+    "breakdown": {
+      "title": "Répartition des paiements:"
+    },
+    "empty": {
+      "history": "Pas encore d'historique de commande.",
+      "orders": "Pas de commandes."
+    }
+  },
+  "bar_admin_orders": {
+    "title": "{bar} ORDERS",
+    "actions": {
+      "history": "Historique des commandes et revenus"
+    }
+  },
+  "bar_categories": {
+    "manage": {
+      "title": "Gérer les catégories pour {bar}",
+      "subtitle": "Créez, modifiez et organisez des catégories de menu pour ce lieu.",
+      "search": {
+        "aria": "Catégories de recherche",
+        "placeholder": "Catégories de recherche…",
+        "input_aria": "Catégories de recherche par nom",
+        "clear": "Recherche claire"
+      },
+      "actions": {
+        "add": "Ajouter une catégorie",
+        "products": "Produits",
+        "edit": "Modifier",
+        "delete": "Supprimer"
+      },
+      "table": {
+        "headers": {
+          "name": "Nom",
+          "description": "Description",
+          "actions": "Actes"
+        }
+      },
+      "confirm_delete": "Êtes-vous sûr de vouloir supprimer cette catégorie?",
+      "empty": "Pas encore de catégories."
+    },
+    "form": {
+      "name": "Nom",
+      "description": "Description",
+      "display_order": "Commande d'affichage",
+      "create": "Créer",
+      "save": "Sauvegarder"
+    },
+    "new": {
+      "title": "Ajouter une catégorie pour {bar}"
+    },
+    "edit": {
+      "title": "Modifier la catégorie pour {bar}"
+    }
+  },
+  "bar_products": {
+    "edit": {
+      "title": "Modifier le produit {product}"
+    },
+    "new": {
+      "title": "Ajouter un produit à {category}"
+    },
+    "form": {
+      "name": "Nom",
+      "price": "Prix ​​(CHF)",
+      "description": "Description",
+      "display_order": "Commande d'affichage",
+      "photo": "Photo",
+      "create": "Créer",
+      "update": "Mise à jour"
+    },
+    "manage": {
+      "title": "Produits en {category} pour {bar}",
+      "subtitle": "Ajouter, modifier et organiser des produits pour cette catégorie.",
+      "actions": {
+        "add": "Ajouter le produit",
+        "edit": "Modifier",
+        "delete": "Supprimer"
+      },
+      "table": {
+        "headers": {
+          "order": "Commande",
+          "photo": "Photo",
+          "name": "Nom",
+          "description": "Description",
+          "price": "Prix ​​(CHF)",
+          "actions": "Actes"
+        }
+      },
+      "confirm_delete": "Êtes-vous sûr de vouloir supprimer ce produit?",
+      "empty": "Pas de produits dans cette catégorie."
+    }
   }
 }
