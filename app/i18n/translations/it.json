@@ -467,7 +467,8 @@
   "notices": {
     "payment_failed": {
       "title": "Pagamento non riuscito",
-      "body": "Il pagamento non è andato a buon fine. Riprova oppure contatta il nostro staff se il problema persiste."
+      "body": "Il pagamento non è andato a buon fine. Riprova oppure contatta il nostro staff se il problema persiste.",
+      "close": "Chiudi"
     }
   },
   "notifications": {
@@ -1474,7 +1475,7 @@
     "title": "Ricarica crediti",
     "form": {
       "amount_label": "Importo",
-      "submit": "Top up with card"
+      "submit": "Ricarica con carta"
     },
     "alerts": {
       "invalid_amount": "Importo non valido",
