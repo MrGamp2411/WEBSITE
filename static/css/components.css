@@ -96,7 +96,7 @@ body.dark-mode{
 .mobile-menu a:focus-visible,.mobile-menu button:focus-visible{outline:2px solid var(--sg-purple-600);outline-offset:3px;box-shadow:none;}
 .menu-language{justify-content:flex-start;}
 .menu-language__code{font-size:.9rem;font-weight:600;text-transform:uppercase;color:var(--muted);margin-left:auto;text-align:right;}
-.language-backdrop{z-index:1002;}
+.language-backdrop{z-index:1250;}
 .language-dialog{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1300;transition:opacity .22s var(--ease);opacity:0;}
 .language-dialog[hidden]{display:none;}
 .language-dialog.is-open{opacity:1;}
