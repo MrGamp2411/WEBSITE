@@ -3,5 +3,356 @@
     "language": "Français",
     "code": "fr",
     "fallback": "en"
+  },
+  "orders": {
+    "statuses": {
+      "placed": "Passée",
+      "accepted": "Acceptée",
+      "ready": "Prête",
+      "completed": "Terminée",
+      "canceled": "Annulée",
+      "rejected": "Refusée"
+    },
+    "payment_methods": {
+      "card": "Carte",
+      "credit_card": "Carte de crédit",
+      "wallet": "Portefeuille",
+      "bar": "Payer au bar"
+    }
+  },
+  "notices": {
+    "payment_failed": {
+      "title": "Paiement échoué",
+      "body": "Le paiement n'a pas abouti. Veuillez réessayer ou contacter notre équipe si le problème persiste."
+    },
+    "payment_success": {
+      "title": "Paiement réussi",
+      "body": "Votre portefeuille a été crédité."
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Vos messages.",
+    "empty": "Aucune notification."
+  },
+  "notification_detail": {
+    "subtitle": "Détails de la notification.",
+    "back": "Retour",
+    "download": "Télécharger la pièce jointe",
+    "image_alt": "Image de la notification"
+  },
+  "cart": {
+    "title": "Votre panier",
+    "subtitle": "Vérifiez votre commande, choisissez votre table et confirmez le paiement.",
+    "wallet": {
+      "label": "Portefeuille :",
+      "add_funds": "Ajouter des fonds"
+    },
+    "table": {
+      "headers": {
+        "item": "Article",
+        "quantity": "Quantité",
+        "price": "Prix",
+        "total": "Total",
+        "actions": "Actions"
+      },
+      "update": "Mettre à jour",
+      "remove": "Retirer"
+    },
+    "form": {
+      "table": {
+        "label": "Table",
+        "placeholder": "Sélectionner une table"
+      },
+      "notes": {
+        "label": "Message au barman",
+        "placeholder": "Ajoutez une note pour le barman"
+      }
+    },
+    "payment": {
+      "title": "Moyen de paiement",
+      "options": {
+        "card": {
+          "title": "Carte de crédit",
+          "note": "Payer maintenant par carte"
+        },
+        "wallet": {
+          "title": "Crédit portefeuille",
+          "note": "Utiliser votre crédit"
+        },
+        "bar": {
+          "title": "Payer au bar",
+          "note": "Payer au comptoir"
+        }
+      }
+    },
+    "summary": {
+      "title": "Récapitulatif de la commande",
+      "subtotal": "Sous-total",
+      "fees": "Frais",
+      "total": "Total",
+      "submit": "Passer la commande",
+      "fee_note": "Les commandes inférieures à 10 CHF incluent des frais de 0,20 CHF.",
+      "secure": "Votre paiement sera traité en toute sécurité."
+    },
+    "empty": {
+      "message": "Votre panier est vide."
+    },
+    "errors": {
+      "other_bar": "Veuillez vider votre panier avant de commander dans un autre bar."
+    }
+  },
+  "search": {
+    "view_all": "Tout afficher",
+    "view_all_recent_aria": "Tout afficher : Bars récemment visités",
+    "sections": {
+      "recent": "Bars récemment visités",
+      "nearby": "Les plus proches de vous",
+      "top": "Les mieux notés",
+      "popular": "Recommandés"
+    },
+    "empty": "Aucun bar trouvé."
+  },
+  "bar_detail": {
+    "status": {
+      "open": "Ouvert maintenant",
+      "closed": "Fermé actuellement"
+    },
+    "hours": {
+      "title": "Horaires d'ouverture",
+      "closed": "Fermé"
+    },
+    "add_to_cart": "Ajouter au panier",
+    "login_to_order": "Connectez-vous pour commander"
+  },
+  "all_bars": {
+    "title": "Tous les bars",
+    "filters": {
+      "toggle_show": "Afficher les filtres",
+      "toggle_hide": "Masquer les filtres",
+      "name": {
+        "label": "Nom du bar",
+        "placeholder": "ex. Central Bar"
+      },
+      "city": {
+        "label": "Ville",
+        "placeholder": "ex. Bellinzona"
+      },
+      "distance": {
+        "label": "Distance max (km)"
+      },
+      "rating": {
+        "label": "Note minimale",
+        "help": "Afficher uniquement les bars avec une note ≥ valeur sélectionnée"
+      },
+      "categories": {
+        "label": "Catégories"
+      },
+      "clear": "Réinitialiser les filtres"
+    }
+  },
+  "admin_analytics": {
+    "title": "Analyses",
+    "tabs": {
+      "overview": "Vue d'ensemble",
+      "revenue": "Revenus et frais",
+      "orders": "Commandes et opérations",
+      "products": "Produits / Menu",
+      "clients": "Clients et crédits",
+      "finance": "Finances",
+      "refunds": "Remboursements",
+      "exports": "Exportations"
+    },
+    "overview": {
+      "metrics": {
+        "orders": "Commandes",
+        "orders_tooltip": "Nombre total de commandes sur la période sélectionnée",
+        "gmv_gross": "GMV brut",
+        "gmv_gross_tooltip": "Valeur totale des commandes avant taxes et frais",
+        "gmv_net": "GMV net",
+        "gmv_net_tooltip": "Valeur totale des commandes après taxes et frais",
+        "aov": "AOV",
+        "aov_tooltip": "Valeur moyenne de la commande",
+        "fees": "Frais SiplyGo",
+        "fees_tooltip": "Montant et pourcentage des frais retenus par SiplyGo",
+        "net_to_bar": "Net pour le bar",
+        "net_to_bar_tooltip": "Montant dû au bar après taxes et frais",
+        "tips": "Pourboires",
+        "tips_tooltip": "Total des pourboires collectés via la plateforme",
+        "cancel_rate": "Taux d'annulation",
+        "cancel_rate_tooltip": "Pourcentage de commandes annulées sur le total"
+      },
+      "highlights": {
+        "peak_hour": "Heure de pointe",
+        "peak_hour_tooltip": "Tranche horaire avec le plus grand nombre de commandes",
+        "top_category": "Catégorie principale",
+        "top_category_tooltip": "Catégorie de produits avec le chiffre d'affaires le plus élevé",
+        "top_bar": "Bar le plus performant",
+        "top_bar_tooltip": "Bar avec le volume de ventes le plus élevé"
+      }
+    },
+    "revenue": {
+      "headers": {
+        "bar": "Bar",
+        "gmv": "GMV",
+        "vat": "TVA",
+        "commission": "Commission",
+        "take_rate": "Taux de retenue",
+        "net": "Net"
+      }
+    },
+    "orders": {
+      "total_cancellations": "Annulations totales : {count}"
+    },
+    "products": {
+      "headers": {
+        "product": "Produit",
+        "quantity": "Quantité",
+        "revenue": "Revenus"
+      }
+    },
+    "clients": {
+      "metrics": {
+        "new": "Nouveaux",
+        "new_tooltip": "Clients ayant passé leur première commande",
+        "returning": "Récurrents",
+        "returning_tooltip": "Clients ayant passé plus d'une commande"
+      },
+      "headers": {
+        "customer": "Client",
+        "orders": "# commandes",
+        "spend": "Dépenses",
+        "last_purchase": "Dernier achat"
+      }
+    },
+    "finance": {
+      "headers": {
+        "period": "Période",
+        "amount": "Montant",
+        "status": "Statut"
+      },
+      "total_vat": "TVA totale : CHF {amount}"
+    },
+    "refunds": {
+      "total": "Total des remboursements : CHF {amount} ({count} commandes)"
+    },
+    "exports": {
+      "message": "Les exports CSV et les rapports programmés seront bientôt disponibles."
+    },
+    "charts": {
+      "gmv": "GMV",
+      "orders": "# commandes",
+      "commission": "Commission",
+      "net": "Net",
+      "orders_per_hour": "Commandes/heure"
+    }
+  },
+  "bar_admin_orders": {
+    "title": "Commandes de {bar}",
+    "actions": {
+      "history": "Historique des commandes et revenus"
+    }
+  },
+  "bar_categories": {
+    "manage": {
+      "title": "Gérer les catégories pour {bar}",
+      "subtitle": "Créez, modifiez et organisez les catégories de menu pour cet établissement.",
+      "search": {
+        "aria": "Rechercher des catégories",
+        "placeholder": "Rechercher des catégories…",
+        "input_aria": "Rechercher des catégories par nom",
+        "clear": "Effacer la recherche"
+      },
+      "actions": {
+        "add": "Ajouter une catégorie",
+        "products": "Produits",
+        "edit": "Modifier",
+        "delete": "Supprimer"
+      },
+      "table": {
+        "headers": {
+          "name": "Nom",
+          "description": "Description",
+          "actions": "Actions"
+        }
+      },
+      "confirm_delete": "Voulez-vous vraiment supprimer cette catégorie ?",
+      "empty": "Aucune catégorie pour le moment."
+    },
+    "form": {
+      "name": "Nom",
+      "description": "Description",
+      "display_order": "Ordre d'affichage",
+      "create": "Créer",
+      "save": "Enregistrer"
+    },
+    "new": {
+      "title": "Ajouter une catégorie pour {bar}"
+    },
+    "edit": {
+      "title": "Modifier la catégorie pour {bar}"
+    }
+  },
+  "bar_products": {
+    "edit": {
+      "title": "Modifier le produit {product}"
+    },
+    "new": {
+      "title": "Ajouter un produit à {category}"
+    },
+    "form": {
+      "name": "Nom",
+      "price": "Prix (CHF)",
+      "description": "Description",
+      "display_order": "Ordre d'affichage",
+      "photo": "Photo",
+      "create": "Créer",
+      "update": "Mettre à jour"
+    },
+    "manage": {
+      "title": "Produits de {category} pour {bar}",
+      "subtitle": "Ajoutez, modifiez et organisez les produits de cette catégorie.",
+      "actions": {
+        "add": "Ajouter un produit",
+        "edit": "Modifier",
+        "delete": "Supprimer"
+      },
+      "table": {
+        "headers": {
+          "order": "Ordre",
+          "photo": "Photo",
+          "name": "Nom",
+          "description": "Description",
+          "price": "Prix (CHF)",
+          "actions": "Actions"
+        }
+      },
+      "confirm_delete": "Voulez-vous vraiment supprimer ce produit ?",
+      "empty": "Aucun produit dans cette catégorie."
+    }
+  },
+  "topup": {
+    "title": "Recharger le crédit",
+    "form": {
+      "amount_label": "Montant",
+      "submit": "Recharger par carte"
+    },
+    "alerts": {
+      "invalid_amount": "Montant invalide",
+      "failed": "Impossible de lancer la recharge"
+    }
+  },
+  "order_success": {
+    "title": "Commande confirmée",
+    "body": {
+      "success": "Votre commande a été passée avec succès !",
+      "total": "Total payé : CHF {total}",
+      "payment_method": "Moyen de paiement : {method}",
+      "remaining": "Crédit restant : CHF {remaining}",
+      "thanks": "Merci d'avoir commandé avec SiplyGo."
+    },
+    "actions": {
+      "home": "Retour à l'accueil"
+    }
   }
 }
