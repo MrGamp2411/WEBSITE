@@ -37,6 +37,10 @@
 - The display orders page stretches to the full viewport width and doubles the size of order headers for clearer visibility.
 - Display orders include 10px horizontal margins and center the order text within each card.
 
+- `common.weekdays.<day>` translations drive the opening hours day labels on bar pages. Use these keys instead of hard-coded
+  weekday names.
+- `cart.errors.other_bar` localises the warning shown when trying to order from a different bar while the cart is full.
+
 - Wallet page UI lives in `templates/wallet.html` using a `.wallet-page` wrapper and inline scoped styles. Transaction rows render inside `<ul id="txList">` as static `.tx` divs with no detail links. "Load more," "Export CSV," "Manage payment methods," and all filters have been removed; the "Top Up" button uses `text-decoration:none` to avoid an underline.
 - Transaction detail views have been removed, so there is no `/wallet/tx/{index}` route or `transaction_detail.html` template.
 - Wallet Recent Activity shows all transactions with the newest first, and wallet cards override the base mobile `max-height` so the feed length isn't capped.

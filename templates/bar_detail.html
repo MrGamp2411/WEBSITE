@@ -26,7 +26,7 @@
       <div class="hours-col">
         {% for h in opening_hours[:4] %}
         <div class="hour-row">
-          <span>{{ h.day }}</span>
+          <span>{{ _('common.weekdays.' ~ h.day_key, default=h.day) }}</span>
           <span>{% if h.open and h.close %}{{ h.open }} - {{ h.close }}{% else %}{{ _('bar_detail.hours.closed', default='Closed') }}{% endif %}</span>
         </div>
         {% endfor %}
@@ -34,7 +34,7 @@
       <div class="hours-col">
         {% for h in opening_hours[4:] %}
         <div class="hour-row">
-          <span>{{ h.day }}</span>
+          <span>{{ _('common.weekdays.' ~ h.day_key, default=h.day) }}</span>
           <span>{% if h.open and h.close %}{{ h.open }} - {{ h.close }}{% else %}{{ _('bar_detail.hours.closed', default='Closed') }}{% endif %}</span>
         </div>
         {% endfor %}

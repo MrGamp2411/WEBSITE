@@ -20,7 +20,16 @@
     "cart": "Carrello",
     "previous": "Precedente",
     "next": "Successivo",
-    "search": "Cerca"
+    "search": "Cerca",
+    "weekdays": {
+      "monday": "Lunedì",
+      "tuesday": "Martedì",
+      "wednesday": "Mercoledì",
+      "thursday": "Giovedì",
+      "friday": "Venerdì",
+      "saturday": "Sabato",
+      "sunday": "Domenica"
+    }
   },
   "layout": {
     "meta": {
@@ -528,6 +537,9 @@
     },
     "empty": {
       "message": "Il tuo carrello è vuoto."
+    },
+    "errors": {
+      "other_bar": "Svuota il carrello prima di ordinare da un altro locale."
     }
   },
   "search": {

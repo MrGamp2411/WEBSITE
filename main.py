@@ -1236,24 +1236,31 @@ def weekly_hours_list(
     Any missing or malformed entries are treated as closed for that day.
     """
     days = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
+        ("monday", "Monday"),
+        ("tuesday", "Tuesday"),
+        ("wednesday", "Wednesday"),
+        ("thursday", "Thursday"),
+        ("friday", "Friday"),
+        ("saturday", "Saturday"),
+        ("sunday", "Sunday"),
     ]
     if not isinstance(hours, dict):
         hours = {}
     result: List[Dict[str, Optional[str]]] = []
-    for idx, day in enumerate(days):
+    for idx, (day_key, day_label) in enumerate(days):
         info = hours.get(str(idx)) if hours else None
         open_time = close_time = None
         if isinstance(info, dict):
             open_time = info.get("open")
             close_time = info.get("close")
-        result.append({"day": day, "open": open_time, "close": close_time})
+        result.append(
+            {
+                "day": day_label,
+                "day_key": day_key,
+                "open": open_time,
+                "close": close_time,
+            }
+        )
     return result
 
 
@@ -2066,6 +2073,7 @@ async def add_to_cart(request: Request, bar_id: int, product_id: int = Form(...)
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    translator = translator_for_request(request)
     bar = bars.get(bar_id)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
@@ -2084,12 +2092,16 @@ async def add_to_cart(request: Request, bar_id: int, product_id: int = Form(...)
             if not category:
                 continue
             products_by_category.setdefault(category, []).append(prod)
+        error_message = translator(
+            "cart.errors.other_bar",
+            default="Please clear your cart before ordering from another bar.",
+        )
         return render_template(
             "bar_detail.html",
             request=request,
             bar=bar,
             products_by_category=products_by_category,
-            error="Please clear your cart before ordering from another bar.",
+            error=error_message,
             pause_popup_close=bar.ordering_paused,
             cart_bar_name=bar.name,
             cart_bar_id=bar.id,
