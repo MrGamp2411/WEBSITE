@@ -480,6 +480,11 @@
       "title": "Pagamento riuscito",
       "body": "Il tuo portafoglio è stato ricaricato.",
       "close": "Chiudi"
+    },
+    "wallet_insufficient": {
+      "title": "Aggiungi credito al portafoglio",
+      "body": "Non hai abbastanza credito nel portafoglio per completare questo ordine. Ricarica il portafoglio o scegli un altro metodo di pagamento.",
+      "close": "Chiudi"
     }
   },
   "notifications": {

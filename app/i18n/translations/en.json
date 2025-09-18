@@ -480,6 +480,11 @@
       "title": "Payment successful",
       "body": "Your wallet has been credited.",
       "close": "Close"
+    },
+    "wallet_insufficient": {
+      "title": "Add wallet credit",
+      "body": "You don't have enough wallet credit to complete this order. Top up your wallet or choose another payment method.",
+      "close": "Close"
     }
   },
   "notifications": {

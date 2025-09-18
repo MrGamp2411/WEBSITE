@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   const APP_I18N = window.APP_I18N || {};
-  const noticeTexts = (APP_I18N.notices && APP_I18N.notices.payment_failed) || {};
+  const noticeMap = APP_I18N.notices || {};
   const appTexts = APP_I18N.app || {};
   function formatTemplate(template, values){
     if(typeof template !== 'string') return '';
@@ -27,10 +27,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const params = new URLSearchParams(window.location.search);
   const notice = params.get('notice');
-  if (['topup_failed', 'payment_failed'].includes(notice)) {
-    const title = params.get('noticeTitle') || noticeTexts.title || 'Payment failed';
-    const body = params.get('noticeBody') || noticeTexts.body || 'Payment was not successful. Please try again or contact our staff if the problem persists.';
-    const closeLabel = noticeTexts.close || 'Close';
+  if (['topup_failed', 'payment_failed', 'wallet_insufficient'].includes(notice)) {
+    const fallbackNotice = noticeMap.payment_failed || {};
+    const noticeConfig = noticeMap[notice] || fallbackNotice;
+    const defaultTitle = 'Payment failed';
+    const defaultBody = 'Payment was not successful. Please try again or contact our staff if the problem persists.';
+    const title = params.get('noticeTitle') || noticeConfig.title || fallbackNotice.title || defaultTitle;
+    const body = params.get('noticeBody') || noticeConfig.body || fallbackNotice.body || defaultBody;
+    const closeLabel = noticeConfig.close || fallbackNotice.close || 'Close';
     const blocker = document.createElement('div');
     blocker.className = 'cart-blocker';
     const popup = document.createElement('div');

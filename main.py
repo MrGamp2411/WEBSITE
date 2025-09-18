@@ -2830,7 +2830,23 @@ async def checkout(
     order_total = cart.total_with_fee()
     if payment_method == "wallet":
         if user.credit < order_total:
-            raise HTTPException(status_code=400, detail="Insufficient credit")
+            params = {
+                "notice": "wallet_insufficient",
+                "noticeTitle": translator(
+                    "notices.wallet_insufficient.title",
+                    default="Add wallet credit",
+                ),
+                "noticeBody": translator(
+                    "notices.wallet_insufficient.body",
+                    default=(
+                        "You don't have enough wallet credit to complete this order. "
+                        "Top up your wallet or choose another payment method."
+                    ),
+                ),
+                "noticeType": "error",
+            }
+            url = "/cart?" + urlencode(params)
+            return RedirectResponse(url=url, status_code=status.HTTP_303_SEE_OTHER)
         user.credit -= order_total
         db_user = db.query(User).filter(User.id == user.id).first()
         if db_user:

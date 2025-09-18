@@ -480,6 +480,11 @@
       "title": "Paiement réussi",
       "body": "Votre portefeuille a été crédité.",
       "close": "Fermer"
+    },
+    "wallet_insufficient": {
+      "title": "Ajoutez du crédit au portefeuille",
+      "body": "Vous n'avez pas assez de crédit dans le portefeuille pour terminer cette commande. Rechargez votre portefeuille ou choisissez un autre mode de paiement.",
+      "close": "Fermer"
     }
   },
   "notifications": {

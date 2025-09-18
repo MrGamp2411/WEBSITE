@@ -480,6 +480,11 @@
       "title": "Zahlung erfolgreich",
       "body": "Dein Wallet wurde gutgeschrieben.",
       "close": "Schließen"
+    },
+    "wallet_insufficient": {
+      "title": "Guthaben im Wallet aufladen",
+      "body": "Du hast nicht genug Guthaben im Wallet, um diese Bestellung abzuschließen. Lade dein Wallet auf oder wähle eine andere Zahlungsmethode.",
+      "close": "Schließen"
     }
   },
   "notifications": {
