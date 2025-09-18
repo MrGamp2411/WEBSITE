@@ -1153,7 +1153,13 @@
         }
       },
       "subject": "Oggetto",
+      "subject_translation_help": "Inserisci l'oggetto per ogni lingua supportata.",
+      "subject_default_language_help": "Inserisci l'oggetto in {language}. Le altre lingue erediteranno questo testo se non è disponibile una traduzione.",
+      "language_subject_label": "Oggetto in {language}",
       "message": "Messaggio",
+      "message_translation_help": "Scrivi il messaggio della notifica in ogni lingua supportata.",
+      "message_default_language_help": "Inserisci il messaggio in {language}. Le altre lingue useranno questo testo se non è disponibile una traduzione.",
+      "language_message_label": "Messaggio in {language}",
       "link_url": "URL del collegamento",
       "image": "Immagine",
       "attachment": "Allegato",
