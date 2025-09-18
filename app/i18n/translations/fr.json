@@ -1477,9 +1477,7 @@
     },
     "form": {
       "name": "Nom",
-      "name_help": "Utilisez l'éditeur de traductions pour mettre à jour les noms.",
       "description": "Description",
-      "description_help": "Utilisez l'éditeur de traductions pour mettre à jour les descriptions.",
       "display_order": "Commande d'affichage",
       "name_translate_button": "Traduire le nom",
       "description_translate_button": "Traduire la description",
@@ -1495,7 +1493,6 @@
     },
     "edit": {
       "title": "Modifier la catégorie pour {bar}",
-      "translation_note": "Besoin de mettre à jour les traductions ? Utilisez les boutons ci-dessous pour modifier les noms et descriptions dans chaque langue.",
       "actions": {
         "edit_name": "Modifier le nom",
         "edit_description": "Modifier la description"
