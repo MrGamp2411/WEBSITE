@@ -228,6 +228,7 @@ class Order(Base):
     ready_at = Column(DateTime)
     paid_at = Column(DateTime)
     cancelled_at = Column(DateTime)
+    cancel_reason = Column(String(50))
     refund_amount = Column(Numeric(10, 2), default=0)
     notes = Column(Text)
     source_channel = Column(String(30))

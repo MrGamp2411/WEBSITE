@@ -156,6 +156,7 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
         elif state in ("FAILED", "DECLINE", "DECLINED", "VOIDED"):
             if order:
                 order.status = "CANCELED"
+                order.cancel_reason = "payment_failed"
                 if not order.cancelled_at:
                     order.cancelled_at = datetime.utcnow()
                 db.add(order)

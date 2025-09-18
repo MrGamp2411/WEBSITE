@@ -21,6 +21,7 @@
 
         <div><dt>{{ _('order_history.card.fields.table', default='Table') }}</dt><dd>{{ order.table_name or '' }}</dd></div>
         <div><dt>{{ _('order_history.card.fields.payment', default='Payment') }}</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
+        {% if order.status == 'CANCELED' and order.cancel_reason %}<div><dt>{{ _('order_history.card.fields.cancel_reason', default='Cancellation reason') }}</dt><dd>{{ _('order_history.card.cancel_reasons.' ~ order.cancel_reason, default=order.cancel_reason|replace('_', ' ')|title) }}</dd></div>{% endif %}
         {% if order.notes %}<div><dt>{{ _('order_history.card.fields.notes', default='Notes') }}</dt><dd>{{ order.notes }}</dd></div>{% endif %}
 
         {% if order.ready_at %}{% set prep_minutes = ((order.ready_at - order.created_at).total_seconds() // 60)|int %}<div><dt>{{ _('order_history.card.fields.prep_time', default='Prep time') }}</dt><dd class="num">{{ _('order_history.card.prep_minutes', minutes=prep_minutes, default='{minutes} min') }}</dd></div>{% endif %}

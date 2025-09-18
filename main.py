@@ -757,6 +757,21 @@ ALLOWED_STATUS_TRANSITIONS = {
 }
 
 
+CANCEL_REASON_CUSTOMER = "customer"
+CANCEL_REASON_BAR_STAFF = "bar_staff"
+CANCEL_REASON_TIMEOUT = "timeout"
+CANCEL_REASON_PAYMENT_FAILED = "payment_failed"
+CANCEL_REASON_UNKNOWN = "unknown"
+
+ALLOWED_CANCEL_REASONS = {
+    CANCEL_REASON_CUSTOMER,
+    CANCEL_REASON_BAR_STAFF,
+    CANCEL_REASON_TIMEOUT,
+    CANCEL_REASON_PAYMENT_FAILED,
+    CANCEL_REASON_UNKNOWN,
+}
+
+
 def update_cached_order_transactions(order: Order, new_status: str) -> None:
     """Update the cached transaction list for a user's wallet feed."""
 
@@ -776,7 +791,11 @@ def update_cached_order_transactions(order: Order, new_status: str) -> None:
 
 
 def apply_order_status(
-    order: Order, new_status: str, db: Session, now: Optional[datetime] = None
+    order: Order,
+    new_status: str,
+    db: Session,
+    now: Optional[datetime] = None,
+    cancel_reason: Optional[str] = None,
 ) -> None:
     """Persist an order status change and related side effects."""
 
@@ -786,20 +805,27 @@ def apply_order_status(
         order.accepted_at = now
     elif new_status == "READY" and not order.ready_at:
         order.ready_at = now
-    elif new_status == "CANCELED" and not order.cancelled_at:
-        order.cancelled_at = now
-        refund = Decimal(order.total)
-        if order.payment_method in ("card", "wallet"):
-            order.refund_amount = refund
-            if order.customer_id:
-                customer = db.get(User, order.customer_id)
-                if customer:
-                    customer.credit = Decimal(customer.credit or 0) + refund
-                    cached = users.get(order.customer_id)
-                    if cached:
-                        cached.credit = float(customer.credit)
-        else:
-            order.refund_amount = Decimal("0")
+    elif new_status == "CANCELED":
+        if cancel_reason:
+            order.cancel_reason = cancel_reason
+        elif not order.cancel_reason:
+            order.cancel_reason = CANCEL_REASON_UNKNOWN
+        if not order.cancelled_at:
+            order.cancelled_at = now
+            refund = Decimal(order.total)
+            if order.payment_method in ("card", "wallet"):
+                order.refund_amount = refund
+                if order.customer_id:
+                    customer = db.get(User, order.customer_id)
+                    if customer:
+                        customer.credit = Decimal(customer.credit or 0) + refund
+                        cached = users.get(order.customer_id)
+                        if cached:
+                            cached.credit = float(customer.credit)
+            else:
+                order.refund_amount = Decimal("0")
+    else:
+        order.cancel_reason = None
 
     wallet_tx = (
         db.query(WalletTransaction)
@@ -837,6 +863,7 @@ async def send_order_update(order: Order) -> Dict[str, Any]:
         "total": order.total,
         "refund_amount": float(order.refund_amount or 0),
         "notes": order.notes,
+        "cancel_reason": order.cancel_reason,
         "items": [
             {
                 "id": i.id,
@@ -1128,6 +1155,7 @@ def ensure_order_columns() -> None:
         "ready_at": "TIMESTAMP",
         "paid_at": "TIMESTAMP",
         "cancelled_at": "TIMESTAMP",
+        "cancel_reason": "VARCHAR(50)",
         "refund_amount": "NUMERIC(10, 2) DEFAULT 0",
         "notes": "TEXT",
         "source_channel": "VARCHAR(30)",
@@ -1665,7 +1693,13 @@ def auto_cancel_unprepared_orders_once(
     )
     canceled: List[Order] = []
     for order in stale_orders:
-        apply_order_status(order, "CANCELED", db, now=now)
+        apply_order_status(
+            order,
+            "CANCELED",
+            db,
+            now=now,
+            cancel_reason=CANCEL_REASON_TIMEOUT,
+        )
         canceled.append(order)
     if canceled:
         db.commit()
@@ -2538,6 +2572,7 @@ class OrderRead(BaseModel):
     bar_name: Optional[str] = None
     public_order_code: Optional[str] = None
     daily_seq: Optional[int] = None
+    cancel_reason: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -2557,6 +2592,7 @@ class OrderWithItemsRead(OrderRead):
 
 class OrderStatusUpdate(BaseModel):
     status: str
+    reason: Optional[str] = None
 
 
 class RegisterIn(BaseModel):
@@ -3261,8 +3297,32 @@ async def update_order_status(
             detail=f"Invalid transition {order.status} -> {new_status}",
         )
 
+    cancel_reason = None
+    if new_status == "CANCELED":
+        if data.reason and data.reason not in ALLOWED_CANCEL_REASONS:
+            raise HTTPException(status_code=400, detail="Invalid cancel reason")
+        if data.reason:
+            cancel_reason = data.reason
+        elif is_customer_cancel:
+            cancel_reason = CANCEL_REASON_CUSTOMER
+        elif is_staff:
+            cancel_reason = CANCEL_REASON_BAR_STAFF
+        else:
+            cancel_reason = CANCEL_REASON_UNKNOWN
+    elif data.reason:
+        raise HTTPException(
+            status_code=400,
+            detail="Cancel reason only allowed when cancelling",
+        )
+
     now = datetime.utcnow()
-    apply_order_status(order, new_status, db, now=now)
+    apply_order_status(
+        order,
+        new_status,
+        db,
+        now=now,
+        cancel_reason=cancel_reason,
+    )
     db.commit()
     order_data = await send_order_update(order)
     return {"status": order.status, "order": order_data}

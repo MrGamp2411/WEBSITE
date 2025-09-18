@@ -289,6 +289,7 @@
   - Orders are grouped into four sections: Incoming (`PLACED`), Preparing (`ACCEPTED`), Ready (`READY`), and Completed (`COMPLETED`/`CANCELED`/`REJECTED`).
   - The `/orders` route treats `CANCELED` and `REJECTED` orders as completed so they're excluded from pending.
   - Order statuses progress `PLACED → ACCEPTED → READY → COMPLETED` (with optional `CANCELED/REJECTED`).
+  - Order cancellations record a `cancel_reason` (`customer`, `bar_staff`, `timeout`, `payment_failed`, or `unknown`) on `orders.cancel_reason` and surface the translated reason in bartender and customer views.
   - Valid transitions are enforced server-side via `ALLOWED_STATUS_TRANSITIONS` in `main.py`.
   - Order listings include customer name/phone, table, and line items for both bartender and user history.
   - Bartender dashboards list orders chronologically: completed orders show newest first, while incoming, preparing, and ready orders show oldest first.
