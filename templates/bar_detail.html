@@ -60,14 +60,16 @@
     <p>{{ category_summary }}</p>
     <ul class="products scroller">
       {% for product in products %}
+      {% set display_name = product_name(product) %}
+      {% set display_description = product_description(product) %}
       <li>
         <article class="product-card">
           <div class="thumb-wrapper">
-            <img class="thumb" src="{{ product.photo_url }}" alt="{{ product.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ product.photo_url }} 400w, {{ product.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
+            <img class="thumb" src="{{ product.photo_url }}" alt="{{ display_name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ product.photo_url }} 400w, {{ product.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
           </div>
-          <h3 class="title">{{ product.name }}</h3>
+          <h3 class="title">{{ display_name }}</h3>
           <div class="card-body">
-            <p class="desc description">{{ product.description }}</p>
+            <p class="desc description">{{ display_description }}</p>
             <p class="price"><strong>CHF {{ '%.2f'|format(product.price) }}</strong></p>
             {% if user %}
             <form class="form form--inline add-to-cart-form" method="post" action="/bars/{{ bar.id }}/add_to_cart">

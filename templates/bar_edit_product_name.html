@@ -1,32 +1,34 @@
 {% extends "layout.html" %}
 {% block content %}
-<section class="product-field-editor">
+<section class="product-translation-editor">
   <a class="back-link" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/edit"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('bar_products.edit_name.back', default='Back to product') }}</a>
-  <h1>{{ _('bar_products.edit_name.title', product=product.name, default='Edit name for {product}') }}</h1>
-  <p class="intro">{{ _('bar_products.edit_name.intro', default='Update the name shown to customers.') }}</p>
+  <h1>{{ _('bar_products.edit_name.title', product=product_name(product), default='Edit names for {product}') }}</h1>
+  <p class="intro">{{ _('bar_products.edit_name.intro', default='Provide a name for each supported language. Customers see the option matching their selected language.') }}</p>
   {% if error_code %}
-  <div class="alert alert-danger">{{ _('bar_products.edit_name.errors.' + error_code, default='Name is required.') }}</div>
+  <div class="alert alert-danger">{{ _('bar_products.edit_name.errors.' + error_code, default='All fields are required.') }}</div>
   {% endif %}
-  <form method="post" action="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/edit/name" class="field-form">
+  <form method="post" action="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/edit/name" class="translation-form">
+    {% for lang in languages %}
     <div class="field-group">
-      <label for="name">{{ _('bar_products.edit_name.fields.name', default='Name') }}</label>
-      <input id="name" name="name" value="{{ name_value }}" required maxlength="80">
+      <label for="name_{{ lang.code }}">{{ _('bar_products.edit_name.fields.language', language=lang.name, default='{language} name') }}</label>
+      <input id="name_{{ lang.code }}" name="name_{{ lang.code }}" value="{{ names.get(lang.code, '') }}" required maxlength="80">
     </div>
+    {% endfor %}
     <div class="form-actions">
-      <button type="submit" class="btn btn--primary">{{ _('bar_products.edit_name.actions.save', default='Save name') }}</button>
+      <button type="submit" class="btn btn--primary">{{ _('bar_products.edit_name.actions.save', default='Save names') }}</button>
     </div>
   </form>
 </section>
 <style>
-.product-field-editor{max-width:720px;margin-inline:auto;padding-block:var(--space-6,24px);display:flex;flex-direction:column;gap:var(--space-4,16px);}
-.product-field-editor .back-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;opacity:.8;}
-.product-field-editor .back-link:hover{opacity:1;}
-.product-field-editor .intro{margin:0;opacity:.8;}
-.field-form{display:flex;flex-direction:column;gap:var(--space-4,16px);}
-.field-form .field-group{display:flex;flex-direction:column;gap:8px;}
-.field-form input,.field-form textarea{padding:12px 14px;border-radius:var(--radius-xl,16px);border:1px solid rgba(15,23,42,.12);font-size:1rem;}
-.field-form input:focus,.field-form textarea:focus{outline:2px solid rgba(91,45,238,.25);outline-offset:2px;}
-.field-form .form-actions{display:flex;justify-content:flex-end;margin-top:var(--space-4,16px);}
+.product-translation-editor{max-width:720px;margin-inline:auto;padding-block:var(--space-6,24px);display:flex;flex-direction:column;gap:var(--space-4,16px);}
+.product-translation-editor .back-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;opacity:.8;}
+.product-translation-editor .back-link:hover{opacity:1;}
+.product-translation-editor .intro{margin:0;opacity:.8;}
+.translation-form{display:flex;flex-direction:column;gap:var(--space-4,16px);}
+.translation-form .field-group{display:flex;flex-direction:column;gap:8px;}
+.translation-form input,.translation-form textarea{padding:12px 14px;border-radius:var(--radius-xl,16px);border:1px solid rgba(15,23,42,.12);font-size:1rem;}
+.translation-form input:focus,.translation-form textarea:focus{outline:2px solid rgba(91,45,238,.25);outline-offset:2px;}
+.translation-form .form-actions{display:flex;justify-content:flex-end;margin-top:var(--space-4,16px);}
 .alert{padding:12px 14px;border-radius:var(--radius-lg,12px);}
 .alert-danger{background:#fee2e2;color:#991b1b;}
 </style>

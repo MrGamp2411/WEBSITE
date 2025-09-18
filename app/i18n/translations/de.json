@@ -1523,34 +1523,34 @@
       "create": "Erstellen",
       "update": "Aktualisieren"
     },
-    "edit_name": {
-      "back": "Zurück zum Produkt",
-      "title": "Name für {product} bearbeiten",
-      "intro": "Aktualisieren Sie den Namen, der Gästen angezeigt wird.",
-      "fields": {
-        "name": "Name"
-      },
-      "actions": {
-        "save": "Name speichern"
-      },
-      "errors": {
-        "required": "Der Name ist erforderlich."
-      }
+  "edit_name": {
+    "back": "Zurück zum Produkt",
+    "title": "Namen für {product} bearbeiten",
+    "intro": "Geben Sie für jede unterstützte Sprache einen Namen ein. Gäste sehen die Variante in ihrer gewählten Sprache.",
+    "fields": {
+      "language": "Name auf {language}"
     },
-    "edit_description": {
-      "back": "Zurück zum Produkt",
-      "title": "Beschreibung für {product} bearbeiten",
-      "intro": "Aktualisieren Sie die Beschreibung, die Gästen angezeigt wird.",
-      "fields": {
-        "description": "Beschreibung"
-      },
-      "actions": {
-        "save": "Beschreibung speichern"
-      },
-      "errors": {
-        "required": "Die Beschreibung ist erforderlich."
-      }
+    "actions": {
+      "save": "Namen speichern"
     },
+    "errors": {
+      "required": "Alle Felder sind erforderlich."
+    }
+  },
+  "edit_description": {
+    "back": "Zurück zum Produkt",
+    "title": "Beschreibungen für {product} bearbeiten",
+    "intro": "Verfassen Sie für jede unterstützte Sprache eine Beschreibung. Die Texte erscheinen im Gästemenü.",
+    "fields": {
+      "language": "Beschreibung auf {language}"
+    },
+    "actions": {
+      "save": "Beschreibungen speichern"
+    },
+    "errors": {
+      "required": "Alle Felder sind erforderlich."
+    }
+  },
     "manage": {
       "title": "Produkte in {category} für {bar}",
       "subtitle": "Hinzufügen, Bearbeiten und Organisieren von Produkten für diese Kategorie.",
