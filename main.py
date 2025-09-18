@@ -5723,6 +5723,31 @@ async def delete_user(request: Request, user_id: int, db: Session = Depends(get_
     db.query(AuditLog).filter(AuditLog.actor_user_id == user_id).delete(
         synchronize_session=False
     )
+    log_ids_to_remove = {
+        row[0]
+        for row in db.query(NotificationLog.id)
+        .filter(
+            or_(
+                NotificationLog.sender_id == user_id,
+                NotificationLog.user_id == user_id,
+            )
+        )
+        .all()
+    }
+    if log_ids_to_remove:
+        db.query(Notification).filter(Notification.log_id.in_(log_ids_to_remove)).delete(
+            synchronize_session=False
+        )
+    db.query(Notification).filter(
+        or_(
+            Notification.user_id == user_id,
+            Notification.sender_id == user_id,
+        )
+    ).delete(synchronize_session=False)
+    if log_ids_to_remove:
+        db.query(NotificationLog).filter(NotificationLog.id.in_(log_ids_to_remove)).delete(
+            synchronize_session=False
+        )
     db.query(Order).filter(Order.customer_id == user_id).update(
         {Order.customer_id: None}, synchronize_session=False
     )
