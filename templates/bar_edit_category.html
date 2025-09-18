@@ -9,7 +9,8 @@
   </div>
   <form class="form" method="post">
     <label for="name">{{ _('bar_categories.form.name', default='Name') }}
-      <input id="name" name="name" value="{{ category.name }}" required>
+      <input id="name" name="name" value="{{ category.name }}" required readonly>
+      <small class="help">{{ _('bar_categories.form.name_help', default='Use the translation editor to update names in any language.') }}</small>
     </label>
     <label for="description">{{ _('bar_categories.form.description', default='Description') }}
       <textarea id="description" name="description" readonly>{{ category.description }}</textarea>
@@ -28,7 +29,7 @@
 .category-edit .translation-actions .btn-outline{flex:0 0 auto;}
 .category-edit .form{display:flex;flex-direction:column;gap:var(--space-4,16px);}
 .category-edit textarea{min-height:110px;}
-.category-edit textarea[readonly]{background:var(--surface-strong,#f3f4f6);cursor:not-allowed;}
+.category-edit input[readonly],.category-edit textarea[readonly]{background:var(--surface-strong,#f3f4f6);cursor:not-allowed;}
 .category-edit .help{display:block;margin-top:6px;font-size:.85rem;opacity:.7;}
 </style>
 {% endblock %}

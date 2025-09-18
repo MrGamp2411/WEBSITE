@@ -6260,7 +6260,12 @@ async def bar_edit_category(
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
-    base_name = (form.get("name") or "").strip()
+    name_translations = getattr(category, "name_translations", None)
+    base_name = (
+        (name_translations or {}).get(DEFAULT_LANGUAGE)
+        or category.name
+        or ""
+    )
     display_order = form.get("display_order") or category.display_order
     description_translations = getattr(category, "description_translations", None)
     base_description = (
