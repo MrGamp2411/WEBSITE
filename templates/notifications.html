@@ -12,8 +12,8 @@
     {% for n in notifications %}
       <li class="mb-3">
         <a href="/notifications/{{ n.id }}" class="card notification-card{% if not n.read %} card--unread{% endif %}">
-          <h3>{{ n.subject }}</h3>
-          <p>{{ n.body|truncate(100) }}</p>
+          <h3>{{ n.localized_subject or n.subject }}</h3>
+          <p>{{ (n.localized_body or n.body)|truncate(100) }}</p>
         </a>
       </li>
     {% else %}

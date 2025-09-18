@@ -404,6 +404,8 @@ class Notification(Base):
     log_id = Column(Integer, ForeignKey("notification_logs.id"), nullable=False)
     subject = Column(String(30))
     body = Column(Text)
+    subject_translations = Column(JSON, default=dict)
+    body_translations = Column(JSON, default=dict)
     image = Column(LargeBinary)
     image_mime = Column(String(100))
     attachment = Column(LargeBinary)
@@ -427,6 +429,8 @@ class NotificationLog(Base):
     bar_id = Column(Integer, ForeignKey("bars.id"))
     subject = Column(String(30))
     body = Column(Text)
+    subject_translations = Column(JSON, default=dict)
+    body_translations = Column(JSON, default=dict)
     link_url = Column(String(255))
     created_at = Column(DateTime, default=datetime.utcnow)
 

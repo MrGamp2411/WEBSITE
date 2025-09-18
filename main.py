@@ -41,7 +41,7 @@ import secrets
 import time
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
 from zoneinfo import ZoneInfo
@@ -219,6 +219,26 @@ def resolve_welcome_message_text(
 ) -> str:
     normalised = normalise_translation_map(translations, fallback)
     return resolve_translated_value(normalised, fallback or "", language_code)
+
+
+def resolve_notification_text(note: Notification, language_code: str) -> Tuple[str, str]:
+    """Return the subject and body for a notification in the desired language."""
+
+    def _map(
+        primary: Any, fallback: Optional[str], secondary: Any = None
+    ) -> Dict[str, str]:
+        source = primary if primary else secondary
+        base = fallback or ""
+        return normalise_translation_map(source, base)
+
+    log = getattr(note, "log", None)
+    subject_fallback = note.subject or (log.subject if log else "")
+    body_fallback = note.body or (log.body if log else "")
+    subject_map = _map(note.subject_translations, subject_fallback, getattr(log, "subject_translations", None))
+    body_map = _map(note.body_translations, body_fallback, getattr(log, "body_translations", None))
+    subject_text = resolve_translated_value(subject_map, subject_fallback, language_code)
+    body_text = resolve_translated_value(body_map, body_fallback, language_code)
+    return subject_text, body_text
 
 
 class Category:
@@ -1177,7 +1197,7 @@ def ensure_audit_log_columns() -> None:
 
 
 def ensure_notification_log_column() -> None:
-    """Ensure notifications table includes log_id foreign key."""
+    """Ensure notifications tables include translation support."""
     inspector = inspect(engine)
     columns = {col["name"] for col in inspector.get_columns("notifications")}
     if "log_id" not in columns:
@@ -1192,8 +1212,79 @@ def ensure_notification_log_column() -> None:
                 text(
                     "CREATE INDEX IF NOT EXISTS ix_notifications_log_id "
                     "ON notifications (log_id)"
+                )
             )
+    if "subject_translations" not in columns:
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE notifications "
+                    "ADD COLUMN subject_translations JSON"
+                )
             )
+    if "body_translations" not in columns:
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE notifications "
+                    "ADD COLUMN body_translations JSON"
+                )
+            )
+
+    log_columns = {
+        col["name"] for col in inspector.get_columns("notification_logs")
+    }
+    if "subject_translations" not in log_columns:
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE notification_logs "
+                    "ADD COLUMN subject_translations JSON"
+                )
+            )
+    if "body_translations" not in log_columns:
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "ALTER TABLE notification_logs "
+                    "ADD COLUMN body_translations JSON"
+                )
+            )
+
+    with SessionLocal() as db:
+        wm = db.get(WelcomeMessage, 1)
+        if not wm:
+            return
+        subject_map = normalise_translation_map(
+            wm.subject_translations, wm.subject
+        )
+        body_map = normalise_translation_map(wm.body_translations, wm.body)
+        welcome_logs = (
+            db.query(NotificationLog)
+            .filter(NotificationLog.target == "user")
+            .filter(NotificationLog.sender_id == NotificationLog.user_id)
+            .filter(NotificationLog.subject_translations.is_(None))
+            .all()
+        )
+        updated_log_ids: List[int] = []
+        for log in welcome_logs:
+            log.subject_translations = subject_map
+            log.body_translations = body_map
+            updated_log_ids.append(log.id)
+        if updated_log_ids:
+            (
+                db.query(Notification)
+                .filter(Notification.log_id.in_(updated_log_ids))
+                .filter(Notification.subject_translations.is_(None))
+                .update(
+                    {
+                        Notification.subject_translations: subject_map,
+                        Notification.body_translations: body_map,
+                    },
+                    synchronize_session=False,
+                )
+            )
+            db.commit()
 
 
 def ensure_welcome_message_table() -> None:
@@ -3463,11 +3554,17 @@ async def register_details(request: Request, db: Session = Depends(get_db)):
         if wm:
             now = datetime.utcnow()
             language_code = getattr(request.state, "language_code", DEFAULT_LANGUAGE)
-            subject_text = resolve_welcome_message_text(
-                wm.subject_translations, wm.subject, language_code
+            subject_translations = normalise_translation_map(
+                wm.subject_translations, wm.subject
             )
-            body_text = resolve_welcome_message_text(
-                wm.body_translations, wm.body, language_code
+            body_translations = normalise_translation_map(
+                wm.body_translations, wm.body
+            )
+            subject_text = resolve_translated_value(
+                subject_translations, wm.subject, language_code
+            )
+            body_text = resolve_translated_value(
+                body_translations, wm.body, language_code
             )
             log = NotificationLog(
                 sender_id=user.id,
@@ -3475,6 +3572,8 @@ async def register_details(request: Request, db: Session = Depends(get_db)):
                 user_id=user.id,
                 subject=subject_text,
                 body=body_text,
+                subject_translations=subject_translations,
+                body_translations=body_translations,
                 created_at=now,
             )
             db.add(log)
@@ -3485,6 +3584,8 @@ async def register_details(request: Request, db: Session = Depends(get_db)):
                 log_id=log.id,
                 subject=subject_text,
                 body=body_text,
+                subject_translations=subject_translations,
+                body_translations=body_translations,
                 created_at=now,
             )
             db.add(note)
@@ -6044,12 +6145,19 @@ async def notifications_view(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    translator_for_request(request)
     notes = (
         db.query(Notification)
+        .options(joinedload(Notification.log))
         .filter(Notification.user_id == user.id)
         .order_by(Notification.created_at.desc())
         .all()
     )
+    language_code = getattr(request.state, "language_code", DEFAULT_LANGUAGE)
+    for note in notes:
+        subject_text, body_text = resolve_notification_text(note, language_code)
+        note.localized_subject = subject_text
+        note.localized_body = body_text
     return render_template(
         "notifications.html", request=request, user=user, notifications=notes
     )
@@ -6062,8 +6170,10 @@ async def notification_detail(
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    translator_for_request(request)
     note = (
         db.query(Notification)
+        .options(joinedload(Notification.log))
         .filter(Notification.id == note_id, Notification.user_id == user.id)
         .first()
     )
@@ -6072,6 +6182,10 @@ async def notification_detail(
     if not note.read:
         note.read = True
         db.commit()
+    language_code = getattr(request.state, "language_code", DEFAULT_LANGUAGE)
+    subject_text, body_text = resolve_notification_text(note, language_code)
+    note.localized_subject = subject_text
+    note.localized_body = body_text
     return render_template(
         "notification_detail.html", request=request, user=user, note=note
     )
