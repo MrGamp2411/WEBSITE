@@ -2,7 +2,6 @@
 {% block content %}
 <h1>{{ _('bar_categories.edit.title', bar=bar.name, default='Edit Category for {bar}') }}</h1>
 <section class="category-edit">
-  <p class="translation-note">{{ _('bar_categories.edit.translation_note', default='Need to update translations? Use the buttons below to edit names and descriptions for every language.') }}</p>
   <div class="translation-actions">
     <a class="btn-outline" href="/bar/{{ bar.id }}/categories/{{ category.id }}/edit/name">{{ _('bar_categories.edit.actions.edit_name', default='Edit name') }}</a>
     <a class="btn-outline" href="/bar/{{ bar.id }}/categories/{{ category.id }}/edit/description">{{ _('bar_categories.edit.actions.edit_description', default='Edit description') }}</a>
@@ -10,11 +9,9 @@
   <form class="form" method="post">
     <label for="name">{{ _('bar_categories.form.name', default='Name') }}
       <input id="name" name="name" value="{{ category.name }}" required readonly>
-      <small class="help">{{ _('bar_categories.form.name_help', default='Use the translation editor to update names in any language.') }}</small>
     </label>
     <label for="description">{{ _('bar_categories.form.description', default='Description') }}
       <textarea id="description" name="description" readonly>{{ category.description }}</textarea>
-      <small class="help">{{ _('bar_categories.form.description_help', default='Use the translation editor to update descriptions in any language.') }}</small>
     </label>
     <label for="display_order">{{ _('bar_categories.form.display_order', default='Display Order') }}
       <input id="display_order" type="number" name="display_order" value="{{ category.display_order }}">
@@ -24,13 +21,11 @@
 </section>
 <style>
 .category-edit{max-width:720px;margin-inline:auto;display:flex;flex-direction:column;gap:var(--space-4,16px);}
-.category-edit .translation-note{margin:0;opacity:.75;}
 .category-edit .translation-actions{display:flex;flex-wrap:wrap;gap:12px;}
 .category-edit .translation-actions .btn-outline{flex:0 0 auto;}
 .category-edit .form{display:flex;flex-direction:column;gap:var(--space-4,16px);}
 .category-edit textarea{min-height:110px;}
 .category-edit input[readonly],.category-edit textarea[readonly]{background:var(--surface-strong,#f3f4f6);cursor:not-allowed;}
-.category-edit .help{display:block;margin-top:6px;font-size:.85rem;opacity:.7;}
 </style>
 {% endblock %}
 

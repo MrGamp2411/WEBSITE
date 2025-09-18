@@ -1453,9 +1453,7 @@
     },
     "form": {
       "name": "Name",
-      "name_help": "Use the translation editor to update names.",
       "description": "Description",
-      "description_help": "Use the translation editor to update descriptions.",
       "display_order": "Display Order",
       "name_translate_button": "Translate name",
       "description_translate_button": "Translate description",
@@ -1471,7 +1469,6 @@
     },
     "edit": {
       "title": "Edit Category for {bar}",
-      "translation_note": "Need to update translations? Use the buttons below to edit names and descriptions for every language.",
       "actions": {
         "edit_name": "Edit name",
         "edit_description": "Edit description"

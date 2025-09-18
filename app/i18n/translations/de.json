@@ -1453,9 +1453,7 @@
     },
     "form": {
       "name": "Bezeichnung",
-      "name_help": "Verwenden Sie den Übersetzungs-Editor, um Bezeichnungen zu aktualisieren.",
       "description": "Warenbezeichnung",
-      "description_help": "Verwenden Sie den Übersetzungs-Editor, um Beschreibungen zu aktualisieren.",
       "display_order": "Reihenfolge anzeigen",
       "name_translate_button": "Name übersetzen",
       "description_translate_button": "Beschreibung übersetzen",
@@ -1471,7 +1469,6 @@
     },
     "edit": {
       "title": "Kategorie bearbeiten für {bar}",
-      "translation_note": "Müssen Übersetzungen aktualisiert werden? Verwenden Sie die Schaltflächen unten, um Namen und Beschreibungen in allen Sprachen zu bearbeiten.",
       "actions": {
         "edit_name": "Namen bearbeiten",
         "edit_description": "Beschreibung bearbeiten"
