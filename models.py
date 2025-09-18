@@ -441,3 +441,5 @@ class WelcomeMessage(Base):
     id = Column(Integer, primary_key=True)
     subject = Column(String(30))
     body = Column(Text)
+    subject_translations = Column(JSON, default=dict)
+    body_translations = Column(JSON, default=dict)

@@ -1261,7 +1261,13 @@
     "title": "Modifier le message de bienvenue",
     "form": {
       "subject": "Sujet",
+      "subject_translate_button": "Traduire le sujet",
+      "subject_translation_help": "Fournissez un sujet pour chaque langue prise en charge.",
+      "language_subject_label": "Sujet en {language}",
       "message": "Message",
+      "message_translate_button": "Traduire le message",
+      "message_translation_help": "Rédigez le message de bienvenue dans chaque langue prise en charge.",
+      "language_message_label": "Message en {language}",
       "save": "Sauvegarder"
     }
   },

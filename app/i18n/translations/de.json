@@ -1237,7 +1237,13 @@
     "title": "Begrüßungsnachricht bearbeiten",
     "form": {
       "subject": "Gegenstand",
+      "subject_translate_button": "Gegenstand übersetzen",
+      "subject_translation_help": "Geben Sie einen Gegenstand für jede unterstützte Sprache ein.",
+      "language_subject_label": "Gegenstand in {language}",
       "message": "Nachricht",
+      "message_translate_button": "Nachricht übersetzen",
+      "message_translation_help": "Schreiben Sie die Begrüßungsnachricht in jeder unterstützten Sprache.",
+      "language_message_label": "Nachricht in {language}",
       "save": "Speichern"
     }
   },

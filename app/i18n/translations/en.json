@@ -1237,7 +1237,13 @@
     "title": "Edit Welcome Message",
     "form": {
       "subject": "Subject",
+      "subject_translate_button": "Translate subject",
+      "subject_translation_help": "Provide a subject for every supported language.",
+      "language_subject_label": "{language} subject",
       "message": "Message",
+      "message_translate_button": "Translate message",
+      "message_translation_help": "Write the welcome message in each supported language.",
+      "language_message_label": "{language} message",
       "save": "Save"
     }
   },

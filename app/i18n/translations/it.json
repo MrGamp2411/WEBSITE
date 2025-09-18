@@ -1237,7 +1237,13 @@
     "title": "Modifica messaggio di benvenuto",
     "form": {
       "subject": "Oggetto",
+      "subject_translate_button": "Traduci oggetto",
+      "subject_translation_help": "Inserisci un oggetto per ogni lingua supportata.",
+      "language_subject_label": "Oggetto in {language}",
       "message": "Messaggio",
+      "message_translate_button": "Traduci messaggio",
+      "message_translation_help": "Scrivi il messaggio di benvenuto in ogni lingua supportata.",
+      "language_message_label": "Messaggio in {language}",
       "save": "Salva"
     }
   },

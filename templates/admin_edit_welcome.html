@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
+{% set subject_map = subject_translations if subject_translations is defined else {} %}
+{% set body_map = body_translations if body_translations is defined else {} %}
 <section class="users-page">
   <header class="users-toolbar">
     <div class="title-wrap">
@@ -10,13 +12,73 @@
   <p class="alert-danger">{{ error }}</p>
   {% endif %}
   <form class="form" method="post" action="/admin/notifications/welcome">
-    <label>{{ _('admin_edit_welcome.form.subject', default='Subject') }}
-      <input type="text" name="subject" value="{{ subject }}" maxlength="30" required>
-    </label>
-    <label>{{ _('admin_edit_welcome.form.message', default='Message') }}
-      <textarea name="body" required>{{ body }}</textarea>
-    </label>
+    <div class="field-group translation-control">
+      <label for="subject">{{ _('admin_edit_welcome.form.subject', default='Subject') }}
+        <input id="subject" type="text" name="subject" value="{{ subject_map.get(language_code, subject) }}" maxlength="30" required>
+      </label>
+      <button type="button" class="btn-outline translation-toggle" data-translation-target="subjectTranslations" aria-expanded="false">{{ _('admin_edit_welcome.form.subject_translate_button', default='Translate subject') }}</button>
+    </div>
+    <div id="subjectTranslations" class="translation-panel" hidden>
+      <p class="translation-help">{{ _('admin_edit_welcome.form.subject_translation_help', default='Provide a subject for every supported language.') }}</p>
+      {% for lang in available_languages %}
+      <label for="subject_{{ lang.code }}">{{ _('admin_edit_welcome.form.language_subject_label', language=lang.name, default='{language} subject') }}
+        <input id="subject_{{ lang.code }}" name="subject_{{ lang.code }}" value="{{ subject_map.get(lang.code, subject) }}" maxlength="30">
+      </label>
+      {% endfor %}
+    </div>
+    <div class="field-group translation-control">
+      <label for="body">{{ _('admin_edit_welcome.form.message', default='Message') }}
+        <textarea id="body" name="body" required>{{ body_map.get(language_code, body) }}</textarea>
+      </label>
+      <button type="button" class="btn-outline translation-toggle" data-translation-target="bodyTranslations" aria-expanded="false">{{ _('admin_edit_welcome.form.message_translate_button', default='Translate message') }}</button>
+    </div>
+    <div id="bodyTranslations" class="translation-panel" hidden>
+      <p class="translation-help">{{ _('admin_edit_welcome.form.message_translation_help', default='Write the welcome message in each supported language.') }}</p>
+      {% for lang in available_languages %}
+      <label for="body_{{ lang.code }}">{{ _('admin_edit_welcome.form.language_message_label', language=lang.name, default='{language} message') }}
+        <textarea id="body_{{ lang.code }}" name="body_{{ lang.code }}">{{ body_map.get(lang.code, body) }}</textarea>
+      </label>
+      {% endfor %}
+    </div>
     <button class="btn btn--primary" type="submit">{{ _('admin_edit_welcome.form.save', default='Save') }}</button>
   </form>
 </section>
+<style>
+.translation-control{display:flex;flex-direction:column;gap:8px;margin-bottom:var(--space-3,12px);}
+.translation-control label{flex:1;}
+.translation-toggle{align-self:flex-start;margin-top:auto;}
+.translation-panel{border:1px dashed rgba(15,23,42,.25);border-radius:12px;padding:16px;margin-bottom:var(--space-3,12px);display:flex;flex-direction:column;gap:12px;}
+.translation-panel label{display:flex;flex-direction:column;font-weight:500;gap:6px;}
+.translation-panel input,.translation-panel textarea{width:100%;}
+.translation-panel textarea{min-height:96px;}
+.translation-help{margin:0;font-size:.9rem;opacity:.75;}
+@media (min-width:600px){
+  .translation-control{flex-direction:row;align-items:flex-end;}
+  .translation-control label{flex:1;}
+  .translation-toggle{margin-left:16px;}
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.translation-toggle').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-translation-target');
+        const target = targetId ? document.getElementById(targetId) : null;
+        if (!target) return;
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        const next = !expanded;
+        btn.setAttribute('aria-expanded', String(next));
+        if (next) {
+          target.removeAttribute('hidden');
+        } else {
+          target.setAttribute('hidden', '');
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}
