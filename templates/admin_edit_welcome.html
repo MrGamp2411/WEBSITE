@@ -26,17 +26,16 @@
       </label>
       {% endfor %}
     </div>
-    <div class="field-group translation-control">
-      <label for="body">{{ _('admin_edit_welcome.form.message', default='Message') }}
-        <textarea id="body" name="body" required>{{ body_map.get(language_code, body) }}</textarea>
-      </label>
-      <button type="button" class="btn-outline translation-toggle" data-translation-target="bodyTranslations" aria-expanded="false">{{ _('admin_edit_welcome.form.message_translate_button', default='Translate message') }}</button>
+    <div class="field-group">
+      <p class="translation-label">{{ _('admin_edit_welcome.form.message', default='Message') }}</p>
     </div>
-    <div id="bodyTranslations" class="translation-panel" hidden>
+    <div id="bodyTranslations" class="translation-panel">
       <p class="translation-help">{{ _('admin_edit_welcome.form.message_translation_help', default='Write the welcome message in each supported language.') }}</p>
+      {% set default_lang = (available_languages | selectattr('code', 'equalto', default_language) | list | first) %}
+      <p class="translation-note">{{ _('admin_edit_welcome.form.message_default_language_help', language=(default_lang.name if default_lang else default_language|upper), default='Provide the {language} message. Other languages inherit it when no translation is set.') }}</p>
       {% for lang in available_languages %}
       <label for="body_{{ lang.code }}">{{ _('admin_edit_welcome.form.language_message_label', language=lang.name, default='{language} message') }}
-        <textarea id="body_{{ lang.code }}" name="body_{{ lang.code }}">{{ body_map.get(lang.code, body) }}</textarea>
+        <textarea id="body_{{ lang.code }}" name="body_{{ lang.code }}"{% if lang.code == default_language %} required aria-required="true"{% endif %}>{{ body_map.get(lang.code, body) }}</textarea>
       </label>
       {% endfor %}
     </div>
@@ -52,6 +51,8 @@
 .translation-panel input,.translation-panel textarea{width:100%;}
 .translation-panel textarea{min-height:96px;}
 .translation-help{margin:0;font-size:.9rem;opacity:.75;}
+.translation-note{margin:0;font-size:.85rem;color:#475569;}
+.translation-label{margin:0;font-weight:600;}
 @media (min-width:600px){
   .translation-control{flex-direction:row;align-items:flex-end;}
   .translation-control label{flex:1;}

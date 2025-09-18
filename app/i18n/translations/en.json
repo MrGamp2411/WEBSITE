@@ -1243,6 +1243,7 @@
       "message": "Message",
       "message_translate_button": "Translate message",
       "message_translation_help": "Write the welcome message in each supported language.",
+      "message_default_language_help": "Provide the {language} message. Other languages inherit it when no translation is set.",
       "language_message_label": "{language} message",
       "save": "Save"
     }

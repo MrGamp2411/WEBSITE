@@ -1243,6 +1243,7 @@
       "message": "Nachricht",
       "message_translate_button": "Nachricht übersetzen",
       "message_translation_help": "Schreiben Sie die Begrüßungsnachricht in jeder unterstützten Sprache.",
+      "message_default_language_help": "Tragen Sie die Nachricht auf {language} ein. Andere Sprachen übernehmen diesen Text, wenn keine Übersetzung vorhanden ist.",
       "language_message_label": "Nachricht in {language}",
       "save": "Speichern"
     }
