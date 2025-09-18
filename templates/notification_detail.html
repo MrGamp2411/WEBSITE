@@ -3,13 +3,13 @@
 <section class="users-page">
   <header class="users-toolbar">
     <div class="title-wrap">
-      <h1>{{ note.subject }}</h1>
+      <h1>{{ note.localized_subject or note.subject }}</h1>
       <p class="subtitle">{{ _('notification_detail.subtitle', default='Notification details.') }}</p>
     </div>
     <a href="/notifications" class="btn-outline">{{ _('notification_detail.back', default='Back') }}</a>
   </header>
   <div class="table-card">
-    <p class="notification-body">{{ note.body }}</p>
+    <p class="notification-body">{{ note.localized_body or note.body }}</p>
     {% if note.link_url %}
     <p><a href="{{ note.link_url }}">{{ note.link_url }}</a></p>
     {% endif %}
