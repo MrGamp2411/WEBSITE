@@ -191,6 +191,11 @@
           title: {{ _('notices.payment_failed.title', default='Payment failed')|tojson }},
           body: {{ _('notices.payment_failed.body', default='Payment was not successful. Please try again or contact our staff if the problem persists.')|tojson }},
           close: {{ _('common.close', default='Close')|tojson }}
+        },
+        wallet_insufficient: {
+          title: {{ _('notices.wallet_insufficient.title', default='Add wallet credit')|tojson }},
+          body: {{ _('notices.wallet_insufficient.body', default="You don't have enough wallet credit to complete this order. Top up your wallet or choose another payment method.")|tojson }},
+          close: {{ _('common.close', default='Close')|tojson }}
         }
       },
       app: {
