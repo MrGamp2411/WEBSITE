@@ -213,6 +213,7 @@
             bar: {{ _('order_history.card.fields.bar', default='Bar')|tojson }},
             table: {{ _('order_history.card.fields.table', default='Table')|tojson }},
             payment: {{ _('order_history.card.fields.payment', default='Payment')|tojson }},
+            cancel_reason: {{ _('order_history.card.fields.cancel_reason', default='Cancellation reason')|tojson }},
             notes: {{ _('order_history.card.fields.notes', default='Notes')|tojson }},
             prep_time: {{ _('order_history.card.fields.prep_time', default='Prep time')|tojson }}
           },
@@ -243,6 +244,13 @@
           wallet: {{ _('orders.payment_methods.wallet', default='Wallet')|tojson }},
           bar: {{ _('orders.payment_methods.bar', default='Pay at bar')|tojson }}
 {% endif %}
+        },
+        cancel_reasons: {
+          customer: {{ _('order_history.card.cancel_reasons.customer', default='Canceled by customer')|tojson }},
+          bar_staff: {{ _('order_history.card.cancel_reasons.bar_staff', default='Canceled by staff')|tojson }},
+          timeout: {{ _('order_history.card.cancel_reasons.timeout', default='Not prepared in time')|tojson }},
+          payment_failed: {{ _('order_history.card.cancel_reasons.payment_failed', default='Payment failed')|tojson }},
+          unknown: {{ _('order_history.card.cancel_reasons.unknown', default='Unknown reason')|tojson }}
         }
       },
       display: {

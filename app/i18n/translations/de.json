@@ -446,12 +446,20 @@
         "bar": "Bar",
         "table": "Tisch",
         "payment": "Zahlung",
+        "cancel_reason": "Stornierungsgrund",
         "notes": "Notizen",
         "prep_time": "Vorbereitungszeit"
       },
       "unknown_customer": "Unbekannt",
       "unknown_item": "Unbekannter Artikel",
-      "prep_minutes": "{minutes} Min"
+      "prep_minutes": "{minutes} Min",
+      "cancel_reasons": {
+        "customer": "Vom Gast storniert",
+        "bar_staff": "Vom Personal storniert",
+        "timeout": "Nicht rechtzeitig zubereitet",
+        "payment_failed": "Zahlung fehlgeschlagen",
+        "unknown": "Unbekannter Grund"
+      }
     }
   },
   "orders": {

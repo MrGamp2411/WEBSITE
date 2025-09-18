@@ -4,6 +4,7 @@ const CARD_TEXTS = ORDERS_I18N.card || {};
 const ACTION_TEXTS = ORDERS_I18N.actions || {};
 const STATUS_TEXTS = ORDERS_I18N.statuses || {};
 const PAYMENT_TEXTS = ORDERS_I18N.payment_methods || {};
+const CANCEL_REASON_TEXTS = ORDERS_I18N.cancel_reasons || {};
 
 function formatTemplate(template, values){
   if(typeof template !== 'string') return '';
@@ -35,6 +36,14 @@ function formatStatus(status) {
     return STATUS_TEXTS[status];
   }
   return status.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatCancelReason(reason) {
+  if (!reason) return '';
+  if (Object.prototype.hasOwnProperty.call(CANCEL_REASON_TEXTS, reason)) {
+    return CANCEL_REASON_TEXTS[reason];
+  }
+  return reason.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 function formatTime(dt) {
@@ -79,7 +88,7 @@ function initBartender(barId) {
     const code = order.public_order_code || ('#' + order.id);
     let actions = '';
     if (order.status === 'PLACED') {
-      actions = `<button data-status="ACCEPTED">${getAction('accept', 'Accept')}</button><button data-status="CANCELED">${getAction('cancel', 'Cancel')}</button>`;
+      actions = `<button data-status="ACCEPTED">${getAction('accept', 'Accept')}</button><button data-status="CANCELED" data-reason="bar_staff">${getAction('cancel', 'Cancel')}</button>`;
     } else if (order.status === 'ACCEPTED') {
       actions = `<button data-status="READY">${getAction('ready', 'Ready')}</button>`;
     } else if (order.status === 'READY') {
@@ -89,6 +98,9 @@ function initBartender(barId) {
     const placed = formatTime(order.created_at);
     const refund = order.status === 'CANCELED' && order.refund_amount
       ? `<div><dt>${getField('refunded', 'Refunded')}</dt><dd class="num nowrap">CHF ${order.refund_amount.toFixed(2)}</dd></div>`
+      : '';
+    const cancelReason = order.status === 'CANCELED' && order.cancel_reason
+      ? `<div><dt>${getField('cancel_reason', 'Cancellation reason')}</dt><dd>${formatCancelReason(order.cancel_reason)}</dd></div>`
       : '';
     const notes = order.notes ? `<div><dt>${getField('notes', 'Notes')}</dt><dd>${order.notes}</dd></div>` : '';
     const prepMinutes = order.ready_at ? diffMinutes(order.created_at, order.ready_at) : null;
@@ -121,6 +133,7 @@ function initBartender(barId) {
       `<div><dt>${getField('bar', 'Bar')}</dt><dd>${order.bar_name || ''}</dd></div>` +
       `<div><dt>${getField('table', 'Table')}</dt><dd>${order.table_name || ''}</dd></div>` +
       `<div><dt>${getField('payment', 'Payment')}</dt><dd>${formatPayment(order.payment_method)}</dd></div>` +
+      cancelReason +
       notes +
       prep +
       `</dl></section>` +
@@ -131,7 +144,7 @@ function initBartender(barId) {
       actionsHtml +
       `</section>`;
     el.querySelectorAll('button').forEach(btn => {
-      btn.addEventListener('click', () => updateStatus(order.id, btn.dataset.status, render));
+      btn.addEventListener('click', () => updateStatus(order.id, btn.dataset.status, render, btn.dataset.reason));
     });
     if (order.status === 'PLACED') {
       insertSorted(incoming, el, true);
@@ -197,6 +210,9 @@ function initUser(userId) {
     const refund = order.status === 'CANCELED' && order.refund_amount
       ? `<div><dt>${getField('refunded', 'Refunded')}</dt><dd class="num nowrap">CHF ${order.refund_amount.toFixed(2)}</dd></div>`
       : '';
+    const cancelReason = order.status === 'CANCELED' && order.cancel_reason
+      ? `<div><dt>${getField('cancel_reason', 'Cancellation reason')}</dt><dd>${formatCancelReason(order.cancel_reason)}</dd></div>`
+      : '';
     const notes = order.notes ? `<div><dt>${getField('notes', 'Notes')}</dt><dd>${order.notes}</dd></div>` : '';
     const prepMinutes = order.ready_at ? diffMinutes(order.created_at, order.ready_at) : null;
     const prep = prepMinutes != null
@@ -204,7 +220,7 @@ function initUser(userId) {
       : '';
     let actionsHtml = '';
     if (order.status === 'PLACED') {
-      actionsHtml = `<div class="order-actions"><button data-order-id="${order.id}" data-status="CANCELED">${getAction('cancel', 'Cancel')}</button></div>`;
+      actionsHtml = `<div class="order-actions"><button data-order-id="${order.id}" data-status="CANCELED" data-reason="customer">${getAction('cancel', 'Cancel')}</button></div>`;
     } else if (['COMPLETED', 'CANCELED'].includes(order.status)) {
       actionsHtml = `<div class="order-actions"><button class="reorder-order" data-order-id="${order.id}" type="button">${getAction('reorder', 'Reorder')}</button></div>`;
     }
@@ -229,6 +245,7 @@ function initUser(userId) {
       `<div><dt>${getField('bar', 'Bar')}</dt><dd>${order.bar_name || ''}</dd></div>` +
       `<div><dt>${getField('table', 'Table')}</dt><dd>${order.table_name || ''}</dd></div>` +
       `<div><dt>${getField('payment', 'Payment')}</dt><dd>${formatPayment(order.payment_method)}</dd></div>` +
+      cancelReason +
       notes +
       prep +
       `</dl></section>` +
@@ -258,7 +275,7 @@ function initUser(userId) {
   pending.addEventListener('click', e => {
     const btn = e.target.closest('button[data-status]');
     if (btn) {
-      updateStatus(btn.dataset.orderId, btn.dataset.status);
+      updateStatus(btn.dataset.orderId, btn.dataset.status, undefined, btn.dataset.reason);
     }
   });
   if (completed) {
@@ -303,11 +320,15 @@ function initUser(userId) {
   }
 }
 
-function updateStatus(orderId, status, onUpdate) {
+function updateStatus(orderId, status, onUpdate, reason) {
+  const payload = { status };
+  if (reason) {
+    payload.reason = reason;
+  }
   fetch(`/api/orders/${orderId}/status`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status })
+    body: JSON.stringify(payload)
   })
     .then(r => r.json())
     .then(data => {

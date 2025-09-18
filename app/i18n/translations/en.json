@@ -446,12 +446,20 @@
         "bar": "Bar",
         "table": "Table",
         "payment": "Payment",
+        "cancel_reason": "Cancellation reason",
         "notes": "Notes",
         "prep_time": "Prep time"
       },
       "unknown_customer": "Unknown",
       "unknown_item": "Unknown item",
-      "prep_minutes": "{minutes} min"
+      "prep_minutes": "{minutes} min",
+      "cancel_reasons": {
+        "customer": "Canceled by customer",
+        "bar_staff": "Canceled by staff",
+        "timeout": "Not prepared in time",
+        "payment_failed": "Payment failed",
+        "unknown": "Unknown reason"
+      }
     }
   },
   "orders": {

@@ -446,12 +446,20 @@
         "bar": "Bar",
         "table": "Tavolo",
         "payment": "Pagamento",
+        "cancel_reason": "Motivazione annullamento",
         "notes": "Note",
         "prep_time": "Tempo di preparazione"
       },
       "unknown_customer": "Sconosciuto",
       "unknown_item": "Articolo sconosciuto",
-      "prep_minutes": "{minutes} min"
+      "prep_minutes": "{minutes} min",
+      "cancel_reasons": {
+        "customer": "Annullato dal cliente",
+        "bar_staff": "Annullato dallo staff",
+        "timeout": "Non preparato in tempo",
+        "payment_failed": "Pagamento non riuscito",
+        "unknown": "Motivo sconosciuto"
+      }
     }
   },
   "orders": {

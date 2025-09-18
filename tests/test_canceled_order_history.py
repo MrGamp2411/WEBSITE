@@ -81,6 +81,8 @@ def test_canceled_order_moves_to_completed_history():
         assert f'Order {code}' not in pending
         assert f'Order {code}' in completed
         assert 'Canceled' in completed
+        assert 'Cancellation reason' in completed
+        assert 'Canceled by staff' in completed
     user_carts.clear()
     users.clear()
     users_by_email.clear()

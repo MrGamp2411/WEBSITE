@@ -126,6 +126,8 @@ def test_cancel_order_refunds_wallet_and_card():
             order = db.get(Order, ids['order_id'])
             db.close()
             assert order.status == 'CANCELED'
+            assert order.cancel_reason == 'bar_staff'
+            assert resp.json()['order']['cancel_reason'] == 'bar_staff'
             assert float(user.credit) == expected
             assert Decimal(order.refund_amount) == Decimal(str(ids['order_total']))
             assert order.cancelled_at is not None
@@ -146,6 +148,7 @@ def test_cancel_bar_order_no_refund():
         order = db.get(Order, ids['order_id'])
         db.close()
         assert order.status == 'CANCELED'
+        assert order.cancel_reason == 'bar_staff'
         assert float(user.credit) == ids['customer_initial_credit']
         assert Decimal(order.refund_amount) == Decimal('0')
         assert order.cancelled_at is not None
@@ -165,6 +168,10 @@ def test_cancel_order_updates_user_cache():
         assert resp.status_code == 200
         cached_after = users_by_email[ids['customer_email']]
         assert cached_after.credit == ids['customer_initial_credit'] + ids['order_total']
+        db = SessionLocal()
+        order = db.get(Order, ids['order_id'])
+        db.close()
+        assert order.cancel_reason == 'bar_staff'
     user_carts.clear()
     users.clear()
     users_by_email.clear()
@@ -181,6 +188,8 @@ def test_cancel_order_reflected_in_html():
         assert f"CHF {ids['customer_initial_credit'] + ids['order_total']:.2f}" in wallet.text
         orders_page = client.get('/orders')
         assert f"<dt>Refunded</dt><dd class=\"num nowrap\">CHF {ids['order_total']:.2f}</dd>" in orders_page.text
+        assert 'Cancellation reason' in orders_page.text
+        assert 'Canceled by staff' in orders_page.text
     user_carts.clear()
     users.clear()
     users_by_email.clear()
@@ -199,6 +208,8 @@ def test_customer_can_cancel_pending_order():
         user = db.get(User, ids['customer_id'])
         db.close()
         assert order.status == 'CANCELED'
+        assert order.cancel_reason == 'customer'
+        assert resp.json()['order']['cancel_reason'] == 'customer'
         assert float(user.credit) == ids['customer_initial_credit'] + ids['order_total']
     user_carts.clear()
     users.clear()
