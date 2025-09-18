@@ -40,7 +40,7 @@ def test_welcome_notification_sent():
             follow_redirects=False,
         )
         assert resp.status_code == 303
-        assert resp.headers["location"] == "/login"
+        assert resp.headers["location"] == "/"
 
     db = SessionLocal()
     user = db.query(User).filter_by(email="new@example.com").one()
@@ -91,7 +91,7 @@ def test_welcome_notification_respects_language():
             follow_redirects=False,
         )
         assert resp.status_code == 303
-        assert resp.headers["location"] == "/login"
+        assert resp.headers["location"] == "/"
 
     db = SessionLocal()
     user = db.query(User).filter_by(email="italian@example.com").one()
@@ -142,7 +142,7 @@ def test_notification_updates_when_switching_language():
             follow_redirects=False,
         )
         assert resp.status_code == 303
-        assert resp.headers["location"] == "/login"
+        assert resp.headers["location"] == "/"
 
         resp = client.post(
             "/login",

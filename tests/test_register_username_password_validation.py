@@ -59,7 +59,7 @@ def test_register_username_validation():
             follow_redirects=False,
         )
         assert resp_ok.status_code == 303
-        assert resp_ok.headers["location"] == "/login"
+        assert resp_ok.headers["location"] == "/"
         client.get("/logout")
         _start(client, "user_dup@example.com")
         resp_dup = client.post(
