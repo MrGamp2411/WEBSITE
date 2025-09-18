@@ -5785,6 +5785,7 @@ async def admin_welcome_get(
         body=wm.body if wm else "",
         subject_translations=subject_translations,
         body_translations=body_translations,
+        default_language=DEFAULT_LANGUAGE,
     )
 
 
@@ -5796,9 +5797,21 @@ async def admin_welcome_post(
     current = get_current_user(request)
     if not current or not current.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    wm = db.get(WelcomeMessage, 1)
+    existing_subjects = (
+        normalise_translation_map(wm.subject_translations, wm.subject)
+        if wm
+        else {}
+    )
+    existing_bodies = (
+        normalise_translation_map(wm.body_translations, wm.body)
+        if wm
+        else {}
+    )
     form = await request.form()
     base_subject = (form.get("subject") or "").strip()
-    base_body = (form.get("body") or "").strip()
+    if not base_subject:
+        base_subject = existing_subjects.get(DEFAULT_LANGUAGE, "").strip()
     if len(base_subject) > 30:
         return RedirectResponse(
             url="/admin/notifications/welcome?error=Subject+too+long",
@@ -5808,13 +5821,27 @@ async def admin_welcome_post(
         normalize_language(getattr(request.state, "language_code", None))
         or DEFAULT_LANGUAGE
     )
+    base_language_body = (form.get(f"body_{base_language}") or "").strip()
+    if not base_language_body:
+        base_language_body = existing_bodies.get(base_language, "").strip()
+    english_body = (form.get(f"body_{DEFAULT_LANGUAGE}") or "").strip()
+    if not english_body:
+        english_body = existing_bodies.get(DEFAULT_LANGUAGE, "").strip()
+    if not english_body:
+        return RedirectResponse(
+            url="/admin/notifications/welcome?error=Message+required",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    base_body = base_language_body or english_body
     subject_translations: Dict[str, str] = {}
     body_translations: Dict[str, str] = {}
     for code in LANGUAGES:
-        subject_value = form.get(f"subject_{code}")
-        if subject_value is None and code == base_language:
-            subject_value = base_subject
-        subject_value = (subject_value or "").strip()
+        subject_value = (form.get(f"subject_{code}") or "").strip()
+        if not subject_value:
+            if code == DEFAULT_LANGUAGE and base_subject:
+                subject_value = base_subject
+            elif code == base_language and base_subject:
+                subject_value = base_subject
         if subject_value:
             if len(subject_value) > 30:
                 return RedirectResponse(
@@ -5822,17 +5849,20 @@ async def admin_welcome_post(
                     status_code=status.HTTP_303_SEE_OTHER,
                 )
             subject_translations[code] = subject_value
-        body_value = form.get(f"body_{code}")
-        if body_value is None and code == base_language:
-            body_value = base_body
-        body_value = (body_value or "").strip()
+        body_value = (form.get(f"body_{code}") or "").strip()
+        if not body_value:
+            if code == DEFAULT_LANGUAGE:
+                body_value = english_body
+            elif code == base_language and base_body:
+                body_value = base_body
         if body_value:
             body_translations[code] = body_value
     if base_subject:
         subject_translations.setdefault(base_language, base_subject)
+    if english_body:
+        body_translations.setdefault(DEFAULT_LANGUAGE, english_body)
     if base_body:
         body_translations.setdefault(base_language, base_body)
-    wm = db.get(WelcomeMessage, 1)
     if not wm:
         wm = WelcomeMessage(id=1)
         db.add(wm)

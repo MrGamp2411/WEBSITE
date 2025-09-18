@@ -1267,6 +1267,7 @@
       "message": "Message",
       "message_translate_button": "Traduire le message",
       "message_translation_help": "Rédigez le message de bienvenue dans chaque langue prise en charge.",
+      "message_default_language_help": "Renseignez le message en {language}. Les autres langues utiliseront ce texte si aucune traduction n'est disponible.",
       "language_message_label": "Message en {language}",
       "save": "Sauvegarder"
     }
