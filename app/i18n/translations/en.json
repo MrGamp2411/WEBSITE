@@ -1505,7 +1505,11 @@
   },
   "bar_products": {
     "edit": {
-      "title": "Edit Product {product}"
+      "title": "Edit Product {product}",
+      "actions": {
+        "edit_name": "Edit name",
+        "edit_description": "Edit description"
+      }
     },
     "new": {
       "title": "Add Product to {category}"
@@ -1518,6 +1522,34 @@
       "photo": "Photo",
       "create": "Create",
       "update": "Update"
+    },
+    "edit_name": {
+      "back": "Back to product",
+      "title": "Edit name for {product}",
+      "intro": "Update the name shown to customers.",
+      "fields": {
+        "name": "Name"
+      },
+      "actions": {
+        "save": "Save name"
+      },
+      "errors": {
+        "required": "Name is required."
+      }
+    },
+    "edit_description": {
+      "back": "Back to product",
+      "title": "Edit description for {product}",
+      "intro": "Update the description shown to customers.",
+      "fields": {
+        "description": "Description"
+      },
+      "actions": {
+        "save": "Save description"
+      },
+      "errors": {
+        "required": "Description is required."
+      }
     },
     "manage": {
       "title": "Products in {category} for {bar}",

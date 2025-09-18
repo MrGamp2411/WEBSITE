@@ -6222,6 +6222,234 @@ async def bar_edit_product(
     )
 
 
+@app.get(
+    "/bar/{bar_id}/categories/{category_id}/products/{product_id}/edit/name",
+    response_class=HTMLResponse,
+)
+async def bar_edit_product_name_form(
+    request: Request,
+    bar_id: int,
+    category_id: int,
+    product_id: int,
+    db: Session = Depends(get_db),
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    db_item = db.get(MenuItem, product_id)
+    if (
+        not category
+        or not db_item
+        or db_item.category_id != category_id
+        or db_item.bar_id != bar_id
+    ):
+        raise HTTPException(status_code=404, detail="Product not found")
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    product = bar.products.get(product_id)
+    if not product:
+        product = Product(
+            id=db_item.id,
+            category_id=db_item.category_id,
+            name=db_item.name,
+            price=float(db_item.price_chf),
+            description=db_item.description or "",
+            display_order=db_item.sort_order or 0,
+            photo_url=f"/api/products/{db_item.id}/image",
+        )
+    return render_template(
+        "bar_edit_product_name.html",
+        request=request,
+        bar=bar,
+        category=category,
+        product=product,
+        name_value=product.name,
+    )
+
+
+@app.post("/bar/{bar_id}/categories/{category_id}/products/{product_id}/edit/name")
+async def bar_edit_product_name(
+    request: Request,
+    bar_id: int,
+    category_id: int,
+    product_id: int,
+    db: Session = Depends(get_db),
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    db_item = db.get(MenuItem, product_id)
+    if (
+        not category
+        or not db_item
+        or db_item.category_id != category_id
+        or db_item.bar_id != bar_id
+    ):
+        raise HTTPException(status_code=404, detail="Product not found")
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    name = (form.get("name") or "").strip()
+    error_code: Optional[str] = None
+    if not name:
+        error_code = "required"
+    if len(name) > 80:
+        name = name[:80]
+    product = bar.products.get(product_id)
+    if not product:
+        product = Product(
+            id=db_item.id,
+            category_id=db_item.category_id,
+            name=db_item.name,
+            price=float(db_item.price_chf),
+            description=db_item.description or "",
+            display_order=db_item.sort_order or 0,
+            photo_url=f"/api/products/{db_item.id}/image",
+        )
+    if error_code:
+        return render_template(
+            "bar_edit_product_name.html",
+            request=request,
+            bar=bar,
+            category=category,
+            product=product,
+            name_value=name,
+            error_code=error_code,
+        )
+    db_item.name = name
+    db.commit()
+    refresh_bar_from_db(bar_id, db)
+    return RedirectResponse(
+        url=f"/bar/{bar_id}/categories/{category_id}/products/{product_id}/edit",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@app.get(
+    "/bar/{bar_id}/categories/{category_id}/products/{product_id}/edit/description",
+    response_class=HTMLResponse,
+)
+async def bar_edit_product_description_form(
+    request: Request,
+    bar_id: int,
+    category_id: int,
+    product_id: int,
+    db: Session = Depends(get_db),
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    db_item = db.get(MenuItem, product_id)
+    if (
+        not category
+        or not db_item
+        or db_item.category_id != category_id
+        or db_item.bar_id != bar_id
+    ):
+        raise HTTPException(status_code=404, detail="Product not found")
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    product = bar.products.get(product_id)
+    if not product:
+        product = Product(
+            id=db_item.id,
+            category_id=db_item.category_id,
+            name=db_item.name,
+            price=float(db_item.price_chf),
+            description=db_item.description or "",
+            display_order=db_item.sort_order or 0,
+            photo_url=f"/api/products/{db_item.id}/image",
+        )
+    return render_template(
+        "bar_edit_product_description.html",
+        request=request,
+        bar=bar,
+        category=category,
+        product=product,
+        description_value=product.description,
+    )
+
+
+@app.post(
+    "/bar/{bar_id}/categories/{category_id}/products/{product_id}/edit/description"
+)
+async def bar_edit_product_description(
+    request: Request,
+    bar_id: int,
+    category_id: int,
+    product_id: int,
+    db: Session = Depends(get_db),
+):
+    user = get_current_user(request)
+    bar = refresh_bar_from_db(bar_id, db)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    category = bar.categories.get(category_id)
+    db_item = db.get(MenuItem, product_id)
+    if (
+        not category
+        or not db_item
+        or db_item.category_id != category_id
+        or db_item.bar_id != bar_id
+    ):
+        raise HTTPException(status_code=404, detail="Product not found")
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    description = (form.get("description") or "").strip()
+    error_code: Optional[str] = None
+    if not description:
+        error_code = "required"
+    if len(description) > 190:
+        description = description[:190]
+    product = bar.products.get(product_id)
+    if not product:
+        product = Product(
+            id=db_item.id,
+            category_id=db_item.category_id,
+            name=db_item.name,
+            price=float(db_item.price_chf),
+            description=db_item.description or "",
+            display_order=db_item.sort_order or 0,
+            photo_url=f"/api/products/{db_item.id}/image",
+        )
+    if error_code:
+        return render_template(
+            "bar_edit_product_description.html",
+            request=request,
+            bar=bar,
+            category=category,
+            product=product,
+            description_value=description,
+            error_code=error_code,
+        )
+    db_item.description = description
+    db.commit()
+    refresh_bar_from_db(bar_id, db)
+    return RedirectResponse(
+        url=f"/bar/{bar_id}/categories/{category_id}/products/{product_id}/edit",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
 @app.get("/bar/{bar_id}/categories/{category_id}/edit", response_class=HTMLResponse)
 async def bar_edit_category_form(
     request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
