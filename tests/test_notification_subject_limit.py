@@ -43,7 +43,7 @@ def test_subject_too_long_is_rejected():
         _login_super_admin(client)
         resp = client.post(
             "/admin/notifications",
-            data={"target": "all", "subject": "x" * 31, "body": "Test"},
+            data={"target": "all", "subject_en": "x" * 31, "body_en": "Test"},
             follow_redirects=False,
         )
         assert resp.status_code == 303

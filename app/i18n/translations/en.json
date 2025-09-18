@@ -1153,7 +1153,13 @@
         }
       },
       "subject": "Subject",
+      "subject_translation_help": "Provide a subject for every supported language.",
+      "subject_default_language_help": "Provide the {language} subject. Other languages inherit it when no translation is set.",
+      "language_subject_label": "{language} subject",
       "message": "Message",
+      "message_translation_help": "Write the notification message in each supported language.",
+      "message_default_language_help": "Provide the {language} message. Other languages inherit it when no translation is set.",
+      "language_message_label": "{language} message",
       "link_url": "Link URL",
       "image": "Image",
       "attachment": "Attachment",

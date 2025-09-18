@@ -49,7 +49,7 @@ def test_view_and_delete_notification():
         _login_super_admin(client)
         resp = client.post(
             "/admin/notifications",
-            data={"target": "all", "subject": "Hi", "body": "Test"},
+            data={"target": "all", "subject_en": "Hi", "body_en": "Test"},
             follow_redirects=False,
         )
         assert resp.status_code == 303

@@ -44,7 +44,12 @@ def test_notification_badge():
         _login(client, "admin@example.com", "ChangeMe!123")
         resp = client.post(
             "/admin/notifications",
-            data={"target": "user", "user_id": user_id, "subject": "Hi", "body": "Test"},
+            data={
+                "target": "user",
+                "user_id": user_id,
+                "subject_en": "Hi",
+                "body_en": "Test",
+            },
             follow_redirects=False,
         )
         assert resp.status_code == 303

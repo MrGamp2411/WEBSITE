@@ -1153,7 +1153,13 @@
         }
       },
       "subject": "Gegenstand",
+      "subject_translation_help": "Geben Sie für jede unterstützte Sprache einen Betreff an.",
+      "subject_default_language_help": "Geben Sie den Betreff auf {language} ein. Andere Sprachen übernehmen diesen Text, wenn keine Übersetzung vorhanden ist.",
+      "language_subject_label": "{language}-Betreff",
       "message": "Nachricht",
+      "message_translation_help": "Formulieren Sie die Benachrichtigung in allen unterstützten Sprachen.",
+      "message_default_language_help": "Geben Sie die Nachricht auf {language} ein. Andere Sprachen verwenden diesen Text, wenn keine Übersetzung verfügbar ist.",
+      "language_message_label": "{language}-Nachricht",
       "link_url": "Verknüpfungs-URL",
       "image": "Bild",
       "attachment": "Anlage",

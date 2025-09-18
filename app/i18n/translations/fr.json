@@ -1177,7 +1177,13 @@
         }
       },
       "subject": "Sujet",
+      "subject_translation_help": "Indiquez un objet pour chaque langue prise en charge.",
+      "subject_default_language_help": "Saisissez l'objet en {language}. Les autres langues reprendront ce texte s'il n'y a pas de traduction.",
+      "language_subject_label": "Objet en {language}",
       "message": "Message",
+      "message_translation_help": "Rédigez le message de notification dans chaque langue prise en charge.",
+      "message_default_language_help": "Renseignez le message en {language}. Les autres langues utiliseront ce texte s'il n'existe pas de traduction.",
+      "language_message_label": "Message en {language}",
       "link_url": "URL de liaison",
       "image": "Image",
       "attachment": "Pièce jointe",
