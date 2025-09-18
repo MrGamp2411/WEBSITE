@@ -212,6 +212,15 @@ def resolve_translated_value(
     return value
 
 
+def resolve_welcome_message_text(
+    translations: Any,
+    fallback: Optional[str],
+    language_code: str,
+) -> str:
+    normalised = normalise_translation_map(translations, fallback)
+    return resolve_translated_value(normalised, fallback or "", language_code)
+
+
 class Category:
     def __init__(
         self,
@@ -1191,6 +1200,8 @@ def ensure_welcome_message_table() -> None:
     """Ensure welcome message table and default row exist."""
     inspector = inspect(engine)
     tables = inspector.get_table_names()
+    subject_payload = json.dumps({DEFAULT_LANGUAGE: "Welcome"})
+    body_payload = json.dumps({DEFAULT_LANGUAGE: "Welcome to SiplyGo!"})
     if "welcome_message" not in tables:
         with engine.begin() as conn:
             conn.execute(
@@ -1198,26 +1209,97 @@ def ensure_welcome_message_table() -> None:
                     "CREATE TABLE welcome_message ("
                     "id INTEGER PRIMARY KEY,"
                     "subject VARCHAR(30),"
-                    "body TEXT"
+                    "body TEXT,"
+                    "subject_translations JSON,"
+                    "body_translations JSON"
                     ")"
                 )
             )
             conn.execute(
                 text(
-                    "INSERT INTO welcome_message (id, subject, body) "
-                    "VALUES (1, 'Welcome', 'Welcome to SiplyGo!')"
-                )
+                    "INSERT INTO welcome_message ("
+                    "id, subject, body, subject_translations, body_translations"
+                    ") VALUES ("
+                    "1, 'Welcome', 'Welcome to SiplyGo!', :subject_translations, :body_translations"
+                    ")"
+                ),
+                {
+                    "subject_translations": subject_payload,
+                    "body_translations": body_payload,
+                },
             )
     else:
+        columns = {col["name"] for col in inspector.get_columns("welcome_message")}
         with engine.begin() as conn:
+            if "subject_translations" not in columns:
+                conn.execute(
+                    text(
+                        "ALTER TABLE welcome_message "
+                        "ADD COLUMN subject_translations JSON"
+                    )
+                )
+            if "body_translations" not in columns:
+                conn.execute(
+                    text(
+                        "ALTER TABLE welcome_message "
+                        "ADD COLUMN body_translations JSON"
+                    )
+                )
             result = conn.execute(text("SELECT COUNT(*) FROM welcome_message"))
             if result.scalar() == 0:
                 conn.execute(
                     text(
-                        "INSERT INTO welcome_message (id, subject, body) "
-                        "VALUES (1, 'Welcome', 'Welcome to SiplyGo!')"
-                    )
+                        "INSERT INTO welcome_message ("
+                        "id, subject, body, subject_translations, body_translations"
+                        ") VALUES ("
+                        "1, 'Welcome', 'Welcome to SiplyGo!', :subject_translations, :body_translations"
+                        ")"
+                    ),
+                    {
+                        "subject_translations": subject_payload,
+                        "body_translations": body_payload,
+                    },
                 )
+            row = conn.execute(
+                text(
+                    "SELECT id, subject, body, subject_translations, body_translations "
+                    "FROM welcome_message WHERE id = 1"
+                )
+            ).first()
+            if row:
+                def _needs_default(value: Any) -> bool:
+                    if value is None:
+                        return True
+                    if isinstance(value, str):
+                        candidate = value.strip()
+                        if not candidate:
+                            return True
+                        try:
+                            decoded = json.loads(candidate)
+                        except json.JSONDecodeError:
+                            return False
+                        return not decoded
+                    if isinstance(value, dict):
+                        return not value
+                    return False
+
+                assignments: List[str] = []
+                params: Dict[str, Any] = {"id": row.id}
+                if _needs_default(row.subject_translations):
+                    assignments.append("subject_translations = :subject_translations")
+                    params["subject_translations"] = subject_payload
+                if _needs_default(row.body_translations):
+                    assignments.append("body_translations = :body_translations")
+                    params["body_translations"] = body_payload
+                if assignments:
+                    conn.execute(
+                        text(
+                            "UPDATE welcome_message SET "
+                            + ", ".join(assignments)
+                            + " WHERE id = :id"
+                        ),
+                        params,
+                    )
 
 
 @app.on_event("startup")
@@ -3377,12 +3459,19 @@ async def register_details(request: Request, db: Session = Depends(get_db)):
         wm = db.get(WelcomeMessage, 1)
         if wm:
             now = datetime.utcnow()
+            language_code = getattr(request.state, "language_code", DEFAULT_LANGUAGE)
+            subject_text = resolve_welcome_message_text(
+                wm.subject_translations, wm.subject, language_code
+            )
+            body_text = resolve_welcome_message_text(
+                wm.body_translations, wm.body, language_code
+            )
             log = NotificationLog(
                 sender_id=user.id,
                 target="user",
                 user_id=user.id,
-                subject=wm.subject,
-                body=wm.body,
+                subject=subject_text,
+                body=body_text,
                 created_at=now,
             )
             db.add(log)
@@ -3391,8 +3480,8 @@ async def register_details(request: Request, db: Session = Depends(get_db)):
                 user_id=user.id,
                 sender_id=user.id,
                 log_id=log.id,
-                subject=wm.subject,
-                body=wm.body,
+                subject=subject_text,
+                body=body_text,
                 created_at=now,
             )
             db.add(note)
@@ -5677,6 +5766,16 @@ async def admin_welcome_get(
     if not current or not current.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     wm = db.get(WelcomeMessage, 1)
+    subject_translations = (
+        normalise_translation_map(wm.subject_translations, wm.subject)
+        if wm
+        else {}
+    )
+    body_translations = (
+        normalise_translation_map(wm.body_translations, wm.body)
+        if wm
+        else {}
+    )
     return render_template(
         "admin_edit_welcome.html",
         request=request,
@@ -5684,30 +5783,63 @@ async def admin_welcome_get(
         error=error,
         subject=wm.subject if wm else "",
         body=wm.body if wm else "",
+        subject_translations=subject_translations,
+        body_translations=body_translations,
     )
 
 
 @app.post("/admin/notifications/welcome", response_class=HTMLResponse)
 async def admin_welcome_post(
     request: Request,
-    subject: str = Form(""),
-    body: str = Form(""),
     db: Session = Depends(get_db),
 ):
     current = get_current_user(request)
     if not current or not current.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    if len(subject) > 30:
+    form = await request.form()
+    base_subject = (form.get("subject") or "").strip()
+    base_body = (form.get("body") or "").strip()
+    if len(base_subject) > 30:
         return RedirectResponse(
             url="/admin/notifications/welcome?error=Subject+too+long",
             status_code=status.HTTP_303_SEE_OTHER,
         )
+    base_language = (
+        normalize_language(getattr(request.state, "language_code", None))
+        or DEFAULT_LANGUAGE
+    )
+    subject_translations: Dict[str, str] = {}
+    body_translations: Dict[str, str] = {}
+    for code in LANGUAGES:
+        subject_value = form.get(f"subject_{code}")
+        if subject_value is None and code == base_language:
+            subject_value = base_subject
+        subject_value = (subject_value or "").strip()
+        if subject_value:
+            if len(subject_value) > 30:
+                return RedirectResponse(
+                    url="/admin/notifications/welcome?error=Subject+too+long",
+                    status_code=status.HTTP_303_SEE_OTHER,
+                )
+            subject_translations[code] = subject_value
+        body_value = form.get(f"body_{code}")
+        if body_value is None and code == base_language:
+            body_value = base_body
+        body_value = (body_value or "").strip()
+        if body_value:
+            body_translations[code] = body_value
+    if base_subject:
+        subject_translations.setdefault(base_language, base_subject)
+    if base_body:
+        body_translations.setdefault(base_language, base_body)
     wm = db.get(WelcomeMessage, 1)
     if not wm:
         wm = WelcomeMessage(id=1)
         db.add(wm)
-    wm.subject = subject
-    wm.body = body
+    wm.subject_translations = subject_translations
+    wm.body_translations = body_translations
+    wm.subject = subject_translations.get(DEFAULT_LANGUAGE, base_subject)
+    wm.body = body_translations.get(DEFAULT_LANGUAGE, base_body)
     db.commit()
     return RedirectResponse(
         url="/admin/notifications?message=Saved",
