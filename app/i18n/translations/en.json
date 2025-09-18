@@ -483,7 +483,7 @@
     },
     "wallet_insufficient": {
       "title": "Add wallet credit",
-      "body": "You don't have enough wallet credit to complete this order. Top up your wallet or choose another payment method.",
+      "body": "You do not have enough wallet credit to complete this order. Top up your wallet or choose another payment method.",
       "close": "Close"
     }
   },
