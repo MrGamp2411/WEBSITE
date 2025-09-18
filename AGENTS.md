@@ -348,7 +348,8 @@
   - Super admins send messages via `/admin/notifications/new`, targeting all users, a single user, or users who ordered at a specific bar.
   - The Admin Notifications page lists recent messages with a **New Message** button linking to the send form and an **Edit Welcome** button for updating the default welcome message.
 - The welcome message editor captures translated subjects and bodies for every supported language; updates are stored on `WelcomeMessage.subject_translations` and `WelcomeMessage.body_translations` with a 30-character limit per subject variant.
-- Welcome message bodies are edited solely through the per-language fields; the primary message textarea and translate toggle were removed.
+- Welcome message subjects and bodies are edited solely through the per-language fields; the primary inputs and translate toggles were removed.
+  - The default-language subject input (English) is required on submit; `admin_welcome_post` falls back to the previous English copy if it isn't provided. Empty subject fields inherit the active language value or the English default.
   - The default-language textarea (English) is required on submit; `admin_welcome_post` falls back to the previous English copy if it isn't provided. The handler keeps the active language's previous text when its textarea is submitted empty and clears other translations when their fields are blank.
   - Each row includes **View** and **Delete** actions; Delete requires confirmation via `.cart-popup`.
   - Viewing a notification at `/admin/notifications/{id}` shows full details and a list of recipient users.

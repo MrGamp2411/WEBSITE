@@ -12,17 +12,16 @@
   <p class="alert-danger">{{ error }}</p>
   {% endif %}
   <form class="form" method="post" action="/admin/notifications/welcome">
-    <div class="field-group translation-control">
-      <label for="subject">{{ _('admin_edit_welcome.form.subject', default='Subject') }}
-        <input id="subject" type="text" name="subject" value="{{ subject_map.get(language_code, subject) }}" maxlength="30" required>
-      </label>
-      <button type="button" class="btn-outline translation-toggle" data-translation-target="subjectTranslations" aria-expanded="false">{{ _('admin_edit_welcome.form.subject_translate_button', default='Translate subject') }}</button>
+    {% set default_lang = (available_languages | selectattr('code', 'equalto', default_language) | list | first) %}
+    <div class="field-group">
+      <p class="translation-label">{{ _('admin_edit_welcome.form.subject', default='Subject') }}</p>
     </div>
-    <div id="subjectTranslations" class="translation-panel" hidden>
+    <div id="subjectTranslations" class="translation-panel">
       <p class="translation-help">{{ _('admin_edit_welcome.form.subject_translation_help', default='Provide a subject for every supported language.') }}</p>
+      <p class="translation-note">{{ _('admin_edit_welcome.form.subject_default_language_help', language=(default_lang.name if default_lang else default_language|upper), default='Provide the {language} subject. Other languages inherit it when no translation is set.') }}</p>
       {% for lang in available_languages %}
       <label for="subject_{{ lang.code }}">{{ _('admin_edit_welcome.form.language_subject_label', language=lang.name, default='{language} subject') }}
-        <input id="subject_{{ lang.code }}" name="subject_{{ lang.code }}" value="{{ subject_map.get(lang.code, subject) }}" maxlength="30">
+        <input id="subject_{{ lang.code }}" name="subject_{{ lang.code }}" value="{{ subject_map.get(lang.code, subject) }}" maxlength="30"{% if lang.code == default_language %} required aria-required="true"{% endif %}>
       </label>
       {% endfor %}
     </div>
@@ -31,7 +30,6 @@
     </div>
     <div id="bodyTranslations" class="translation-panel">
       <p class="translation-help">{{ _('admin_edit_welcome.form.message_translation_help', default='Write the welcome message in each supported language.') }}</p>
-      {% set default_lang = (available_languages | selectattr('code', 'equalto', default_language) | list | first) %}
       <p class="translation-note">{{ _('admin_edit_welcome.form.message_default_language_help', language=(default_lang.name if default_lang else default_language|upper), default='Provide the {language} message. Other languages inherit it when no translation is set.') }}</p>
       {% for lang in available_languages %}
       <label for="body_{{ lang.code }}">{{ _('admin_edit_welcome.form.language_message_label', language=lang.name, default='{language} message') }}
