@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="product-field-editor">
+  <a class="back-link" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/edit"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('bar_products.edit_description.back', default='Back to product') }}</a>
+  <h1>{{ _('bar_products.edit_description.title', product=product.name, default='Edit description for {product}') }}</h1>
+  <p class="intro">{{ _('bar_products.edit_description.intro', default='Update the description shown to customers.') }}</p>
+  {% if error_code %}
+  <div class="alert alert-danger">{{ _('bar_products.edit_description.errors.' + error_code, default='Description is required.') }}</div>
+  {% endif %}
+  <form method="post" action="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/edit/description" class="field-form">
+    <div class="field-group">
+      <label for="description">{{ _('bar_products.edit_description.fields.description', default='Description') }}</label>
+      <textarea id="description" name="description" maxlength="190" required>{{ description_value }}</textarea>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn--primary">{{ _('bar_products.edit_description.actions.save', default='Save description') }}</button>
+    </div>
+  </form>
+</section>
+<style>
+.product-field-editor{max-width:720px;margin-inline:auto;padding-block:var(--space-6,24px);display:flex;flex-direction:column;gap:var(--space-4,16px);}
+.product-field-editor .back-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;opacity:.8;}
+.product-field-editor .back-link:hover{opacity:1;}
+.product-field-editor .intro{margin:0;opacity:.8;}
+.field-form{display:flex;flex-direction:column;gap:var(--space-4,16px);}
+.field-form .field-group{display:flex;flex-direction:column;gap:8px;}
+.field-form input,.field-form textarea{padding:12px 14px;border-radius:var(--radius-xl,16px);border:1px solid rgba(15,23,42,.12);font-size:1rem;}
+.field-form input:focus,.field-form textarea:focus{outline:2px solid rgba(91,45,238,.25);outline-offset:2px;}
+.field-form .form-actions{display:flex;justify-content:flex-end;margin-top:var(--space-4,16px);}
+.alert{padding:12px 14px;border-radius:var(--radius-lg,12px);}
+.alert-danger{background:#fee2e2;color:#991b1b;}
+</style>
+{% endblock %}

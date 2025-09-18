@@ -1505,7 +1505,11 @@
   },
   "bar_products": {
     "edit": {
-      "title": "Produkt bearbeiten {product}"
+      "title": "Produkt bearbeiten {product}",
+      "actions": {
+        "edit_name": "Name bearbeiten",
+        "edit_description": "Beschreibung bearbeiten"
+      }
     },
     "new": {
       "title": "Produkt in {category} hinzufügen"
@@ -1518,6 +1522,34 @@
       "photo": "Foto",
       "create": "Erstellen",
       "update": "Aktualisieren"
+    },
+    "edit_name": {
+      "back": "Zurück zum Produkt",
+      "title": "Name für {product} bearbeiten",
+      "intro": "Aktualisieren Sie den Namen, der Gästen angezeigt wird.",
+      "fields": {
+        "name": "Name"
+      },
+      "actions": {
+        "save": "Name speichern"
+      },
+      "errors": {
+        "required": "Der Name ist erforderlich."
+      }
+    },
+    "edit_description": {
+      "back": "Zurück zum Produkt",
+      "title": "Beschreibung für {product} bearbeiten",
+      "intro": "Aktualisieren Sie die Beschreibung, die Gästen angezeigt wird.",
+      "fields": {
+        "description": "Beschreibung"
+      },
+      "actions": {
+        "save": "Beschreibung speichern"
+      },
+      "errors": {
+        "required": "Die Beschreibung ist erforderlich."
+      }
     },
     "manage": {
       "title": "Produkte in {category} für {bar}",
