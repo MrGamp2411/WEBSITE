@@ -2,28 +2,34 @@
 {% block content %}
 <h1>{{ _('bar_categories.edit.title', bar=bar.name, default='Edit Category for {bar}') }}</h1>
 <section class="category-edit">
-  <div class="translation-actions">
-    <a class="btn-outline" href="/bar/{{ bar.id }}/categories/{{ category.id }}/edit/name">{{ _('bar_categories.edit.actions.edit_name', default='Edit name') }}</a>
-    <a class="btn-outline" href="/bar/{{ bar.id }}/categories/{{ category.id }}/edit/description">{{ _('bar_categories.edit.actions.edit_description', default='Edit description') }}</a>
+  <div class="card">
+    <div class="card__body">
+      <form class="form" method="post">
+        <div class="form-field">
+          <label for="name">{{ _('bar_categories.form.name', default='Name') }}</label>
+          <input id="name" name="name" value="{{ category.name }}" required readonly>
+          <a class="btn-outline field-action" href="/bar/{{ bar.id }}/categories/{{ category.id }}/edit/name">{{ _('bar_categories.edit.actions.edit_name', default='Edit name') }}</a>
+        </div>
+        <div class="form-field">
+          <label for="description">{{ _('bar_categories.form.description', default='Description') }}</label>
+          <textarea id="description" name="description" readonly>{{ category.description }}</textarea>
+          <a class="btn-outline field-action" href="/bar/{{ bar.id }}/categories/{{ category.id }}/edit/description">{{ _('bar_categories.edit.actions.edit_description', default='Edit description') }}</a>
+        </div>
+        <div class="form-field">
+          <label for="display_order">{{ _('bar_categories.form.display_order', default='Display Order') }}</label>
+          <input id="display_order" type="number" name="display_order" value="{{ category.display_order }}">
+        </div>
+        <button class="btn btn--primary" type="submit">{{ _('bar_categories.form.save', default='Save') }}</button>
+      </form>
+    </div>
   </div>
-  <form class="form" method="post">
-    <label for="name">{{ _('bar_categories.form.name', default='Name') }}
-      <input id="name" name="name" value="{{ category.name }}" required readonly>
-    </label>
-    <label for="description">{{ _('bar_categories.form.description', default='Description') }}
-      <textarea id="description" name="description" readonly>{{ category.description }}</textarea>
-    </label>
-    <label for="display_order">{{ _('bar_categories.form.display_order', default='Display Order') }}
-      <input id="display_order" type="number" name="display_order" value="{{ category.display_order }}">
-    </label>
-    <button class="btn btn--primary" type="submit">{{ _('bar_categories.form.save', default='Save') }}</button>
-  </form>
 </section>
 <style>
-.category-edit{max-width:720px;margin-inline:auto;display:flex;flex-direction:column;gap:var(--space-4,16px);}
-.category-edit .translation-actions{display:flex;flex-wrap:wrap;gap:12px;}
-.category-edit .translation-actions .btn-outline{flex:0 0 auto;}
-.category-edit .form{display:flex;flex-direction:column;gap:var(--space-4,16px);}
+.category-edit{max-width:720px;margin-inline:auto;}
+.category-edit .card__body{display:flex;}
+.category-edit .form{display:flex;flex-direction:column;gap:var(--space-5,24px);width:100%;}
+.category-edit .form-field{display:flex;flex-direction:column;gap:var(--space-2,12px);}
+.category-edit .field-action{align-self:flex-start;}
 .category-edit textarea{min-height:110px;}
 .category-edit input[readonly],.category-edit textarea[readonly]{background:var(--surface-strong,#f3f4f6);cursor:not-allowed;}
 </style>
