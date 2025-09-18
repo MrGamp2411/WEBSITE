@@ -1523,34 +1523,34 @@
       "create": "Create",
       "update": "Update"
     },
-    "edit_name": {
-      "back": "Back to product",
-      "title": "Edit name for {product}",
-      "intro": "Update the name shown to customers.",
-      "fields": {
-        "name": "Name"
-      },
-      "actions": {
-        "save": "Save name"
-      },
-      "errors": {
-        "required": "Name is required."
-      }
+  "edit_name": {
+    "back": "Back to product",
+    "title": "Edit names for {product}",
+    "intro": "Provide a name for each supported language. Customers see the option matching their selected language.",
+    "fields": {
+      "language": "{language} name"
     },
-    "edit_description": {
-      "back": "Back to product",
-      "title": "Edit description for {product}",
-      "intro": "Update the description shown to customers.",
-      "fields": {
-        "description": "Description"
-      },
-      "actions": {
-        "save": "Save description"
-      },
-      "errors": {
-        "required": "Description is required."
-      }
+    "actions": {
+      "save": "Save names"
     },
+    "errors": {
+      "required": "All fields are required."
+    }
+  },
+  "edit_description": {
+    "back": "Back to product",
+    "title": "Edit descriptions for {product}",
+    "intro": "Write a description for each supported language. Descriptions appear on the customer menu.",
+    "fields": {
+      "language": "{language} description"
+    },
+    "actions": {
+      "save": "Save descriptions"
+    },
+    "errors": {
+      "required": "All fields are required."
+    }
+  },
     "manage": {
       "title": "Products in {category} for {bar}",
       "subtitle": "Add, edit and organize products for this category.",

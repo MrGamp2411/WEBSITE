@@ -31,10 +31,10 @@
         <tr>
           <td>{{ product.display_order }}</td>
           <td>
-            <img src="{{ product.photo_url }}" alt="{{ product.name }} photo" width="50" height="28" loading="lazy" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
+            <img src="{{ product.photo_url }}" alt="{{ product_name(product) }} photo" width="50" height="28" loading="lazy" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
           </td>
-          <td>{{ product.name }}</td>
-          <td>{{ product.description }}</td>
+          <td>{{ product_name(product) }}</td>
+          <td>{{ product_description(product) }}</td>
           <td>{{ "%.2f"|format(product.price) }}</td>
           <td class="actions">
             <div class="actions-group">

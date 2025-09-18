@@ -250,13 +250,26 @@ class Product:
         description: str,
         display_order: int = 0,
         photo_url: Optional[str] = None,
+        name_translations: Optional[Dict[str, str]] = None,
+        description_translations: Optional[Dict[str, str]] = None,
     ):
         self.id = id
         self.category_id = category_id
-        self.name = name
+        self.name_translations = normalise_translation_map(
+            name_translations, name
+        )
+        self.description_translations = normalise_translation_map(
+            description_translations, description
+        )
+        self.name = resolve_translated_value(
+            self.name_translations, name, DEFAULT_LANGUAGE
+        )
         self.price = price
         # Ensure product descriptions stay within 190 characters
-        self.description = description[:190]
+        resolved_description = resolve_translated_value(
+            self.description_translations, description, DEFAULT_LANGUAGE
+        )
+        self.description = resolved_description[:190]
         self.display_order = display_order
         self.photo_url = photo_url
 
@@ -369,6 +382,25 @@ def get_category_description_for_language(category: Any, language_code: str) -> 
     base = getattr(category, "description", "")
     translations = normalise_translation_map(raw, base)
     return resolve_translated_value(translations, base, language_code)
+
+
+def get_product_name_for_language(product: Any, language_code: str) -> str:
+    if product is None:
+        return ""
+    raw = getattr(product, "name_translations", None)
+    base = getattr(product, "name", "")
+    translations = normalise_translation_map(raw, base)
+    return resolve_translated_value(translations, base, language_code)
+
+
+def get_product_description_for_language(product: Any, language_code: str) -> str:
+    if product is None:
+        return ""
+    raw = getattr(product, "description_translations", None)
+    base = getattr(product, "description", "")
+    translations = normalise_translation_map(raw, base)
+    value = resolve_translated_value(translations, base, language_code)
+    return value[:190]
 
 
 class DemoUser:
@@ -921,6 +953,8 @@ def ensure_menu_item_columns() -> None:
     required = {
         "sort_order": "INTEGER",
         "photo": "VARCHAR(255)",
+        "name_translations": "JSON",
+        "description_translations": "JSON",
     }
     missing = {name: ddl for name, ddl in required.items() if name not in columns}
     if missing:
@@ -940,6 +974,53 @@ def ensure_menu_item_columns() -> None:
                     "WHERE photo IS NULL AND photo_url IS NOT NULL"
                 )
             )
+    with SessionLocal() as db:
+        updated = False
+        for item in db.query(MenuItem).all():
+            name_translations = dict(item.name_translations or {})
+            base_name = name_translations.get(DEFAULT_LANGUAGE) or item.name or ""
+            if not name_translations and base_name:
+                name_translations = {code: base_name for code in LANGUAGES}
+            else:
+                for code in LANGUAGES:
+                    name_translations.setdefault(code, base_name)
+            for code, value in list(name_translations.items()):
+                if isinstance(value, str) and len(value) > 80:
+                    name_translations[code] = value[:80]
+            description_translations = dict(item.description_translations or {})
+            base_description = (
+                description_translations.get(DEFAULT_LANGUAGE)
+                or item.description
+                or ""
+            )
+            if not description_translations and base_description:
+                description_translations = {
+                    code: base_description for code in LANGUAGES
+                }
+            else:
+                for code in LANGUAGES:
+                    description_translations.setdefault(code, base_description)
+            for code, value in list(description_translations.items()):
+                if isinstance(value, str) and len(value) > 190:
+                    description_translations[code] = value[:190]
+            if name_translations != (item.name_translations or {}):
+                item.name_translations = name_translations
+                updated = True
+            if description_translations != (item.description_translations or {}):
+                item.description_translations = description_translations
+                updated = True
+            primary_name = (name_translations.get(DEFAULT_LANGUAGE) or "")[:80]
+            primary_description = (
+                description_translations.get(DEFAULT_LANGUAGE) or ""
+            )[:190]
+            if primary_name and (item.name or "") != primary_name:
+                item.name = primary_name
+                updated = True
+            if primary_description and (item.description or "") != primary_description:
+                item.description = primary_description
+                updated = True
+        if updated:
+            db.commit()
 
 
 def ensure_order_columns() -> None:
@@ -1545,14 +1626,28 @@ def load_bars_from_db() -> None:
                 )
             # Load products for the bar
             for item in b.menu_items:
+                name_translations = normalise_translation_map(
+                    item.name_translations, item.name or ""
+                )
+                description_translations = normalise_translation_map(
+                    item.description_translations, item.description or ""
+                )
+                base_name = resolve_translated_value(
+                    name_translations, item.name or "", DEFAULT_LANGUAGE
+                )
+                base_description = resolve_translated_value(
+                    description_translations, item.description or "", DEFAULT_LANGUAGE
+                )
                 bar.products[item.id] = Product(
                     id=item.id,
                     category_id=item.category_id,
-                    name=item.name,
+                    name=base_name,
                     price=float(item.price_chf),
-                    description=item.description or "",
+                    description=base_description,
                     display_order=item.sort_order or 0,
                     photo_url=f"/api/products/{item.id}/image",
+                    name_translations=name_translations,
+                    description_translations=description_translations,
                 )
             # Load tables for the bar
             for t in b.tables:
@@ -1677,14 +1772,28 @@ def refresh_bar_from_db(bar_id: int, db: Session) -> Optional[Bar]:
             description_translations=description_translations,
         )
     for item in b.menu_items:
+        name_translations = normalise_translation_map(
+            item.name_translations, item.name or ""
+        )
+        description_translations = normalise_translation_map(
+            item.description_translations, item.description or ""
+        )
+        base_name = resolve_translated_value(
+            name_translations, item.name or "", DEFAULT_LANGUAGE
+        )
+        base_description = resolve_translated_value(
+            description_translations, item.description or "", DEFAULT_LANGUAGE
+        )
         bar.products[item.id] = Product(
             id=item.id,
             category_id=item.category_id,
-            name=item.name,
+            name=base_name,
             price=float(item.price_chf),
-            description=item.description or "",
+            description=base_description,
             display_order=item.sort_order or 0,
             photo_url=f"/api/products/{item.id}/image",
+            name_translations=name_translations,
+            description_translations=description_translations,
         )
     for t in b.tables:
         bar.tables[t.id] = Table(id=t.id, name=t.name, description=t.description or "")
@@ -1828,6 +1937,25 @@ def render_template(template_name: str, **context) -> HTMLResponse:
 
     context.setdefault("category_name", _category_name_helper)
     context.setdefault("category_description", _category_description_helper)
+
+    def _product_name_helper(
+        product_obj: Any, language: Optional[str] = None
+    ) -> str:
+        code = normalize_language(language) if language else language_code
+        if not code:
+            code = language_code
+        return get_product_name_for_language(product_obj, code)
+
+    def _product_description_helper(
+        product_obj: Any, language: Optional[str] = None
+    ) -> str:
+        code = normalize_language(language) if language else language_code
+        if not code:
+            code = language_code
+        return get_product_description_for_language(product_obj, code)
+
+    context.setdefault("product_name", _product_name_helper)
+    context.setdefault("product_description", _product_description_helper)
 
     template = templates_env.get_template(template_name)
     return HTMLResponse(template.render(**context), status_code=status_code)
@@ -2391,10 +2519,11 @@ async def add_to_cart(request: Request, bar_id: int, product_id: int = Form(...)
     if "application/json" in request.headers.get("accept", ""):
         count = sum(item.quantity for item in cart.items.values())
         total = cart.total_with_fee()
+        language_code = getattr(request.state, "language_code", DEFAULT_LANGUAGE)
         items = [
             {
                 "id": item.product.id,
-                "name": item.product.name,
+                "name": get_product_name_for_language(item.product, language_code),
                 "qty": item.quantity,
                 "price": f"CHF {item.product.price:.2f}",
                 "lineTotal": f"CHF {item.total:.2f}",
@@ -2422,10 +2551,11 @@ async def view_cart(request: Request):
     if "application/json" in request.headers.get("accept", ""):
         count = sum(item.quantity for item in cart.items.values())
         total = cart.total_with_fee()
+        language_code = getattr(request.state, "language_code", DEFAULT_LANGUAGE)
         items = [
             {
                 "id": item.product.id,
-                "name": item.product.name,
+                "name": get_product_name_for_language(item.product, language_code),
                 "qty": item.quantity,
                 "price": f"CHF {item.product.price:.2f}",
                 "lineTotal": f"CHF {item.total:.2f}",
@@ -2473,10 +2603,11 @@ async def update_cart(
     if "application/json" in request.headers.get("accept", ""):
         count = sum(item.quantity for item in cart.items.values())
         total = cart.total_with_fee()
+        language_code = getattr(request.state, "language_code", DEFAULT_LANGUAGE)
         items = [
             {
                 "id": item.product.id,
-                "name": item.product.name,
+                "name": get_product_name_for_language(item.product, language_code),
                 "qty": item.quantity,
                 "price": f"CHF {item.product.price:.2f}",
                 "lineTotal": f"CHF {item.total:.2f}",
@@ -2648,9 +2779,10 @@ async def checkout(
     )
     await send_order_update(db_order)
     if bar and payment_method != "bar":
+        language_code = getattr(request.state, "language_code", DEFAULT_LANGUAGE)
         tx_items = [
             {
-                "name": item.product.name,
+                "name": get_product_name_for_language(item.product, language_code),
                 "quantity": item.quantity,
                 "price": float(item.product.price),
             }
@@ -6021,9 +6153,11 @@ async def bar_new_product(
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
-    name = form.get("name")
+    name = (form.get("name") or "").strip()
     price = form.get("price")
-    description = form.get("description")
+    description = (form.get("description") or "").strip()
+    if len(name) > 80:
+        name = name[:80]
     if description:
         description = description[:190]
     display_order = form.get("display_order") or 0
@@ -6061,6 +6195,12 @@ async def bar_new_product(
         photo=photo_url,
         sort_order=order_val,
     )
+    db_item.name_translations = {
+        code: name for code in LANGUAGES
+    }
+    db_item.description_translations = {
+        code: description for code in LANGUAGES
+    }
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
@@ -6119,14 +6259,28 @@ async def bar_edit_product_form(
     db_item = db.get(MenuItem, product_id)
     if not category or not db_item or db_item.category_id != category_id:
         raise HTTPException(status_code=404, detail="Product not found")
+    name_translations = normalise_translation_map(
+        db_item.name_translations, db_item.name or ""
+    )
+    description_translations = normalise_translation_map(
+        db_item.description_translations, db_item.description or ""
+    )
+    base_name = resolve_translated_value(
+        name_translations, db_item.name or "", DEFAULT_LANGUAGE
+    )
+    base_description = resolve_translated_value(
+        description_translations, db_item.description or "", DEFAULT_LANGUAGE
+    )
     product = Product(
         id=db_item.id,
         category_id=db_item.category_id,
-        name=db_item.name,
+        name=base_name,
         price=float(db_item.price_chf),
-        description=db_item.description or "",
+        description=base_description,
         display_order=db_item.sort_order or 0,
         photo_url=make_absolute_url(f"/api/products/{db_item.id}/image", request),
+        name_translations=name_translations,
+        description_translations=description_translations,
     )
     if not user or not (
         user.is_super_admin
@@ -6160,14 +6314,28 @@ async def bar_edit_product(
         raise HTTPException(status_code=404, detail="Product not found")
     product = bar.products.get(product_id)
     if not product:
+        name_translations = normalise_translation_map(
+            db_item.name_translations, db_item.name or ""
+        )
+        description_translations = normalise_translation_map(
+            db_item.description_translations, db_item.description or ""
+        )
+        base_name = resolve_translated_value(
+            name_translations, db_item.name or "", DEFAULT_LANGUAGE
+        )
+        base_description = resolve_translated_value(
+            description_translations, db_item.description or "", DEFAULT_LANGUAGE
+        )
         product = Product(
             id=db_item.id,
             category_id=db_item.category_id,
-            name=db_item.name,
+            name=base_name,
             price=float(db_item.price_chf),
-            description=db_item.description or "",
+            description=base_description,
             display_order=db_item.sort_order or 0,
             photo_url=f"/api/products/{db_item.id}/image",
+            name_translations=name_translations,
+            description_translations=description_translations,
         )
     if not user or not (
         user.is_super_admin
@@ -6183,9 +6351,32 @@ async def bar_edit_product(
     display_order = form.get("display_order") or product.display_order
     photo_file = form.get("photo")
     if name:
+        name = name[:80]
         product.name = db_item.name = name
+        db_name_translations = normalise_translation_map(
+            db_item.name_translations, name
+        )
+        db_name_translations[DEFAULT_LANGUAGE] = name
+        db_item.name_translations = db_name_translations
+        if hasattr(product, "name_translations"):
+            product_name_translations = normalise_translation_map(
+                getattr(product, "name_translations", {}), name
+            )
+            product_name_translations[DEFAULT_LANGUAGE] = name
+            product.name_translations = product_name_translations
     if description:
         product.description = db_item.description = description
+        db_description_translations = normalise_translation_map(
+            db_item.description_translations, description
+        )
+        db_description_translations[DEFAULT_LANGUAGE] = description
+        db_item.description_translations = db_description_translations
+        if hasattr(product, "description_translations"):
+            product_description_translations = normalise_translation_map(
+                getattr(product, "description_translations", {}), description
+            )
+            product_description_translations[DEFAULT_LANGUAGE] = description
+            product.description_translations = product_description_translations
     if price:
         try:
             price_val = float(price)
@@ -6252,15 +6443,29 @@ async def bar_edit_product_name_form(
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     product = bar.products.get(product_id)
+    name_translations = normalise_translation_map(
+        db_item.name_translations, db_item.name or ""
+    )
+    description_translations = normalise_translation_map(
+        db_item.description_translations, db_item.description or ""
+    )
+    base_name = resolve_translated_value(
+        name_translations, db_item.name or "", DEFAULT_LANGUAGE
+    )
+    base_description = resolve_translated_value(
+        description_translations, db_item.description or "", DEFAULT_LANGUAGE
+    )
     if not product:
         product = Product(
             id=db_item.id,
             category_id=db_item.category_id,
-            name=db_item.name,
+            name=base_name,
             price=float(db_item.price_chf),
-            description=db_item.description or "",
+            description=base_description,
             display_order=db_item.sort_order or 0,
             photo_url=f"/api/products/{db_item.id}/image",
+            name_translations=name_translations,
+            description_translations=description_translations,
         )
     return render_template(
         "bar_edit_product_name.html",
@@ -6268,7 +6473,8 @@ async def bar_edit_product_name_form(
         bar=bar,
         category=category,
         product=product,
-        name_value=product.name,
+        names={code: name_translations.get(code, base_name) for code in LANGUAGES},
+        languages=[{"code": code, "name": name} for code, name in LANGUAGES.items()],
     )
 
 
@@ -6299,22 +6505,39 @@ async def bar_edit_product_name(
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
-    name = (form.get("name") or "").strip()
+    translations: Dict[str, str] = {}
     error_code: Optional[str] = None
-    if not name:
-        error_code = "required"
-    if len(name) > 80:
-        name = name[:80]
+    for code in LANGUAGES:
+        value = (form.get(f"name_{code}") or "").strip()
+        if not value:
+            error_code = "required"
+        if len(value) > 80:
+            value = value[:80]
+        translations[code] = value
     product = bar.products.get(product_id)
+    name_translations = normalise_translation_map(
+        db_item.name_translations, db_item.name or ""
+    )
+    description_translations = normalise_translation_map(
+        db_item.description_translations, db_item.description or ""
+    )
+    base_description = resolve_translated_value(
+        description_translations, db_item.description or "", DEFAULT_LANGUAGE
+    )
     if not product:
+        primary_name = resolve_translated_value(
+            name_translations, db_item.name or "", DEFAULT_LANGUAGE
+        )
         product = Product(
             id=db_item.id,
             category_id=db_item.category_id,
-            name=db_item.name,
+            name=primary_name,
             price=float(db_item.price_chf),
-            description=db_item.description or "",
+            description=base_description,
             display_order=db_item.sort_order or 0,
             photo_url=f"/api/products/{db_item.id}/image",
+            name_translations=name_translations,
+            description_translations=description_translations,
         )
     if error_code:
         return render_template(
@@ -6323,10 +6546,18 @@ async def bar_edit_product_name(
             bar=bar,
             category=category,
             product=product,
-            name_value=name,
+            names=translations,
+            languages=[{"code": code, "name": name} for code, name in LANGUAGES.items()],
             error_code=error_code,
         )
-    db_item.name = name
+    fallback = translations.get(DEFAULT_LANGUAGE) or db_item.name or ""
+    normalised = normalise_translation_map(translations, fallback)
+    primary_name = resolve_translated_value(normalised, fallback, DEFAULT_LANGUAGE)
+    db_item.name = primary_name
+    db_item.name_translations = normalised
+    if product:
+        product.name = primary_name
+        product.name_translations = normalised
     db.commit()
     refresh_bar_from_db(bar_id, db)
     return RedirectResponse(
@@ -6366,22 +6597,46 @@ async def bar_edit_product_description_form(
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     product = bar.products.get(product_id)
     if not product:
+        name_translations = normalise_translation_map(
+            db_item.name_translations, db_item.name or ""
+        )
+        description_translations = normalise_translation_map(
+            db_item.description_translations, db_item.description or ""
+        )
+        base_name = resolve_translated_value(
+            name_translations, db_item.name or "", DEFAULT_LANGUAGE
+        )
+        base_description = resolve_translated_value(
+            description_translations, db_item.description or "", DEFAULT_LANGUAGE
+        )
         product = Product(
             id=db_item.id,
             category_id=db_item.category_id,
-            name=db_item.name,
+            name=base_name,
             price=float(db_item.price_chf),
-            description=db_item.description or "",
+            description=base_description,
             display_order=db_item.sort_order or 0,
             photo_url=f"/api/products/{db_item.id}/image",
+            name_translations=name_translations,
+            description_translations=description_translations,
         )
+    description_translations = normalise_translation_map(
+        db_item.description_translations, db_item.description or ""
+    )
+    base_description = resolve_translated_value(
+        description_translations, db_item.description or "", DEFAULT_LANGUAGE
+    )
     return render_template(
         "bar_edit_product_description.html",
         request=request,
         bar=bar,
         category=category,
         product=product,
-        description_value=product.description,
+        descriptions={
+            code: description_translations.get(code, base_description)
+            for code in LANGUAGES
+        },
+        languages=[{"code": code, "name": name} for code, name in LANGUAGES.items()],
     )
 
 
@@ -6414,22 +6669,39 @@ async def bar_edit_product_description(
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     form = await request.form()
-    description = (form.get("description") or "").strip()
+    translations: Dict[str, str] = {}
     error_code: Optional[str] = None
-    if not description:
-        error_code = "required"
-    if len(description) > 190:
-        description = description[:190]
+    for code in LANGUAGES:
+        value = (form.get(f"description_{code}") or "").strip()
+        if not value:
+            error_code = "required"
+        if len(value) > 190:
+            value = value[:190]
+        translations[code] = value
     product = bar.products.get(product_id)
+    name_translations = normalise_translation_map(
+        db_item.name_translations, db_item.name or ""
+    )
+    description_translations = normalise_translation_map(
+        db_item.description_translations, db_item.description or ""
+    )
+    primary_name = resolve_translated_value(
+        name_translations, db_item.name or "", DEFAULT_LANGUAGE
+    )
     if not product:
+        primary_description = resolve_translated_value(
+            description_translations, db_item.description or "", DEFAULT_LANGUAGE
+        )
         product = Product(
             id=db_item.id,
             category_id=db_item.category_id,
-            name=db_item.name,
+            name=primary_name,
             price=float(db_item.price_chf),
-            description=db_item.description or "",
+            description=primary_description,
             display_order=db_item.sort_order or 0,
             photo_url=f"/api/products/{db_item.id}/image",
+            name_translations=name_translations,
+            description_translations=description_translations,
         )
     if error_code:
         return render_template(
@@ -6438,10 +6710,20 @@ async def bar_edit_product_description(
             bar=bar,
             category=category,
             product=product,
-            description_value=description,
+            descriptions=translations,
+            languages=[{"code": code, "name": name} for code, name in LANGUAGES.items()],
             error_code=error_code,
         )
-    db_item.description = description
+    fallback = translations.get(DEFAULT_LANGUAGE) or db_item.description or ""
+    normalised = normalise_translation_map(translations, fallback)
+    primary_description = resolve_translated_value(
+        normalised, fallback, DEFAULT_LANGUAGE
+    )
+    db_item.description = primary_description
+    db_item.description_translations = normalised
+    if product:
+        product.description = primary_description
+        product.description_translations = normalised
     db.commit()
     refresh_bar_from_db(bar_id, db)
     return RedirectResponse(

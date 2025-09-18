@@ -28,7 +28,7 @@
           <tbody>
             {% for item in cart.items.values() %}
             <tr>
-              <td>{{ item.product.name }}</td>
+              <td>{{ product_name(item.product) }}</td>
               <td>
                 <form class="form form--inline" method="post" action="/cart/update">
                   <input type="hidden" name="product_id" value="{{ item.product.id }}">

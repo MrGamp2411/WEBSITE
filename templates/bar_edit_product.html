@@ -1,14 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
 {% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
-<h1>{{ _('bar_products.edit.title', product=product.name, default='Edit Product {product}') }}</h1>
+{% set preview_name = product_name(product) %}
+{% set preview_description = product_description(product) %}
+<h1>{{ _('bar_products.edit.title', product=preview_name, default='Edit Product {product}') }}</h1>
 <section class="product-edit">
   <div class="card">
     <div class="card__body">
       <form class="form" method="post" enctype="multipart/form-data">
         <div class="form-field locked-field">
           <label for="name">{{ _('bar_products.form.name', default='Name') }}</label>
-          <p class="description-preview">{{ product.name }}</p>
+          <p class="description-preview">{{ preview_name }}</p>
           <input id="name" name="name" type="hidden" value="{{ product.name }}" required>
           <a class="btn-outline field-action" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/edit/name">{{ _('bar_products.edit.actions.edit_name', default='Edit name') }}</a>
         </div>
@@ -18,7 +20,7 @@
         </div>
         <div class="form-field locked-field">
           <label for="description">{{ _('bar_products.form.description', default='Description') }}</label>
-          <p class="description-preview">{{ product.description }}</p>
+          <p class="description-preview">{{ preview_description }}</p>
           <textarea id="description" name="description" hidden maxlength="190">{{ product.description }}</textarea>
           <a class="btn-outline field-action" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/edit/description">{{ _('bar_products.edit.actions.edit_description', default='Edit description') }}</a>
         </div>
@@ -29,7 +31,7 @@
         <div class="form-field">
           <label>{{ _('bar_products.form.photo', default='Photo') }}</label>
           <div class="photo-preview">
-            <img src="{{ product.photo_url }}" alt="{{ product.name }} photo" loading="lazy" decoding="async" onerror="this.src='{{ fallback_img }}';this.onerror=null;" width="400" height="225" />
+            <img src="{{ product.photo_url }}" alt="{{ preview_name }} photo" loading="lazy" decoding="async" onerror="this.src='{{ fallback_img }}';this.onerror=null;" width="400" height="225" />
           </div>
           <input id="photo" type="file" name="photo" accept="image/*">
         </div>

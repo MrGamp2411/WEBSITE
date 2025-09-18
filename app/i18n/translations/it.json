@@ -1523,34 +1523,34 @@
       "create": "Crea",
       "update": "Aggiorna"
     },
-    "edit_name": {
-      "back": "Torna al prodotto",
-      "title": "Modifica il nome di {product}",
-      "intro": "Aggiorna il nome mostrato ai clienti.",
-      "fields": {
-        "name": "Nome"
-      },
-      "actions": {
-        "save": "Salva nome"
-      },
-      "errors": {
-        "required": "Il nome è obbligatorio."
-      }
+  "edit_name": {
+    "back": "Torna al prodotto",
+    "title": "Modifica i nomi di {product}",
+    "intro": "Inserisci un nome per ogni lingua supportata. I clienti vedono l'opzione corrispondente alla lingua selezionata.",
+    "fields": {
+      "language": "Nome in {language}"
     },
-    "edit_description": {
-      "back": "Torna al prodotto",
-      "title": "Modifica la descrizione di {product}",
-      "intro": "Aggiorna la descrizione mostrata ai clienti.",
-      "fields": {
-        "description": "Descrizione"
-      },
-      "actions": {
-        "save": "Salva descrizione"
-      },
-      "errors": {
-        "required": "La descrizione è obbligatoria."
-      }
+    "actions": {
+      "save": "Salva nomi"
     },
+    "errors": {
+      "required": "Tutti i campi sono obbligatori."
+    }
+  },
+  "edit_description": {
+    "back": "Torna al prodotto",
+    "title": "Modifica le descrizioni di {product}",
+    "intro": "Scrivi una descrizione per ogni lingua supportata. Le descrizioni vengono mostrate nel menu clienti.",
+    "fields": {
+      "language": "Descrizione in {language}"
+    },
+    "actions": {
+      "save": "Salva descrizioni"
+    },
+    "errors": {
+      "required": "Tutti i campi sono obbligatori."
+    }
+  },
     "manage": {
       "title": "Prodotti in {category} per {bar}",
       "subtitle": "Aggiungi, modifica e organizza i prodotti per questa categoria.",

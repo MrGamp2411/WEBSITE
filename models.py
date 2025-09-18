@@ -135,6 +135,8 @@ class MenuItem(Base):
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
     name = Column(String(100), nullable=False)
     description = Column(String(190))
+    name_translations = Column(JSON)
+    description_translations = Column(JSON)
     price_chf = Column(Numeric(10, 2), nullable=False)
     vat_rate = Column(Numeric(4, 2), default=0)
     sku = Column(String(50))
