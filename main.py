@@ -757,6 +757,66 @@ ALLOWED_STATUS_TRANSITIONS = {
 }
 
 
+def update_cached_order_transactions(order: Order, new_status: str) -> None:
+    """Update the cached transaction list for a user's wallet feed."""
+
+    if not order.customer_id:
+        return
+    cached_user = users.get(order.customer_id)
+    if not cached_user:
+        return
+    for tx in cached_user.transactions:
+        if getattr(tx, "order_id", None) == order.id:
+            if new_status in ("ACCEPTED", "READY", "COMPLETED"):
+                tx.status = "COMPLETED"
+            elif new_status in ("CANCELED", "REJECTED"):
+                tx.status = "CANCELED"
+                tx.total = 0.0
+            break
+
+
+def apply_order_status(
+    order: Order, new_status: str, db: Session, now: Optional[datetime] = None
+) -> None:
+    """Persist an order status change and related side effects."""
+
+    now = now or datetime.utcnow()
+    order.status = new_status
+    if new_status == "ACCEPTED" and not order.accepted_at:
+        order.accepted_at = now
+    elif new_status == "READY" and not order.ready_at:
+        order.ready_at = now
+    elif new_status == "CANCELED" and not order.cancelled_at:
+        order.cancelled_at = now
+        refund = Decimal(order.total)
+        if order.payment_method in ("card", "wallet"):
+            order.refund_amount = refund
+            if order.customer_id:
+                customer = db.get(User, order.customer_id)
+                if customer:
+                    customer.credit = Decimal(customer.credit or 0) + refund
+                    cached = users.get(order.customer_id)
+                    if cached:
+                        cached.credit = float(customer.credit)
+        else:
+            order.refund_amount = Decimal("0")
+
+    wallet_tx = (
+        db.query(WalletTransaction)
+        .filter(WalletTransaction.order_id == order.id)
+        .one_or_none()
+    )
+    if wallet_tx:
+        if new_status in ("ACCEPTED", "READY", "COMPLETED"):
+            wallet_tx.status = "COMPLETED"
+        elif new_status in ("CANCELED", "REJECTED"):
+            wallet_tx.status = "CANCELED"
+            wallet_tx.total = Decimal("0")
+        db.add(wallet_tx)
+
+    update_cached_order_transactions(order, new_status)
+
+
 async def send_order_update(order: Order) -> Dict[str, Any]:
     """Broadcast order updates to bartender and customer channels."""
     data = {
@@ -1417,6 +1477,7 @@ async def on_startup():
     user_carts.clear()
     seed_super_admin()
     load_bars_from_db()
+    asyncio.create_task(auto_cancel_unprepared_orders_worker())
     asyncio.create_task(auto_close_bars_worker())
     asyncio.create_task(purge_old_notifications_worker())
 
@@ -1585,6 +1646,48 @@ def is_open_now_from_hours(hours: Dict[str, Dict[str, str]]) -> bool:
         return False
     now_t = now.time()
     return start <= now_t < end
+
+
+def auto_cancel_unprepared_orders_once(
+    db: Session, now: datetime
+) -> List[Order]:
+    """Cancel accepted orders that have not been prepared within an hour."""
+
+    cutoff = now - timedelta(minutes=60)
+    stale_orders = (
+        db.query(Order)
+        .filter(
+            Order.status == "ACCEPTED",
+            Order.accepted_at.isnot(None),
+            Order.accepted_at < cutoff,
+        )
+        .all()
+    )
+    canceled: List[Order] = []
+    for order in stale_orders:
+        apply_order_status(order, "CANCELED", db, now=now)
+        canceled.append(order)
+    if canceled:
+        db.commit()
+        for order in canceled:
+            # Ensure related items are loaded before the session closes
+            order.items  # pragma: no cover - relationship load
+    return canceled
+
+
+async def auto_cancel_unprepared_orders_worker() -> None:
+    """Periodically cancel stale accepted orders."""
+
+    while True:
+        try:
+            now = datetime.utcnow()
+            with SessionLocal() as db:
+                canceled_orders = auto_cancel_unprepared_orders_once(db, now)
+                for order in canceled_orders:
+                    await send_order_update(order)
+        except Exception:
+            pass
+        await asyncio.sleep(60)
 
 
 def auto_close_bars_once(db: Session, now: datetime) -> None:
@@ -3158,49 +3261,9 @@ async def update_order_status(
             detail=f"Invalid transition {order.status} -> {new_status}",
         )
 
-    order.status = new_status
     now = datetime.utcnow()
-    if new_status == "ACCEPTED" and not order.accepted_at:
-        order.accepted_at = now
-    if new_status == "READY" and not order.ready_at:
-        order.ready_at = now
-    if new_status == "CANCELED" and not order.cancelled_at:
-        order.cancelled_at = now
-        refund = Decimal(order.total)
-        if order.payment_method in ("card", "wallet"):
-            order.refund_amount = refund
-            if order.customer_id:
-                customer = db.get(User, order.customer_id)
-                if customer:
-                    customer.credit = Decimal(customer.credit or 0) + refund
-                    cached = users.get(order.customer_id)
-                    if cached:
-                        cached.credit = float(customer.credit)
-        else:
-            order.refund_amount = Decimal("0")
-    wallet_tx = (
-        db.query(WalletTransaction)
-        .filter(WalletTransaction.order_id == order.id)
-        .one_or_none()
-    )
-    if wallet_tx:
-        if new_status in ("ACCEPTED", "READY", "COMPLETED"):
-            wallet_tx.status = "COMPLETED"
-        elif new_status in ("CANCELED", "REJECTED"):
-            wallet_tx.status = "CANCELED"
-            wallet_tx.total = Decimal("0")
-        db.add(wallet_tx)
+    apply_order_status(order, new_status, db, now=now)
     db.commit()
-    cached_user = users.get(order.customer_id) if order.customer_id else None
-    if cached_user:
-        for tx in cached_user.transactions:
-            if getattr(tx, "order_id", None) == order.id:
-                if new_status in ("ACCEPTED", "READY", "COMPLETED"):
-                    tx.status = "COMPLETED"
-                elif new_status in ("CANCELED", "REJECTED"):
-                    tx.status = "CANCELED"
-                    tx.total = 0.0
-                break
     order_data = await send_order_update(order)
     return {"status": order.status, "order": order_data}
 
