@@ -353,6 +353,7 @@
   - The default-language textarea (English) is required on submit; `admin_welcome_post` falls back to the previous English copy if it isn't provided. The handler keeps the active language's previous text when its textarea is submitted empty and clears other translations when their fields are blank.
   - Each row includes **View** and **Delete** actions; Delete requires confirmation via `.cart-popup`.
   - Viewing a notification at `/admin/notifications/{id}` shows full details and a list of recipient users.
+  - `register_details` resolves the active language via `translator_for_request` before sending welcome notifications so users receive the message in their chosen locale.
   - Each send is logged to `NotificationLog` so broadcasts to all users appear once in the table instead of repeating per user.
   - Selecting a specific user or bar uses searchable tables; choosing "All Users" hides these selectors and does not require an ID.
   - The form disables hidden `user_id` and `bar_id` inputs when not targeting specific recipients and alerts if a required selection is missing.

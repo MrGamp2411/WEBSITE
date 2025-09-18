@@ -3395,6 +3395,9 @@ async def register_details(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request)
     if not user or user.role != "registering":
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    # Ensure the request's language is resolved so welcome notifications
+    # respect the active locale when sent.
+    translator_for_request(request)
     form = await request.form()
     username = form.get("username") or ""
     phone = form.get("phone") or ""
