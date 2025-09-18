@@ -49,7 +49,7 @@ def test_notification_deletion_removes_user_entries():
         _login(client, "admin@example.com", "ChangeMe!123")
         resp = client.post(
             "/admin/notifications",
-            data={"target": "all", "subject": "Hi", "body": "Test"},
+            data={"target": "all", "subject_en": "Hi", "body_en": "Test"},
             follow_redirects=False,
         )
         assert resp.status_code == 303

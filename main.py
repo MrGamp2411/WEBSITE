@@ -5859,6 +5859,9 @@ async def admin_notifications_new(
         error=error,
         users=users,
         bars=bars,
+        subject_translations={},
+        body_translations={},
+        default_language=DEFAULT_LANGUAGE,
     )
 
 
@@ -6013,8 +6016,6 @@ async def admin_notifications_send(
     target: str = Form(...),
     user_id: int | None = Form(None),
     bar_id: int | None = Form(None),
-    subject: str = Form(""),
-    body: str = Form(""),
     link_url: str = Form(""),
     image: UploadFile | None = File(None),
     attachment: UploadFile | None = File(None),
@@ -6040,11 +6041,69 @@ async def admin_notifications_send(
             url="/admin/notifications/new?error=Invalid+target",
             status_code=status.HTTP_303_SEE_OTHER,
         )
-    if len(subject) > 30:
+    form = await request.form()
+    base_language = (
+        normalize_language(getattr(request.state, "language_code", None))
+        or DEFAULT_LANGUAGE
+    )
+    english_subject = (form.get(f"subject_{DEFAULT_LANGUAGE}") or "").strip()
+    base_subject = (form.get(f"subject_{base_language}") or "").strip()
+    if not english_subject and base_subject:
+        english_subject = base_subject
+    if not english_subject:
+        return RedirectResponse(
+            url="/admin/notifications/new?error=Subject+required",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    if len(english_subject) > 30:
         return RedirectResponse(
             url="/admin/notifications/new?error=Subject+too+long",
             status_code=status.HTTP_303_SEE_OTHER,
         )
+    if base_subject and len(base_subject) > 30:
+        return RedirectResponse(
+            url="/admin/notifications/new?error=Subject+too+long",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    if not base_subject:
+        base_subject = english_subject
+    english_body = (form.get(f"body_{DEFAULT_LANGUAGE}") or "").strip()
+    base_body = (form.get(f"body_{base_language}") or "").strip()
+    if not english_body and base_body:
+        english_body = base_body
+    if not english_body:
+        return RedirectResponse(
+            url="/admin/notifications/new?error=Message+required",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    if not base_body:
+        base_body = english_body
+    subject_translations: Dict[str, str] = {}
+    body_translations: Dict[str, str] = {}
+    for code in LANGUAGES:
+        subject_value = (form.get(f"subject_{code}") or "").strip()
+        if not subject_value:
+            if code == DEFAULT_LANGUAGE:
+                subject_value = english_subject
+            elif code == base_language and base_subject:
+                subject_value = base_subject
+        if subject_value:
+            if len(subject_value) > 30:
+                return RedirectResponse(
+                    url="/admin/notifications/new?error=Subject+too+long",
+                    status_code=status.HTTP_303_SEE_OTHER,
+                )
+            subject_translations[code] = subject_value
+        body_value = (form.get(f"body_{code}") or "").strip()
+        if not body_value:
+            if code == DEFAULT_LANGUAGE:
+                body_value = english_body
+            elif code == base_language and base_body:
+                body_value = base_body
+        if body_value:
+            body_translations[code] = body_value
+    subject_text = subject_translations.get(DEFAULT_LANGUAGE, english_subject)
+    body_text = body_translations.get(DEFAULT_LANGUAGE, english_body)
     image_bytes = await image.read() if image else None
     image_mime = image.content_type if image else None
     attachment_bytes = await attachment.read() if attachment else None
@@ -6055,8 +6114,10 @@ async def admin_notifications_send(
         target=target,
         user_id=user_id if target == "user" else None,
         bar_id=bar_id if target == "bar" else None,
-        subject=subject,
-        body=body,
+        subject=subject_text,
+        body=body_text,
+        subject_translations=subject_translations,
+        body_translations=body_translations,
         link_url=link_url or None,
         created_at=now,
     )
@@ -6067,8 +6128,10 @@ async def admin_notifications_send(
             user_id=uid,
             sender_id=current.id,
             log_id=log.id,
-            subject=subject,
-            body=body,
+            subject=subject_text,
+            body=body_text,
+            subject_translations=subject_translations,
+            body_translations=body_translations,
             link_url=link_url or None,
             image=image_bytes,
             image_mime=image_mime,
