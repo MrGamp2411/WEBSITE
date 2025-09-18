@@ -1477,6 +1477,7 @@
     },
     "form": {
       "name": "Nom",
+      "name_help": "Utilisez l'éditeur de traductions pour mettre à jour les noms.",
       "description": "Description",
       "description_help": "Utilisez l'éditeur de traductions pour mettre à jour les descriptions.",
       "display_order": "Commande d'affichage",

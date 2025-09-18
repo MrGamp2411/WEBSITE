@@ -1453,6 +1453,7 @@
     },
     "form": {
       "name": "Name",
+      "name_help": "Use the translation editor to update names.",
       "description": "Description",
       "description_help": "Use the translation editor to update descriptions.",
       "display_order": "Display Order",

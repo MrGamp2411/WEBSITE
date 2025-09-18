@@ -1453,6 +1453,7 @@
     },
     "form": {
       "name": "Bezeichnung",
+      "name_help": "Verwenden Sie den Übersetzungs-Editor, um Bezeichnungen zu aktualisieren.",
       "description": "Warenbezeichnung",
       "description_help": "Verwenden Sie den Übersetzungs-Editor, um Beschreibungen zu aktualisieren.",
       "display_order": "Reihenfolge anzeigen",

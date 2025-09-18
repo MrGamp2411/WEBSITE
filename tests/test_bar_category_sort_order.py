@@ -139,3 +139,57 @@ def test_category_edit_form_does_not_change_description():
     assert db_category.description == "Original description"
     assert db_category.description_translations["en"] == "Original description"
     db.close()
+
+
+def test_category_edit_form_does_not_change_name():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    bars.clear()
+    users.clear()
+    users_by_email.clear()
+    users_by_username.clear()
+
+    db = SessionLocal()
+    bar = BarModel(name="LockBar", slug="lockbar")
+    db.add(bar)
+    db.commit()
+    db.refresh(bar)
+    bar_id = bar.id
+
+    category = CategoryModel(
+        bar_id=bar.id,
+        name="Drinks",
+        description="Original description",
+        name_translations={
+            "en": "Drinks",
+            "it": "Bevande",
+            "fr": "Boissons",
+            "de": "Getränke",
+        },
+    )
+    db.add(category)
+    db.commit()
+    db.refresh(category)
+    category_id = category.id
+    db.close()
+
+    load_bars_from_db()
+
+    with TestClient(app) as client:
+        _login(client)
+        resp = client.post(
+            f"/bar/{bar_id}/categories/{category_id}/edit",
+            data={
+                "name": "Injected name",
+                "description": "Anything",
+                "display_order": "5",
+            },
+            follow_redirects=False,
+        )
+        assert resp.status_code == 303
+
+    db = SessionLocal()
+    db_category = db.get(CategoryModel, category_id)
+    assert db_category.name == "Drinks"
+    assert db_category.name_translations["en"] == "Drinks"
+    db.close()
