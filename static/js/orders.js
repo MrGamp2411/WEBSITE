@@ -4,6 +4,7 @@ const CARD_TEXTS = ORDERS_I18N.card || {};
 const ACTION_TEXTS = ORDERS_I18N.actions || {};
 const STATUS_TEXTS = ORDERS_I18N.statuses || {};
 const PAYMENT_TEXTS = ORDERS_I18N.payment_methods || {};
+const REASON_TEXTS = CARD_TEXTS.cancellation_reasons || {};
 
 function formatTemplate(template, values){
   if(typeof template !== 'string') return '';
@@ -27,6 +28,15 @@ function formatPayment(method) {
     return PAYMENT_TEXTS[key];
   }
   return method.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatCancellationReason(reason) {
+  if (!reason) return '';
+  const key = reason.toLowerCase();
+  if (Object.prototype.hasOwnProperty.call(REASON_TEXTS, key)) {
+    return REASON_TEXTS[key];
+  }
+  return reason.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 function formatStatus(status) {
@@ -90,6 +100,9 @@ function initBartender(barId) {
     const refund = order.status === 'CANCELED' && order.refund_amount
       ? `<div><dt>${getField('refunded', 'Refunded')}</dt><dd class="num nowrap">CHF ${order.refund_amount.toFixed(2)}</dd></div>`
       : '';
+    const cancellation = order.status === 'CANCELED' && order.cancellation_reason
+      ? `<div><dt>${getField('cancellation_reason', 'Cancellation reason')}</dt><dd>${formatCancellationReason(order.cancellation_reason)}</dd></div>`
+      : '';
     const notes = order.notes ? `<div><dt>${getField('notes', 'Notes')}</dt><dd>${order.notes}</dd></div>` : '';
     const prepMinutes = order.ready_at ? diffMinutes(order.created_at, order.ready_at) : null;
     const prep = prepMinutes != null
@@ -121,6 +134,7 @@ function initBartender(barId) {
       `<div><dt>${getField('bar', 'Bar')}</dt><dd>${order.bar_name || ''}</dd></div>` +
       `<div><dt>${getField('table', 'Table')}</dt><dd>${order.table_name || ''}</dd></div>` +
       `<div><dt>${getField('payment', 'Payment')}</dt><dd>${formatPayment(order.payment_method)}</dd></div>` +
+      cancellation +
       notes +
       prep +
       `</dl></section>` +
@@ -197,6 +211,9 @@ function initUser(userId) {
     const refund = order.status === 'CANCELED' && order.refund_amount
       ? `<div><dt>${getField('refunded', 'Refunded')}</dt><dd class="num nowrap">CHF ${order.refund_amount.toFixed(2)}</dd></div>`
       : '';
+    const cancellation = order.status === 'CANCELED' && order.cancellation_reason
+      ? `<div><dt>${getField('cancellation_reason', 'Cancellation reason')}</dt><dd>${formatCancellationReason(order.cancellation_reason)}</dd></div>`
+      : '';
     const notes = order.notes ? `<div><dt>${getField('notes', 'Notes')}</dt><dd>${order.notes}</dd></div>` : '';
     const prepMinutes = order.ready_at ? diffMinutes(order.created_at, order.ready_at) : null;
     const prep = prepMinutes != null
@@ -229,6 +246,7 @@ function initUser(userId) {
       `<div><dt>${getField('bar', 'Bar')}</dt><dd>${order.bar_name || ''}</dd></div>` +
       `<div><dt>${getField('table', 'Table')}</dt><dd>${order.table_name || ''}</dd></div>` +
       `<div><dt>${getField('payment', 'Payment')}</dt><dd>${formatPayment(order.payment_method)}</dd></div>` +
+      cancellation +
       notes +
       prep +
       `</dl></section>` +

@@ -88,6 +88,7 @@ def test_auto_cancel_unprepared_orders_once():
     db.refresh(tx)
 
     assert stale_order.status == "CANCELED"
+    assert stale_order.cancellation_reason == "timeout"
     assert stale_order.cancelled_at is not None
     assert Decimal(stale_order.refund_amount) == Decimal('10.00')
     assert float(customer.credit) == 10.0

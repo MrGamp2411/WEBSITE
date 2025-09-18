@@ -776,12 +776,20 @@ def update_cached_order_transactions(order: Order, new_status: str) -> None:
 
 
 def apply_order_status(
-    order: Order, new_status: str, db: Session, now: Optional[datetime] = None
+    order: Order,
+    new_status: str,
+    db: Session,
+    now: Optional[datetime] = None,
+    cancellation_reason: Optional[str] = None,
 ) -> None:
     """Persist an order status change and related side effects."""
 
     now = now or datetime.utcnow()
     order.status = new_status
+    if new_status == "CANCELED":
+        order.cancellation_reason = cancellation_reason or order.cancellation_reason
+    else:
+        order.cancellation_reason = None
     if new_status == "ACCEPTED" and not order.accepted_at:
         order.accepted_at = now
     elif new_status == "READY" and not order.ready_at:
@@ -837,6 +845,7 @@ async def send_order_update(order: Order) -> Dict[str, Any]:
         "total": order.total,
         "refund_amount": float(order.refund_amount or 0),
         "notes": order.notes,
+        "cancellation_reason": order.cancellation_reason,
         "items": [
             {
                 "id": i.id,
@@ -1130,6 +1139,7 @@ def ensure_order_columns() -> None:
         "cancelled_at": "TIMESTAMP",
         "refund_amount": "NUMERIC(10, 2) DEFAULT 0",
         "notes": "TEXT",
+        "cancellation_reason": "VARCHAR(40)",
         "source_channel": "VARCHAR(30)",
         "closing_id": "INTEGER",
         "order_local_date": "DATE",
@@ -1665,7 +1675,7 @@ def auto_cancel_unprepared_orders_once(
     )
     canceled: List[Order] = []
     for order in stale_orders:
-        apply_order_status(order, "CANCELED", db, now=now)
+        apply_order_status(order, "CANCELED", db, now=now, cancellation_reason="timeout")
         canceled.append(order)
     if canceled:
         db.commit()
@@ -2531,6 +2541,7 @@ class OrderRead(BaseModel):
     total: float
     refund_amount: float = 0
     notes: Optional[str] = None
+    cancellation_reason: Optional[str] = None
     customer_name: Optional[str] = None
     customer_prefix: Optional[str] = None
     customer_phone: Optional[str] = None
@@ -3262,7 +3273,19 @@ async def update_order_status(
         )
 
     now = datetime.utcnow()
-    apply_order_status(order, new_status, db, now=now)
+    cancellation_reason = None
+    if new_status == "CANCELED":
+        if is_customer_cancel:
+            cancellation_reason = "customer"
+        elif is_staff and user:
+            cancellation_reason = "bartender"
+    apply_order_status(
+        order,
+        new_status,
+        db,
+        now=now,
+        cancellation_reason=cancellation_reason,
+    )
     db.commit()
     order_data = await send_order_update(order)
     return {"status": order.status, "order": order_data}

@@ -213,11 +213,17 @@
             bar: {{ _('order_history.card.fields.bar', default='Bar')|tojson }},
             table: {{ _('order_history.card.fields.table', default='Table')|tojson }},
             payment: {{ _('order_history.card.fields.payment', default='Payment')|tojson }},
+            cancellation_reason: {{ _('order_history.card.fields.cancellation_reason', default='Cancellation reason')|tojson }},
             notes: {{ _('order_history.card.fields.notes', default='Notes')|tojson }},
             prep_time: {{ _('order_history.card.fields.prep_time', default='Prep time')|tojson }}
           },
           unknown_customer: {{ _('order_history.card.unknown_customer', default='Unknown')|tojson }},
-          prep_minutes: {{ _('order_history.card.prep_minutes', minutes='{minutes}', default='{minutes} min')|tojson }}
+          prep_minutes: {{ _('order_history.card.prep_minutes', minutes='{minutes}', default='{minutes} min')|tojson }},
+          cancellation_reasons: {
+            bartender: {{ _('order_history.card.cancellation_reasons.bartender', default='Canceled by bartender')|tojson }},
+            customer: {{ _('order_history.card.cancellation_reasons.customer', default='Canceled by customer')|tojson }},
+            timeout: {{ _('order_history.card.cancellation_reasons.timeout', default='Not prepared in time')|tojson }}
+          }
         },
         actions: {
           accept: {{ _('bartender_orders.actions.accept', default='Accept')|tojson }},
