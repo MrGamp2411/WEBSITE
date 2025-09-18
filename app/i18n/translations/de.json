@@ -446,12 +446,18 @@
         "bar": "Bar",
         "table": "Tisch",
         "payment": "Zahlung",
+        "cancellation_reason": "Stornierungsgrund",
         "notes": "Notizen",
         "prep_time": "Vorbereitungszeit"
       },
       "unknown_customer": "Unbekannt",
       "unknown_item": "Unbekannter Artikel",
-      "prep_minutes": "{minutes} Min"
+      "prep_minutes": "{minutes} Min",
+      "cancellation_reasons": {
+        "bartender": "Vom Barkeeper storniert",
+        "customer": "Vom Kunden storniert",
+        "timeout": "Nicht rechtzeitig zubereitet"
+      }
     }
   },
   "orders": {

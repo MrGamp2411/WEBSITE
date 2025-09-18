@@ -51,6 +51,7 @@
 - Wallet Recent Activity shows all transactions with the newest first, and wallet cards override the base mobile `max-height` so the feed length isn't capped.
 - The balance card's meta now only shows an `Available` badge and omits any "last updated" text.
 - Wallet transactions for orders begin in a `PROCESSING` state and update to `COMPLETED` once the order is accepted or to `CANCELED` if the order is canceled. Canceled transactions display a `- CHF 0.00` amount.
+- Order cancellations capture a `cancellation_reason` (`bartender`, `customer`, or `timeout`) and order cards display the translated reason under "Cancellation reason" when applicable.
 - Card payments finalized by the Wallee webhook are added to the wallet feed so card orders appear alongside wallet transactions. Pay-at-bar orders are excluded from the wallet feed.
 - Top-ups append a `topup` transaction in a `PROCESSING` state during `/api/topup/init`; the Wallee webhook updates it to `COMPLETED` and refreshes the user's cached credit.
 - The `/topup` form submits with a "Top up with card" button so the call-to-action stays in English.

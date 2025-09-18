@@ -446,12 +446,18 @@
         "bar": "Bar",
         "table": "Table",
         "payment": "Payment",
+        "cancellation_reason": "Cancellation reason",
         "notes": "Notes",
         "prep_time": "Prep time"
       },
       "unknown_customer": "Unknown",
       "unknown_item": "Unknown item",
-      "prep_minutes": "{minutes} min"
+      "prep_minutes": "{minutes} min",
+      "cancellation_reasons": {
+        "bartender": "Canceled by bartender",
+        "customer": "Canceled by customer",
+        "timeout": "Not prepared in time"
+      }
     }
   },
   "orders": {

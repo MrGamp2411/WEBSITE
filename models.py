@@ -230,6 +230,7 @@ class Order(Base):
     cancelled_at = Column(DateTime)
     refund_amount = Column(Numeric(10, 2), default=0)
     notes = Column(Text)
+    cancellation_reason = Column(String(40))
     source_channel = Column(String(30))
     closing_id = Column(Integer, ForeignKey("bar_closings.id"))
     order_local_date = Column(Date)
