@@ -1263,6 +1263,7 @@
       "subject": "Sujet",
       "subject_translate_button": "Traduire le sujet",
       "subject_translation_help": "Fournissez un sujet pour chaque langue prise en charge.",
+      "subject_default_language_help": "Renseignez le sujet en {language}. Les autres langues utiliseront ce texte si aucune traduction n'est disponible.",
       "language_subject_label": "Sujet en {language}",
       "message": "Message",
       "message_translate_button": "Traduire le message",

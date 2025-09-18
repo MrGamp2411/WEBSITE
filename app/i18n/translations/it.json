@@ -1239,6 +1239,7 @@
       "subject": "Oggetto",
       "subject_translate_button": "Traduci oggetto",
       "subject_translation_help": "Inserisci un oggetto per ogni lingua supportata.",
+      "subject_default_language_help": "Compila l'oggetto in {language}. Le altre lingue useranno questo testo se non è disponibile una traduzione.",
       "language_subject_label": "Oggetto in {language}",
       "message": "Messaggio",
       "message_translate_button": "Traduci messaggio",

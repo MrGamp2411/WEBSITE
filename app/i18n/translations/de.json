@@ -1239,6 +1239,7 @@
       "subject": "Gegenstand",
       "subject_translate_button": "Gegenstand übersetzen",
       "subject_translation_help": "Geben Sie einen Gegenstand für jede unterstützte Sprache ein.",
+      "subject_default_language_help": "Tragen Sie den Gegenstand auf {language} ein. Andere Sprachen übernehmen diesen Text, wenn keine Übersetzung vorhanden ist.",
       "language_subject_label": "Gegenstand in {language}",
       "message": "Nachricht",
       "message_translate_button": "Nachricht übersetzen",
