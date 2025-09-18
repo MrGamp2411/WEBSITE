@@ -3590,7 +3590,7 @@ async def register_details(request: Request, db: Session = Depends(get_db)):
             )
             db.add(note)
             db.commit()
-        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_form("All fields are required")
 
 
