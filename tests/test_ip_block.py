@@ -118,9 +118,9 @@ def test_login_from_blocked_ip_redirects_user():
 
     demo_user = users[user_id]
     assert demo_user.role == 'ip_block'
-    assert demo_user.base_role == 'customer'
+    assert demo_user.base_role == 'ip_block'
 
     db = SessionLocal()
     stored_user = db.get(User, user_id)
-    assert stored_user.role == RoleEnum.CUSTOMER
+    assert stored_user.role == RoleEnum.IPBLOCK
     db.close()

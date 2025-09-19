@@ -3899,7 +3899,13 @@ async def login(request: Request, db: Session = Depends(get_db)):
             longitude=lon,
         )
         if canonical_ip and canonical_ip in blocked_ip_lookup:
-            user.role = "ip_block"
+            if user.role != "ip_block":
+                user.role = "ip_block"
+            user.base_role = "ip_block"
+            db_user = db.get(User, user.id)
+            if db_user and db_user.role != RoleEnum.IPBLOCK:
+                db_user.role = RoleEnum.IPBLOCK
+                db.commit()
             return RedirectResponse(
                 url="/ip-blocked", status_code=status.HTTP_303_SEE_OTHER
             )
