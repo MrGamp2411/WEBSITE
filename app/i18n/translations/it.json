@@ -1658,6 +1658,7 @@
   "ip_blocked": {
     "title": "Accesso di rete bloccato",
     "lead": "La rete da cui hai effettuato l'accesso è bloccata su SiplyGo. Contatta l'assistenza e controlla le notifiche per maggiori dettagli.",
+    "security_notice": "Questo account è stato temporaneamente bloccato per motivi di sicurezza. La creazione di nuovi account o l'accesso ad altri account comporterà lo stesso blocco anche su di essi.",
     "support": "Serve aiuto? Contatta l'assistenza all'indirizzo <a href=\"mailto:{email}\">{email}</a> o chiama <a href=\"tel:{phone_tel}\">{phone}</a>.",
     "view_notifications": "Vai alle notifiche"
   },

@@ -1658,6 +1658,7 @@
   "ip_blocked": {
     "title": "Netzwerkzugriff blockiert",
     "lead": "Das Netzwerk, mit dem du dich angemeldet hast, ist auf SiplyGo blockiert. Kontaktiere den Support und prüfe deine Benachrichtigungen für weitere Details.",
+    "security_notice": "Dieses Konto wurde aus Sicherheitsgründen vorübergehend gesperrt. Das Erstellen neuer Konten oder das Anmelden bei anderen Konten führt ebenfalls zu derselben Sperre.",
     "support": "Brauchst du Hilfe? Kontaktiere unser Support-Team unter <a href=\"mailto:{email}\">{email}</a> oder rufe <a href=\"tel:{phone_tel}\">{phone}</a> an.",
     "view_notifications": "Zu den Benachrichtigungen"
   },

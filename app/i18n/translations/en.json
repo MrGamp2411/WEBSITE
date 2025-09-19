@@ -1658,6 +1658,7 @@
   "ip_blocked": {
     "title": "Network access blocked",
     "lead": "The network you used to sign in is blocked from SiplyGo. Please contact support and review your notifications for more details.",
+    "security_notice": "This account has been temporarily blocked for security reasons. Creating new accounts or signing into other accounts will result in the same block on them.",
     "support": "Need help? Contact our support team at <a href=\"mailto:{email}\">{email}</a> or call <a href=\"tel:{phone_tel}\">{phone}</a>.",
     "view_notifications": "Go to notifications"
   },
