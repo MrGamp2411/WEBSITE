@@ -217,7 +217,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);transit
 .static-page h2{font-size:clamp(20px,3vw,28px);margin:var(--space-3) 0 var(--space-1);color:var(--text);}
 .static-page p{margin:0;color:var(--color-muted);}
 .static-page ul,.static-page ol{margin:0;padding-left:1.25rem;display:grid;gap:.5rem;color:var(--color-muted);}
-.static-page a{color:var(--sg-purple-700);text-decoration:underline;}
+.static-page a:not(.btn){color:var(--sg-purple-700);text-decoration:underline;}
 .static-page strong{color:var(--text);}
 
  .filters-toolbar{position:sticky;top:0;z-index:10;background:var(--bg);margin-bottom:var(--space-2);border-radius:var(--sg-card-radius);}
