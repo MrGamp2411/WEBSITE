@@ -46,6 +46,7 @@
   redirects and the template lives at `templates/blocked.html`.
 - IP block entries are managed from `/admin/ip-block` with UI in `templates/admin_ip_block.html`; blocked addresses are stored via the `BlockedIP` model and cached in `blocked_ips` / `blocked_ip_lookup`.
 - Users logging in from a blocked IP receive the `ip_block` role, are redirected to `/ip-blocked`, and only see notifications and the IP block notice.
+- Super admins are immune to IP block enforcement; they keep the `super_admin` role even when signing in from blocked addresses and cannot be assigned `blocked` or `ip_block` roles.
 
 - `common.weekdays.<day>` translations drive the opening hours day labels on bar pages. Use these keys instead of hard-coded
   weekday names.

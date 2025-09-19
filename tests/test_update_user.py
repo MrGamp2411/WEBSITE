@@ -422,6 +422,41 @@ def test_blocking_user_clears_cart():
     db.close()
 
 
+def test_super_admin_cannot_be_assigned_block_roles():
+    with TestClient(app) as client:
+        _login_super_admin(client)
+        db = SessionLocal()
+        admin = db.query(User).filter(User.email == "admin@example.com").first()
+        assert admin is not None
+        admin_id = admin.id
+        username = admin.username
+        email = admin.email
+        prefix = admin.prefix or ""
+        phone = admin.phone or ""
+        db.close()
+
+        form = {
+            "username": username,
+            "email": email,
+            "prefix": prefix,
+            "phone": phone,
+            "role": "blocked",
+            "bar_ids": "",
+            "add_credit": "0",
+            "remove_credit": "0",
+        }
+        resp = client.post(
+            f"/admin/users/edit/{admin_id}", data=form, follow_redirects=False
+        )
+        assert resp.status_code == 400
+        assert "Super admins cannot be blocked." in resp.text
+
+        db = SessionLocal()
+        stored_admin = db.get(User, admin_id)
+        assert stored_admin.role == RoleEnum.SUPERADMIN
+        db.close()
+
+
 def test_update_user_password_change():
     db = SessionLocal()
     old_hash = hashlib.sha256("old".encode("utf-8")).hexdigest()
