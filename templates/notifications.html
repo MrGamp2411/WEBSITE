@@ -1,25 +1,201 @@
 {% extends "layout.html" %}
 {% block content %}
-<section class="users-page">
-  <header class="users-toolbar">
-    <div class="title-wrap">
-      <h1>{{ _('notifications.title', default='Notifications') }}</h1>
-      <p class="subtitle">{{ _('notifications.subtitle', default='Your messages.') }}</p>
-    </div>
-  </header>
-  <div class="table-card">
-    <ul class="notifications-list">
-    {% for n in notifications %}
-      <li class="mb-3">
-        <a href="/notifications/{{ n.id }}" class="card notification-card{% if not n.read %} card--unread{% endif %}">
-          <h3>{{ n.localized_subject or n.subject }}</h3>
-          <p>{{ (n.localized_body or n.body)|truncate(100) }}</p>
-        </a>
-      </li>
-    {% else %}
-      <li>{{ _('notifications.empty', default='No notifications.') }}</li>
-    {% endfor %}
-    </ul>
+<section class="notifications-page">
+  <div class="page-head">
+    <header class="users-toolbar">
+      <div class="title-wrap">
+        <h1>{{ _('notifications.title', default='Notifications') }}</h1>
+        <p class="subtitle">{{ _('notifications.subtitle', default='Your messages.') }}</p>
+      </div>
+    </header>
   </div>
+
+  <nav class="filters" aria-label="Filtra notifiche">
+    <button class="filter-pill is-active" data-filter="all" type="button">Tutte</button>
+    <button class="filter-pill" data-filter="unread" type="button">Non lette</button>
+    <button class="filter-pill" data-filter="orders" type="button">Ordini</button>
+    <button class="filter-pill" data-filter="system" type="button">Sistema</button>
+  </nav>
+
+  <div class="notif-feed" id="notif-feed">
+    {% if notifications %}
+      {% set current_group = None %}
+      {% for n in notifications %}
+        {% if n.created_at %}
+          {% set group_key = n.created_at.strftime('%Y-%m-%d') %}
+          {% set group_label = n.created_at.strftime('%d %b %Y') %}
+        {% else %}
+          {% set group_key = 'unknown-' ~ loop.index0 %}
+          {% set group_label = 'Earlier' %}
+        {% endif %}
+        {% if group_key != current_group %}
+          <h4 class="group-label">{{ group_label }}</h4>
+          {% set current_group = group_key %}
+        {% endif %}
+        {% set tag_value = n.log.target if n.log and n.log.target else 'system' %}
+        {% set tag_label = tag_value.replace('_', ' ')|title %}
+        <article class="notif-card{% if not n.read %} is-unread{% endif %}"
+                 data-type="{{ tag_value|lower }}"
+                 data-date="{{ n.created_at.strftime('%Y-%m-%d') if n.created_at else '' }}"
+                 aria-live="polite">
+          <a href="/notifications/{{ n.id }}" class="notif-link card notification-card{% if not n.read %} card--unread{% endif %}">
+            <div class="notif-row">
+              <div class="notif-main">
+                <h3 class="notif-title">{{ n.localized_subject or n.subject }}</h3>
+                <p class="notif-body">{{ (n.localized_body or n.body)|truncate(160) }}</p>
+                <div class="notif-meta">
+                  {% if n.created_at %}
+                    <time datetime="{{ n.created_at.isoformat() }}">{{ n.created_at|format_time }}</time>
+                  {% endif %}
+                  {% if n.created_at %}
+                    <span class="dot" aria-hidden="true">•</span>
+                  {% endif %}
+                  <span class="notif-tag">{{ tag_label }}</span>
+                </div>
+              </div>
+              <i class="unread-dot" aria-hidden="true"></i>
+            </div>
+          </a>
+        </article>
+      {% endfor %}
+    {% endif %}
+
+    <div class="notif-empty"{% if notifications %} hidden{% endif %} aria-live="polite">
+      <div class="empty-inner">
+        <h3>{{ _('notifications.empty', default='No notifications.') }}</h3>
+        <p>Le tue notifiche appariranno qui.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="safe-bottom"></div>
 </section>
+
+<style>
+.notifications-page{
+  --bg: var(--sg-bg, #f7f7fb);
+  --card: var(--sg-card, #ffffff);
+  --text: var(--sg-text, #111827);
+  --muted: var(--sg-muted, #6b7280);
+  --brand: var(--brand-purple, #7b61ff);
+  --brand-weak: rgba(123,97,255,.14);
+  --border: rgba(0,0,0,.06);
+  --radius: 16px;
+  --shadow-1: 0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.06);
+  background: linear-gradient(180deg, rgba(123,97,255,.12) 0%, rgba(255,255,255,0) 120%);
+  min-height: 100%;
+}
+
+.notifications-page .page-head{
+  padding: 20px 16px 8px;
+}
+
+.notifications-page .users-toolbar{
+  background: linear-gradient(135deg, rgba(123,97,255,.18), rgba(123,97,255,0));
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-1);
+}
+
+.notifications-page .title-wrap h1{
+  margin: 0;
+}
+
+.notifications-page .title-wrap .subtitle{
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.notifications-page .filters{
+  display:flex; gap:.5rem; padding: 4px 12px 12px; overflow:auto;
+  -webkit-overflow-scrolling: touch;
+}
+.notifications-page .filter-pill{
+  border:1px solid var(--border);
+  background:#fff; padding:8px 12px; border-radius:999px;
+  font-size:14px; line-height:1; white-space:nowrap;
+}
+.notifications-page .filter-pill.is-active{
+  background: var(--brand-weak);
+  color: var(--brand); border-color: transparent;
+}
+
+.notifications-page .notif-feed{
+  display:flex; flex-direction:column; gap:12px;
+  padding: 6px 12px 24px;
+}
+
+.notifications-page .group-label{
+  position: sticky; top: 64px; z-index: 1;
+  align-self:flex-start;
+  font-weight:600; font-size:12px; letter-spacing:.02em;
+  color: var(--muted); background: rgba(255,255,255,.8);
+  backdrop-filter: blur(6px);
+  padding: 4px 10px; border-radius: 999px; margin: 6px 0;
+}
+
+.notifications-page .notif-card{
+  position: relative;
+  background: var(--card);
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+  padding: 14px 16px;
+}
+.notifications-page .notif-card.is-unread{
+  box-shadow: var(--shadow-1), 0 0 0 2px rgba(123,97,255,.12) inset;
+}
+.notifications-page .notif-card.is-unread::before{
+  content:""; position:absolute; left:0; top:10px; bottom:10px; width:3px;
+  background: var(--brand); border-radius:3px;
+}
+
+.notifications-page .notif-link{
+  display:block; color:inherit; text-decoration:none;
+}
+
+.notifications-page .notif-row{ display:flex; gap:12px; align-items:flex-start; }
+.notifications-page .unread-dot{
+  width:8px; height:8px; border-radius:50%; background: var(--brand);
+  margin-left:auto; margin-top:4px; display:none;
+}
+.notifications-page .notif-card.is-unread .unread-dot{ display:block; }
+
+.notifications-page .notif-title{
+  margin:0 0 4px; font-size:16px; line-height:1.2; color: var(--text); font-weight:700;
+}
+.notifications-page .notif-body{
+  margin:0; font-size:14px; color: var(--muted);
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.notifications-page .notif-meta{
+  margin-top:8px; font-size:12px; color: var(--muted);
+  display:flex; align-items:center; gap:6px;
+}
+.notifications-page .notif-meta .dot{ opacity:.5; }
+
+.notifications-page .notif-tag{
+  background: var(--brand-weak);
+  color: var(--brand); padding:2px 8px; border-radius:999px; font-size:12px;
+}
+
+.notifications-page .notif-empty{
+  display:flex; align-items:center; justify-content:center;
+  border:1px dashed var(--border); border-radius: var(--radius);
+  padding: 40px 16px; background:#fff; box-shadow: var(--shadow-1);
+}
+.notifications-page .notif-empty .empty-inner{ text-align:center; }
+.notifications-page .notif-empty h3{ margin:0 0 6px; font-size:16px; }
+.notifications-page .notif-empty p{ margin:0; color: var(--muted); font-size:14px; }
+
+.notifications-page .safe-bottom{ height: 24px; }
+
+@media (min-width: 768px){
+  .notifications-page .page-head{ padding: 28px 24px 12px; }
+  .notifications-page .users-toolbar{ padding: 24px; }
+  .notifications-page .notif-feed{ gap:14px; padding: 8px 16px 40px; }
+  .notifications-page .notif-card{ padding:16px 18px; }
+  .notifications-page .group-label{ top: 72px; }
+}
+</style>
 {% endblock %}
