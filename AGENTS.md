@@ -44,6 +44,8 @@
 - Display orders include 10px horizontal margins and center the order text within each card.
 - Block role users are limited to notifications and the `/blocked` help screen; BlockRedirectMiddleware in `main.py` enforces
   redirects and the template lives at `templates/blocked.html`.
+- IP block entries are managed from `/admin/ip-block` with UI in `templates/admin_ip_block.html`; blocked addresses are stored via the `BlockedIP` model and cached in `blocked_ips` / `blocked_ip_lookup`.
+- Users logging in from a blocked IP receive the `ip_block` role, are redirected to `/ip-blocked`, and only see notifications and the IP block notice.
 
 - `common.weekdays.<day>` translations drive the opening hours day labels on bar pages. Use these keys instead of hard-coded
   weekday names.

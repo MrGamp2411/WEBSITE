@@ -892,6 +892,11 @@
         "description": "Nachrichten an Benutzer senden.",
         "action": "Benachrichtigungen verwalten"
       },
+      "ip_block": {
+        "title": "IP-Block",
+        "description": "Verwalte blockierte IP-Adressen.",
+        "action": "IP-Block verwalten"
+      },
       "payments": {
         "title": "Zahlungen",
         "description": "Überprüfen Sie Auszahlungen, Rechnungen und Bestelleinnahmen.",
@@ -957,7 +962,8 @@
       "bartender": "Barkeeper",
       "display": "Anzeige",
       "customer": "Abnehmer",
-      "blocked": "Blockiert"
+      "blocked": "Blockiert",
+      "ip_block": "IP-Block"
     },
     "sections": {
       "assigned": "Zugeordnete Balken",
@@ -1622,6 +1628,38 @@
     "actions": {
       "home": "Zur Startseite"
     }
+  },
+  "admin_ip_block": {
+    "title": "IP-Block",
+    "subtitle": "Verwalte Netzadressen, die keinen Zugriff auf die Plattform haben.",
+    "form": {
+      "ip_label": "IP-Adresse",
+      "ip_placeholder": "z. B. 203.0.113.10",
+      "note_label": "Notizen",
+      "note_placeholder": "Optionaler Grund",
+      "submit": "IP hinzufügen"
+    },
+    "table": {
+      "headers": {
+        "ip": "IP-Adresse",
+        "note": "Notizen",
+        "created": "Hinzugefügt",
+        "actions": "Aktionen"
+      },
+      "delete": "Entfernen"
+    },
+    "empty": "Keine blockierten IP-Adressen.",
+    "dialog": {
+      "prompt": "Diese IP aus der Sperrliste entfernen?",
+      "cancel": "Abbrechen",
+      "confirm": "Entfernen"
+    }
+  },
+  "ip_blocked": {
+    "title": "Netzwerkzugriff blockiert",
+    "lead": "Das Netzwerk, mit dem du dich angemeldet hast, ist auf SiplyGo blockiert. Kontaktiere den Support und prüfe deine Benachrichtigungen für weitere Details.",
+    "support": "Brauchst du Hilfe? Kontaktiere unser Support-Team unter <a href=\"mailto:{email}\">{email}</a> oder rufe <a href=\"tel:{phone_tel}\">{phone}</a> an.",
+    "view_notifications": "Zu den Benachrichtigungen"
   },
   "blocked": {
     "title": "Kontozugriff eingeschränkt",

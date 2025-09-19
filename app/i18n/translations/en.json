@@ -892,6 +892,11 @@
         "description": "Send messages to users.",
         "action": "Manage Notifications"
       },
+      "ip_block": {
+        "title": "IP Block",
+        "description": "Manage blocked IP addresses.",
+        "action": "Manage IP Block"
+      },
       "payments": {
         "title": "Payments",
         "description": "Review payouts, invoices, and order revenue.",
@@ -957,7 +962,8 @@
       "bartender": "Bartender",
       "display": "Display",
       "customer": "Customer",
-      "blocked": "Blocked"
+      "blocked": "Blocked",
+      "ip_block": "IP Block"
     },
     "sections": {
       "assigned": "Assigned Bars",
@@ -1622,6 +1628,38 @@
     "actions": {
       "home": "Return to home"
     }
+  },
+  "admin_ip_block": {
+    "title": "IP Block",
+    "subtitle": "Manage network addresses that cannot access the platform.",
+    "form": {
+      "ip_label": "IP address",
+      "ip_placeholder": "e.g. 203.0.113.10",
+      "note_label": "Notes",
+      "note_placeholder": "Optional reason",
+      "submit": "Add IP"
+    },
+    "table": {
+      "headers": {
+        "ip": "IP address",
+        "note": "Notes",
+        "created": "Added",
+        "actions": "Actions"
+      },
+      "delete": "Remove"
+    },
+    "empty": "No blocked IP addresses yet.",
+    "dialog": {
+      "prompt": "Remove this IP from the block list?",
+      "cancel": "Cancel",
+      "confirm": "Remove"
+    }
+  },
+  "ip_blocked": {
+    "title": "Network access blocked",
+    "lead": "The network you used to sign in is blocked from SiplyGo. Please contact support and review your notifications for more details.",
+    "support": "Need help? Contact our support team at <a href=\"mailto:{email}\">{email}</a> or call <a href=\"tel:{phone_tel}\">{phone}</a>.",
+    "view_notifications": "Go to notifications"
   },
   "blocked": {
     "title": "Account access limited",

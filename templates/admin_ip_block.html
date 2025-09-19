@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="users-page">
+  <header class="users-toolbar">
+    <div class="title-wrap">
+      <h1>{{ _('admin_ip_block.title', default='IP Block') }}</h1>
+      <p class="subtitle">{{ _('admin_ip_block.subtitle', default='Manage network addresses that cannot access the platform.') }}</p>
+    </div>
+  </header>
+  {% if message %}
+  <p class="alert-success">{{ message }}</p>
+  {% endif %}
+  {% if error %}
+  <p class="alert-danger">{{ error }}</p>
+  {% endif %}
+
+  <div class="table-card">
+    <form class="ip-block-form" method="post" action="/admin/ip-block">
+      <div class="form-grid">
+        <label>
+          <span>{{ _('admin_ip_block.form.ip_label', default='IP address') }}</span>
+          <input type="text" name="ip_address" placeholder="{{ _('admin_ip_block.form.ip_placeholder', default='e.g. 203.0.113.10') }}" required>
+        </label>
+        <label>
+          <span>{{ _('admin_ip_block.form.note_label', default='Notes') }}</span>
+          <input type="text" name="note" maxlength="255" placeholder="{{ _('admin_ip_block.form.note_placeholder', default='Optional reason') }}">
+        </label>
+        <div class="form-actions">
+          <button type="submit" class="btn btn--primary">{{ _('admin_ip_block.form.submit', default='Add IP') }}</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  {% if blocked_ips %}
+  <div class="table-card">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>{{ _('admin_ip_block.table.headers.ip', default='IP address') }}</th>
+          <th>{{ _('admin_ip_block.table.headers.note', default='Notes') }}</th>
+          <th>{{ _('admin_ip_block.table.headers.created', default='Added') }}</th>
+          <th class="actions">{{ _('admin_ip_block.table.headers.actions', default='Actions') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in blocked_ips %}
+        <tr>
+          <td>{{ entry.address }}</td>
+          <td>{{ entry.note }}</td>
+          <td>{{ entry.created_at|format_time }}</td>
+          <td class="actions">
+            <form method="post" action="/admin/ip-block/{{ entry.id }}/delete" class="ip-block-delete" data-entry-id="{{ entry.id }}">
+              <button type="submit" class="btn-danger-soft">{{ _('admin_ip_block.table.delete', default='Remove') }}</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="empty-state">{{ _('admin_ip_block.empty', default='No blocked IP addresses yet.') }}</p>
+  {% endif %}
+</section>
+<div id="ipBlocker" class="cart-blocker" hidden>
+  <div class="cart-popup">
+    <p>{{ _('admin_ip_block.dialog.prompt', default='Remove this IP from the block list?') }}</p>
+    <div class="cart-popup-actions">
+      <button type="button" class="btn btn--secondary js-cancel-ip">{{ _('admin_ip_block.dialog.cancel', default='Cancel') }}</button>
+      <button type="button" class="btn btn--primary js-confirm-ip">{{ _('admin_ip_block.dialog.confirm', default='Remove') }}</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  const blocker = document.getElementById('ipBlocker');
+  const cancelBtn = blocker?.querySelector('.js-cancel-ip');
+  const confirmBtn = blocker?.querySelector('.js-confirm-ip');
+  let targetForm = null;
+
+  document.querySelectorAll('.ip-block-delete').forEach(form => {
+    form.addEventListener('submit', evt => {
+      if (!targetForm) {
+        evt.preventDefault();
+        targetForm = form;
+        if (blocker) blocker.hidden = false;
+      }
+    });
+  });
+
+  cancelBtn?.addEventListener('click', () => {
+    if (blocker) blocker.hidden = true;
+    targetForm = null;
+  });
+
+  confirmBtn?.addEventListener('click', () => {
+    if (targetForm) targetForm.submit();
+  });
+})();
+</script>
+{% endblock %}

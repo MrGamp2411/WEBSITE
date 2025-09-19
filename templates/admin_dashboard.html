@@ -31,6 +31,11 @@
         <p>{{ _('admin_dashboard.cards.notifications.description', default='Send messages to users.') }}</p>
         <a class="btn btn--primary" href="/admin/notifications">{{ _('admin_dashboard.cards.notifications.action', default='Manage Notifications') }}</a>
       </article>
+      <article class="card quick-card">
+        <h3 class="card-title"><i class="bi bi-shield-lock"></i> {{ _('admin_dashboard.cards.ip_block.title', default='IP Block') }}</h3>
+        <p>{{ _('admin_dashboard.cards.ip_block.description', default='Manage blocked IP addresses.') }}</p>
+        <a class="btn btn--primary" href="/admin/ip-block">{{ _('admin_dashboard.cards.ip_block.action', default='Manage IP Block') }}</a>
+      </article>
       <article class="card quick-card"><!-- CHANGED -->
         <h3 class="card-title"><i class="bi bi-credit-card"></i> {{ _('admin_dashboard.cards.payments.title', default='Payments') }}</h3><!-- CHANGED -->
         <p>{{ _('admin_dashboard.cards.payments.description', default='Review payouts, invoices, and order revenue.') }}</p><!-- CHANGED -->
