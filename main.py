@@ -653,12 +653,16 @@ class BlockRedirectMiddleware(BaseHTTPMiddleware):
                 if (
                     canonical_ip in blocked_ip_lookup
                     and user.role != "ip_block"
+                    and not getattr(user, "is_super_admin", False)
                 ):
                     user.role = "ip_block"
                     user.base_role = "ip_block"
                     with SessionLocal() as db:
                         db_user = db.get(User, user.id)
-                        if db_user and db_user.role != RoleEnum.IPBLOCK:
+                        if db_user and db_user.role not in {
+                            RoleEnum.IPBLOCK,
+                            RoleEnum.SUPERADMIN,
+                        }:
                             db_user.role = RoleEnum.IPBLOCK
                             db.commit()
             redirect_target: Optional[str] = None
@@ -3848,9 +3852,9 @@ async def login(request: Request, db: Session = Depends(get_db)):
         record = login_attempts[email]
         if record["count"] >= 5:
             await asyncio.sleep(2 ** (record["count"] - 4))
+        db_user = db.query(User).filter(User.email == email).first()
         user = users_by_email.get(email)
         if not user:
-            db_user = db.query(User).filter(User.email == email).first()
             if db_user and verify_password(db_user.password_hash, password):
                 role_map = {
                     RoleEnum.SUPERADMIN: "super_admin",
@@ -3928,6 +3932,9 @@ async def login(request: Request, db: Session = Depends(get_db)):
                 canonical_ip = ipaddress.ip_address(client_ip_raw).compressed
             except ValueError:
                 canonical_ip = client_ip_raw
+        if db_user and db_user.role == RoleEnum.SUPERADMIN:
+            user.role = "super_admin"
+            user.base_role = "super_admin"
         if user.is_ip_blocked and user.base_role and user.base_role != "ip_block":
             user.role = user.base_role
         request.session["user_id"] = user.id
@@ -3944,17 +3951,23 @@ async def login(request: Request, db: Session = Depends(get_db)):
             longitude=lon,
         )
         if canonical_ip and canonical_ip in blocked_ip_lookup:
-            if user.role != "ip_block":
-                user.role = "ip_block"
-            user.base_role = "ip_block"
-            db_user = db.get(User, user.id)
-            if db_user and db_user.role != RoleEnum.IPBLOCK:
-                db_user.role = RoleEnum.IPBLOCK
-                db.commit()
-            return RedirectResponse(
-                url="/ip-blocked", status_code=status.HTTP_303_SEE_OTHER
-            )
-        if user.base_role == "ip_block":
+            if user.is_super_admin:
+                pass
+            else:
+                if user.role != "ip_block":
+                    user.role = "ip_block"
+                user.base_role = "ip_block"
+                db_user = db.get(User, user.id)
+                if db_user and db_user.role not in {
+                    RoleEnum.IPBLOCK,
+                    RoleEnum.SUPERADMIN,
+                }:
+                    db_user.role = RoleEnum.IPBLOCK
+                    db.commit()
+                return RedirectResponse(
+                    url="/ip-blocked", status_code=status.HTTP_303_SEE_OTHER
+                )
+        if user.base_role == "ip_block" and not user.is_super_admin:
             user.role = "ip_block"
             return RedirectResponse(
                 url="/ip-blocked", status_code=status.HTTP_303_SEE_OTHER
@@ -5915,6 +5928,27 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
             bars=bars.values(),
             current=current,
         )
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    target_is_super_admin = (
+        db_user.role == RoleEnum.SUPERADMIN
+        or user.base_role == "super_admin"
+        or user.role == "super_admin"
+        or db_user.email == os.getenv("ADMIN_EMAIL", "admin@example.com")
+    )
+    if target_is_super_admin and role in {"blocked", "ip_block"}:
+        return render_template(
+            "admin_edit_user.html",
+            request=request,
+            user=user,
+            bars=bars.values(),
+            current=current,
+            error="Super admins cannot be blocked.",
+            status_code=400,
+        )
+    if target_is_super_admin:
+        role = "super_admin"
     username_lower = username.lower()
     if (
         username != username_lower
@@ -6018,9 +6052,6 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
             error="Invalid credit amount",
         )
     user.credit = user.credit + add_amt - remove_amt
-    db_user = db.query(User).filter(User.id == user_id).first()
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
     db_user.username = username
     db_user.email = email
     if phone:

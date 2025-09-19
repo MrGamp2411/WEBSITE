@@ -128,6 +128,54 @@ def test_login_from_blocked_ip_redirects_user():
     db.close()
 
 
+def test_super_admin_login_ignores_ip_block():
+    setup_db()
+    db = SessionLocal()
+    pwd = hashlib.sha256('pass'.encode('utf-8')).hexdigest()
+    admin = User(
+        username='admin',
+        email='admin@example.com',
+        password_hash=pwd,
+        role=RoleEnum.SUPERADMIN,
+    )
+    db.add(admin)
+    db.commit()
+    db.refresh(admin)
+    admin_id = admin.id
+    blocked = BlockedIP(address='203.0.113.5')
+    db.add(blocked)
+    db.commit()
+    db.close()
+
+    load_bars_from_db()
+    load_blocked_ips_from_db()
+
+    with TestClient(app) as client:
+        resp = client.post(
+            '/login',
+            data={'email': 'admin@example.com', 'password': 'pass'},
+            headers={'x-forwarded-for': '203.0.113.5'},
+            follow_redirects=False,
+        )
+        assert resp.status_code == 303
+        assert resp.headers['location'] == '/dashboard'
+
+        dashboard = client.get(
+            '/admin/dashboard',
+            headers={'x-forwarded-for': '203.0.113.5'},
+        )
+        assert dashboard.status_code == 200
+
+    demo_user = users[admin_id]
+    assert demo_user.role == 'super_admin'
+    assert demo_user.base_role == 'super_admin'
+
+    db = SessionLocal()
+    stored_admin = db.get(User, admin_id)
+    assert stored_admin.role == RoleEnum.SUPERADMIN
+    db.close()
+
+
 def test_register_from_blocked_ip_sets_role():
     setup_db()
     db = SessionLocal()
