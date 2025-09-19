@@ -129,7 +129,7 @@ function initBartender(barId) {
       `<section class="order-card__meta"><dl class="order-kv">` +
       `<div><dt>${getField('total', 'Total')}</dt><dd class="num nowrap">CHF ${order.total.toFixed(2)}</dd></div>` +
       refund +
-      `<div><dt>${getField('placed', 'Placed')}</dt><dd class="num nowrap">${placed}</dd></div>` +
+      `<div><dt>${getField('placed', 'Placed')}</dt><dd class="num">${placed}</dd></div>` +
       `<div><dt>${getField('customer', 'Customer')}</dt><dd>${customerName}${phoneHtml}</dd></div>` +
       `<div><dt>${getField('bar', 'Bar')}</dt><dd>${order.bar_name || ''}</dd></div>` +
       `<div><dt>${getField('table', 'Table')}</dt><dd>${order.table_name || ''}</dd></div>` +
@@ -241,7 +241,7 @@ function initUser(userId) {
       `<section class="order-card__meta"><dl class="order-kv">` +
       `<div><dt>${getField('total', 'Total')}</dt><dd class="num nowrap">CHF ${order.total.toFixed(2)}</dd></div>` +
       refund +
-      `<div><dt>${getField('placed', 'Placed')}</dt><dd class="num nowrap">${placed}</dd></div>` +
+      `<div><dt>${getField('placed', 'Placed')}</dt><dd class="num">${placed}</dd></div>` +
       `<div><dt>${getField('customer', 'Customer')}</dt><dd>${customerName}${phoneHtml}</dd></div>` +
       `<div><dt>${getField('bar', 'Bar')}</dt><dd>${order.bar_name || ''}</dd></div>` +
       `<div><dt>${getField('table', 'Table')}</dt><dd>${order.table_name || ''}</dd></div>` +
