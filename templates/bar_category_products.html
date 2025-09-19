@@ -4,6 +4,10 @@
 {% set category_title = category_name(category) %}
 <section class="menu-page">
   <header class="menu-toolbar">
+    <a class="back-link" href="/bar/{{ bar.id }}/categories">
+      <i class="bi bi-chevron-left" aria-hidden="true"></i>
+      {{ _('bar_products.manage.back', default='Back to categories') }}
+    </a>
     <div class="title-wrap">
       <h1>{{ _('bar_products.manage.title', category=category_title, bar=bar.name, default='Products in {category} for {bar}') }}</h1>
       <p class="subtitle">{{ _('bar_products.manage.subtitle', default='Add, edit and organize products for this category.') }}</p>

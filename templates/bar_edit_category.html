@@ -1,5 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
+<a class="back-link" href="/bar/{{ bar.id }}/categories">
+  <i class="bi bi-chevron-left" aria-hidden="true"></i>
+  {{ _('bar_categories.edit.back', default='Back to categories') }}
+</a>
 <h1>{{ _('bar_categories.edit.title', bar=bar.name, default='Edit Category for {bar}') }}</h1>
 <section class="category-edit">
   <div class="card">

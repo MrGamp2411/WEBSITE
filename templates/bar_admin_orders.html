@@ -2,6 +2,10 @@
 {% block content %}
 <section class="orders-page">
   <header class="orders-head">
+    <a class="back-link" href="/dashboard">
+      <i class="bi bi-chevron-left" aria-hidden="true"></i>
+      {{ _('bar_admin_orders.back', default='Back to dashboard') }}
+    </a>
     <h1 class="orders-title">{{ _('bar_admin_orders.title', bar=bar.name, default='{bar} Orders') }}</h1>
     <div class="orders-controls">
       <a class="btn" href="/dashboard/bar/{{ bar.id }}/orders/history">{{ _('bar_admin_orders.actions.history', default='Order History & Revenue') }}</a>

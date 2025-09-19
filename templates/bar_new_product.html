@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
 {% set category_title = category_name(category) %}
+<a class="back-link" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products">
+  <i class="bi bi-chevron-left" aria-hidden="true"></i>
+  {{ _('bar_products.new.back', default='Back to products') }}
+</a>
 <h1>{{ _('bar_products.new.title', category=category_title, default='Add Product to {category}') }}</h1>
 {% if error %}<p class="error">{{ error }}</p>{% endif %}
 <form class="form" method="post" enctype="multipart/form-data">

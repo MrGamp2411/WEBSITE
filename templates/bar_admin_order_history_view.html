@@ -1,5 +1,12 @@
 {% extends "layout.html" %}
 {% block content %}
+{% set back_year = closing.closed_at.year %}
+{% set back_month = closing.closed_at.month %}
+{% set back_label = closing.closed_at.strftime('%B %Y') %}
+<a class="back-link" href="/dashboard/bar/{{ bar.id }}/orders/history/{{ back_year }}/{{ back_month }}">
+  <i class="bi bi-chevron-left" aria-hidden="true"></i>
+  {{ _('bar_admin_history.back_to_month', month=back_label, default='Back to {month}') }}
+</a>
 <h1>{{ _('bar_admin_history.orders_title', bar=bar.name, date=closing.closed_at|format_time, default='{bar} - Orders for {date}') }}</h1>
 <div class="revenue-card rc">
   <div class="rc-header">

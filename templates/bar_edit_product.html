@@ -3,6 +3,10 @@
 {% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjI1Jz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
 {% set preview_name = product_name(product) %}
 {% set preview_description = product_description(product) %}
+<a class="back-link" href="/bar/{{ bar.id }}/categories/{{ category.id }}/products">
+  <i class="bi bi-chevron-left" aria-hidden="true"></i>
+  {{ _('bar_products.edit.back', default='Back to products') }}
+</a>
 <h1>{{ _('bar_products.edit.title', product=preview_name, default='Edit Product {product}') }}</h1>
 <section class="product-edit">
   <div class="card">

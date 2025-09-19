@@ -2,6 +2,10 @@
 {% block content %}
 <section class="menu-page">
   <header class="menu-toolbar">
+    <a class="back-link" href="/admin/bars/edit/{{ bar.id }}">
+      <i class="bi bi-chevron-left" aria-hidden="true"></i>
+      {{ _('bar_categories.manage.back', default='Back to bar settings') }}
+    </a>
     <div class="title-wrap">
       <h1>{{ _('bar_categories.manage.title', bar=bar.name, default='Manage Categories for {bar}') }}</h1>
       <p class="subtitle">{{ _('bar_categories.manage.subtitle', default='Create, edit and organize menu categories for this venue.') }}</p>

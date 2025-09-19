@@ -1433,6 +1433,9 @@
     "title": "{bar} - Order History & Revenue",
     "month_title": "{bar} - {month}",
     "orders_title": "{bar} - Orders for {date}",
+    "back_to_orders": "Back to live orders",
+    "back_to_history": "Back to order history",
+    "back_to_month": "Back to {month}",
     "actions": {
       "view": "View",
       "confirm": "Confirm Payment"
@@ -1453,6 +1456,7 @@
   },
   "bar_admin_orders": {
     "title": "{bar} Orders",
+    "back": "Back to dashboard",
     "actions": {
       "history": "Order History & Revenue"
     }
@@ -1461,6 +1465,7 @@
     "manage": {
       "title": "Manage Categories for {bar}",
       "subtitle": "Create, edit and organize menu categories for this venue.",
+      "back": "Back to bar settings",
       "search": {
         "aria": "Search categories",
         "placeholder": "Search categories…",
@@ -1497,10 +1502,12 @@
       "save": "Save"
     },
     "new": {
-      "title": "Add Category for {bar}"
+      "title": "Add Category for {bar}",
+      "back": "Back to categories"
     },
     "edit": {
       "title": "Edit Category for {bar}",
+      "back": "Back to categories",
       "actions": {
         "edit_name": "Edit name",
         "edit_description": "Edit description"
@@ -1538,13 +1545,15 @@
   "bar_products": {
     "edit": {
       "title": "Edit Product {product}",
+      "back": "Back to products",
       "actions": {
         "edit_name": "Edit name",
         "edit_description": "Edit description"
       }
     },
     "new": {
-      "title": "Add Product to {category}"
+      "title": "Add Product to {category}",
+      "back": "Back to products"
     },
     "form": {
       "name": "Name",
@@ -1586,6 +1595,7 @@
     "manage": {
       "title": "Products in {category} for {bar}",
       "subtitle": "Add, edit and organize products for this category.",
+      "back": "Back to categories",
       "actions": {
         "add": "Add Product",
         "edit": "Edit",

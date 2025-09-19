@@ -1457,6 +1457,9 @@
     "title": "{bar} - Historique et revenus de commande",
     "month_title": "{bar} - {month}",
     "orders_title": "{bar} - Ordres de {date}",
+    "back_to_orders": "Retour aux commandes en direct",
+    "back_to_history": "Retour à l'historique des commandes",
+    "back_to_month": "Retour à {month}",
     "actions": {
       "view": "Voir",
       "confirm": "Confirmer le paiement"
@@ -1477,6 +1480,7 @@
   },
   "bar_admin_orders": {
     "title": "{bar} ORDERS",
+    "back": "Retour au tableau de bord",
     "actions": {
       "history": "Historique des commandes et revenus"
     }
@@ -1485,6 +1489,7 @@
     "manage": {
       "title": "Gérer les catégories pour {bar}",
       "subtitle": "Créez, modifiez et organisez des catégories de menu pour ce lieu.",
+      "back": "Retour aux paramètres du bar",
       "search": {
         "aria": "Catégories de recherche",
         "placeholder": "Catégories de recherche…",
@@ -1521,10 +1526,12 @@
       "save": "Sauvegarder"
     },
     "new": {
-      "title": "Ajouter une catégorie pour {bar}"
+      "title": "Ajouter une catégorie pour {bar}",
+      "back": "Retour aux catégories"
     },
     "edit": {
       "title": "Modifier la catégorie pour {bar}",
+      "back": "Retour aux catégories",
       "actions": {
         "edit_name": "Modifier le nom",
         "edit_description": "Modifier la description"
@@ -1562,13 +1569,15 @@
   "bar_products": {
     "edit": {
       "title": "Modifier le produit {product}",
+      "back": "Retour aux produits",
       "actions": {
         "edit_name": "Modifier le nom",
         "edit_description": "Modifier la description"
       }
     },
     "new": {
-      "title": "Ajouter un produit à {category}"
+      "title": "Ajouter un produit à {category}",
+      "back": "Retour aux produits"
     },
     "form": {
       "name": "Nom",
@@ -1610,6 +1619,7 @@
     "manage": {
       "title": "Produits en {category} pour {bar}",
       "subtitle": "Ajouter, modifier et organiser des produits pour cette catégorie.",
+      "back": "Retour aux catégories",
       "actions": {
         "add": "Ajouter le produit",
         "edit": "Modifier",
