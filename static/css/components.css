@@ -351,6 +351,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);transit
 .dashboard-actions .card h3{margin-top:0;}
 
 /* admin dashboard */
+.back-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;opacity:.85;margin-bottom:var(--space-2,8px);}
+.back-link:hover,.back-link:focus-visible{opacity:1;}
 .admin-dashboard{display:block;}
 .admin-header{margin-block:var(--space-4);}
 .admin-subtitle{margin-top:var(--space-1);opacity:.9;}
