@@ -5809,6 +5809,13 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     role_enum = role_enum_map.get(role, RoleEnum.CUSTOMER)
     db_user.role = role_enum
     db_user.credit = Decimal(str(user.credit))
+    if role == "blocked":
+        cart = user_carts.pop(user.id, None)
+        if cart:
+            cart.clear()
+        db.query(UserCart).filter(UserCart.user_id == user_id).delete(
+            synchronize_session=False
+        )
     # Update user-bar role association: remove previous roles then add new assignment
     db.query(UserBarRole).filter(UserBarRole.user_id == user_id).delete(
         synchronize_session=False
