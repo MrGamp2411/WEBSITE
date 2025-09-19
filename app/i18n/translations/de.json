@@ -1387,6 +1387,7 @@
   },
   "bartender_orders": {
     "title": "{bar} Bestellungen",
+    "back": "Zurück zum Dashboard",
     "pause": "Anhalten der Bestellung",
     "sections": {
       "incoming": "Eingehende Aufträge",

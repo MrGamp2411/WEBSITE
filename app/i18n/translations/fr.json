@@ -1411,6 +1411,7 @@
   },
   "bartender_orders": {
     "title": "{bar} ORDERS",
+    "back": "Retour au tableau de bord",
     "pause": "Commande de pause",
     "sections": {
       "incoming": "Ordres entrants",

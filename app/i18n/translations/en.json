@@ -1387,6 +1387,7 @@
   },
   "bartender_orders": {
     "title": "{bar} Orders",
+    "back": "Back to dashboard",
     "pause": "Pause ordering",
     "sections": {
       "incoming": "Incoming Orders",
