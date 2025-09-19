@@ -34,6 +34,7 @@
 - Registration is a two-step flow. `/register` collects email and password and assigns a temporary `REGISTERING` role. Users are redirected to `/register/details` to supply username, phone prefix, and number, and cannot access other pages until this step completes.
   - Once step two succeeds and the role becomes `CUSTOMER`, the user stays signed in and is redirected to the homepage (`/`).
   - Each registration step displays a disclaimer stating that creating an account accepts the Terms of Service, with the link pointing to `/terms`.
+- Username input on `/register/details` forces lowercase on every keystroke so pasted or typed uppercase characters are normalised before submission. See the inline script at the bottom of `templates/register.html`.
 - Registering users hitting any other route are redirected back to `/register/details` by middleware until step two finishes.
 - Super admins can create users directly from the Admin Users page by entering only an email and password; this bypasses the normal registration flow and checks.
 - Startup ensures the `roleenum` type contains `REGISTERING` via `ensure_role_enum()`.
