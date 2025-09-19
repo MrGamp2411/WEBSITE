@@ -892,6 +892,11 @@
         "description": "Invia messaggi agli utenti.",
         "action": "Gestisci notifiche"
       },
+      "ip_block": {
+        "title": "Blocco IP",
+        "description": "Gestisci gli indirizzi IP bloccati.",
+        "action": "Gestisci blocco IP"
+      },
       "payments": {
         "title": "Pagamenti",
         "description": "Rivedi pagamenti, fatture e ricavi degli ordini.",
@@ -957,7 +962,8 @@
       "bartender": "Bartender",
       "display": "Display",
       "customer": "Cliente",
-      "blocked": "Bloccato"
+      "blocked": "Bloccato",
+      "ip_block": "Blocco IP"
     },
     "sections": {
       "assigned": "Locali assegnati",
@@ -1622,6 +1628,38 @@
     "actions": {
       "home": "Torna alla home"
     }
+  },
+  "admin_ip_block": {
+    "title": "Blocco IP",
+    "subtitle": "Gestisci gli indirizzi di rete che non possono accedere alla piattaforma.",
+    "form": {
+      "ip_label": "Indirizzo IP",
+      "ip_placeholder": "es. 203.0.113.10",
+      "note_label": "Note",
+      "note_placeholder": "Motivo facoltativo",
+      "submit": "Aggiungi IP"
+    },
+    "table": {
+      "headers": {
+        "ip": "Indirizzo IP",
+        "note": "Note",
+        "created": "Aggiunto",
+        "actions": "Azioni"
+      },
+      "delete": "Rimuovi"
+    },
+    "empty": "Nessun indirizzo IP bloccato.",
+    "dialog": {
+      "prompt": "Rimuovere questo IP dalla lista dei blocchi?",
+      "cancel": "Annulla",
+      "confirm": "Rimuovi"
+    }
+  },
+  "ip_blocked": {
+    "title": "Accesso di rete bloccato",
+    "lead": "La rete da cui hai effettuato l'accesso è bloccata su SiplyGo. Contatta l'assistenza e controlla le notifiche per maggiori dettagli.",
+    "support": "Serve aiuto? Contatta l'assistenza all'indirizzo <a href=\"mailto:{email}\">{email}</a> o chiama <a href=\"tel:{phone_tel}\">{phone}</a>.",
+    "view_notifications": "Vai alle notifiche"
   },
   "blocked": {
     "title": "Accesso all'account limitato",

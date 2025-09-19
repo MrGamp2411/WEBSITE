@@ -37,6 +37,7 @@ class RoleEnum(str, PyEnum):
     REGISTERING = "Registering"
     DISPLAY = "Display"
     BLOCKED = "Blocked"
+    IPBLOCK = "IPBlock"
 
 
 class User(Base):
@@ -185,6 +186,15 @@ class ProductImage(Base):
     mime = Column(String, nullable=False)
     data = Column(LargeBinary, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class BlockedIP(Base):
+    __tablename__ = "blocked_ips"
+
+    id = Column(Integer, primary_key=True)
+    address = Column(String(45), unique=True, nullable=False)
+    note = Column(String(255))
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
 class BarClosing(Base):

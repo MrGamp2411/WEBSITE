@@ -34,6 +34,7 @@ Limitations:
 import os
 import asyncio
 import hashlib
+import ipaddress
 import json
 import random
 import re
@@ -102,6 +103,7 @@ from models import (
     Notification,
     NotificationLog,
     WelcomeMessage,
+    BlockedIP,
 )
 from pydantic import BaseModel, constr, ConfigDict, ValidationError
 from decimal import Decimal
@@ -461,6 +463,7 @@ class DemoUser:
         self.phone_e164 = phone_e164
         self.phone_region = phone_region
         self.role = role
+        self.base_role = role
         self.bar_ids = bar_ids or []
         self.pending_bar_id = pending_bar_id
         self.credit = credit
@@ -485,6 +488,10 @@ class DemoUser:
     @property
     def is_blocked(self) -> bool:
         return self.role == "blocked"
+
+    @property
+    def is_ip_blocked(self) -> bool:
+        return self.role == "ip_block"
 
     @property
     def bar_id(self) -> Optional[int]:
@@ -539,6 +546,14 @@ class Transaction:
         self.order_id = order_id
         self.status = status
         self.created_at = created_at or datetime.utcnow()
+
+
+class BlockedIPEntry:
+    def __init__(self, entry_id: int, address: str, note: str, created_at: datetime):
+        self.id = entry_id
+        self.address = address
+        self.note = note
+        self.created_at = created_at
 
 
 class Cart:
@@ -624,20 +639,26 @@ class BlockRedirectMiddleware(BaseHTTPMiddleware):
         session = request.session
         user = users.get(session.get("user_id")) if session else None
         path = request.url.path
-        if user and getattr(user, "is_blocked", False):
-            allowed = (
-                path.startswith("/notifications")
-                or path.startswith("/static")
-                or path.startswith("/photo")
-                or path == "/blocked"
-                or path == "/logout"
-                or path == "/favicon.ico"
-            )
-            if not allowed:
-                return RedirectResponse(
-                    url="/blocked",
-                    status_code=status.HTTP_303_SEE_OTHER,
+        if user:
+            redirect_target: Optional[str] = None
+            if getattr(user, "is_blocked", False):
+                redirect_target = "/blocked"
+            elif getattr(user, "is_ip_blocked", False):
+                redirect_target = "/ip-blocked"
+            if redirect_target:
+                allowed = (
+                    path.startswith("/notifications")
+                    or path.startswith("/static")
+                    or path.startswith("/photo")
+                    or path in {"/blocked", "/ip-blocked"}
+                    or path == "/logout"
+                    or path == "/favicon.ico"
                 )
+                if not allowed:
+                    return RedirectResponse(
+                        url=redirect_target,
+                        status_code=status.HTTP_303_SEE_OTHER,
+                    )
         return await call_next(request)
 
 
@@ -925,7 +946,7 @@ def ensure_role_enum() -> None:
                 "WHERE t.typname = 'roleenum'"
             )
         ).scalars().all()
-        for label in ["REGISTERING", "DISPLAY", "BLOCKED"]:
+        for label in ["REGISTERING", "DISPLAY", "BLOCKED", "IPBLOCK"]:
             if label not in existing:
                 conn.execute(
                     text(f"ALTER TYPE roleenum ADD VALUE IF NOT EXISTS '{label}'")
@@ -1514,6 +1535,7 @@ async def on_startup():
     user_carts.clear()
     seed_super_admin()
     load_bars_from_db()
+    load_blocked_ips_from_db()
     asyncio.create_task(auto_cancel_unprepared_orders_worker())
     asyncio.create_task(auto_close_bars_worker())
     asyncio.create_task(purge_old_notifications_worker())
@@ -1536,6 +1558,10 @@ users: Dict[int, DemoUser] = {}
 users_by_username: Dict[str, DemoUser] = {}
 users_by_email: Dict[str, DemoUser] = {}
 next_user_id = 1
+
+# Blocked IP storage
+blocked_ips: Dict[int, BlockedIPEntry] = {}
+blocked_ip_lookup: Dict[str, BlockedIPEntry] = {}
 
 # Username validation
 USERNAME_REGEX = re.compile(
@@ -1586,6 +1612,16 @@ def verify_password(stored: str, password: str) -> bool:
             return False
     expected = hashlib.sha256((password + PASSWORD_PEPPER).encode("utf-8")).hexdigest()
     return stored == expected
+
+
+def get_request_ip(request: Request) -> Optional[str]:
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        for part in forwarded.split(","):
+            candidate = part.strip()
+            if candidate:
+                return candidate
+    return request.client.host if request.client else None
 
 
 # Simple login attempt tracking
@@ -1976,16 +2012,39 @@ def load_bars_from_db() -> None:
                 if r.role == RoleEnum.BARADMIN:
                     bar.bar_admin_ids.append(r.user_id)
                     if r.user_id in users:
-                        if b.id not in users[r.user_id].bar_ids:
-                            users[r.user_id].bar_ids.append(b.id)
-                        users[r.user_id].role = "bar_admin"
+                        user_obj = users[r.user_id]
+                        if b.id not in user_obj.bar_ids:
+                            user_obj.bar_ids.append(b.id)
+                        user_obj.role = "bar_admin"
+                        user_obj.base_role = "bar_admin"
                 elif r.role == RoleEnum.BARTENDER:
                     bar.bartender_ids.append(r.user_id)
                     if r.user_id in users:
-                        if b.id not in users[r.user_id].bar_ids:
-                            users[r.user_id].bar_ids.append(b.id)
-                        users[r.user_id].role = "bartender"
+                        user_obj = users[r.user_id]
+                        if b.id not in user_obj.bar_ids:
+                            user_obj.bar_ids.append(b.id)
+                        user_obj.role = "bartender"
+                        user_obj.base_role = "bartender"
             bars[b.id] = bar
+    finally:
+        db.close()
+
+
+def load_blocked_ips_from_db() -> None:
+    db = SessionLocal()
+    try:
+        blocked_ips.clear()
+        blocked_ip_lookup.clear()
+        rows = db.query(BlockedIP).order_by(BlockedIP.created_at.desc()).all()
+        for row in rows:
+            entry = BlockedIPEntry(
+                row.id,
+                row.address,
+                row.note or "",
+                row.created_at or datetime.utcnow(),
+            )
+            blocked_ips[entry.id] = entry
+            blocked_ip_lookup[entry.address] = entry
     finally:
         db.close()
 
@@ -3678,6 +3737,7 @@ async def register_details(request: Request, db: Session = Depends(get_db)):
         user.phone_e164 = phone_e164
         user.phone_region = phone_region
         user.role = "customer"
+        user.base_role = "customer"
         users_by_username[username_lower] = user
         wm = db.get(WelcomeMessage, 1)
         if wm:
@@ -3755,6 +3815,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
                     RoleEnum.REGISTERING: "registering",
                     RoleEnum.DISPLAY: "display",
                     RoleEnum.BLOCKED: "blocked",
+                    RoleEnum.IPBLOCK: "ip_block",
                 }
                 bar_ids = [r.bar_id for r in db_user.bar_roles]
                 user = DemoUser(
@@ -3815,6 +3876,15 @@ async def login(request: Request, db: Session = Depends(get_db)):
                 "login.html", request=request, error="Invalid credentials"
             )
         login_attempts.pop(email, None)
+        client_ip_raw = get_request_ip(request)
+        canonical_ip = None
+        if client_ip_raw:
+            try:
+                canonical_ip = ipaddress.ip_address(client_ip_raw).compressed
+            except ValueError:
+                canonical_ip = client_ip_raw
+        if user.is_ip_blocked and user.base_role and user.base_role != "ip_block":
+            user.role = user.base_role
         request.session["user_id"] = user.id
         log_action(
             db,
@@ -3822,12 +3892,22 @@ async def login(request: Request, db: Session = Depends(get_db)):
             action="login",
             entity_type="User",
             entity_id=user.id,
-            ip=request.client.host if request.client else None,
+            ip=canonical_ip,
             user_agent=request.headers.get("user-agent"),
             credit=float(user.credit or 0),
             latitude=lat,
             longitude=lon,
         )
+        if canonical_ip and canonical_ip in blocked_ip_lookup:
+            user.role = "ip_block"
+            return RedirectResponse(
+                url="/ip-blocked", status_code=status.HTTP_303_SEE_OTHER
+            )
+        if user.base_role == "ip_block":
+            user.role = "ip_block"
+            return RedirectResponse(
+                url="/ip-blocked", status_code=status.HTTP_303_SEE_OTHER
+            )
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(
         "login.html", request=request, error="Email and password required"
@@ -3999,6 +4079,17 @@ async def blocked_view(request: Request):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     translator_for_request(request)
     return render_template("blocked.html", request=request, user=user)
+
+
+@app.get("/ip-blocked", response_class=HTMLResponse)
+async def ip_blocked_view(request: Request):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    if not getattr(user, "is_ip_blocked", False):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    translator_for_request(request)
+    return render_template("ip_blocked.html", request=request, user=user)
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
@@ -5015,6 +5106,7 @@ async def confirm_bartender(request: Request):
     if not user or not bar or user.pending_bar_id != bar_id:
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     user.role = "bartender"
+    user.base_role = "bartender"
     if bar_id not in user.bar_ids:
         user.bar_ids.append(bar_id)
     user.pending_bar_id = None
@@ -5031,6 +5123,91 @@ async def admin_dashboard(request: Request):
     if not user or not user.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template("admin_dashboard.html", request=request)
+
+
+@app.get("/admin/ip-block", response_class=HTMLResponse)
+async def admin_ip_block(request: Request, message: str | None = None, error: str | None = None):
+    current = get_current_user(request)
+    if not current or not current.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    entries = sorted(blocked_ips.values(), key=lambda e: e.created_at, reverse=True)
+    return render_template(
+        "admin_ip_block.html",
+        request=request,
+        user=current,
+        blocked_ips=entries,
+        message=message,
+        error=error,
+    )
+
+
+@app.post("/admin/ip-block", response_class=HTMLResponse)
+async def admin_ip_block_add(request: Request, db: Session = Depends(get_db)):
+    current = get_current_user(request)
+    if not current or not current.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    form = await request.form()
+    raw_ip = (form.get("ip_address") or "").strip()
+    note = (form.get("note") or "").strip()
+    if not raw_ip:
+        return RedirectResponse(
+            url="/admin/ip-block?error=IP+required",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    try:
+        canonical_ip = ipaddress.ip_address(raw_ip).compressed
+    except ValueError:
+        return RedirectResponse(
+            url="/admin/ip-block?error=Invalid+IP+address",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    if canonical_ip in blocked_ip_lookup:
+        return RedirectResponse(
+            url="/admin/ip-block?error=IP+already+blocked",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    if len(note) > 255:
+        return RedirectResponse(
+            url="/admin/ip-block?error=Note+too+long",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+    entry = BlockedIP(address=canonical_ip, note=note or None)
+    db.add(entry)
+    db.commit()
+    db.refresh(entry)
+    record = BlockedIPEntry(
+        entry.id,
+        entry.address,
+        entry.note or "",
+        entry.created_at or datetime.utcnow(),
+    )
+    blocked_ips[record.id] = record
+    blocked_ip_lookup[record.address] = record
+    return RedirectResponse(
+        url="/admin/ip-block?message=IP+added",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@app.post("/admin/ip-block/{entry_id}/delete", response_class=HTMLResponse)
+async def admin_ip_block_delete(
+    request: Request, entry_id: int, db: Session = Depends(get_db)
+):
+    current = get_current_user(request)
+    if not current or not current.is_super_admin:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    entry = db.get(BlockedIP, entry_id)
+    if entry:
+        address = entry.address
+        db.delete(entry)
+        db.commit()
+        blocked_ips.pop(entry_id, None)
+        if address:
+            blocked_ip_lookup.pop(address, None)
+    return RedirectResponse(
+        url="/admin/ip-block?message=IP+removed",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
 
 
 @app.get("/admin/payments", response_class=HTMLResponse)
@@ -5409,6 +5586,7 @@ async def admin_users_view(
         RoleEnum.REGISTERING: "registering",
         RoleEnum.DISPLAY: "display",
         RoleEnum.BLOCKED: "blocked",
+        RoleEnum.IPBLOCK: "ip_block",
     }
     for db_user in db_users:
         existing = users.get(db_user.id)
@@ -5774,6 +5952,7 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         add_credit = "0"
         remove_credit = "0"
     user.role = role
+    user.base_role = role
     user.bar_ids = bar_ids
     try:
         add_amt = float(add_credit)
@@ -5805,11 +5984,12 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         "customer": RoleEnum.CUSTOMER,
         "display": RoleEnum.DISPLAY,
         "blocked": RoleEnum.BLOCKED,
+        "ip_block": RoleEnum.IPBLOCK,
     }
     role_enum = role_enum_map.get(role, RoleEnum.CUSTOMER)
     db_user.role = role_enum
     db_user.credit = Decimal(str(user.credit))
-    if role == "blocked":
+    if role in {"blocked", "ip_block"}:
         cart = user_carts.pop(user.id, None)
         if cart:
             cart.clear()

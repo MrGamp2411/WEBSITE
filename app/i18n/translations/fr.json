@@ -916,6 +916,11 @@
         "description": "Envoyer des messages aux utilisateurs.",
         "action": "Gérer les notifications"
       },
+      "ip_block": {
+        "title": "Blocage IP",
+        "description": "Gérer les adresses IP bloquées.",
+        "action": "Gérer le blocage IP"
+      },
       "payments": {
         "title": "Paiements",
         "description": "Passez en revue les paiements, les factures et les revenus des commandes.",
@@ -981,7 +986,8 @@
       "bartender": "Barman",
       "display": "Afficher",
       "customer": "Client",
-      "blocked": "Bloqué"
+      "blocked": "Bloqué",
+      "ip_block": "Blocage IP"
     },
     "sections": {
       "assigned": "Barres assignées",
@@ -1622,6 +1628,38 @@
       "confirm_delete": "Êtes-vous sûr de vouloir supprimer ce produit?",
       "empty": "Pas de produits dans cette catégorie."
     }
+  },
+  "admin_ip_block": {
+    "title": "Blocage IP",
+    "subtitle": "Gérez les adresses réseau qui ne peuvent pas accéder à la plateforme.",
+    "form": {
+      "ip_label": "Adresse IP",
+      "ip_placeholder": "ex. 203.0.113.10",
+      "note_label": "Notes",
+      "note_placeholder": "Raison facultative",
+      "submit": "Ajouter IP"
+    },
+    "table": {
+      "headers": {
+        "ip": "Adresse IP",
+        "note": "Notes",
+        "created": "Ajouté",
+        "actions": "Actions"
+      },
+      "delete": "Supprimer"
+    },
+    "empty": "Aucune adresse IP bloquée.",
+    "dialog": {
+      "prompt": "Supprimer cette IP de la liste des blocages ?",
+      "cancel": "Annuler",
+      "confirm": "Supprimer"
+    }
+  },
+  "ip_blocked": {
+    "title": "Accès réseau bloqué",
+    "lead": "Le réseau utilisé pour vous connecter est bloqué sur SiplyGo. Contactez l'assistance et consultez vos notifications pour plus de détails.",
+    "support": "Besoin d'aide ? Contactez notre équipe d'assistance à l'adresse <a href=\"mailto:{email}\">{email}</a> ou appelez <a href=\"tel:{phone_tel}\">{phone}</a>.",
+    "view_notifications": "Aller aux notifications"
   },
   "blocked": {
     "title": "Accès au compte limité",
