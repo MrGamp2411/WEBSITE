@@ -3,6 +3,10 @@
 {% set form_data = form_values if form_values is defined else {} %}
 {% set name_map = form_data.get('name_translations', {}) %}
 {% set description_map = form_data.get('description_translations', {}) %}
+<a class="back-link" href="/bar/{{ bar.id }}/categories">
+  <i class="bi bi-chevron-left" aria-hidden="true"></i>
+  {{ _('bar_categories.new.back', default='Back to categories') }}
+</a>
 <h1>{{ _('bar_categories.new.title', bar=bar.name, default='Add Category for {bar}') }}</h1>
 {% if error %}<p class="error">{{ error }}</p>{% endif %}
 <form class="form" method="post">

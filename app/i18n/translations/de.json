@@ -1433,6 +1433,9 @@
     "title": "{bar} - Bestellhistorie & Einnahmen",
     "month_title": "{bar} - {month}",
     "orders_title": "{bar} - Bestellungen für {date}",
+    "back_to_orders": "Zurück zu laufenden Bestellungen",
+    "back_to_history": "Zurück zur Bestellhistorie",
+    "back_to_month": "Zurück zu {month}",
     "actions": {
       "view": "Ansicht",
       "confirm": "Zahlung bestätigen"
@@ -1453,6 +1456,7 @@
   },
   "bar_admin_orders": {
     "title": "{bar} Bestellungen",
+    "back": "Zurück zum Dashboard",
     "actions": {
       "history": "Bestellen Sie Geschichte & Einnahmen"
     }
@@ -1461,6 +1465,7 @@
     "manage": {
       "title": "Kategorien verwalten für {bar}",
       "subtitle": "Erstellen, bearbeiten und organisieren Sie Menükategorien für diesen Lokal.",
+      "back": "Zurück zu den Bareinstellungen",
       "search": {
         "aria": "Suchkategorien",
         "placeholder": "Kategorien suchen...",
@@ -1497,10 +1502,12 @@
       "save": "Speichern"
     },
     "new": {
-      "title": "Kategorie hinzufügen für {bar}"
+      "title": "Kategorie hinzufügen für {bar}",
+      "back": "Zurück zu den Kategorien"
     },
     "edit": {
       "title": "Kategorie bearbeiten für {bar}",
+      "back": "Zurück zu den Kategorien",
       "actions": {
         "edit_name": "Namen bearbeiten",
         "edit_description": "Beschreibung bearbeiten"
@@ -1538,13 +1545,15 @@
   "bar_products": {
     "edit": {
       "title": "Produkt bearbeiten {product}",
+      "back": "Zurück zu den Produkten",
       "actions": {
         "edit_name": "Name bearbeiten",
         "edit_description": "Beschreibung bearbeiten"
       }
     },
     "new": {
-      "title": "Produkt in {category} hinzufügen"
+      "title": "Produkt in {category} hinzufügen",
+      "back": "Zurück zu den Produkten"
     },
     "form": {
       "name": "Bezeichnung",
@@ -1586,6 +1595,7 @@
     "manage": {
       "title": "Produkte in {category} für {bar}",
       "subtitle": "Hinzufügen, Bearbeiten und Organisieren von Produkten für diese Kategorie.",
+      "back": "Zurück zu den Kategorien",
       "actions": {
         "add": "Produkt hinzufügen",
         "edit": "Bearbeiten",

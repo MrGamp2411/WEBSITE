@@ -1433,6 +1433,9 @@
     "title": "{bar} - Storico ordini e incassi",
     "month_title": "{bar} - {month}",
     "orders_title": "{bar} - Ordini per {date}",
+    "back_to_orders": "Torna agli ordini in tempo reale",
+    "back_to_history": "Torna allo storico ordini",
+    "back_to_month": "Torna a {month}",
     "actions": {
       "view": "Visualizza",
       "confirm": "Conferma pagamento"
@@ -1453,6 +1456,7 @@
   },
   "bar_admin_orders": {
     "title": "{bar} - Ordini",
+    "back": "Torna alla dashboard",
     "actions": {
       "history": "Storico ordini e incassi"
     }
@@ -1461,6 +1465,7 @@
     "manage": {
       "title": "Gestisci categorie per {bar}",
       "subtitle": "Crea, modifica e organizza le categorie del menu per questo locale.",
+      "back": "Torna alle impostazioni del locale",
       "search": {
         "aria": "Cerca categorie",
         "placeholder": "Cerca categorie…",
@@ -1497,10 +1502,12 @@
       "save": "Salva"
     },
     "new": {
-      "title": "Aggiungi categoria per {bar}"
+      "title": "Aggiungi categoria per {bar}",
+      "back": "Torna alle categorie"
     },
     "edit": {
       "title": "Modifica categoria per {bar}",
+      "back": "Torna alle categorie",
       "actions": {
         "edit_name": "Modifica nome",
         "edit_description": "Modifica descrizione"
@@ -1538,13 +1545,15 @@
   "bar_products": {
     "edit": {
       "title": "Modifica prodotto {product}",
+      "back": "Torna ai prodotti",
       "actions": {
         "edit_name": "Modifica nome",
         "edit_description": "Modifica descrizione"
       }
     },
     "new": {
-      "title": "Aggiungi prodotto a {category}"
+      "title": "Aggiungi prodotto a {category}",
+      "back": "Torna ai prodotti"
     },
     "form": {
       "name": "Nome",
@@ -1586,6 +1595,7 @@
     "manage": {
       "title": "Prodotti in {category} per {bar}",
       "subtitle": "Aggiungi, modifica e organizza i prodotti per questa categoria.",
+      "back": "Torna alle categorie",
       "actions": {
         "add": "Aggiungi prodotto",
         "edit": "Modifica",
