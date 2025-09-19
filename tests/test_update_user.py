@@ -10,8 +10,25 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, SessionLocal, engine  # noqa: E402
-from models import User, RoleEnum, Bar, UserBarRole  # noqa: E402
-from main import app, refresh_bar_from_db  # noqa: E402
+from models import (  # noqa: E402
+    User,
+    RoleEnum,
+    Bar,
+    UserBarRole,
+    Category,
+    MenuItem,
+    UserCart,
+)
+from main import (  # noqa: E402
+    app,
+    refresh_bar_from_db,
+    user_carts,
+    users,
+    get_cart_for_user,
+    users_by_email,
+    users_by_username,
+    bars,
+)
 
 
 def setup_module(module):
@@ -306,6 +323,102 @@ def test_update_user_multiple_bar_assignment():
         .all()
     )
     assert [r.bar_id for r in roles] == [bar1_id, bar2_id]
+    db.close()
+
+
+def test_blocking_user_clears_cart():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    user_carts.clear()
+    users.clear()
+    users_by_email.clear()
+    users_by_username.clear()
+    bars.clear()
+
+    db = SessionLocal()
+    bar = Bar(name="BlockCart", slug="blockcart")
+    db.add(bar)
+    db.commit()
+    db.refresh(bar)
+    category = Category(bar_id=bar.id, name="Drinks")
+    db.add(category)
+    db.commit()
+    db.refresh(category)
+    item = MenuItem(
+        bar_id=bar.id,
+        category_id=category.id,
+        name="Sparkling Water",
+        price_chf=5,
+    )
+    db.add(item)
+    password_hash = hashlib.sha256("pass".encode("utf-8")).hexdigest()
+    user = User(
+        username="blockcartuser",
+        email="blockcart@example.com",
+        password_hash=password_hash,
+        role=RoleEnum.CUSTOMER,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(item)
+    db.refresh(user)
+    bar_id = bar.id
+    item_id = item.id
+    user_id = user.id
+    user_email = user.email
+    db.close()
+
+    db = SessionLocal()
+    refresh_bar_from_db(bar_id, db)
+    db.close()
+
+    with TestClient(app) as client:
+        resp = client.post(
+            "/login",
+            data={"email": user_email, "password": "pass"},
+            follow_redirects=False,
+        )
+        assert resp.status_code == 303
+        add_resp = client.post(
+            f"/bars/{bar_id}/add_to_cart",
+            data={"product_id": item_id},
+            headers={"accept": "application/json"},
+        )
+        assert add_resp.status_code == 200
+
+    demo_user = users[user_id]
+    cart = get_cart_for_user(demo_user)
+    assert len(cart.items) == 1
+
+    db = SessionLocal()
+    stored_cart = db.query(UserCart).filter(UserCart.user_id == user_id).first()
+    assert stored_cart is not None
+    db.close()
+
+    with TestClient(app) as admin_client:
+        _login_super_admin(admin_client)
+        form = {
+            "username": "blockcartuser",
+            "email": user_email,
+            "prefix": "",
+            "phone": "",
+            "role": "blocked",
+            "bar_ids": "",
+            "add_credit": "0",
+            "remove_credit": "0",
+        }
+        resp = admin_client.post(
+            f"/admin/users/edit/{user_id}", data=form, follow_redirects=False
+        )
+        assert resp.status_code == 303
+
+    assert user_id not in user_carts or not user_carts[user_id].items
+
+    db = SessionLocal()
+    stored_cart = db.query(UserCart).filter(UserCart.user_id == user_id).first()
+    assert stored_cart is None
+    updated_user = db.get(User, user_id)
+    assert updated_user.role == RoleEnum.BLOCKED
     db.close()
 
 
