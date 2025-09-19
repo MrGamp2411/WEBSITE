@@ -956,7 +956,8 @@
       "bar_admin": "Bar Admin",
       "bartender": "Bartender",
       "display": "Display",
-      "customer": "Customer"
+      "customer": "Customer",
+      "blocked": "Blocked"
     },
     "sections": {
       "assigned": "Assigned Bars",
@@ -1548,34 +1549,34 @@
       "create": "Create",
       "update": "Update"
     },
-  "edit_name": {
-    "back": "Back to product",
-    "title": "Edit names for {product}",
-    "intro": "Provide a name for each supported language. Customers see the option matching their selected language.",
-    "fields": {
-      "language": "{language} name"
+    "edit_name": {
+      "back": "Back to product",
+      "title": "Edit names for {product}",
+      "intro": "Provide a name for each supported language. Customers see the option matching their selected language.",
+      "fields": {
+        "language": "{language} name"
+      },
+      "actions": {
+        "save": "Save names"
+      },
+      "errors": {
+        "required": "All fields are required."
+      }
     },
-    "actions": {
-      "save": "Save names"
+    "edit_description": {
+      "back": "Back to product",
+      "title": "Edit descriptions for {product}",
+      "intro": "Write a description for each supported language. Descriptions appear on the customer menu.",
+      "fields": {
+        "language": "{language} description"
+      },
+      "actions": {
+        "save": "Save descriptions"
+      },
+      "errors": {
+        "required": "All fields are required."
+      }
     },
-    "errors": {
-      "required": "All fields are required."
-    }
-  },
-  "edit_description": {
-    "back": "Back to product",
-    "title": "Edit descriptions for {product}",
-    "intro": "Write a description for each supported language. Descriptions appear on the customer menu.",
-    "fields": {
-      "language": "{language} description"
-    },
-    "actions": {
-      "save": "Save descriptions"
-    },
-    "errors": {
-      "required": "All fields are required."
-    }
-  },
     "manage": {
       "title": "Products in {category} for {bar}",
       "subtitle": "Add, edit and organize products for this category.",
@@ -1621,5 +1622,11 @@
     "actions": {
       "home": "Return to home"
     }
+  },
+  "blocked": {
+    "title": "Account access limited",
+    "lead": "Your account is temporarily restricted. Please review the latest notifications for more details.",
+    "support": "Need help? Contact our support team at <a href=\"mailto:{email}\">{email}</a> or call <a href=\"tel:{phone_tel}\">{phone}</a>.",
+    "view_notifications": "Go to notifications"
   }
 }

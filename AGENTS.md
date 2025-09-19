@@ -42,6 +42,8 @@
 - Display users are redirected from any non-display route to their bar's display orders page.
 - The display orders page stretches to the full viewport width and doubles the size of order headers for clearer visibility.
 - Display orders include 10px horizontal margins and center the order text within each card.
+- Block role users are limited to notifications and the `/blocked` help screen; BlockRedirectMiddleware in `main.py` enforces
+  redirects and the template lives at `templates/blocked.html`.
 
 - `common.weekdays.<day>` translations drive the opening hours day labels on bar pages. Use these keys instead of hard-coded
   weekday names.

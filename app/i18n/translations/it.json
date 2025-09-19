@@ -956,7 +956,8 @@
       "bar_admin": "Amministratore del locale",
       "bartender": "Bartender",
       "display": "Display",
-      "customer": "Cliente"
+      "customer": "Cliente",
+      "blocked": "Bloccato"
     },
     "sections": {
       "assigned": "Locali assegnati",
@@ -1548,34 +1549,34 @@
       "create": "Crea",
       "update": "Aggiorna"
     },
-  "edit_name": {
-    "back": "Torna al prodotto",
-    "title": "Modifica i nomi di {product}",
-    "intro": "Inserisci un nome per ogni lingua supportata. I clienti vedono l'opzione corrispondente alla lingua selezionata.",
-    "fields": {
-      "language": "Nome in {language}"
+    "edit_name": {
+      "back": "Torna al prodotto",
+      "title": "Modifica i nomi di {product}",
+      "intro": "Inserisci un nome per ogni lingua supportata. I clienti vedono l'opzione corrispondente alla lingua selezionata.",
+      "fields": {
+        "language": "Nome in {language}"
+      },
+      "actions": {
+        "save": "Salva nomi"
+      },
+      "errors": {
+        "required": "Tutti i campi sono obbligatori."
+      }
     },
-    "actions": {
-      "save": "Salva nomi"
+    "edit_description": {
+      "back": "Torna al prodotto",
+      "title": "Modifica le descrizioni di {product}",
+      "intro": "Scrivi una descrizione per ogni lingua supportata. Le descrizioni vengono mostrate nel menu clienti.",
+      "fields": {
+        "language": "Descrizione in {language}"
+      },
+      "actions": {
+        "save": "Salva descrizioni"
+      },
+      "errors": {
+        "required": "Tutti i campi sono obbligatori."
+      }
     },
-    "errors": {
-      "required": "Tutti i campi sono obbligatori."
-    }
-  },
-  "edit_description": {
-    "back": "Torna al prodotto",
-    "title": "Modifica le descrizioni di {product}",
-    "intro": "Scrivi una descrizione per ogni lingua supportata. Le descrizioni vengono mostrate nel menu clienti.",
-    "fields": {
-      "language": "Descrizione in {language}"
-    },
-    "actions": {
-      "save": "Salva descrizioni"
-    },
-    "errors": {
-      "required": "Tutti i campi sono obbligatori."
-    }
-  },
     "manage": {
       "title": "Prodotti in {category} per {bar}",
       "subtitle": "Aggiungi, modifica e organizza i prodotti per questa categoria.",
@@ -1621,5 +1622,11 @@
     "actions": {
       "home": "Torna alla home"
     }
+  },
+  "blocked": {
+    "title": "Accesso all'account limitato",
+    "lead": "Il tuo account è temporaneamente limitato. Controlla le ultime notifiche per maggiori dettagli.",
+    "support": "Serve aiuto? Contatta l'assistenza all'indirizzo <a href=\"mailto:{email}\">{email}</a> o chiama <a href=\"tel:{phone_tel}\">{phone}</a>.",
+    "view_notifications": "Vai alle notifiche"
   }
 }

@@ -39,6 +39,7 @@
     <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>{{ _('admin_edit_user.roles.bartender', default='Bartender') }}</option>
     <option value="display" {% if user.role=='display' %}selected{% endif %}>{{ _('admin_edit_user.roles.display', default='Display') }}</option>
     <option value="customer" {% if user.role=='customer' %}selected{% endif %}>{{ _('admin_edit_user.roles.customer', default='Customer') }}</option>
+    <option value="blocked" {% if user.role=='blocked' %}selected{% endif %}>{{ _('admin_edit_user.roles.blocked', default='Blocked') }}</option>
   </select>
 
   <h2>{{ _('admin_edit_user.sections.assigned', default='Assigned Bars') }}</h2>

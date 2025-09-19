@@ -956,7 +956,8 @@
       "bar_admin": "Verwaltungsleiste",
       "bartender": "Barkeeper",
       "display": "Anzeige",
-      "customer": "Abnehmer"
+      "customer": "Abnehmer",
+      "blocked": "Blockiert"
     },
     "sections": {
       "assigned": "Zugeordnete Balken",
@@ -1548,34 +1549,34 @@
       "create": "Erstellen",
       "update": "Aktualisieren"
     },
-  "edit_name": {
-    "back": "Zurück zum Produkt",
-    "title": "Namen für {product} bearbeiten",
-    "intro": "Geben Sie für jede unterstützte Sprache einen Namen ein. Gäste sehen die Variante in ihrer gewählten Sprache.",
-    "fields": {
-      "language": "Name auf {language}"
+    "edit_name": {
+      "back": "Zurück zum Produkt",
+      "title": "Namen für {product} bearbeiten",
+      "intro": "Geben Sie für jede unterstützte Sprache einen Namen ein. Gäste sehen die Variante in ihrer gewählten Sprache.",
+      "fields": {
+        "language": "Name auf {language}"
+      },
+      "actions": {
+        "save": "Namen speichern"
+      },
+      "errors": {
+        "required": "Alle Felder sind erforderlich."
+      }
     },
-    "actions": {
-      "save": "Namen speichern"
+    "edit_description": {
+      "back": "Zurück zum Produkt",
+      "title": "Beschreibungen für {product} bearbeiten",
+      "intro": "Verfassen Sie für jede unterstützte Sprache eine Beschreibung. Die Texte erscheinen im Gästemenü.",
+      "fields": {
+        "language": "Beschreibung auf {language}"
+      },
+      "actions": {
+        "save": "Beschreibungen speichern"
+      },
+      "errors": {
+        "required": "Alle Felder sind erforderlich."
+      }
     },
-    "errors": {
-      "required": "Alle Felder sind erforderlich."
-    }
-  },
-  "edit_description": {
-    "back": "Zurück zum Produkt",
-    "title": "Beschreibungen für {product} bearbeiten",
-    "intro": "Verfassen Sie für jede unterstützte Sprache eine Beschreibung. Die Texte erscheinen im Gästemenü.",
-    "fields": {
-      "language": "Beschreibung auf {language}"
-    },
-    "actions": {
-      "save": "Beschreibungen speichern"
-    },
-    "errors": {
-      "required": "Alle Felder sind erforderlich."
-    }
-  },
     "manage": {
       "title": "Produkte in {category} für {bar}",
       "subtitle": "Hinzufügen, Bearbeiten und Organisieren von Produkten für diese Kategorie.",
@@ -1621,5 +1622,11 @@
     "actions": {
       "home": "Zur Startseite"
     }
+  },
+  "blocked": {
+    "title": "Kontozugriff eingeschränkt",
+    "lead": "Ihr Konto ist vorübergehend eingeschränkt. Prüfen Sie die neuesten Benachrichtigungen für weitere Informationen.",
+    "support": "Brauchen Sie Hilfe? Kontaktieren Sie unseren Support unter <a href=\"mailto:{email}\">{email}</a> oder rufen Sie <a href=\"tel:{phone_tel}\">{phone}</a> an.",
+    "view_notifications": "Zu den Benachrichtigungen"
   }
 }
