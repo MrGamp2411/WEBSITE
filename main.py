@@ -3655,6 +3655,22 @@ async def register_step_one(request: Request, db: Session = Depends(get_db)):
         users_by_username[temp_username_lower] = user
         users_by_email[email] = user
         request.session["user_id"] = user.id
+        client_ip_raw = get_request_ip(request)
+        canonical_ip = None
+        if client_ip_raw:
+            try:
+                canonical_ip = ipaddress.ip_address(client_ip_raw).compressed
+            except ValueError:
+                canonical_ip = client_ip_raw
+        log_action(
+            db,
+            actor_user_id=db_user.id,
+            action="register",
+            entity_type="User",
+            entity_id=db_user.id,
+            ip=canonical_ip,
+            user_agent=request.headers.get("user-agent"),
+        )
         return RedirectResponse(url="/register/details", status_code=status.HTTP_303_SEE_OTHER)
     return render_form("All fields are required")
 
