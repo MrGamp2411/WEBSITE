@@ -124,3 +124,47 @@ def test_login_from_blocked_ip_redirects_user():
     stored_user = db.get(User, user_id)
     assert stored_user.role == RoleEnum.IPBLOCK
     db.close()
+
+
+def test_register_from_blocked_ip_sets_role():
+    setup_db()
+    db = SessionLocal()
+    blocked = BlockedIP(address='203.0.113.5')
+    db.add(blocked)
+    db.commit()
+    db.close()
+
+    load_bars_from_db()
+    load_blocked_ips_from_db()
+
+    with TestClient(app) as client:
+        resp = client.post(
+            '/register',
+            data={
+                'email': 'blocked@example.com',
+                'password': 'pass12345',
+                'confirm_password': 'pass12345',
+            },
+            headers={'x-forwarded-for': '203.0.113.5'},
+            follow_redirects=False,
+        )
+        assert resp.status_code == 303
+        assert resp.headers['location'] == '/ip-blocked'
+
+        page = client.get('/ip-blocked')
+        assert page.status_code == 200
+
+        details_redirect = client.get('/register/details', follow_redirects=False)
+        assert details_redirect.status_code == 303
+        assert details_redirect.headers['location'] == '/ip-blocked'
+
+    db = SessionLocal()
+    stored_user = db.query(User).filter(User.email == 'blocked@example.com').first()
+    assert stored_user is not None
+    user_id = stored_user.id
+    assert stored_user.role == RoleEnum.IPBLOCK
+    db.close()
+
+    demo_user = users[user_id]
+    assert demo_user.role == 'ip_block'
+    assert demo_user.base_role == 'ip_block'
