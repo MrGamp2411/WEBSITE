@@ -3,6 +3,7 @@
 <section class="static-page blocked-page">
   <h1>{{ _('ip_blocked.title', default='Network access blocked') }}</h1>
   <p>{{ _('ip_blocked.lead', default='The network you used to sign in is blocked from SiplyGo. Please contact support and review your notifications for more details.') }}</p>
+  <p>{{ _('ip_blocked.security_notice', default='This account has been temporarily blocked for security reasons. Creating new accounts or signing into other accounts will result in the same block on them.') }}</p>
   <p>{{ _('ip_blocked.support', email=SUPPORT_EMAIL, phone=SUPPORT_NUMBER, phone_tel=SUPPORT_NUMBER_TEL, default='Need help? Contact our support team at <a href="mailto:{email}">{email}</a> or call <a href="tel:{phone_tel}">{phone}</a>.')|safe }}</p>
   <a class="btn btn--primary" href="/notifications">{{ _('ip_blocked.view_notifications', default='Go to notifications') }}</a>
 </section>
