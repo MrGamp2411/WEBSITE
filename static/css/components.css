@@ -426,7 +426,7 @@ body.dark-mode .language-option__meta i{color:#ede9fe;}
 .order-kv{display:grid;grid-template-columns:max-content 1fr;column-gap:14px;row-gap:6px;align-items:start;}
 .order-kv>div{display:contents;}
 .order-kv dt{opacity:.7;font-weight:500;white-space:nowrap;}
-.order-kv dt.order-kv__term--wrap{white-space:normal;}
+.order-kv dt.order-kv__term--wrap{white-space:normal;max-width:clamp(12ch,45%,20ch);}
 .order-kv dd{margin:0;font-weight:600;}
 .num{font-feature-settings:"tnum" 1,"lnum" 1;}
 .nowrap{white-space:nowrap;}
