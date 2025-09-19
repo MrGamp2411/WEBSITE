@@ -101,7 +101,7 @@ function initBartender(barId) {
       ? `<div><dt>${getField('refunded', 'Refunded')}</dt><dd class="num nowrap">CHF ${order.refund_amount.toFixed(2)}</dd></div>`
       : '';
     const cancellation = order.status === 'CANCELED' && order.cancellation_reason
-      ? `<div><dt>${getField('cancellation_reason', 'Cancellation reason')}</dt><dd>${formatCancellationReason(order.cancellation_reason)}</dd></div>`
+      ? `<div><dt class="order-kv__term--wrap">${getField('cancellation_reason', 'Cancellation reason')}</dt><dd>${formatCancellationReason(order.cancellation_reason)}</dd></div>`
       : '';
     const notes = order.notes ? `<div><dt>${getField('notes', 'Notes')}</dt><dd>${order.notes}</dd></div>` : '';
     const prepMinutes = order.ready_at ? diffMinutes(order.created_at, order.ready_at) : null;
@@ -212,7 +212,7 @@ function initUser(userId) {
       ? `<div><dt>${getField('refunded', 'Refunded')}</dt><dd class="num nowrap">CHF ${order.refund_amount.toFixed(2)}</dd></div>`
       : '';
     const cancellation = order.status === 'CANCELED' && order.cancellation_reason
-      ? `<div><dt>${getField('cancellation_reason', 'Cancellation reason')}</dt><dd>${formatCancellationReason(order.cancellation_reason)}</dd></div>`
+      ? `<div><dt class="order-kv__term--wrap">${getField('cancellation_reason', 'Cancellation reason')}</dt><dd>${formatCancellationReason(order.cancellation_reason)}</dd></div>`
       : '';
     const notes = order.notes ? `<div><dt>${getField('notes', 'Notes')}</dt><dd>${order.notes}</dd></div>` : '';
     const prepMinutes = order.ready_at ? diffMinutes(order.created_at, order.ready_at) : null;

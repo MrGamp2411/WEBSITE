@@ -36,7 +36,7 @@
             <div><dt>{{ _('order_history.card.fields.payment', default='Payment') }}</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
             {% if order.status == 'CANCELED' and order.cancellation_reason %}
             <div>
-              <dt>{{ _('order_history.card.fields.cancellation_reason', default='Cancellation reason') }}</dt>
+              <dt class="order-kv__term--wrap">{{ _('order_history.card.fields.cancellation_reason', default='Cancellation reason') }}</dt>
               <dd>{{ _('order_history.card.cancellation_reasons.' ~ (order.cancellation_reason|lower), default=order.cancellation_reason|replace('_', ' ')|title) }}</dd>
             </div>
             {% endif %}
@@ -108,7 +108,7 @@
             <div><dt>{{ _('order_history.card.fields.payment', default='Payment') }}</dt><dd>{{ order.payment_method.replace('_', ' ')|title if order.payment_method else '' }}</dd></div>
             {% if order.status == 'CANCELED' and order.cancellation_reason %}
             <div>
-              <dt>{{ _('order_history.card.fields.cancellation_reason', default='Cancellation reason') }}</dt>
+              <dt class="order-kv__term--wrap">{{ _('order_history.card.fields.cancellation_reason', default='Cancellation reason') }}</dt>
               <dd>{{ _('order_history.card.cancellation_reasons.' ~ (order.cancellation_reason|lower), default=order.cancellation_reason|replace('_', ' ')|title) }}</dd>
             </div>
             {% endif %}
