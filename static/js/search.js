@@ -496,7 +496,12 @@ function sortNearby() {
     applyState(appliedState);
   }, 300);
 
-  searchInput?.addEventListener('input', e => syncSearch(e.target.value));
+  searchInput?.addEventListener('keydown', e => {
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      syncSearch(e.target.value);
+    }
+  });
 
   distanceToggle?.addEventListener('change', e => {
     state.active.max_km = e.target.checked;

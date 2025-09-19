@@ -89,7 +89,12 @@
   function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}}
   const run = debounce(applyFilter,120);
 
-  input.addEventListener('input', run);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      run();
+    }
+  });
   document.querySelector('.bars-search .clear')?.addEventListener('click',()=>{
     input.value=''; applyFilter(); input.focus();
   });
