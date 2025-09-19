@@ -468,6 +468,7 @@ class DemoUser:
         self.pending_bar_id = pending_bar_id
         self.credit = credit
         self.transactions: List[Transaction] = []
+        self.current_ip: Optional[str] = None
 
     @property
     def is_super_admin(self) -> bool:
@@ -640,6 +641,26 @@ class BlockRedirectMiddleware(BaseHTTPMiddleware):
         user = users.get(session.get("user_id")) if session else None
         path = request.url.path
         if user:
+            client_ip_raw = get_request_ip(request)
+            canonical_ip: Optional[str] = None
+            if client_ip_raw:
+                try:
+                    canonical_ip = ipaddress.ip_address(client_ip_raw).compressed
+                except ValueError:
+                    canonical_ip = client_ip_raw
+            if canonical_ip:
+                user.current_ip = canonical_ip
+                if (
+                    canonical_ip in blocked_ip_lookup
+                    and user.role != "ip_block"
+                ):
+                    user.role = "ip_block"
+                    user.base_role = "ip_block"
+                    with SessionLocal() as db:
+                        db_user = db.get(User, user.id)
+                        if db_user and db_user.role != RoleEnum.IPBLOCK:
+                            db_user.role = RoleEnum.IPBLOCK
+                            db.commit()
             redirect_target: Optional[str] = None
             if getattr(user, "is_blocked", False):
                 redirect_target = "/blocked"
