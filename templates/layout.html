@@ -46,10 +46,10 @@
       </button>
       <a class="hdr-logo" href="/">SiplyGo</a>
       <div class="hdr-actions">
-        {% if user and not user.is_display %}
+        {% if user and not (user.is_display or user.is_blocked) %}
         <a class="credit-pill" href="/wallet" aria-label="{{ _('common.credits', default='Credits') }}">CHF {{ "%.2f"|format(user.credit) }}</a>
         {% endif %}
-        {% if not user or not user.is_display %}
+        {% if not user or (not user.is_display and not user.is_blocked) %}
         {% set cart_count_display = cart_count if cart_count else 0 %}
         <a class="cart-icon" href="/cart" aria-label="{{ _('layout.header.cart_aria', count=cart_count_display, default='Cart ({count} items)') }}">
           <i class="bi bi-cart2" aria-hidden="true"></i>
@@ -67,10 +67,10 @@
       </button>
       <a class="hdr-logo" href="/">SiplyGo</a>
       <div class="hdr-actions">
-        {% if user and not user.is_display %}
+        {% if user and not (user.is_display or user.is_blocked) %}
         <a class="credit-pill desktop-credit" href="/wallet" aria-label="{{ _('common.credits', default='Credits') }}">CHF {{ "%.2f"|format(user.credit) }}</a>
         {% endif %}
-        {% if not user or not user.is_display %}
+        {% if not user or (not user.is_display and not user.is_blocked) %}
         {% set cart_count_display = cart_count if cart_count else 0 %}
         <a class="cart-icon" href="/cart" aria-label="{{ _('layout.header.cart_aria', count=cart_count_display, default='Cart ({count} items)') }}">
           <i class="bi bi-cart2" aria-hidden="true"></i>
@@ -87,15 +87,20 @@
         <span>{{ _('layout.header.language', default='Language') }}</span>
         <span class="menu-language__code" aria-hidden="true">{{ language_code|upper }}</span>
       </button>
-      {% if user and (user.is_super_admin or user.is_bar_admin or user.is_bartender) %}
+      {% if user and not user.is_blocked and (user.is_super_admin or user.is_bar_admin or user.is_bartender) %}
       <a href="/dashboard" role="menuitem"><i class="bi bi-speedometer2" aria-hidden="true"></i><span>{{ _('common.dashboard', default='Dashboard') }}</span></a>
       {% endif %}
       {% if user %}
+      {% if user.is_blocked %}
+      <a href="/notifications" role="menuitem"><i class="bi bi-bell" aria-hidden="true"></i><span>{{ _('common.notifications', default='Notifications') }}</span>{% if unread_notifications %}<span class="notif-badge" aria-live="polite">{{ unread_notifications }}</span>{% endif %}</a>
+      <a href="/logout" role="menuitem"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>{{ _('common.logout', default='Logout') }}</span></a>
+      {% else %}
       <a href="/wallet" role="menuitem"><i class="bi bi-wallet2" aria-hidden="true"></i><span>{{ _('common.wallet', default='Wallet') }}</span></a>
       <a href="/orders" role="menuitem"><i class="bi bi-clock-history" aria-hidden="true"></i><span>{{ _('common.orders', default='Orders') }}</span></a>
       <a href="/notifications" role="menuitem"><i class="bi bi-bell" aria-hidden="true"></i><span>{{ _('common.notifications', default='Notifications') }}</span>{% if unread_notifications %}<span class="notif-badge" aria-live="polite">{{ unread_notifications }}</span>{% endif %}</a>
       <a href="/profile" role="menuitem"><i class="bi bi-person" aria-hidden="true"></i><span>{{ _('common.profile', default='Profile') }}</span></a>
       <a href="/logout" role="menuitem"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>{{ _('common.logout', default='Logout') }}</span></a>
+      {% endif %}
       {% else %}
       <a href="/login" role="menuitem" class="menu-login"><i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>{{ _('common.login', default='Login') }}</span></a>
       <a href="/register" role="menuitem" class="menu-register"><i class="bi bi-person-plus" aria-hidden="true"></i><span>{{ _('common.register', default='Register') }}</span></a>

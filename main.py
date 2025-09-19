@@ -483,6 +483,10 @@ class DemoUser:
         return self.role == "display"
 
     @property
+    def is_blocked(self) -> bool:
+        return self.role == "blocked"
+
+    @property
     def bar_id(self) -> Optional[int]:
         return self.bar_ids[0] if self.bar_ids else None
 
@@ -615,6 +619,28 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/photo", StaticFiles(directory="photo"), name="photo")
 
 
+class BlockRedirectMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        session = request.session
+        user = users.get(session.get("user_id")) if session else None
+        path = request.url.path
+        if user and getattr(user, "is_blocked", False):
+            allowed = (
+                path.startswith("/notifications")
+                or path.startswith("/static")
+                or path.startswith("/photo")
+                or path == "/blocked"
+                or path == "/logout"
+                or path == "/favicon.ico"
+            )
+            if not allowed:
+                return RedirectResponse(
+                    url="/blocked",
+                    status_code=status.HTTP_303_SEE_OTHER,
+                )
+        return await call_next(request)
+
+
 class RegisterRedirectMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         session = request.session
@@ -695,6 +721,7 @@ app.add_middleware(
 )
 
 # Enable server-side sessions for authentication
+app.add_middleware(BlockRedirectMiddleware)
 app.add_middleware(DisplayRedirectMiddleware)
 app.add_middleware(RegisterRedirectMiddleware)
 app.add_middleware(AuditLogMiddleware)
@@ -898,7 +925,7 @@ def ensure_role_enum() -> None:
                 "WHERE t.typname = 'roleenum'"
             )
         ).scalars().all()
-        for label in ["REGISTERING", "DISPLAY"]:
+        for label in ["REGISTERING", "DISPLAY", "BLOCKED"]:
             if label not in existing:
                 conn.execute(
                     text(f"ALTER TYPE roleenum ADD VALUE IF NOT EXISTS '{label}'")
@@ -3727,6 +3754,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
                     RoleEnum.CUSTOMER: "customer",
                     RoleEnum.REGISTERING: "registering",
                     RoleEnum.DISPLAY: "display",
+                    RoleEnum.BLOCKED: "blocked",
                 }
                 bar_ids = [r.bar_id for r in db_user.bar_roles]
                 user = DemoUser(
@@ -3960,6 +3988,17 @@ async def profile_password_update(request: Request, db: Session = Depends(get_db
 async def logout(request: Request):
     request.session.clear()
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.get("/blocked", response_class=HTMLResponse)
+async def blocked_view(request: Request):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    if not getattr(user, "is_blocked", False):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    translator_for_request(request)
+    return render_template("blocked.html", request=request, user=user)
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
@@ -5369,6 +5408,7 @@ async def admin_users_view(
         RoleEnum.CUSTOMER: "customer",
         RoleEnum.REGISTERING: "registering",
         RoleEnum.DISPLAY: "display",
+        RoleEnum.BLOCKED: "blocked",
     }
     for db_user in db_users:
         existing = users.get(db_user.id)
@@ -5473,6 +5513,7 @@ def _load_demo_user(user_id: int, db: Session) -> DemoUser:
         RoleEnum.CUSTOMER: "customer",
         RoleEnum.REGISTERING: "registering",
         RoleEnum.DISPLAY: "display",
+        RoleEnum.BLOCKED: "blocked",
     }
     bar_ids = [r.bar_id for r in db_user.bar_roles]
     user = DemoUser(
@@ -5763,6 +5804,7 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         "bartender": RoleEnum.BARTENDER,
         "customer": RoleEnum.CUSTOMER,
         "display": RoleEnum.DISPLAY,
+        "blocked": RoleEnum.BLOCKED,
     }
     role_enum = role_enum_map.get(role, RoleEnum.CUSTOMER)
     db_user.role = role_enum
