@@ -3671,6 +3671,14 @@ async def register_step_one(request: Request, db: Session = Depends(get_db)):
             ip=canonical_ip,
             user_agent=request.headers.get("user-agent"),
         )
+        if canonical_ip and canonical_ip in blocked_ip_lookup:
+            user.role = "ip_block"
+            user.base_role = "ip_block"
+            db_user.role = RoleEnum.IPBLOCK
+            db.commit()
+            return RedirectResponse(
+                url="/ip-blocked", status_code=status.HTTP_303_SEE_OTHER
+            )
         return RedirectResponse(url="/register/details", status_code=status.HTTP_303_SEE_OTHER)
     return render_form("All fields are required")
 
