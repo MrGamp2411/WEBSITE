@@ -27,7 +27,7 @@
           <dl class="order-kv">
             <div><dt>{{ _('order_history.card.fields.total', default='Total') }}</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.total) }}</dd></div>
             {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>{{ _('order_history.card.fields.refunded', default='Refunded') }}</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
-            <div><dt>{{ _('order_history.card.fields.placed', default='Placed') }}</dt><dd class="num nowrap">{{ order.created_at|format_time }}</dd></div>
+            <div><dt>{{ _('order_history.card.fields.placed', default='Placed') }}</dt><dd class="num">{{ order.created_at|format_time }}</dd></div>
 
             <div><dt>{{ _('order_history.card.fields.customer', default='Customer') }}</dt><dd>{{ order.customer_name or _('order_history.card.unknown_customer', default='Unknown') }} <a href="tel:{{ (order.customer_prefix or '')|replace(' ', '') }}{{ (order.customer_phone or '')|replace(' ', '') }}">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</a></dd></div>
             <div><dt>{{ _('order_history.card.fields.bar', default='Bar') }}</dt><dd>{{ order.bar_name or '' }}</dd></div>
@@ -99,7 +99,7 @@
           <dl class="order-kv">
             <div><dt>{{ _('order_history.card.fields.total', default='Total') }}</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.total) }}</dd></div>
             {% if order.status == 'CANCELED' and order.refund_amount %}<div><dt>{{ _('order_history.card.fields.refunded', default='Refunded') }}</dt><dd class="num nowrap">CHF {{ "%.2f"|format(order.refund_amount) }}</dd></div>{% endif %}
-            <div><dt>{{ _('order_history.card.fields.placed', default='Placed') }}</dt><dd class="num nowrap">{{ order.created_at|format_time }}</dd></div>
+            <div><dt>{{ _('order_history.card.fields.placed', default='Placed') }}</dt><dd class="num">{{ order.created_at|format_time }}</dd></div>
 
             <div><dt>{{ _('order_history.card.fields.customer', default='Customer') }}</dt><dd>{{ order.customer_name or _('order_history.card.unknown_customer', default='Unknown') }} <a href="tel:{{ (order.customer_prefix or '')|replace(' ', '') }}{{ (order.customer_phone or '')|replace(' ', '') }}">({{ order.customer_prefix or '' }} {{ order.customer_phone or '' }})</a></dd></div>
             <div><dt>{{ _('order_history.card.fields.bar', default='Bar') }}</dt><dd>{{ order.bar_name or '' }}</dd></div>
