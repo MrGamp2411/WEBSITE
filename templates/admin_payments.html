@@ -15,8 +15,8 @@
           type="search"
           inputmode="search"
           autocomplete="off"
-          placeholder="{{ _('admin_payments.search.placeholder', default='Search bars by name…') }}"
-          aria-label="{{ _('admin_payments.search.input_aria', default='Search bars by name') }}"
+          placeholder="{{ _('admin_payments.search.placeholder', default='Search bars by name or number…') }}"
+          aria-label="{{ _('admin_payments.search.input_aria', default='Search bars by name or number') }}"
         >
         <button class="clear" type="button" aria-label="{{ _('admin_payments.search.clear', default='Clear search') }}">
           <i class="bi bi-x-circle" aria-hidden="true"></i>
@@ -29,6 +29,7 @@
     <table class="payments-table users-table">
       <thead>
         <tr>
+          <th class="number">{{ _('admin_payments.table.headers.number', default='Number') }}</th>
           <th>{{ _('admin_payments.table.headers.name', default='Name') }}</th>
           <th class="actions">{{ _('admin_payments.table.headers.actions', default='Actions') }}</th>
         </tr>
@@ -36,6 +37,7 @@
       <tbody>
         {% for bar in bars %}
         <tr>
+          <td class="number">{{ bar.id }}</td>
           <td>{{ bar.name }}</td>
           <td class="actions">
             <div class="actions-group">
@@ -66,8 +68,12 @@
   function applyFilter(){
     const q = norm(input.value);
     rows.forEach(tr => {
-      const nameCell = tr.cells && tr.cells[0] ? tr.cells[0].textContent : '';
-      const match = !q || norm(nameCell).includes(q);
+      const numberCell = tr.cells && tr.cells[0] ? tr.cells[0].textContent : '';
+      const nameCell = tr.cells && tr.cells[1] ? tr.cells[1].textContent : '';
+      const match =
+        !q ||
+        norm(nameCell).includes(q) ||
+        norm(numberCell).includes(q);
       tr.style.display = match ? '' : 'none';
     });
   }

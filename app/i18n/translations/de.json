@@ -1322,12 +1322,13 @@
     "subtitle": "Bewertung Bar Einnahmen und Schließungen.",
     "search": {
       "aria": "Suchbalken",
-      "placeholder": "Balken nach Namen suchen...",
-      "input_aria": "Balken nach Namen suchen",
+      "placeholder": "Balken nach Namen oder Nummer suchen...",
+      "input_aria": "Balken nach Namen oder Nummer suchen",
       "clear": "Suche löschen"
     },
     "table": {
       "headers": {
+        "number": "Nummer",
         "name": "Bezeichnung",
         "actions": "Aktionen"
       }
