@@ -450,6 +450,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);transit
 .notifications-page .notifications-list{display:flex;flex-direction:column;gap:var(--space-2);}
 .notifications-page .notifications-list li{margin:0;}
 .notifications-page .notification-card{width:calc(100vw - 50px);margin-inline:calc(50% - 50vw + 25px);border-radius:0;border-left:0;border-right:0;}
+.notifications-page .users-toolbar{width:calc(100vw - 50px);margin-inline:calc(50% - 50vw + 25px);}
+.notifications-page .users-toolbar .title-wrap{width:100%;}
+.notifications-page .users-toolbar h1,
+.notifications-page .users-toolbar .subtitle{text-align:left;}
 
 /* utilities */
 .alert{padding:var(--space-2);border-radius:var(--radius);margin-bottom:var(--space-3);}
