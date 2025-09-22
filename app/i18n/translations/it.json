@@ -1636,6 +1636,9 @@
   },
   "topup": {
     "title": "Ricarica crediti",
+    "notice": {
+      "minimum": "Il deposito minimo è di 10 Fr."
+    },
     "form": {
       "amount_label": "Importo",
       "submit": "Ricarica con carta"
