@@ -3504,8 +3504,10 @@ async def init_topup(
         raise HTTPException(status_code=401)
 
     amount = topup_req.amount
-    if not math.isfinite(amount) or amount < 1 or amount > 1000:
-        raise HTTPException(status_code=400, detail="Invalid amount")
+    if not math.isfinite(amount) or amount < 10 or amount > 1000:
+        raise HTTPException(
+            status_code=400, detail="Amount must be between 10 and 1000"
+        )
     amount = round(amount + 1e-9, 2)
 
     CURRENCY = os.getenv("CURRENCY", "CHF")

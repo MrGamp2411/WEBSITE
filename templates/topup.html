@@ -4,7 +4,7 @@
   <h1>{{ _('topup.title', default='Top Up Credit') }}</h1>
   <form id="topupForm">
     <label for="amount">{{ _('topup.form.amount_label', default='Amount') }}
-      <input id="amount" name="amount" type="number" min="1" step="0.05" required inputmode="decimal">
+      <input id="amount" name="amount" type="number" min="10" step="0.05" required inputmode="decimal">
     </label>
     <div class="preset-buttons">
       <button type="button" class="btn" data-amount="10">10 CHF</button>
@@ -29,7 +29,7 @@
     e.preventDefault();
     if (submitBtn.disabled) return;
     const amount = parseFloat(amountInput.value);
-    if (!Number.isFinite(amount) || amount < 1) {
+    if (!Number.isFinite(amount) || amount < 10) {
       alert(invalidAmountMessage);
       return;
     }

@@ -1641,7 +1641,7 @@
       "submit": "Mit Karte aufladen"
     },
     "alerts": {
-      "invalid_amount": "Ungültiger Betrag",
+      "invalid_amount": "Ungültiger Betrag (mindestens 10 CHF)",
       "failed": "Aufladung konnte nicht gestartet werden"
     }
   },
