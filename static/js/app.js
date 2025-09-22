@@ -241,10 +241,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function reverseGeocode(lat, lon) {
+    if (!locationInput) return;
     fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
       .then(res => res.json())
       .then(data => {
-        if (!locationInput) return;
         if (data.address) {
           const {city, town, village, postcode} = data.address;
           const place = city || town || village;
@@ -339,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   ensureMenuBackdrop();
   const closeBtn = mobileMenu?.querySelector('.js-close-menu');
-  const contentEls = document.querySelectorAll('main, .hdr-sub, footer');
+  const contentEls = document.querySelectorAll('main, footer');
   let activeToggle;
   let lastFocused;
 
@@ -496,17 +496,6 @@ document.addEventListener('DOMContentLoaded', function() {
     btn.addEventListener('click', () => {
       setLanguage(btn.getAttribute('data-lang'));
     });
-  });
-
-  document.querySelector('.js-open-search')?.addEventListener('click', () => {
-    const ov = document.querySelector('.search-overlay');
-    ov?.classList.add('open');
-    ov?.removeAttribute('hidden');
-  });
-  document.querySelector('.overlay-close')?.addEventListener('click', () => {
-    const ov = document.querySelector('.search-overlay');
-    ov?.classList.remove('open');
-    ov?.setAttribute('hidden','');
   });
 
   // Carousel controls

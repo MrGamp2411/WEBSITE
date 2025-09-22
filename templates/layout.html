@@ -136,25 +136,6 @@
     {% endif %}
   </header>
   <div class="menu-backdrop" hidden></div>
-    {% if not user or not user.is_display %}
-    <div class="hdr-sub">
-      <button class="location-pill location-selector js-open-location" aria-label="{{ _('layout.location.change', default='Change location') }}"><span id="locationDisplay">📍 {{ _('layout.location.detecting', default='Detecting location...') }}</span></button>
-      <a class="btn-icon" href="/search" aria-label="{{ _('layout.search.button_aria', default='Search') }}"><i class="bi bi-search"></i></a>
-    </div>
-    <input type="search" id="locationInput" class="visually-hidden" value="{{ _('layout.location.detecting', default='Detecting location...') }}" placeholder="{{ _('layout.location.input_placeholder', default='Enter city or ZIP') }}" aria-label="{{ _('layout.location.input_label', default='Current location') }}" list="citySuggestionsMobile" autocomplete="postal-code">
-    <datalist id="citySuggestionsMobile">
-      <option value="Lugano"></option>
-      <option value="Locarno"></option>
-      <option value="Zurich"></option>
-    </datalist>
-    <div class="search-overlay" hidden>
-      <button class="overlay-close" aria-label="{{ _('layout.search.overlay_close', default='Close') }}">×</button>
-      <div class="overlay-body">
-        <input type="search" id="barSearch" placeholder="{{ _('layout.search.input_placeholder', default='Search bars...') }}" aria-label="{{ _('layout.search.input_aria', default='Search bars') }}" inputmode="search" autocomplete="off" enterkeyhint="search">
-        <div id="searchSuggestions" class="search-suggestions"></div>
-      </div>
-    </div>
-    {% endif %}
   <main id="main" class="container">
       {% block content %}{% endblock %}
   </main>
