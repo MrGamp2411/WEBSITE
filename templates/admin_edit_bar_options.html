@@ -2,7 +2,7 @@
 {% block content %}
 <section class="bar-edit-page">
   <header class="bar-edit-header">
-    <a href="/admin/bars" class="back-link"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_edit_bar_options.back', default='Back to Bars') }}</a>
+    <a href="{{ '/dashboard' if user and user.is_bar_admin else '/admin/bars' }}" class="back-link"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_edit_bar_options.back', default='Back to Bars') }}</a>
     <h1>{{ _('admin_edit_bar_options.title', bar=bar.name, default='Edit {bar}') }}</h1>
     <p class="subtitle">{{ _('admin_edit_bar_options.subtitle', default='Select a section to manage for this venue.') }}</p>
   </header>
