@@ -1,94 +1,193 @@
 {% extends "layout.html" %}
 {% block content %}
-<a class="back-link" href="/admin/bars"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_new_bar.back', default='Back to Bars') }}</a>
-<h1>{{ _('admin_new_bar.title', default='Create New Bar') }}</h1>
-{% if error %}<p class="error">{{ error }}</p>{% endif %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<div id="map" style="height:400px;"></div>
+<section class="editbar">
+  <a class="back-link" href="/admin/bars"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_new_bar.back', default='Back to Bars') }}</a>
+  <h1>{{ _('admin_new_bar.title', default='Create New Bar') }}</h1>
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
 
-<form class="form" method="post" action="/admin/bars/new" enctype="multipart/form-data">
-  <label for="name">{{ _('admin_new_bar.form.name', default='Name') }}
-    <input id="name" type="text" name="name" required>
-  </label>
-  <label for="address">{{ _('admin_new_bar.form.address', default='Address') }}
-    <input id="address" type="text" name="address" required>
-  </label>
-  <label for="city">{{ _('admin_new_bar.form.city', default='City') }}
-    <input id="city" type="text" name="city" required>
-  </label>
-  <label for="state">{{ _('admin_new_bar.form.state', default='State') }}
-    <input id="state" type="text" name="state" required>
-  </label>
-  <label for="description">{{ _('admin_new_bar.form.description', default='Description') }}
-    <textarea id="description" name="description" required maxlength="120"></textarea>
-  </label>
-  <label for="photo">{{ _('admin_new_bar.form.photo', default='Photo') }}
-    <input id="photo" type="file" name="photo">
-  </label>
-    <label for="categories">{{ _('admin_new_bar.form.categories', default='Categories') }}
-      <select id="categories" name="categories" multiple>
-        {% for c in bar_categories %}
-        <option value="{{ c }}"{% if selected_categories and c in selected_categories %} selected{% endif %}>{{ c }}</option>
-        {% endfor %}
-      </select>
-    </label>
-  <label for="manual_closed">
-    <input id="manual_closed" name="manual_closed" type="checkbox"> {{ _('admin_new_bar.form.manual_closed', default='Close bar manually') }}
-  </label>
-  {% set days = [
-    _('admin_new_bar.days.monday', default='Monday'),
-    _('admin_new_bar.days.tuesday', default='Tuesday'),
-    _('admin_new_bar.days.wednesday', default='Wednesday'),
-    _('admin_new_bar.days.thursday', default='Thursday'),
-    _('admin_new_bar.days.friday', default='Friday'),
-    _('admin_new_bar.days.saturday', default='Saturday'),
-    _('admin_new_bar.days.sunday', default='Sunday')
-  ] %}
-  <table class="opening-hours">
-    <thead>
-      <tr><th>{{ _('admin_new_bar.form.hours.day', default='Day') }}</th><th>{{ _('admin_new_bar.form.hours.open', default='Open') }}</th><th>{{ _('admin_new_bar.form.hours.close', default='Close') }}</th></tr>
-    </thead>
-    <tbody>
-    {% for day in days %}
-      {% set idx = loop.index0 %}
-      <tr>
-        <td>{{ day }}</td>
-        <td><input type="time" name="open_{{ idx }}"></td>
-        <td><input type="time" name="close_{{ idx }}"></td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-  <input id="latitude" type="hidden" name="latitude" required>
-  <input id="longitude" type="hidden" name="longitude" required>
-  <button class="btn btn--primary" type="submit">{{ _('admin_new_bar.form.submit', default='Create Bar') }}</button>
-</form>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    const initialLat = 45.4642;
-    const initialLng = 9.1900;
-    const map = L.map('map').setView([initialLat, initialLng], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-    const marker = L.marker([initialLat, initialLng], {draggable:true}).addTo(map);
-    function updateInputs(e) {
-      const pos = e.target.getLatLng();
-      document.getElementById('latitude').value = pos.lat.toFixed(6);
-      document.getElementById('longitude').value = pos.lng.toFixed(6);
+  <div class="card map-card">
+    <div id="map" style="height:400px;"></div>
+  </div>
+
+  <form method="post" action="/admin/bars/new" enctype="multipart/form-data" class="editbar-form">
+    <div class="grid-2">
+
+      <div class="card form-card">
+        <h2 class="card-title"><i class="bi bi-geo-alt"></i> {{ _('admin_edit_bar.cards.details.title', default='Details') }}</h2>
+
+        <div class="field-group">
+          <label for="name">{{ _('admin_new_bar.form.name', default='Name') }}</label>
+          <input id="name" name="name" class="input-pill" type="text" required>
+        </div>
+
+        <div class="field-group">
+          <label for="address">{{ _('admin_new_bar.form.address', default='Address') }}</label>
+          <input id="address" name="address" class="input-pill" type="text" required>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="city">{{ _('admin_new_bar.form.city', default='City') }}</label>
+            <input id="city" name="city" class="input-pill" type="text" required>
+          </div>
+          <div class="field-group">
+            <label for="state">{{ _('admin_new_bar.form.state', default='State') }}</label>
+            <input id="state" name="state" class="input-pill" type="text" required>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="description">{{ _('admin_new_bar.form.description', default='Description') }}</label>
+          <textarea id="description" name="description" class="input-pill" rows="3" maxlength="120" required></textarea>
+          <small class="help">{{ _('admin_edit_bar.help.description', default='Short, clear description. Links will be ignored.') }}</small>
+        </div>
+
+        <div class="field-group">
+          <label>{{ _('admin_new_bar.form.categories', default='Categories') }}</label>
+          <div id="categoriesChips" class="chips-grid" aria-describedby="catHelp"></div>
+          <div class="chips-meta">
+            {% set max_categories = 5 %}
+            {% set selected_count = selected_categories|length if selected_categories else 0 %}
+            <small
+              id="catCount"
+              class="count"
+              data-template="{{ _('admin_edit_bar.categories.count', default='{selected}/{max} selected') }}"
+              data-max="{{ max_categories }}"
+            >
+              {{ _('admin_edit_bar.categories.count', default='{selected}/{max} selected', selected=selected_count, max=max_categories) }}
+            </small>
+            <small id="catHelp">{{ _('admin_edit_bar.help.categories', default='Click to select/deselect. Selected items are highlighted.') }}</small>
+          </div>
+          <select id="categoriesNative" name="categories" multiple hidden>
+            {% for c in bar_categories %}
+              <option value="{{ c }}" {% if selected_categories and c in selected_categories %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="card form-card">
+        <h2 class="card-title"><i class="bi bi-card-image"></i> {{ _('admin_edit_bar.cards.media.title', default='Media &amp; Hours')|safe }}</h2>
+
+        <div class="field-group">
+          <label for="photo">{{ _('admin_new_bar.form.photo', default='Photo') }}</label>
+          <input id="photo" name="photo" type="file">
+        </div>
+
+        <div class="field-group">
+          <label class="switch-label">
+            <input id="manual_closed" name="manual_closed" type="checkbox"> {{ _('admin_new_bar.form.manual_closed', default='Close bar manually') }}
+          </label>
+        </div>
+
+        <div class="field-group hours-table-wrap">
+          {% set days = [
+            _('admin_new_bar.days.monday', default='Monday'),
+            _('admin_new_bar.days.tuesday', default='Tuesday'),
+            _('admin_new_bar.days.wednesday', default='Wednesday'),
+            _('admin_new_bar.days.thursday', default='Thursday'),
+            _('admin_new_bar.days.friday', default='Friday'),
+            _('admin_new_bar.days.saturday', default='Saturday'),
+            _('admin_new_bar.days.sunday', default='Sunday')
+          ] %}
+          <table class="hours-table">
+            <thead>
+              <tr>
+                <th>{{ _('admin_new_bar.form.hours.day', default='Day') }}</th>
+                <th>{{ _('admin_new_bar.form.hours.open', default='Open') }}</th>
+                <th>{{ _('admin_new_bar.form.hours.close', default='Close') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for day in days %}
+              {% set idx = loop.index0 %}
+              <tr>
+                <td>{{ day }}</td>
+                <td><input type="time" name="open_{{ idx }}"></td>
+                <td><input type="time" name="close_{{ idx }}"></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <input id="latitude" name="latitude" type="hidden" required>
+    <input id="longitude" name="longitude" type="hidden" required>
+
+    <div class="form-actions save-inline">
+      <button type="submit" class="btn btn--primary">{{ _('admin_new_bar.form.submit', default='Create Bar') }}</button>
+    </div>
+  </form>
+</section>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const initialLat = 45.4642;
+  const initialLng = 9.1900;
+  const map = L.map('map').setView([initialLat, initialLng], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+  const marker = L.marker([initialLat, initialLng], {draggable:true}).addTo(map);
+  function updateInputs(e) {
+    const pos = e.target.getLatLng();
+    document.getElementById('latitude').value = pos.lat.toFixed(6);
+    document.getElementById('longitude').value = pos.lng.toFixed(6);
+  }
+  marker.on('dragend', updateInputs);
+  updateInputs({target: marker});
+</script>
+<script>
+(function(){
+  const select = document.getElementById('categoriesNative');
+  const mount  = document.getElementById('categoriesChips');
+  const countEl= document.getElementById('catCount');
+  const countTemplate = countEl?.dataset.template || '{selected}/{max}';
+  const countMax = Number(countEl?.dataset.max || 5);
+  if(select && mount){
+    const MAX = countMax || 5;
+    const all = Array.from(select.options).map(o=>({ value:o.value, label:o.text, selected:o.selected }));
+    const selectedCount = ()=> all.filter(i=>i.selected).length;
+
+    function syncSelect(){
+      all.forEach(i=>{
+        const opt = Array.from(select.options).find(o=>o.value===i.value);
+        if(opt) opt.selected = i.selected;
+      });
     }
-    marker.on('dragend', updateInputs);
-    updateInputs({target: marker});
+    function render(){
+      mount.innerHTML = '';
+      const cnt = selectedCount();
+      if(countEl) countEl.textContent = countTemplate.replace('{selected}', cnt).replace('{max}', MAX);
+      const limitReached = cnt >= MAX;
 
-    const catSelect = document.getElementById('categories');
-    catSelect.addEventListener('change', () => {
-      const selected = Array.from(catSelect.selectedOptions);
-      if (selected.length > 5) {
-        selected[selected.length - 1].selected = false;
-        alert({{ _('admin_new_bar.alerts.max_categories', default='Select up to 5 categories')|tojson }});
-      }
-    });
-  </script>
-  {% endblock %}
+      all.forEach(item=>{
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip' + (item.selected ? ' chip--selected' : '');
+        b.textContent = item.label;
+        b.setAttribute('aria-pressed', item.selected ? 'true' : 'false');
+        b.addEventListener('click', ()=>{
+          if(item.selected){
+            item.selected = false;
+          }else if(!limitReached){
+            item.selected = true;
+          }
+          syncSelect();
+          render();
+        });
+        mount.appendChild(b);
+      });
+    }
+
+    render();
+  }
+})();
+</script>
+{% endblock %}
 
