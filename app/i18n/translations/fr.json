@@ -757,10 +757,12 @@
   },
   "admin_tables": {
     "edit": {
-      "title": "Modifier la table pour {bar}"
+      "title": "Modifier la table pour {bar}",
+      "back": "Retour aux tables"
     },
     "new": {
-      "title": "Ajouter une table pour {bar}"
+      "title": "Ajouter une table pour {bar}",
+      "back": "Retour aux tables"
     },
     "form": {
       "labels": {
@@ -775,6 +777,7 @@
     "manage": {
       "title": "Gérer les tables pour {bar}",
       "subtitle": "Ajoutez, modifiez et organisez des tables pour ce lieu.",
+      "back": "Retour aux paramètres du bar",
       "search": {
         "aria": "Tables de recherche",
         "placeholder": "Tables de recherche…",
@@ -804,6 +807,7 @@
   "admin_bar_users": {
     "title": "Gérer les utilisateurs pour {bar}",
     "subtitle": "Ajouter ou affecter du personnel à ce lieu.",
+    "back": "Retour aux paramètres du bar",
     "add_existing": {
       "summary": "Ajouter l'utilisateur existant",
       "email": "E-mail",
@@ -873,6 +877,7 @@
   },
   "admin_change_user_password": {
     "title": "Modifier le mot de passe pour {user}",
+    "back": "Retour aux paramètres utilisateur",
     "form": {
       "new_password": "Nouveau mot de passe",
       "confirm_password": "Confirmez le mot de passe",
@@ -953,6 +958,7 @@
   },
   "admin_edit_user": {
     "title": "Modifier l'utilisateur {user}",
+    "back": "Retour aux utilisateurs",
     "dialog": {
       "ok": "D'ACCORD",
       "cancel": "Annuler",
@@ -1055,6 +1061,7 @@
   },
   "admin_edit_bar": {
     "title": "Éditer la barre",
+    "back": "Retour aux paramètres du bar",
     "cards": {
       "details": {
         "title": "Détails"
@@ -1185,6 +1192,7 @@
   "admin_new_notification": {
     "title": "Nouvelle notification",
     "subtitle": "Envoyer un message aux utilisateurs.",
+    "back": "Retour aux notifications",
     "form": {
       "target": {
         "label": "Cible",
@@ -1252,6 +1260,7 @@
   },
   "admin_new_bar": {
     "title": "Créer une nouvelle barre",
+    "back": "Retour aux bars",
     "form": {
       "name": "Nom",
       "address": "Adresse",
@@ -1283,6 +1292,7 @@
   },
   "admin_edit_welcome": {
     "title": "Modifier le message de bienvenue",
+    "back": "Retour aux notifications",
     "form": {
       "subject": "Sujet",
       "subject_translate_button": "Traduire le sujet",
@@ -1300,6 +1310,7 @@
   "admin_notification_view": {
     "title": "Notification {id}",
     "subtitle": "Détails et destinataires.",
+    "back": "Retour aux notifications",
     "actions": {
       "back": "Dos",
       "back_to_list": "Retour à la liste"
@@ -1322,6 +1333,12 @@
       },
       "read_yes": "Oui",
       "read_no": "Non"
+    }
+  },
+  "admin_order_detail": {
+    "back": {
+      "user": "Retour à l'utilisateur",
+      "payments": "Retour aux paiements"
     }
   },
   "admin_payments": {
@@ -1348,6 +1365,7 @@
   "admin_view_user": {
     "title": "Utilisateur: {user}",
     "subtitle": "Détails et activité du compte.",
+    "back": "Retour aux utilisateurs",
     "profile": {
       "title": "Profil",
       "email": "E-mail:",

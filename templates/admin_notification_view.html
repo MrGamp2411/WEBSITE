@@ -2,11 +2,11 @@
 {% block content %}
 <section class="users-page">
   <header class="users-toolbar">
+    <a href="/admin/notifications" class="back-link"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_notification_view.back', default='Back to notifications') }}</a>
     <div class="title-wrap">
       <h1>{{ _('admin_notification_view.title', id=note.id, default='Notification {id}') }}</h1>
       <p class="subtitle">{{ _('admin_notification_view.subtitle', default='Details and recipients.') }}</p>
     </div>
-    <a href="/admin/notifications" class="btn-outline">{{ _('admin_notification_view.actions.back', default='Back') }}</a>
   </header>
 
   <div class="table-card">

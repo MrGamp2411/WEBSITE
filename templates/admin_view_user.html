@@ -2,6 +2,7 @@
 {% block content %}
 <section class="users-page">
   <header class="users-toolbar">
+    <a class="back-link" href="/admin/users"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_view_user.back', default='Back to users') }}</a>
     <div class="title-wrap">
       <h1>{{ _('admin_view_user.title', user=user.username, default='User: {user}') }}</h1>
       <p class="subtitle">{{ _('admin_view_user.subtitle', default='Account details and activity.') }}</p>

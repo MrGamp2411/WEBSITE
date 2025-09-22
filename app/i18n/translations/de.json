@@ -733,10 +733,12 @@
   },
   "admin_tables": {
     "edit": {
-      "title": "Tabelle bearbeiten für {bar}"
+      "title": "Tabelle bearbeiten für {bar}",
+      "back": "Zurück zu den Tabellen"
     },
     "new": {
-      "title": "Tabelle hinzufügen für {bar}"
+      "title": "Tabelle hinzufügen für {bar}",
+      "back": "Zurück zu den Tabellen"
     },
     "form": {
       "labels": {
@@ -751,6 +753,7 @@
     "manage": {
       "title": "Tabellen verwalten für {bar}",
       "subtitle": "Tabellen für diesen Lokal hinzufügen, bearbeiten und organisieren.",
+      "back": "Zurück zu den Bareinstellungen",
       "search": {
         "aria": "Suchtabellen",
         "placeholder": "Tabellen durchsuchen...",
@@ -780,6 +783,7 @@
   "admin_bar_users": {
     "title": "Benutzer verwalten für {bar}",
     "subtitle": "Hinzufügen oder Zuweisen von Mitarbeitern zu diesem Lokal.",
+    "back": "Zurück zu den Bareinstellungen",
     "add_existing": {
       "summary": "Bestehende Benutzer hinzufügen",
       "email": "E-Mail-Adresse",
@@ -849,6 +853,7 @@
   },
   "admin_change_user_password": {
     "title": "Passwort für {user} bearbeiten",
+    "back": "Zurück zu den Nutzereinstellungen",
     "form": {
       "new_password": "Neues Passwort",
       "confirm_password": "Passwort bestätigen",
@@ -929,6 +934,7 @@
   },
   "admin_edit_user": {
     "title": "Benutzer bearbeiten {user}",
+    "back": "Zurück zu den Nutzern",
     "dialog": {
       "ok": "In Ordnung.",
       "cancel": "Abbrechen",
@@ -1031,6 +1037,7 @@
   },
   "admin_edit_bar": {
     "title": "Balken bearbeiten",
+    "back": "Zurück zu den Bareinstellungen",
     "cards": {
       "details": {
         "title": "Einzelheiten"
@@ -1161,6 +1168,7 @@
   "admin_new_notification": {
     "title": "Neue Benachrichtigung",
     "subtitle": "Sende eine Nachricht an Benutzer.",
+    "back": "Zurück zu den Benachrichtigungen",
     "form": {
       "target": {
         "label": "Ziel",
@@ -1228,6 +1236,7 @@
   },
   "admin_new_bar": {
     "title": "Neue Balken erstellen",
+    "back": "Zurück zu den Bars",
     "form": {
       "name": "Bezeichnung",
       "address": "Anschrift",
@@ -1259,6 +1268,7 @@
   },
   "admin_edit_welcome": {
     "title": "Begrüßungsnachricht bearbeiten",
+    "back": "Zurück zu den Benachrichtigungen",
     "form": {
       "subject": "Gegenstand",
       "subject_translate_button": "Gegenstand übersetzen",
@@ -1276,6 +1286,7 @@
   "admin_notification_view": {
     "title": "Meldung {id}",
     "subtitle": "Details und Empfänger.",
+    "back": "Zurück zu den Benachrichtigungen",
     "actions": {
       "back": "Zurück",
       "back_to_list": "Zurück zur Liste"
@@ -1298,6 +1309,12 @@
       },
       "read_yes": "Nein",
       "read_no": "Nein"
+    }
+  },
+  "admin_order_detail": {
+    "back": {
+      "user": "Zurück zum Nutzer",
+      "payments": "Zurück zu den Zahlungen"
     }
   },
   "admin_payments": {
@@ -1324,6 +1341,7 @@
   "admin_view_user": {
     "title": "Benutzer: {user}",
     "subtitle": "Kontodetails und Aktivitäten.",
+    "back": "Zurück zu den Nutzern",
     "profile": {
       "title": "Profil",
       "email": "E-Mail:",

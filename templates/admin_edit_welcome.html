@@ -4,6 +4,7 @@
 {% set body_map = body_translations if body_translations is defined else {} %}
 <section class="users-page">
   <header class="users-toolbar">
+    <a class="back-link" href="/admin/notifications"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_edit_welcome.back', default='Back to notifications') }}</a>
     <div class="title-wrap">
       <h1>{{ _('admin_edit_welcome.title', default='Edit Welcome Message') }}</h1>
     </div>
