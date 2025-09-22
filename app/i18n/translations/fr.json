@@ -616,6 +616,9 @@
   },
   "topup": {
     "title": "Recharger le crédit",
+    "notice": {
+      "minimum": "Le dépôt minimum est de 10 CHF."
+    },
     "form": {
       "amount_label": "Montant",
       "submit": "Recharger par carte"

@@ -1636,6 +1636,9 @@
   },
   "topup": {
     "title": "Guthaben aufladen",
+    "notice": {
+      "minimum": "Die Mindesteinzahlung beträgt 10 CHF."
+    },
     "form": {
       "amount_label": "Betrag",
       "submit": "Mit Karte aufladen"

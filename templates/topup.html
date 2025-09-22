@@ -2,6 +2,7 @@
 {% block content %}
 <div class="auth-card">
   <h1>{{ _('topup.title', default='Top Up Credit') }}</h1>
+  <p class="topup-note">{{ _('topup.notice.minimum', default='Minimum top-up is 10 CHF.') }}</p>
   <form id="topupForm">
     <label for="amount">{{ _('topup.form.amount_label', default='Amount') }}
       <input id="amount" name="amount" type="number" min="10" step="0.05" required inputmode="decimal">
