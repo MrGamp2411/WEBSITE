@@ -58,5 +58,12 @@ def test_checkout_uses_amount_including_tax():
             )
             create_kwargs = MockTx.create.call_args.kwargs
         assert resp.status_code == 303
-        line_item = create_kwargs['transaction'].line_items[0]
+        tx_create = create_kwargs['transaction']
+        line_item = tx_create.line_items[0]
         assert line_item.amount_including_tax == 5.2
+        assert tx_create.customer_id == str(user.id)
+        assert tx_create.customer_email_address == user.email
+        assert tx_create.billing_address.given_name == user.username
+        assert tx_create.billing_address.family_name == user.username
+        assert tx_create.billing_address.email_address == user.email
+        assert tx_create.meta_data == {"username": user.username}

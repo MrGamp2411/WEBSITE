@@ -118,7 +118,7 @@ from payouts import schedule_payout
 from audit import log_action
 from urllib.parse import urljoin, urlencode
 from app.webhooks.wallee import router as wallee_webhook_router
-from wallee.models import LineItemCreate, TransactionCreate
+from wallee.models import AddressCreate, LineItemCreate, TransactionCreate
 from wallee.rest import ApiException
 from app.phone import normalize_phone_or_raise
 from app.i18n import (
@@ -3110,6 +3110,12 @@ async def checkout(
                 and wallee_client.cfg.api_secret
             ):
                 raise ApiException()
+            customer_label = user.username or user.email or f"user-{user.id}"
+            billing_address = AddressCreate(
+                given_name=customer_label,
+                family_name=customer_label,
+                email_address=user.email,
+            )
             tx_create = TransactionCreate(
                 line_items=[
                     LineItemCreate(
@@ -3124,6 +3130,10 @@ async def checkout(
                 currency="CHF",
                 success_url=f"{base_url}/orders",
                 failed_url=failed_url,
+                customer_id=str(user.id),
+                customer_email_address=user.email,
+                billing_address=billing_address,
+                meta_data={"username": customer_label},
             )
             tx = wallee_client.tx_service.create(
                 space_id=wallee_client.space_id, transaction=tx_create
@@ -3564,6 +3574,12 @@ async def init_topup(
     success_url = f"{base_url}/wallet/topup/success?" + urlencode({"topup": topup.id})
     failed_url = f"{base_url}/wallet/topup/failed?" + urlencode({"topup": topup.id})
 
+    customer_label = user.username or user.email or f"user-{user.id}"
+    billing_address = AddressCreate(
+        given_name=customer_label,
+        family_name=customer_label,
+        email_address=user.email,
+    )
     line = LineItemCreate(
         name=f"Wallet Top-up {CURRENCY} {amount:.2f}",
         unique_id=f"topup-{topup.id}",
@@ -3578,6 +3594,10 @@ async def init_topup(
         auto_confirmation_enabled=True,
         success_url=success_url,
         failed_url=failed_url,
+        customer_id=str(user.id),
+        customer_email_address=user.email,
+        billing_address=billing_address,
+        meta_data={"username": customer_label},
     )
 
     print(
