@@ -32,6 +32,7 @@
 - Homepage hero only shows a Browse Bars button linking to `/search`; Search and How it works buttons and promo chips were removed.
 - Browse Bars button is centered in the hero section.
 - Horizontal scrolling is locked with `overflow-x: clip` on `html, body`, and header width uses `100%` to avoid viewport overflow.
+- Body uses a column flex layout with `min-height: 100dvh` and grows `<main>` so the footer always anchors to the bottom even on sparse pages.
 - Registration is a two-step flow. `/register` collects email and password and assigns a temporary `REGISTERING` role. Users are redirected to `/register/details` to supply username, phone prefix, and number, and cannot access other pages until this step completes.
   - Once step two succeeds and the role becomes `CUSTOMER`, the user stays signed in and is redirected to the homepage (`/`).
   - Each registration step displays a disclaimer stating that creating an account accepts the Terms of Service, with the link pointing to `/terms`.

@@ -5,7 +5,7 @@ html{font-family:var(--font-sans);font-size:var(--step-0);-webkit-text-size-adju
       radial-gradient(1320px 768px at 78% 0%, var(--sg-t2) 0%, transparent 70%),
       radial-gradient(1440px 840px at 50% 105%, var(--sg-t3) 0%, transparent 75%),
       var(--sg-bg0);background-attachment:fixed;}
-body{background:transparent!important;margin:0;font-size:var(--step-0);line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;color:var(--fg,#111);transition:background var(--dur) var(--ease),color var(--dur) var(--ease);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);position:relative;}
+body{background:transparent!important;margin:0;font-size:var(--step-0);line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;color:var(--fg,#111);transition:background var(--dur) var(--ease),color var(--dur) var(--ease);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);position:relative;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;}
 html,body{width:100%;max-width:100%;overflow-x:clip;}
 @supports not (overflow-x:clip){html,body{overflow-x:hidden;}}
 .site-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:
@@ -14,6 +14,7 @@ html,body{width:100%;max-width:100%;overflow-x:clip;}
       radial-gradient(1440px 840px at 50% 105%, var(--sg-t3) 0%, transparent 75%),
       var(--sg-bg0);background-attachment:fixed;}
 #root,.app,main{position:relative;z-index:1;}
+main{flex:1 1 auto;}
 @media (max-width:768px){
   html,.site-bg{background:
         radial-gradient(864px 504px at 20% 4%, rgba(124,58,237,.12) 0%, transparent 60%),
