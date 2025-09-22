@@ -55,6 +55,7 @@
 - `cart.errors.other_bar` localises the warning shown when trying to order from a different bar while the cart is full.
 
 - Wallet page UI lives in `templates/wallet.html` using a `.wallet-page` wrapper and inline scoped styles. Transaction rows render inside `<ul id="txList">` as static `.tx` divs with no detail links. "Load more," "Export CSV," "Manage payment methods," and all filters have been removed; the "Top Up" button uses `text-decoration:none` to avoid an underline.
+- Wallet top-ups must be at least 10 CHF; enforce this in both API validation and client-side forms.
 - Transaction detail views have been removed, so there is no `/wallet/tx/{index}` route or `transaction_detail.html` template.
 - Wallet Recent Activity shows all transactions with the newest first, and wallet cards override the base mobile `max-height` so the feed length isn't capped.
 - The balance card's meta now only shows an `Available` badge and omits any "last updated" text.

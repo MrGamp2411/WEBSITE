@@ -621,7 +621,7 @@
       "submit": "Recharger par carte"
     },
     "alerts": {
-      "invalid_amount": "Montant invalide",
+      "invalid_amount": "Montant invalide (minimum 10 CHF)",
       "failed": "Impossible de lancer la recharge"
     }
   },

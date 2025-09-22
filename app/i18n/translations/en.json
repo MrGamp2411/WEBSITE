@@ -1641,7 +1641,7 @@
       "submit": "Top up with card"
     },
     "alerts": {
-      "invalid_amount": "Invalid amount",
+      "invalid_amount": "Invalid amount (minimum 10 CHF)",
       "failed": "Unable to start top-up"
     }
   },
