@@ -656,6 +656,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);transit
   gap:16px;
   margin-bottom:var(--space-4);
 }
+.bar-title-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.bar-title{
+  margin:0;
+}
+.bar-directions{
+  text-decoration:none;
+}
 .bar-cover-wrapper{
   width:100%;
   aspect-ratio:16/9;

@@ -586,7 +586,8 @@
       "closed": "Fermé"
     },
     "add_to_cart": "Ajouter au panier",
-    "login_to_order": "Connectez-vous pour commander"
+    "login_to_order": "Connectez-vous pour commander",
+    "get_directions": "Obtenir l’itinéraire"
   },
   "all_bars": {
     "title": "Tous les bars",

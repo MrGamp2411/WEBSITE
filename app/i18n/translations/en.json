@@ -586,7 +586,8 @@
       "closed": "Closed"
     },
     "add_to_cart": "Add to Cart",
-    "login_to_order": "Login to order"
+    "login_to_order": "Login to order",
+    "get_directions": "Get directions"
   },
   "all_bars": {
     "title": "All bars",
