@@ -20,6 +20,34 @@
     </ul>
   </div>
 
+  <h2>{{ _('admin_view_user.updates.title', default='Profile updates') }}</h2>
+  <p class="subtitle">{{ _('admin_view_user.updates.subtitle', default='Detailed history of profile edits.') }}</p>
+  <div class="table-card" style="max-height:300px; overflow-y:auto;">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>{{ _('admin_view_user.updates.table.headers.field', default='Field') }}</th>
+          <th>{{ _('admin_view_user.updates.table.headers.previous', default='Previous value') }}</th>
+          <th>{{ _('admin_view_user.updates.table.headers.current', default='New value') }}</th>
+          <th>{{ _('admin_view_user.updates.table.headers.date', default='Date') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for change in profile_updates %}
+        <tr>
+          <td>{{ _('admin_view_user.updates.fields.' ~ change.field, default=change.field|title) }}</td>
+          <td>{{ change.previous or '-' }}</td>
+          <td>{{ change.current or '-' }}</td>
+          <td>{{ change.created_at|format_time }}</td>
+        </tr>
+        {% endfor %}
+        {% if profile_updates|length == 0 %}
+        <tr><td colspan="4">{{ _('admin_view_user.updates.empty', default='No profile updates recorded.') }}</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
   <h2>{{ _('admin_view_user.orders.title', default='Orders') }}</h2>
   <p class="subtitle">{{ _('admin_view_user.orders.subtitle', default='Most recent first. Scroll to view older orders.') }}</p>
   <div class="table-card" style="max-height:300px; overflow-y:auto;">

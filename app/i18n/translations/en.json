@@ -1352,6 +1352,24 @@
       "credit": "Credit:",
       "bars": "Bars:"
     },
+    "updates": {
+      "title": "Profile updates",
+      "subtitle": "Detailed history of profile edits.",
+      "table": {
+        "headers": {
+          "field": "Field",
+          "previous": "Previous value",
+          "current": "New value",
+          "date": "Date"
+        }
+      },
+      "fields": {
+        "username": "Username",
+        "email": "Email",
+        "phone": "Phone"
+      },
+      "empty": "No profile updates recorded."
+    },
     "orders": {
       "title": "Orders",
       "subtitle": "Most recent first. Scroll to view older orders.",

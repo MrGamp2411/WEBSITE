@@ -1352,6 +1352,24 @@
       "credit": "Einnahmen",
       "bars": "Bars:"
     },
+    "updates": {
+      "title": "Profilaktualisierungen",
+      "subtitle": "Detaillierte Historie der Profiländerungen.",
+      "table": {
+        "headers": {
+          "field": "Feld",
+          "previous": "Bisheriger Wert",
+          "current": "Neuer Wert",
+          "date": "Datum"
+        }
+      },
+      "fields": {
+        "username": "Benutzername",
+        "email": "E-Mail",
+        "phone": "Telefon"
+      },
+      "empty": "Keine Profilaktualisierungen vorhanden."
+    },
     "orders": {
       "title": "Bestellungen",
       "subtitle": "Zuletzt zuerst. Scrollen, um ältere Bestellungen anzuzeigen.",

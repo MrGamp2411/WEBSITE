@@ -4076,6 +4076,39 @@ async def profile_update(request: Request, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.id == user.id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
+
+    def join_phone(prefix_value: str, phone_value: str) -> str:
+        parts = [p for p in [prefix_value, phone_value] if p]
+        return " ".join(parts)
+
+    changes = []
+    if username_lower != (db_user.username or ""):
+        changes.append(
+            {
+                "field": "username",
+                "from": db_user.username or "",
+                "to": username_lower,
+            }
+        )
+    if email != (db_user.email or ""):
+        changes.append(
+            {
+                "field": "email",
+                "from": db_user.email or "",
+                "to": email,
+            }
+        )
+    previous_phone_display = join_phone(db_user.prefix or "", db_user.phone or "")
+    new_phone_display = join_phone(prefix, phone)
+    if new_phone_display != previous_phone_display:
+        changes.append(
+            {
+                "field": "phone",
+                "from": previous_phone_display,
+                "to": new_phone_display,
+            }
+        )
+
     if username_lower != user.username.lower():
         del users_by_username[user.username.lower()]
         user.username = username_lower
@@ -4100,6 +4133,17 @@ async def profile_update(request: Request, db: Session = Depends(get_db)):
     db_user.phone_region = phone_region
     db.commit()
     users[user.id] = user
+    if changes:
+        log_action(
+            db,
+            actor_user_id=user.id,
+            action="profile_update",
+            entity_type="User",
+            entity_id=user.id,
+            payload={"changes": changes},
+            phone=user.phone_e164,
+            credit=float(user.credit or 0),
+        )
     return RedirectResponse(url="/profile?success=1", status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -5857,6 +5901,26 @@ async def view_user(request: Request, user_id: int, db: Session = Depends(get_db
         .order_by(AuditLog.created_at.desc())
         .all()
     )
+    profile_updates = []
+    for log in logs:
+        if log.action != "profile_update" or not log.payload_json:
+            continue
+        try:
+            payload = json.loads(log.payload_json)
+        except json.JSONDecodeError:
+            continue
+        for change in payload.get("changes", []):
+            field = change.get("field")
+            if not field:
+                continue
+            profile_updates.append(
+                {
+                    "field": field,
+                    "previous": change.get("from", ""),
+                    "current": change.get("to", ""),
+                    "created_at": log.created_at,
+                }
+            )
     logins = (
         db.query(AuditLog)
         .filter(
@@ -5874,6 +5938,7 @@ async def view_user(request: Request, user_id: int, db: Session = Depends(get_db
         orders=orders,
         logs=logs,
         logins=logins,
+        profile_updates=profile_updates,
         bars=bars,
     )
 

@@ -1,13 +1,14 @@
 import os
 import sys
 import pathlib
+import json
 
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, SessionLocal, engine  # noqa: E402
-from models import User, RoleEnum  # noqa: E402
+from models import User, RoleEnum, AuditLog  # noqa: E402
 from main import app, hash_password, verify_password  # noqa: E402
 
 
@@ -65,6 +66,23 @@ def test_profile_update_details():
     assert updated.username == "newuser"
     assert updated.email == "new@example.com"
     assert updated.phone == "0765551234"
+    log = (
+        db.query(AuditLog)
+        .filter(
+            AuditLog.actor_user_id == user_id,
+            AuditLog.action == "profile_update",
+        )
+        .first()
+    )
+    assert log is not None
+    payload = json.loads(log.payload_json)
+    changes = {change["field"]: change for change in payload.get("changes", [])}
+    assert changes["username"]["from"] == "olduser"
+    assert changes["username"]["to"] == "newuser"
+    assert changes["email"]["from"] == "old@example.com"
+    assert changes["email"]["to"] == "new@example.com"
+    assert changes["phone"]["from"] == "+41 0790000000"
+    assert changes["phone"]["to"] == "+41 0765551234"
     db.close()
 
 
