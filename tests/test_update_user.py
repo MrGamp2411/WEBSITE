@@ -212,6 +212,49 @@ def test_update_user_reassign_bar():
     db.close()
 
 
+def test_super_admin_can_override_validation_rules():
+    db = SessionLocal()
+    password_hash = hashlib.sha256("pass".encode("utf-8")).hexdigest()
+    user = User(
+        username="strictuser",
+        email="strictuser@example.com",
+        password_hash=password_hash,
+        role=RoleEnum.CUSTOMER,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    user_id = user.id
+    original_phone_e164 = user.phone_e164
+    original_phone_region = user.phone_region
+    db.close()
+
+    with TestClient(app) as client:
+        _login_super_admin(client)
+        form = {
+            "username": "Mario Rossi",
+            "email": "strictuser@example.com",
+            "prefix": "+41",
+            "phone": "12",
+            "role": "customer",
+            "bar_ids": "",
+            "add_credit": "0",
+            "remove_credit": "0",
+        }
+        resp = client.post(
+            f"/admin/users/edit/{user_id}", data=form, follow_redirects=False
+        )
+        assert resp.status_code == 303
+
+    db = SessionLocal()
+    updated = db.query(User).filter(User.id == user_id).first()
+    assert updated.username == "Mario Rossi"
+    assert updated.phone == "12"
+    assert updated.phone_e164 == original_phone_e164
+    assert updated.phone_region == original_phone_region
+    db.close()
+
+
 def test_update_user_credit_and_bar_assignment():
     db = SessionLocal()
     password_hash = hashlib.sha256("pass".encode("utf-8")).hexdigest()
