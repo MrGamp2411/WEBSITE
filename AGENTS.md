@@ -442,3 +442,5 @@
   - `notices.payment_failed` provides the payment failure notice copy for global alerts.
     - Include a `close` label so the wallet notice button renders in every language; reuse the same value for `notices.payment_success.close`.
 - Translation JSON files are verified by `tests/test_translations.py`, which ensures English, Italiano, Français, and Deutsch files all exist, share identical key paths (excluding `_meta`), and provide non-empty string values.
+
+- Notifications page cards now include a 25px margin on both sides via `.notifications-page .notification-card` in `static/css/components.css` to keep them from touching the viewport edges.
