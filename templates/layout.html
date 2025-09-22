@@ -93,7 +93,6 @@
       {% if user %}
       {% if user.is_blocked or user.is_ip_blocked %}
       <a href="/notifications" role="menuitem"><i class="bi bi-bell" aria-hidden="true"></i><span>{{ _('common.notifications', default='Notifications') }}</span>{% if unread_notifications %}<span class="notif-badge" aria-live="polite">{{ unread_notifications }}</span>{% endif %}</a>
-      <a href="/logout" role="menuitem"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>{{ _('common.logout', default='Logout') }}</span></a>
       {% else %}
       {% if not user.is_ip_blocked %}
       <a href="/wallet" role="menuitem"><i class="bi bi-wallet2" aria-hidden="true"></i><span>{{ _('common.wallet', default='Wallet') }}</span></a>

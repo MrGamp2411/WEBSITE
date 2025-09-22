@@ -676,7 +676,6 @@ class BlockRedirectMiddleware(BaseHTTPMiddleware):
                     or path.startswith("/static")
                     or path.startswith("/photo")
                     or path in {"/blocked", "/ip-blocked"}
-                    or path == "/logout"
                     or path == "/favicon.ico"
                 )
                 if not allowed:
@@ -1701,6 +1700,20 @@ def get_current_user(request: Request) -> Optional[DemoUser]:
             return _load_demo_user(user_id, db)
         except HTTPException:
             return None
+
+
+def redirect_for_authenticated_user(user: DemoUser) -> RedirectResponse:
+    if user.is_blocked:
+        target = "/blocked"
+    elif user.is_ip_blocked:
+        target = "/ip-blocked"
+    elif user.role == "registering":
+        target = "/register/details"
+    elif user.is_display and user.bar_id:
+        target = f"/dashboard/bar/{user.bar_id}/orders"
+    else:
+        target = "/dashboard"
+    return RedirectResponse(url=target, status_code=status.HTTP_303_SEE_OTHER)
 
 
 
@@ -3643,12 +3656,18 @@ async def api_auth_register(payload: AuthRegister):
 @app.get("/register", response_class=HTMLResponse)
 async def register_form(request: Request):
     """Display the first step of registration (email & password)."""
+    user = get_current_user(request)
+    if user:
+        return redirect_for_authenticated_user(user)
     return render_template("register_step1.html", request=request)
 
 
 @app.post("/register", response_class=HTMLResponse)
 async def register_step_one(request: Request, db: Session = Depends(get_db)):
     """Handle step one of registration."""
+    user = get_current_user(request)
+    if user:
+        return redirect_for_authenticated_user(user)
     form = await request.form()
     email = form.get("email") or ""
     password = form.get("password") or ""
@@ -3857,12 +3876,18 @@ async def register_details(request: Request, db: Session = Depends(get_db)):
 @app.get("/login", response_class=HTMLResponse)
 async def login_form(request: Request):
     """Display the login form."""
+    user = get_current_user(request)
+    if user:
+        return redirect_for_authenticated_user(user)
     return render_template("login.html", request=request)
 
 
 @app.post("/login", response_class=HTMLResponse)
 async def login(request: Request, db: Session = Depends(get_db)):
     """Handle login submissions."""
+    existing_user = get_current_user(request)
+    if existing_user:
+        return redirect_for_authenticated_user(existing_user)
     form = await request.form()
     email = form.get("email")
     password = form.get("password")
@@ -4196,6 +4221,9 @@ async def profile_password_update(request: Request, db: Session = Depends(get_db
 
 @app.get("/logout")
 async def logout(request: Request):
+    user = get_current_user(request)
+    if user and (user.is_blocked or user.is_ip_blocked):
+        return redirect_for_authenticated_user(user)
     request.session.clear()
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 

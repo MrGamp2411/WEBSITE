@@ -39,6 +39,8 @@
 - Username input on `/register/details` forces lowercase on every keystroke so pasted or typed uppercase characters are normalised before submission. See the inline script at the bottom of `templates/register.html`.
 - Registering users hitting any other route are redirected back to `/register/details` by middleware until step two finishes.
 - Super admins can create users directly from the Admin Users page by entering only an email and password; this bypasses the normal registration flow and checks.
+- Authenticated users are redirected away from `/login` and `/register`; use `redirect_for_authenticated_user` in `main.py` when adding new entry points.
+- Blocked and IP-blocked users cannot log out; BlockRedirectMiddleware denies `/logout` and the layout hides the link for these roles.
 - Startup ensures the `roleenum` type contains `REGISTERING` via `ensure_role_enum()`.
 - Display role users see only a two-column live orders screen (preparing/ready) at `/dashboard/bar/{id}/orders` with order codes only and no footer or cart links.
 - Display role header removes navigation links and menu toggles; the logo is not clickable and only a Logout link remains.
