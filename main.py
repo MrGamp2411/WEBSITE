@@ -5281,7 +5281,7 @@ async def admin_payments(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request)
     if not user or not user.is_super_admin:
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    db_bars = db.query(BarModel).all()
+    db_bars = db.query(BarModel).order_by(BarModel.id.asc()).all()
     return render_template("admin_payments.html", request=request, bars=db_bars)
 
 
