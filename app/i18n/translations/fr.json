@@ -1379,6 +1379,24 @@
       "credit": "Crédit:",
       "bars": "Bars:"
     },
+    "updates": {
+      "title": "Mises à jour du profil",
+      "subtitle": "Historique détaillé des modifications du profil.",
+      "table": {
+        "headers": {
+          "field": "Champ",
+          "previous": "Valeur précédente",
+          "current": "Nouvelle valeur",
+          "date": "Date"
+        }
+      },
+      "fields": {
+        "username": "Nom d'utilisateur",
+        "email": "E-mail",
+        "phone": "Téléphone"
+      },
+      "empty": "Aucune mise à jour du profil enregistrée."
+    },
     "orders": {
       "title": "Ordres",
       "subtitle": "Le plus récent en premier. Faites défiler pour afficher les commandes plus anciennes.",

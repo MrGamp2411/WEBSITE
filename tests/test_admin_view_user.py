@@ -2,6 +2,7 @@ import os
 import sys
 import hashlib
 import pathlib
+import json
 
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
@@ -100,6 +101,49 @@ def test_view_user_lists_login_activity():
         assert "test-agent" in resp.text
         assert "12.34" in resp.text
         assert "56.78" in resp.text
+
+
+def test_view_user_shows_profile_updates():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    password_hash = hashlib.sha256("pass".encode("utf-8")).hexdigest()
+    user = User(
+        username="cust",
+        email="cust@example.com",
+        password_hash=password_hash,
+        role=RoleEnum.CUSTOMER,
+    )
+    db.add(user)
+    db.commit()
+    log = AuditLog(
+        actor_user_id=user.id,
+        action="profile_update",
+        entity_type="User",
+        entity_id=user.id,
+        payload_json=json.dumps(
+            {
+                "changes": [
+                    {
+                        "field": "phone",
+                        "from": "+41 0790000000",
+                        "to": "+41 0765551234",
+                    }
+                ]
+            }
+        ),
+    )
+    db.add(log)
+    db.commit()
+    user_id = user.id
+    db.close()
+
+    with TestClient(app) as client:
+        _login_super_admin(client)
+        resp = client.get(f"/admin/users/view/{user_id}")
+        assert resp.status_code == 200
+        assert "+41 0790000000" in resp.text
+        assert "+41 0765551234" in resp.text
 
 
 def test_order_detail_view():

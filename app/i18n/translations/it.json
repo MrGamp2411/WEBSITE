@@ -1352,6 +1352,24 @@
       "credit": "Credito:",
       "bars": "Locali:"
     },
+    "updates": {
+      "title": "Aggiornamenti profilo",
+      "subtitle": "Cronologia dettagliata delle modifiche al profilo.",
+      "table": {
+        "headers": {
+          "field": "Campo",
+          "previous": "Valore precedente",
+          "current": "Nuovo valore",
+          "date": "Data"
+        }
+      },
+      "fields": {
+        "username": "Nome utente",
+        "email": "Email",
+        "phone": "Telefono"
+      },
+      "empty": "Nessun aggiornamento profilo registrato."
+    },
     "orders": {
       "title": "Ordini",
       "subtitle": "Dal più recente. Scorri per visualizzare gli ordini più vecchi.",
