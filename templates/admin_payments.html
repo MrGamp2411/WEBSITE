@@ -37,7 +37,7 @@
       <tbody>
         {% for bar in bars %}
         <tr>
-          <td class="number">{{ bar.id }}</td>
+          <td class="number">{{ "{:03d}".format(bar.id) }}</td>
           <td>{{ bar.name }}</td>
           <td class="actions">
             <div class="actions-group">
