@@ -6007,6 +6007,7 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
     add_credit = form.get("add_credit") or "0"
     remove_credit = form.get("remove_credit") or "0"
     bar_ids = [int(b) for b in form.getlist("bar_ids") if b]
+    allow_override = current.is_super_admin
     if not (username and email is not None and role is not None):
         return render_template(
             "admin_edit_user.html",
@@ -6036,13 +6037,17 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
         )
     if target_is_super_admin:
         role = "super_admin"
+    username = username.strip()
     username_lower = username.lower()
     if (
-        username != username_lower
-        or not USERNAME_REGEX.fullmatch(username_lower)
-        or username_lower.isdigit()
-        or re.fullmatch(r"[^@]+@[^@]+\.[^@]+", username_lower)
-        or username_lower in RESERVED_USERNAMES
+        (not allow_override and username != username_lower)
+        or (not allow_override and not USERNAME_REGEX.fullmatch(username_lower))
+        or (not allow_override and username_lower.isdigit())
+        or (
+            not allow_override
+            and re.fullmatch(r"[^@]+@[^@]+\.[^@]+", username_lower)
+        )
+        or (not allow_override and username_lower in RESERVED_USERNAMES)
     ):
         return render_template(
             "admin_edit_user.html",
@@ -6077,47 +6082,54 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
             current=current,
             error="Email already taken",
         )
-    if username_lower != user.username.lower():
-        del users_by_username[user.username.lower()]
-        user.username = username_lower
-        users_by_username[username_lower] = user
-    else:
-        user.username = username_lower
+    old_username_lower = user.username.lower()
+    new_username_display = username if allow_override else username_lower
+    if username_lower != old_username_lower:
+        users_by_username.pop(old_username_lower, None)
+    user.username = new_username_display
+    users_by_username[username_lower] = user
     if email != user.email:
-        del users_by_email[user.email]
+        users_by_email.pop(user.email, None)
         user.email = email
         users_by_email[user.email] = user
     else:
         user.email = email
+    user.prefix = prefix or ""
+    phone_e164 = db_user.phone_e164
+    phone_region = db_user.phone_region
     if phone:
         try:
             RegisterIn.model_validate({"dial_code": prefix, "phone": phone})
         except ValidationError:
-            return render_template(
-                "admin_edit_user.html",
-                request=request,
-                user=user,
-                bars=bars.values(),
-                current=current,
-                error="Invalid phone number length.",
-                status_code=422,
-            )
-        try:
-            phone_e164, phone_region = normalize_phone_or_raise(prefix or "", phone)
-        except HTTPException as exc:
-            return render_template(
-                "admin_edit_user.html",
-                request=request,
-                user=user,
-                bars=bars.values(),
-                current=current,
-                error=exc.detail,
-                status_code=exc.status_code,
-            )
-        user.prefix = prefix or ""
+            if not allow_override:
+                return render_template(
+                    "admin_edit_user.html",
+                    request=request,
+                    user=user,
+                    bars=bars.values(),
+                    current=current,
+                    error="Invalid phone number length.",
+                    status_code=422,
+                )
+        else:
+            try:
+                phone_e164, phone_region = normalize_phone_or_raise(prefix or "", phone)
+            except HTTPException as exc:
+                if not allow_override:
+                    return render_template(
+                        "admin_edit_user.html",
+                        request=request,
+                        user=user,
+                        bars=bars.values(),
+                        current=current,
+                        error=exc.detail,
+                        status_code=exc.status_code,
+                    )
         user.phone = phone or ""
-        user.phone_e164 = phone_e164
-        user.phone_region = phone_region
+    else:
+        user.phone = ""
+    user.phone_e164 = phone_e164 or ""
+    user.phone_region = phone_region or ""
     if not current.is_super_admin:
         role = "bar_admin" if role == "bar_admin" else "bartender"
         bar_ids = current.bar_ids.copy()
@@ -6139,13 +6151,12 @@ async def update_user(request: Request, user_id: int, db: Session = Depends(get_
             error="Invalid credit amount",
         )
     user.credit = user.credit + add_amt - remove_amt
-    db_user.username = username
+    db_user.username = new_username_display
     db_user.email = email
-    if phone:
-        db_user.prefix = prefix or None
-        db_user.phone = phone or None
-        db_user.phone_e164 = phone_e164
-        db_user.phone_region = phone_region
+    db_user.prefix = prefix or None
+    db_user.phone = phone or None
+    db_user.phone_e164 = phone_e164
+    db_user.phone_region = phone_region
     role_enum_map = {
         "super_admin": RoleEnum.SUPERADMIN,
         "bar_admin": RoleEnum.BARADMIN,
