@@ -64,6 +64,6 @@ def test_checkout_uses_amount_including_tax():
         assert tx_create.customer_id == str(user.id)
         assert tx_create.customer_email_address == user.email
         assert tx_create.billing_address.given_name == user.username
-        assert tx_create.billing_address.family_name == user.username
+        assert tx_create.billing_address.family_name is None
         assert tx_create.billing_address.email_address == user.email
         assert tx_create.meta_data == {"username": user.username}

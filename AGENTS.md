@@ -91,6 +91,7 @@
     - `wallet_topups` columns include `id`, `user_id`, `amount_decimal`, `currency`, `wallee_tx_id` (unique BIGINT), `status`, `processed_at`, `created_at`, and `updated_at`.
     - Save `int(tx.id)` to `wallet_topups.wallee_tx_id` and query by this field in the webhook.
     - Transaction payloads send the user's username via `billing_address`, `customer_id`, and `meta_data['username']` so Wallee's dashboard shows who initiated each payment.
+      - Leave `billing_address.family_name` unset so Wallee only displays the username once in its customer name field.
     - Startup ensures these fields via `ensure_wallet_topup_columns()` which renames any legacy `wallee_transaction_id` column and sets the `status` default to `PENDING`.
     - The `payments` table tracks order payments only and no longer defines a `user_id` column.
     - Wallee API clients live in `app/wallee_client.py`; reuse the module's `tx_service`, `pp_service`, and `whenc_srv` instead of creating new clients.
