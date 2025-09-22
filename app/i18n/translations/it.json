@@ -586,7 +586,8 @@
       "closed": "Chiuso"
     },
     "add_to_cart": "Aggiungi al carrello",
-    "login_to_order": "Accedi per ordinare"
+    "login_to_order": "Accedi per ordinare",
+    "get_directions": "Ottieni indicazioni"
   },
   "all_bars": {
     "title": "Tutti i locali",

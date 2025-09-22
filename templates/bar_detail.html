@@ -9,7 +9,34 @@
     <img class="bar-cover" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
     {% endif %}
   </div>
-  <h1 class="bar-title" itemprop="name">{{ bar.name }}</h1>
+  {% set google_maps_url = None %}
+  {% set apple_maps_url = None %}
+  {% if bar.latitude and bar.longitude %}
+  {% set destination_value = bar.latitude ~ ',' ~ bar.longitude %}
+  {% set google_maps_url = 'https://www.google.com/maps/dir/?api=1&destination=' ~ destination_value|urlencode %}
+  {% set apple_maps_url = 'https://maps.apple.com/?daddr=' ~ destination_value|urlencode %}
+  {% elif bar.address and bar.city %}
+    {% if bar.state %}
+    {% set destination_value = bar.address ~ ', ' ~ bar.city ~ ', ' ~ bar.state %}
+    {% else %}
+    {% set destination_value = bar.address ~ ', ' ~ bar.city %}
+    {% endif %}
+  {% set google_maps_url = 'https://www.google.com/maps/dir/?api=1&destination=' ~ destination_value|urlencode %}
+  {% set apple_maps_url = 'https://maps.apple.com/?daddr=' ~ destination_value|urlencode %}
+  {% endif %}
+  <div class="bar-title-row">
+    <h1 class="bar-title" itemprop="name">{{ bar.name }}</h1>
+    {% if google_maps_url and apple_maps_url %}
+    <a class="cta-pill cta-pill--ghost bar-directions"
+      href="{{ google_maps_url }}"
+      data-google-url="{{ google_maps_url }}"
+      data-apple-url="{{ apple_maps_url }}"
+      target="_blank"
+      rel="noopener">
+      {{ _('bar_detail.get_directions', default='Get directions') }}
+    </a>
+    {% endif %}
+  </div>
   <div class="bar-meta">
     <span class="bar-status">
       <span class="status {% if bar.is_open_now %}status-open{% else %}status-closed{% endif %}">{% if bar.is_open_now %}{{ _('bar_detail.status.open', default='Open now') }}{% else %}{{ _('bar_detail.status.closed', default='Closed now') }}{% endif %}</span>
@@ -89,5 +116,27 @@
 {% endblock %}
 
 {% block scripts %}
-<script>window.orderingPaused = {{ 'true' if bar.ordering_paused else 'false' }};</script>
+<script>
+  window.orderingPaused = {{ 'true' if bar.ordering_paused else 'false' }};
+</script>
+<script>
+  (function() {
+    var directionsLink = document.querySelector('.bar-directions');
+    if (!directionsLink) {
+      return;
+    }
+
+    var appleUrl = directionsLink.getAttribute('data-apple-url');
+    var googleUrl = directionsLink.getAttribute('data-google-url');
+    var userAgent = window.navigator.userAgent || '';
+    var platform = window.navigator.platform || '';
+    var isAppleDevice = /iPad|iPhone|iPod/.test(userAgent) || (platform === 'MacIntel' && typeof window.navigator.standalone !== 'undefined');
+
+    if (isAppleDevice && appleUrl) {
+      directionsLink.setAttribute('href', appleUrl);
+    } else if (googleUrl) {
+      directionsLink.setAttribute('href', googleUrl);
+    }
+  })();
+</script>
 {% endblock %}

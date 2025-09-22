@@ -586,7 +586,8 @@
       "closed": "Geschlossen"
     },
     "add_to_cart": "Zum Warenkorb hinzufügen",
-    "login_to_order": "Zum Bestellen anmelden"
+    "login_to_order": "Zum Bestellen anmelden",
+    "get_directions": "Route planen"
   },
   "all_bars": {
     "title": "Alle Bars",
