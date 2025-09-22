@@ -3113,7 +3113,7 @@ async def checkout(
             customer_label = user.username or user.email or f"user-{user.id}"
             billing_address = AddressCreate(
                 given_name=customer_label,
-                family_name=customer_label,
+                family_name=None,
                 email_address=user.email,
             )
             tx_create = TransactionCreate(
@@ -3577,7 +3577,7 @@ async def init_topup(
     customer_label = user.username or user.email or f"user-{user.id}"
     billing_address = AddressCreate(
         given_name=customer_label,
-        family_name=customer_label,
+        family_name=None,
         email_address=user.email,
     )
     line = LineItemCreate(
