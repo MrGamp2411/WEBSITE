@@ -3,6 +3,7 @@
 - Commit messages subject line must not exceed 30 characters.
 - Notification subject line must not exceed 30 characters.
 - Admin notifications form subject input enforces this with `maxlength=30`.
+- Bar admin edit pages send bar admins back to `/dashboard`; super admins continue to use `/admin/bars` for navigation.
 - Phone validation errors must use English messaging; see `app/phone.py` and `tests/test_register_phone_validation.py`.
 - Dark mode functionality has been removed; the site theme is fixed to light.
 - Product image uploads surface English errors: "No file uploaded", "Uploaded file must be an image", and "File too large (>5MB)".
