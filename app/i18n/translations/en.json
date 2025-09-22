@@ -733,10 +733,12 @@
   },
   "admin_tables": {
     "edit": {
-      "title": "Edit Table for {bar}"
+      "title": "Edit Table for {bar}",
+      "back": "Back to tables"
     },
     "new": {
-      "title": "Add Table for {bar}"
+      "title": "Add Table for {bar}",
+      "back": "Back to tables"
     },
     "form": {
       "labels": {
@@ -751,6 +753,7 @@
     "manage": {
       "title": "Manage Tables for {bar}",
       "subtitle": "Add, edit and organize tables for this venue.",
+      "back": "Back to bar settings",
       "search": {
         "aria": "Search tables",
         "placeholder": "Search tables…",
@@ -780,6 +783,7 @@
   "admin_bar_users": {
     "title": "Manage Users for {bar}",
     "subtitle": "Add or assign staff to this venue.",
+    "back": "Back to bar settings",
     "add_existing": {
       "summary": "Add Existing User",
       "email": "Email",
@@ -849,6 +853,7 @@
   },
   "admin_change_user_password": {
     "title": "Edit Password for {user}",
+    "back": "Back to user settings",
     "form": {
       "new_password": "New Password",
       "confirm_password": "Confirm Password",
@@ -929,6 +934,7 @@
   },
   "admin_edit_user": {
     "title": "Edit User {user}",
+    "back": "Back to users",
     "dialog": {
       "ok": "OK",
       "cancel": "Cancel",
@@ -1031,6 +1037,7 @@
   },
   "admin_edit_bar": {
     "title": "Edit Bar",
+    "back": "Back to bar settings",
     "cards": {
       "details": {
         "title": "Details"
@@ -1161,6 +1168,7 @@
   "admin_new_notification": {
     "title": "New Notification",
     "subtitle": "Send a message to users.",
+    "back": "Back to notifications",
     "form": {
       "target": {
         "label": "Target",
@@ -1228,6 +1236,7 @@
   },
   "admin_new_bar": {
     "title": "Create New Bar",
+    "back": "Back to Bars",
     "form": {
       "name": "Name",
       "address": "Address",
@@ -1259,6 +1268,7 @@
   },
   "admin_edit_welcome": {
     "title": "Edit Welcome Message",
+    "back": "Back to notifications",
     "form": {
       "subject": "Subject",
       "subject_translate_button": "Translate subject",
@@ -1276,6 +1286,7 @@
   "admin_notification_view": {
     "title": "Notification {id}",
     "subtitle": "Details and recipients.",
+    "back": "Back to notifications",
     "actions": {
       "back": "Back",
       "back_to_list": "Back to list"
@@ -1298,6 +1309,12 @@
       },
       "read_yes": "Yes",
       "read_no": "No"
+    }
+  },
+  "admin_order_detail": {
+    "back": {
+      "user": "Back to user",
+      "payments": "Back to payments"
     }
   },
   "admin_payments": {
@@ -1324,6 +1341,7 @@
   "admin_view_user": {
     "title": "User: {user}",
     "subtitle": "Account details and activity.",
+    "back": "Back to users",
     "profile": {
       "title": "Profile",
       "email": "Email:",

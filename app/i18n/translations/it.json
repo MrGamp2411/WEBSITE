@@ -733,10 +733,12 @@
   },
   "admin_tables": {
     "edit": {
-      "title": "Modifica tavolo per {bar}"
+      "title": "Modifica tavolo per {bar}",
+      "back": "Torna ai tavoli"
     },
     "new": {
-      "title": "Aggiungi tavolo per {bar}"
+      "title": "Aggiungi tavolo per {bar}",
+      "back": "Torna ai tavoli"
     },
     "form": {
       "labels": {
@@ -751,6 +753,7 @@
     "manage": {
       "title": "Gestisci tavoli per {bar}",
       "subtitle": "Aggiungi, modifica e organizza i tavoli per questo locale.",
+      "back": "Torna alle impostazioni del locale",
       "search": {
         "aria": "Cerca tavoli",
         "placeholder": "Cerca tavoli…",
@@ -780,6 +783,7 @@
   "admin_bar_users": {
     "title": "Gestisci utenti per {bar}",
     "subtitle": "Aggiungi o assegna lo staff a questo locale.",
+    "back": "Torna alle impostazioni del locale",
     "add_existing": {
       "summary": "Aggiungi utente esistente",
       "email": "Email",
@@ -849,6 +853,7 @@
   },
   "admin_change_user_password": {
     "title": "Modifica password per {user}",
+    "back": "Torna alle impostazioni utente",
     "form": {
       "new_password": "Nuova password",
       "confirm_password": "Conferma password",
@@ -929,6 +934,7 @@
   },
   "admin_edit_user": {
     "title": "Modifica utente {user}",
+    "back": "Torna agli utenti",
     "dialog": {
       "ok": "OK",
       "cancel": "Annulla",
@@ -1031,6 +1037,7 @@
   },
   "admin_edit_bar": {
     "title": "Modifica locale",
+    "back": "Torna alle impostazioni del locale",
     "cards": {
       "details": {
         "title": "Dettagli"
@@ -1161,6 +1168,7 @@
   "admin_new_notification": {
     "title": "Nuova notifica",
     "subtitle": "Invia un messaggio agli utenti.",
+    "back": "Torna alle notifiche",
     "form": {
       "target": {
         "label": "Destinatari",
@@ -1228,6 +1236,7 @@
   },
   "admin_new_bar": {
     "title": "Crea nuovo locale",
+    "back": "Torna ai locali",
     "form": {
       "name": "Nome",
       "address": "Indirizzo",
@@ -1259,6 +1268,7 @@
   },
   "admin_edit_welcome": {
     "title": "Modifica messaggio di benvenuto",
+    "back": "Torna alle notifiche",
     "form": {
       "subject": "Oggetto",
       "subject_translate_button": "Traduci oggetto",
@@ -1276,6 +1286,7 @@
   "admin_notification_view": {
     "title": "Notifica {id}",
     "subtitle": "Dettagli e destinatari.",
+    "back": "Torna alle notifiche",
     "actions": {
       "back": "Indietro",
       "back_to_list": "Torna all'elenco"
@@ -1298,6 +1309,12 @@
       },
       "read_yes": "Sì",
       "read_no": "No"
+    }
+  },
+  "admin_order_detail": {
+    "back": {
+      "user": "Torna all'utente",
+      "payments": "Torna ai pagamenti"
     }
   },
   "admin_payments": {
@@ -1324,6 +1341,7 @@
   "admin_view_user": {
     "title": "Utente: {user}",
     "subtitle": "Dettagli account e attività.",
+    "back": "Torna agli utenti",
     "profile": {
       "title": "Profilo",
       "email": "Email:",

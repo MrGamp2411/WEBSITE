@@ -2,6 +2,11 @@
 {% block content %}
 {% set order_code = order.public_order_code or ('#' ~ order.id) %}
 {% set status_label = order.status|replace('_', ' ')|title %}
+{% if order.customer_id %}
+<a class="back-link" href="/admin/users/view/{{ order.customer_id }}"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_order_detail.back.user', default='Back to user') }}</a>
+{% else %}
+<a class="back-link" href="/admin/payments"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_order_detail.back.payments', default='Back to payments') }}</a>
+{% endif %}
 <h1>{{ _('order_history.card.title', code=order_code, default='Order {code}') }}</h1>
 <div class="order-list">
   <article class="order-card card card--{{ order.status|lower }}" role="article" aria-labelledby="order-{{ order.id }}-title" data-status="{{ order.status }}">

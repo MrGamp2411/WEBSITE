@@ -5,6 +5,7 @@
 {% set default_lang = (available_languages | selectattr('code', 'equalto', default_language) | list | first) %}
 <section class="users-page">
   <header class="users-toolbar">
+    <a class="back-link" href="/admin/notifications"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_new_notification.back', default='Back to notifications') }}</a>
     <div class="title-wrap">
       <h1>{{ _('admin_new_notification.title', default='New Notification') }}</h1>
       <p class="subtitle">{{ _('admin_new_notification.subtitle', default='Send a message to users.') }}</p>
