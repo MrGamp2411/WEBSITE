@@ -1710,6 +1710,7 @@
   "ip_blocked": {
     "title": "Accès réseau bloqué",
     "lead": "Le réseau utilisé pour vous connecter est bloqué sur SiplyGo. Contactez l'assistance et consultez vos notifications pour plus de détails.",
+    "security_notice": "Ce compte a été temporairement bloqué pour des raisons de sécurité. La création de nouveaux comptes ou la connexion à d'autres comptes entraînera le même blocage sur ceux-ci.",
     "support": "Besoin d'aide ? Contactez notre équipe d'assistance à l'adresse <a href=\"mailto:{email}\">{email}</a> ou appelez <a href=\"tel:{phone_tel}\">{phone}</a>.",
     "view_notifications": "Aller aux notifications"
   },
