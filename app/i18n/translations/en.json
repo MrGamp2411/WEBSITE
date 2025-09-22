@@ -1322,12 +1322,13 @@
     "subtitle": "Review bar revenue and closings.",
     "search": {
       "aria": "Search bars",
-      "placeholder": "Search bars by name…",
-      "input_aria": "Search bars by name",
+      "placeholder": "Search bars by name or number…",
+      "input_aria": "Search bars by name or number",
       "clear": "Clear search"
     },
     "table": {
       "headers": {
+        "number": "Number",
         "name": "Name",
         "actions": "Actions"
       }

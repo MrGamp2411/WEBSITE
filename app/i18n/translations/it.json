@@ -1322,12 +1322,13 @@
     "subtitle": "Controlla ricavi e chiusure dei locali.",
     "search": {
       "aria": "Cerca locali",
-      "placeholder": "Cerca locali per nome…",
-      "input_aria": "Cerca locali per nome",
+      "placeholder": "Cerca locali per nome o numero…",
+      "input_aria": "Cerca locali per nome o numero",
       "clear": "Cancella ricerca"
     },
     "table": {
       "headers": {
+        "number": "Numero",
         "name": "Nome",
         "actions": "Azioni"
       }

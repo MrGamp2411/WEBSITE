@@ -1349,12 +1349,13 @@
     "subtitle": "Examiner les revenus et les fermetures du barreau.",
     "search": {
       "aria": "Barres de recherche",
-      "placeholder": "Recherchez les barres par nom…",
-      "input_aria": "Barres de recherche par nom",
+      "placeholder": "Recherchez les barres par nom ou numéro…",
+      "input_aria": "Barres de recherche par nom ou numéro",
       "clear": "Recherche claire"
     },
     "table": {
       "headers": {
+        "number": "Numéro",
         "name": "Nom",
         "actions": "Actes"
       }
