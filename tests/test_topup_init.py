@@ -77,6 +77,12 @@ def test_topup_init_creates_record():
     tx_create = create_kwargs["transaction"]
     assert tx_create.success_url == expected_success
     assert tx_create.failed_url == expected_failed
+    assert tx_create.customer_id == str(user.id)
+    assert tx_create.customer_email_address == user.email
+    assert tx_create.billing_address.given_name == user.username
+    assert tx_create.billing_address.family_name == user.username
+    assert tx_create.billing_address.email_address == user.email
+    assert tx_create.meta_data == {"username": user.username}
     updated = db.query(User).filter(User.id == user.id).first()
     assert float(updated.credit or 0) == 0.0
     db.close()
