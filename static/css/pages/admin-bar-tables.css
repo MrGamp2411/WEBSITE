@@ -1,0 +1,7 @@
+.menu-table .index-col {
+  width: 56px;
+}
+
+.js-delete-table + form[hidden] {
+  display: none;
+}

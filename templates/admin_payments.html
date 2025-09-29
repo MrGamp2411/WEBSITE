@@ -1,4 +1,8 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+{{ super() }}
+<link rel="stylesheet" href="/static/css/pages/admin-payments.css">
+{% endblock %}
 {% block content %}
 <section class="payments-page users-page">
   <header class="payments-toolbar users-toolbar">
@@ -8,7 +12,7 @@
       <p class="subtitle">{{ _('admin_payments.subtitle', default='Review bar revenue and closings.') }}</p>
     </div>
     <div class="toolbar-actions">
-      <form class="payments-search users-search" role="search" aria-label="{{ _('admin_payments.search.aria', default='Search bars') }}" onsubmit="return false">
+      <form class="payments-search users-search js-prevent-submit" role="search" aria-label="{{ _('admin_payments.search.aria', default='Search bars') }}">
         <i class="bi bi-search" aria-hidden="true"></i>
         <input
           id="paymentsSearch"
@@ -45,8 +49,8 @@
               <button type="submit" form="add_test_{{ bar.id }}" class="btn-outline">{{ _('admin_payments.actions.add_test', default='Add Test Closing') }}</button>
               <button type="submit" form="delete_test_{{ bar.id }}" class="btn-danger-soft">{{ _('admin_payments.actions.delete_test', default='Delete Test Closing') }}</button>
             </div>
-            <form id="add_test_{{ bar.id }}" method="post" action="/admin/payments/{{ bar.id }}/test_closing" style="display:none"></form>
-            <form id="delete_test_{{ bar.id }}" method="post" action="/admin/payments/{{ bar.id }}/test_closing/delete" style="display:none"></form>
+            <form id="add_test_{{ bar.id }}" method="post" action="/admin/payments/{{ bar.id }}/test_closing" class="test-closing-form"></form>
+            <form id="delete_test_{{ bar.id }}" method="post" action="/admin/payments/{{ bar.id }}/test_closing/delete" class="test-closing-form"></form>
           </td>
         </tr>
 {% endfor %}

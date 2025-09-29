@@ -1,4 +1,8 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+{{ super() }}
+<link rel="stylesheet" href="/static/css/pages/admin-view-user.css">
+{% endblock %}
 {% block content %}
 <section class="users-page">
   <header class="users-toolbar">
@@ -22,7 +26,7 @@
 
   <h2>{{ _('admin_view_user.updates.title', default='Profile updates') }}</h2>
   <p class="subtitle">{{ _('admin_view_user.updates.subtitle', default='Detailed history of profile edits.') }}</p>
-  <div class="table-card" style="max-height:300px; overflow-y:auto;">
+  <div class="table-card table-card--scroll">
     <table class="users-table">
       <thead>
         <tr>
@@ -50,7 +54,7 @@
 
   <h2>{{ _('admin_view_user.orders.title', default='Orders') }}</h2>
   <p class="subtitle">{{ _('admin_view_user.orders.subtitle', default='Most recent first. Scroll to view older orders.') }}</p>
-  <div class="table-card" style="max-height:300px; overflow-y:auto;">
+  <div class="table-card table-card--scroll">
     <table class="users-table">
       <thead>
         <tr>
@@ -86,7 +90,7 @@
 
   <h2>{{ _('admin_view_user.logins.title', default='Login Activity') }}</h2>
   <p class="subtitle">{{ _('admin_view_user.logins.subtitle', default='Most recent first. Scroll to view older logins.') }}</p>
-  <div class="table-card" style="max-height:300px; overflow-y:auto;">
+  <div class="table-card table-card--scroll">
     <table class="users-table">
       <thead>
         <tr>
@@ -114,7 +118,7 @@
 
   <h2>{{ _('admin_view_user.audit.title', default='Audit Logs') }}</h2>
   <p class="subtitle">{{ _('admin_view_user.audit.subtitle', default='Most recent first. Scroll to view older logs.') }}</p>
-  <div class="table-card" style="max-height:300px; overflow-y:auto;">
+  <div class="table-card table-card--scroll">
     <table class="users-table">
       <thead>
         <tr>

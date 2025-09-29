@@ -1,8 +1,13 @@
 (function(){
+  const searchForm = document.querySelector('.menu-search.js-prevent-submit');
   const input = document.getElementById('tableSearch');
   const clearBtn = document.querySelector('.menu-search .clear');
   const tbody = document.querySelector('.menu-table tbody');
   if(!input || !tbody) return;
+
+  searchForm?.addEventListener('submit', event => {
+    event.preventDefault();
+  });
 
   const rows = Array.from(tbody.rows);
   const normalise = value => (value || '')

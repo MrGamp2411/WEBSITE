@@ -153,7 +153,7 @@
   - Admin Manage Bars page uses `templates/admin_bars.html` with `.bars-page` styles in `static/css/components.css`. The page header stacks the title above the search and Add Bar controls
 - Admin Manage Bars page includes a client-side name search via `#barsSearch`
 - Admin Manage Bars actions use uppercase text-only pill buttons that expand to fit text; links and buttons inherit the base font so Delete matches Edit sizing while employing a brighter `.btn-danger-soft` red to deter accidental clicks
-- Admin Manage Payments page uses `templates/admin_payments.html`, reusing the `.users-page` layout classes (`.users-toolbar`, `.users-search`, `.users-table`) alongside `.payments-page` for admin tweaks. It includes a client-side bar search via `#paymentsSearch` and grouped action pills (`.btn-outline` for View/Add Test Closing, `.btn-danger-soft` for Delete Test Closing). The page header stacks the title above the search controls
+- Admin Manage Payments page uses `templates/admin_payments.html`, reusing the `.users-page` layout classes (`.users-toolbar`, `.users-search`, `.users-table`) alongside `.payments-page` for admin tweaks. It includes a client-side bar search via `#paymentsSearch` and grouped action pills (`.btn-outline` for View/Add Test Closing, `.btn-danger-soft` for Delete Test Closing). The page header stacks the title above the search controls, and the template imports `/static/css/pages/admin-payments.css` to keep auxiliary test-closing forms hidden.
 - Admin Audit Logs page uses `templates/admin_audit_logs.html` with `.users-page` layout and filters for username, bar name, and action. Username and bar searches submit on Enter; the action dropdown submits on change. The table shows usernames and bar names instead of numeric IDs.
 - Admin Manage Categories page uses `templates/bar_manage_categories.html` with `.menu-page` styles in `static/css/components.css`, a client-side category search via `#categorySearch`, and grouped uppercase action pills (`.btn-outline` for Products and Edit, `.btn-danger-soft` for Delete). The page header stacks the title above the search and Add Category controls
 - Category edit and create forms live in `templates/bar_edit_category.html` and `templates/bar_new_category.html`; both now expose translation panels for name and description that post `name_<lang>` and `description_<lang>` inputs alongside the base fields.
@@ -194,7 +194,7 @@
   - Open status uses `.status-open` (green) and closed status uses `.status-closed` (red)
   - Bar ordering pause state stored in `bars.ordering_paused` (BOOLEAN, defaults to FALSE)
   - Bar edit options page links to table management (`templates/admin_bar_tables.html`) where staff can add, edit, and delete tables. Add and edit forms live in `templates/admin_bar_new_table.html` and `templates/admin_bar_edit_table.html`; table descriptions use a `<textarea>` styled by the `.form textarea` rule and are for staff only
-  - Admin Manage Tables page uses `templates/admin_bar_tables.html` with `.menu-page` styles, a client-side table search via `#tableSearch`, and grouped action pills (`.btn-outline` for Edit, `.btn-danger-soft` for Delete)
+  - Admin Manage Tables page uses `templates/admin_bar_tables.html` with `.menu-page` styles, a client-side table search via `#tableSearch`, and grouped action pills (`.btn-outline` for Edit, `.btn-danger-soft` for Delete). The template imports `/static/css/pages/admin-bar-tables.css` to size the index column and keep delete forms hidden until triggered.
   - Deleting a table triggers a confirmation popup using `.cart-blocker` and `.cart-popup` like other admin pages
   - Edit Bar options UI uses `templates/admin_edit_bar_options.html` with `.bar-edit-page` and `.action-card` links in a 2-column grid (1 column on mobile)
 - Products:
@@ -253,7 +253,7 @@
 - Admin users list loads each user's `bar_id` and `credit` directly from the database so assignments survive restarts
 - Admin user edits update passwords and refresh user caches so new assignments replace old data
 - Admin Manage Users page uses `templates/admin_users.html` with `.users-page` styles, a client-side username/email search via `#userSearch`, and grouped action pills (`View`, `Edit`) in each row
-- Super admins can open `/admin/users/view/{id}` rendered by `templates/admin_view_user.html` to review a user's profile, orders, and audit logs
+- Super admins can open `/admin/users/view/{id}` rendered by `templates/admin_view_user.html` to review a user's profile, orders, and audit logs. The template imports `/static/css/pages/admin-view-user.css` so history tables stay scrollable without inline styles.
 - The Orders table on this view displays each order's `public_order_code` or `#id` in the ID column to match order card formatting
 - Admin user view lists orders and audit logs in fixed-height scrollable tables so longer histories don't stretch the page
 - Admin user view also shows login activity with IP, user agent, phone, location, and date in a scrollable table
