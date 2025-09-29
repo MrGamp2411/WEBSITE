@@ -1,4 +1,8 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+{{ super() }}
+<link rel="stylesheet" href="/static/css/pages/admin-new-notification.css">
+{% endblock %}
 {% block content %}
 {% set subject_map = subject_translations if subject_translations is defined else {} %}
 {% set body_map = body_translations if body_translations is defined else {} %}
@@ -14,7 +18,15 @@
   {% if error %}
   <p class="alert-danger">{{ error }}</p>
   {% endif %}
-  <form class="form" method="post" action="/admin/notifications" enctype="multipart/form-data">
+  <form id="notificationForm"
+        class="form"
+        method="post"
+        action="/admin/notifications"
+        enctype="multipart/form-data"
+        data-select-user="{{ _('admin_new_notification.alerts.select_user', default='Please select a user.') }}"
+        data-select-bar="{{ _('admin_new_notification.alerts.select_bar', default='Please select a bar.') }}"
+        data-select-label="{{ _('admin_new_notification.actions.select', default='Select') }}"
+        data-selected-label="{{ _('admin_new_notification.actions.selected', default='Selected') }}">
     <label>{{ _('admin_new_notification.form.target.label', default='Target') }}
       <select name="target" id="target" required>
         <option value="all">{{ _('admin_new_notification.form.target.options.all', default='All Users') }}</option>
@@ -135,85 +147,5 @@
 
 {% block scripts %}
 {{ super() }}
-<script>
-(function(){
-  const target = document.getElementById('target');
-  const userSection = document.getElementById('userSection');
-  const barSection = document.getElementById('barSection');
-  const userInput = document.getElementById('user_id');
-  const barInput = document.getElementById('bar_id');
-  const form = document.querySelector('form');
-  const texts = {{ {
-    'select_user': _('admin_new_notification.alerts.select_user', default='Please select a user.'),
-    'select_bar': _('admin_new_notification.alerts.select_bar', default='Please select a bar.'),
-    'select': _('admin_new_notification.actions.select', default='Select'),
-    'selected': _('admin_new_notification.actions.selected', default='Selected')
-  }|tojson }};
-  function updateTarget(){
-    const val = target.value;
-    userSection.hidden = val !== 'user';
-    barSection.hidden = val !== 'bar';
-    userInput.disabled = val !== 'user';
-    barInput.disabled = val !== 'bar';
-    if(val !== 'user') userInput.value = '';
-    if(val !== 'bar') barInput.value = '';
-  }
-  target.addEventListener('change', updateTarget);
-  updateTarget();
-  form.addEventListener('submit', e => {
-    const val = target.value;
-    if((val === 'user' && !userInput.value) || (val === 'bar' && !barInput.value)){
-      e.preventDefault();
-      alert(val === 'user' ? texts.select_user : texts.select_bar);
-    }
-  });
-  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
-  function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms);}}
-  function setupSearch(input, tbody){
-    if(!input) return;
-    const apply = () => {
-      const q = norm(input.value);
-      Array.from(tbody.querySelectorAll('tr')).forEach(tr=>{
-        const name = tr.dataset.name || '';
-        tr.style.display = !q || norm(name).includes(q) ? '' : 'none';
-      });
-    };
-    input.addEventListener('input', debounce(apply,120));
-    input.closest('.users-search, .bars-search')?.querySelector('.clear')?.addEventListener('click', () => {
-      input.value=''; apply(); input.focus();
-    });
-  }
-  setupSearch(document.getElementById('userSearch'), document.getElementById('userRows'));
-  setupSearch(document.getElementById('barSearch'), document.getElementById('barRows'));
-  document.getElementById('userRows')?.addEventListener('click', e => {
-    const btn = e.target.closest('.js-pick-user');
-    if(!btn) return;
-    e.preventDefault();
-    userInput.value = btn.dataset.userId;
-    document.querySelectorAll('.js-pick-user').forEach(b=>b.textContent=texts.select);
-    btn.textContent=texts.selected;
-  });
-  document.getElementById('barRows')?.addEventListener('click', e => {
-    const btn = e.target.closest('.js-pick-bar');
-    if(!btn) return;
-    e.preventDefault();
-    barInput.value = btn.dataset.barId;
-    document.querySelectorAll('.js-pick-bar').forEach(b=>b.textContent=texts.select);
-    btn.textContent=texts.selected;
-  });
-})();
-</script>
-{% endblock %}
-
-{% block styles %}
-{{ super() }}
-<style>
-.translation-panel{border:1px dashed rgba(15,23,42,.25);border-radius:12px;padding:16px;margin-bottom:var(--space-3,12px);display:flex;flex-direction:column;gap:12px;}
-.translation-panel label{display:flex;flex-direction:column;font-weight:500;gap:6px;}
-.translation-panel input,.translation-panel textarea{width:100%;}
-.translation-panel textarea{min-height:96px;}
-.translation-help{margin:0;font-size:.9rem;opacity:.75;}
-.translation-note{margin:0;font-size:.85rem;color:#475569;}
-.translation-label{margin:0;font-weight:600;}
-</style>
+<script src="/static/js/admin-new-notification.js" defer></script>
 {% endblock %}

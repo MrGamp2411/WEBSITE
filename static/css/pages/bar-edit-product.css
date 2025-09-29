@@ -1,0 +1,54 @@
+.product-edit {
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.product-edit .card {
+  max-height: none;
+}
+
+.product-edit .card__body {
+  display: flex;
+}
+
+.product-edit .form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5, 24px);
+  width: 100%;
+}
+
+.product-edit .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 12px);
+}
+
+.product-edit .field-action {
+  align-self: flex-start;
+}
+
+.product-edit .locked-field .description-preview {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-xl, 16px);
+  background: var(--surface-strong, #f3f4f6);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.product-edit .locked-field .description-preview:empty::before {
+  content: "";
+}
+
+.product-edit .photo-preview {
+  border-radius: var(--radius-xl, 16px);
+  overflow: hidden;
+  max-width: 200px;
+}
+
+.product-edit .photo-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
