@@ -39,7 +39,7 @@
         <tr>
           <td>{{ product.display_order }}</td>
           <td>
-            <img src="{{ product.photo_url }}" alt="{{ product_name(product) }} photo" width="50" height="28" loading="lazy" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
+            <img src="{{ product.photo_url }}" alt="{{ product_name(product) }} photo" width="50" height="28" loading="lazy" data-fallback-src="{{ fallback_img }}">
           </td>
           <td>{{ product_name(product) }}</td>
           <td>{{ product_description(product) }}</td>
@@ -77,6 +77,7 @@
 
 {% block scripts %}
 {{ super() }}
+<script src="/static/js/image-fallback.js" defer></script>
 <script src="/static/js/bar-category-products.js" defer></script>
 {% endblock %}
 
