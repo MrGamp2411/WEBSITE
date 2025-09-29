@@ -34,7 +34,9 @@
 - Horizontal scrolling is locked with `overflow-x: clip` on `html, body`, and header width uses `100%` to avoid viewport overflow.
 - Body uses a column flex layout with `min-height: 100dvh` and grows `<main>` so the footer always anchors to the bottom even on sparse pages.
 - Display orders page uses `/static/css/pages/display-orders.css` for layout adjustments and `/static/js/display-page.js` to bootstrap `initDisplay` via the `data-bar-id` attribute.
+- Bartender and bar admin order dashboards share `/static/css/pages/bar-orders.css` for layout and `/static/js/bar-orders.js` to bootstrap `initBartender` (reading the `data-bar-id` attribute) and handle pause toggles.
 - Admin payments search logic now lives in `/static/js/admin-payments.js`; templates only render markup.
+- Admin users search filtering now runs through `/static/js/admin-users.js` loaded with `defer`.
 - Registration username lowercase enforcement is handled by `/static/js/register.js` loaded with `defer`.
 - Registration is a two-step flow. `/register` collects email and password and assigns a temporary `REGISTERING` role. Users are redirected to `/register/details` to supply username, phone prefix, and number, and cannot access other pages until this step completes.
   - Once step two succeeds and the role becomes `CUSTOMER`, the user stays signed in and is redirected to the homepage (`/`).
