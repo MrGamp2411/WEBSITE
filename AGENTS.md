@@ -20,6 +20,9 @@
   - `templates/bar_edit_category.html` imports `/static/css/pages/bar-edit-category.css`.
   - `templates/bar_edit_category_description.html`, `templates/bar_edit_category_name.html`, and `templates/bar_edit_product_description.html` import `/static/css/pages/translation-editor.css`.
   - `templates/bar_manage_categories.html` imports `/static/css/pages/bar-manage-categories.css` and `/static/js/bar-manage-categories.js`.
+  - `templates/admin_edit_bar_description.html` imports `/static/css/pages/admin-edit-bar-description.css`.
+  - `templates/admin_analytics.html` imports `/static/css/pages/admin-analytics.css` and `/static/js/admin-analytics.js` (Chart.js stays on the CDN and page data hydrates via `#adminAnalyticsData`).
+  - `templates/admin_notifications.html` imports `/static/js/admin-notifications.js` for delete confirmation handling.
 - Footer marketing pages (About, Help Center, For Bars, Terms) live in `templates/about.html`, `templates/help_center.html`, `templates/for_bars.html`, and `templates/terms.html`; they share the `.static-page` styles defined in `static/css/components.css`.
   - Support contact details for these static pages pull from Jinja globals defined in `main.py` (`SUPPORT_EMAIL`, `SUPPORT_NUMBER`, `TERMS_VERSION`, etc.); update those constants to change emails, phone numbers, or term dates sitewide.
   - The About page intro copy reads "Built and operated by Siply..." followed by "We’re building a modern ordering experience..." to highlight Siply's role and hospitality focus.
