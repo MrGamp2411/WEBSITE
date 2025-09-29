@@ -1,4 +1,8 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+{{ super() }}
+<link rel="stylesheet" href="/static/css/pages/admin-edit-welcome.css">
+{% endblock %}
 {% block content %}
 {% set subject_map = subject_translations if subject_translations is defined else {} %}
 {% set body_map = body_translations if body_translations is defined else {} %}
@@ -41,44 +45,9 @@
     <button class="btn btn--primary" type="submit">{{ _('admin_edit_welcome.form.save', default='Save') }}</button>
   </form>
 </section>
-<style>
-.translation-control{display:flex;flex-direction:column;gap:8px;margin-bottom:var(--space-3,12px);}
-.translation-control label{flex:1;}
-.translation-toggle{align-self:flex-start;margin-top:auto;}
-.translation-panel{border:1px dashed rgba(15,23,42,.25);border-radius:12px;padding:16px;margin-bottom:var(--space-3,12px);display:flex;flex-direction:column;gap:12px;}
-.translation-panel label{display:flex;flex-direction:column;font-weight:500;gap:6px;}
-.translation-panel input,.translation-panel textarea{width:100%;}
-.translation-panel textarea{min-height:96px;}
-.translation-help{margin:0;font-size:.9rem;opacity:.75;}
-.translation-note{margin:0;font-size:.85rem;color:#475569;}
-.translation-label{margin:0;font-weight:600;}
-@media (min-width:600px){
-  .translation-control{flex-direction:row;align-items:flex-end;}
-  .translation-control label{flex:1;}
-  .translation-toggle{margin-left:16px;}
-}
-</style>
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.translation-toggle').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const targetId = btn.getAttribute('data-translation-target');
-        const target = targetId ? document.getElementById(targetId) : null;
-        if (!target) return;
-        const expanded = btn.getAttribute('aria-expanded') === 'true';
-        const next = !expanded;
-        btn.setAttribute('aria-expanded', String(next));
-        if (next) {
-          target.removeAttribute('hidden');
-        } else {
-          target.setAttribute('hidden', '');
-        }
-      });
-    });
-  });
-</script>
+<script src="/static/js/admin-edit-welcome.js" defer></script>
 {% endblock %}

@@ -1,13 +1,17 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+{{ super() }}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="/static/css/pages/admin-edit-bar.css">
+{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <section class="editbar">
   <a class="back-link" href="{{ '/dashboard' if user and user.is_bar_admin else '/admin/bars/edit/' ~ bar.id }}"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_edit_bar.back', default='Back to bar settings') }}</a>
   <h1>{{ _('admin_edit_bar.title', default='Edit Bar') }}</h1>
   {% if error %}<p class="error">{{ error }}</p>{% endif %}
 
   <div class="card map-card">
-    <div id="map" style="height:400px;"></div>
+    <div id="map" data-initial-lat="{{ bar.latitude }}" data-initial-lng="{{ bar.longitude }}"></div>
   </div>
 
   <form method="post" action="/admin/bars/edit/{{ bar.id }}/info" enctype="multipart/form-data" class="editbar-form">
@@ -140,103 +144,10 @@
     </div>
   </form>
 </section>
-<style>
-.description-field .description-preview{
-  margin:0 0 12px;
-  padding:12px 16px;
-  border-radius:var(--radius-xl,16px);
-  background:var(--surface-strong,#f3f4f6);
-  font-size:0.95rem;
-  line-height:1.5;
-}
-.description-field .description-preview:empty::before{
-  content:"";
-}
-</style>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-  const initialLat = {{ bar.latitude }};
-  const initialLng = {{ bar.longitude }};
-  const map = L.map('map').setView([initialLat, initialLng], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '© OpenStreetMap contributors'
-  }).addTo(map);
-  const marker = L.marker([initialLat, initialLng], {draggable:true}).addTo(map);
-  function updateInputs(e) {
-    const pos = e.target.getLatLng();
-    document.getElementById('latitude').value = pos.lat.toFixed(6);
-    document.getElementById('longitude').value = pos.lng.toFixed(6);
-  }
-  marker.on('dragend', updateInputs);
-  updateInputs({target: marker});
-</script>
-<script>
-(function(){
-  // --- Categories max 5 ---
-  const select = document.getElementById('categoriesNative');
-  const mount  = document.getElementById('categoriesChips');
-  const countEl= document.getElementById('catCount');
-  const countTemplate = countEl?.dataset.template || '{selected}/{max}';
-  const countMax = Number(countEl?.dataset.max || 5);
-  if(select && mount){
-    const MAX = countMax || 5;
-    const all = Array.from(select.options).map(o=>({ value:o.value, label:o.text, selected:o.selected }));
-    const selectedCount = ()=> all.filter(i=>i.selected).length;
-
-    function syncSelect(){
-      all.forEach(i=>{
-        const opt = Array.from(select.options).find(o=>o.value===i.value);
-        if(opt) opt.selected = i.selected;
-      });
-    }
-    function render(){
-      mount.innerHTML = '';
-      const cnt = selectedCount();
-      if(countEl) countEl.textContent = countTemplate.replace('{selected}', cnt).replace('{max}', MAX);
-      const limitReached = cnt >= MAX;
-
-      all.forEach(item=>{
-        const b = document.createElement('button');
-        b.type='button';
-        b.className='chip-btn';
-        b.setAttribute('aria-pressed', item.selected ? 'true' : 'false');
-        b.textContent = item.label;
-
-        // disabilita i NON selezionati quando raggiunto il limite
-        if(limitReached && !item.selected){ b.disabled = true; }
-
-        b.addEventListener('click', ()=>{
-          if(!item.selected && selectedCount() >= MAX) return; // hard stop
-          item.selected = !item.selected;
-          syncSelect();
-          render();
-        });
-
-        b.addEventListener('keydown', (e)=>{
-          if(e.key==='Enter' || e.key===' '){ e.preventDefault(); b.click(); }
-        });
-
-        mount.appendChild(b);
-      });
-    }
-    render();
-  }
-
-  // --- Close bar manually: dis/abilita gli input time ---
-  const closeCb = document.getElementById('manual_closed');
-  const hoursWrap = document.querySelector('.hours-table');
-  function applyHoursDisabled(){
-    if(!hoursWrap || !closeCb) return;
-    const disabled = closeCb.checked;
-    hoursWrap.classList.toggle('hours-disabled', disabled);
-    hoursWrap.querySelectorAll('input[type="time"]').forEach(el=>{ el.disabled = disabled; });
-  }
-  if(closeCb){
-    applyHoursDisabled();
-    closeCb.addEventListener('change', applyHoursDisabled);
-  }
-})();
-</script>
 {% endblock %}
 
+{% block scripts %}
+{{ super() }}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/js/admin-edit-bar.js" defer></script>
+{% endblock %}
