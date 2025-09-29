@@ -1,0 +1,42 @@
+.category-edit {
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.category-edit .card {
+  max-height: none;
+}
+
+.category-edit .card__body {
+  display: flex;
+}
+
+.category-edit .form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5, 24px);
+  width: 100%;
+}
+
+.category-edit .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 12px);
+}
+
+.category-edit .field-action {
+  align-self: flex-start;
+}
+
+.category-edit .locked-field .description-preview {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-xl, 16px);
+  background: var(--surface-strong, #f3f4f6);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.category-edit .locked-field .description-preview:empty::before {
+  content: "";
+}
