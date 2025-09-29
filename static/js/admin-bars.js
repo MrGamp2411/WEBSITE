@@ -31,6 +31,9 @@
   const runFilter = debounce(applyFilter, 120);
 
   input.addEventListener('input', runFilter);
+  document.querySelector('.bars-search')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+  });
   document.querySelector('.bars-search .clear')?.addEventListener('click', () => {
     input.value = '';
     applyFilter();

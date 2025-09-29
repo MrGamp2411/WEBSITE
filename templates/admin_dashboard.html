@@ -77,12 +77,22 @@
       <article class="card quick-card danger"><!-- CHANGED -->
         <h3 class="card-title"><i class="bi bi-exclamation-octagon"></i> {{ _('admin_dashboard.cards.danger.title', default='Danger Zone') }}</h3>
         <p>{{ _('admin_dashboard.cards.danger.description', default='Delete all orders for a clean slate.') }}</p><!-- CHANGED -->
-        <form method="post" action="/admin/orders/clear" onsubmit="return confirm({{ _('admin_dashboard.danger.confirm', default='Delete all orders?')|tojson }});">
+        <form
+          method="post"
+          action="/admin/orders/clear"
+          class="admin-dashboard__clear-orders"
+          data-confirm-message="{{ _('admin_dashboard.danger.confirm', default='Delete all orders?')|e }}"
+        >
           <button class="btn btn--danger" type="submit">{{ _('admin_dashboard.cards.danger.action', default='Delete All Orders') }}</button>
         </form>
       </article>
     </div>
   </section>
 </section>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="/static/js/admin-dashboard.js" defer></script>
 {% endblock %}
 
