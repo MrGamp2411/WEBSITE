@@ -1,110 +1,192 @@
-# SiplyGo Prototype
+# SiplyGo Platform Manual
 
-This project is a FastAPI prototype. This update adds initial database scaffolding
-using SQLAlchemy and a Docker Compose setup with PostgreSQL.
+SiplyGo is a FastAPI-powered web platform that demonstrates a premium bar ordering workflow with rich admin tooling, multilingual content, wallet management, and payment integrations. This document acts as the single source of truth for developers and operators: it explains how to run the stack, describes every user-facing feature, summarises critical modules and variables, and links the templates, stylesheets, and scripts that power each page.
 
-## Running with Docker Compose
+## Table of contents
+- [Project overview](#project-overview)
+- [Architecture](#architecture)
+- [Running the application](#running-the-application)
+  - [Environment variables](#environment-variables)
+  - [Local Python workflow](#local-python-workflow)
+  - [Docker Compose](#docker-compose)
+  - [Database migrations](#database-migrations)
+  - [Tests and linters](#tests-and-linters)
+- [Domain features](#domain-features)
+  - [Global layout and localisation](#global-layout-and-localisation)
+  - [Visitor and customer experience](#visitor-and-customer-experience)
+  - [Account management](#account-management)
+  - [Ordering, cart, and payments](#ordering-cart-and-payments)
+  - [Wallet and top-ups](#wallet-and-top-ups)
+  - [Notifications system](#notifications-system)
+  - [Bar administration](#bar-administration)
+  - [Staff operations](#staff-operations)
+  - [Super admin console](#super-admin-console)
+- [Background services and utilities](#background-services-and-utilities)
+- [Static assets](#static-assets)
+- [Data model reference](#data-model-reference)
+- [Support and constants](#support-and-constants)
 
-1. Ensure the environment variables `POSTGRES_USER`,
-   `POSTGRES_PASSWORD`, and `POSTGRES_DB` are set. `DATABASE_URL` will be
-   automatically constructed from these values (override it to use an
-   external database). Optionally set `POSTGRES_HOST` if the database is
-   not reachable via the default `postgres` hostname.
-2. Start the containers:
+## Project overview
+- **Framework**: FastAPI with Jinja2 templates for server-rendered views and Starlette middleware for sessions and localisation. 【F:main.py†L40-L77】【F:main.py†L740-L806】
+- **Persistence**: PostgreSQL (or SQLite for tests) via SQLAlchemy ORM; Alembic handles schema migrations. 【F:database.py†L1-L39】【F:alembic.ini†L1-L68】
+- **Frontend**: Progressive enhancement with vanilla JavaScript modules under `static/js`, scoped CSS under `static/css`, and responsive layout tokens in `static/css/tokens.css`. 【F:static/js/cart.js†L1-L20】【F:static/css/tokens.css†L1-L80】
+- **Payments**: Wallet credit, card payments, and Wallee webhook handling for order fulfilment and top-ups. 【F:main.py†L3430-L3519】【F:app/webhooks/wallee.py†L1-L157】
+- **Testing**: Comprehensive pytest suite covering flows from registration and ordering to admin analytics, notifications, and payouts. 【F:tests/test_admin_analytics.py†L1-L36】【F:tests/test_checkout_with_outdated_orders_table.py†L1-L62】
 
-```
-docker compose up --build
-```
+## Architecture
+| Layer | Files | Responsibility |
+| ----- | ----- | -------------- |
+| Application entry | `main.py` | Route handlers, session cart logic, WebSocket push updates, background tasks, admin workflows, and HTML rendering. 【F:main.py†L2414-L7892】 |
+| Data access | `models.py`, `database.py` | SQLAlchemy models for users, bars, menu items, orders, payments, wallet events, notifications, audits, and bar staffing plus database session helpers. 【F:models.py†L17-L402】 |
+| Business logic | `finance.py`, `payouts.py`, `audit.py`, `app/phone.py`, `app/utils/disposable_email.py` | Platform fee maths, payout scheduling, audit logging, phone validation, and disposable email enforcement. 【F:finance.py†L1-L27】【F:payouts.py†L1-L47】【F:audit.py†L1-L34】【F:app/phone.py†L1-L53】【F:app/utils/disposable_email.py†L5-L94】 |
+| Localisation | `app/i18n` | Language detection, translation helpers, and JSON resource management for English, Italiano, Français, and Deutsch. 【F:app/i18n/__init__.py†L4-L127】 |
+| Payments integration | `app/webhooks/wallee.py`, `app/wallee_client.py` | Wallee transaction verification and webhook processing for orders and wallet top-ups. 【F:app/webhooks/wallee.py†L1-L248】 |
+| CLI and scripts | `app/scripts` | Database utilities (e.g. seeding, maintenance scripts). |
 
-The app will then be available at http://localhost:8000.
+## Running the application
 
-## Database
+### Environment variables
+Configure the application via environment variables. Unless noted, defaults follow the development profile. 【F:README.md†L42-L93】【F:main.py†L52-L76】【F:main.py†L758-L806】【F:main.py†L938-L943】【F:main.py†L1609-L1643】【F:main.py†L3531-L3539】
 
-- Models are defined in `models.py`.
-- Database engine and session helpers live in `database.py`.
-- Tables are created on startup if they do not yet exist.
+| Variable | Purpose | Default |
+| -------- | ------- | ------- |
+| `DATABASE_URL` | SQLAlchemy connection string. Autogenerated from Postgres variables when omitted. | _required unless Postgres trio provided_ |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `POSTGRES_HOST`, `POSTGRES_PORT` | Compose `DATABASE_URL` automatically. | `postgres` host, `5432` port |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Seed credentials for the SuperAdmin account. | `admin@example.com`, `ChangeMe!123` |
+| `SUPPORT_EMAIL`, `SUPPORT_NUMBER` | Support contact exposed in static pages and footer. | `support@siplygo.example.com`, `+41 91 555 01 23` |
+| `FRONTEND_ORIGINS` | Allowed CORS origins for API requests. | `http://localhost:5173` |
+| `BAR_TIMEZONE` / `TZ` | Timezone used when computing “open now”, schedules, and order codes. | System TZ |
+| `PASSWORD_PEPPER` | Extra hash pepper appended before Argon2 hashing. | `""` |
+| `CURRENCY` | ISO currency code displayed in wallet, checkout, and reporting. | `CHF` |
+| `WALLEE_SPACE_ID`, `WALLEE_USER_ID`, `WALLEE_API_SECRET`, `WALLEE_VERIFY_SIGNATURE` | Wallee API credentials and webhook signature toggle. | Signature verification on |
+| `DISPOSABLE_EMAIL_ENFORCE`, `DISPOSABLE_DOMAIN_URLS`, `DISPOSABLE_CACHE_TTL_MIN`, `DISPOSABLE_LOCAL_PATH` | Disposable-email guard configuration. | Enforced, 360-minute cache |
+| `ENV` | Environment label (dev/staging/prod). | `dev` |
+| `BASE_URL` | Public base URL used in payment callbacks. | unset |
 
-This is a starting point for adding persistent storage and role-based features.
+### Local Python workflow
+1. Install Python 3.11+ and create a virtual environment.
+2. Install dependencies: `pip install -r requirements.txt`.
+3. Export the environment variables listed above.
+4. Run migrations (see below) then start the server: `uvicorn main:app --reload`.
+5. Visit `http://localhost:8000` for the full web experience. 【F:README.md†L95-L106】
 
-## Timezone
+### Docker Compose
+1. Set the Postgres and application environment variables in a `.env` file or shell.
+2. Build and start services: `docker compose up --build`.
+3. The FastAPI server listens on `http://localhost:8000`. Postgres data is persisted in the `postgres_data` volume. 【F:docker-compose.yml†L1-L19】
 
-Opening hours are evaluated in the timezone specified by the
-`BAR_TIMEZONE` environment variable (or `TZ` if set). Ensure this variable
-matches your local timezone (e.g. `Europe/Rome`) so the "open now" status
-reflects your local time.
+### Database migrations
+- Initialise Alembic once via `alembic upgrade head` (bundled migrations live in `alembic/versions`).
+- Generate new migrations with `alembic revision --autogenerate -m "describe change"`.
+- Tests automatically create and drop tables against an in-memory SQLite database. 【F:alembic/env.py†L1-L108】【F:tests/conftest.py†L1-L60】
 
-## API
+### Tests and linters
+- Execute the full regression suite: `pytest`. 【F:tests/test_checkout_failed_redirect.py†L1-L64】
+- Individual modules include inline doctest-friendly examples; run `pytest path/to/test_file.py` to focus on a feature. 【F:tests/test_register_phone_validation.py†L1-L58】
 
-The application exposes minimal database-backed endpoints to illustrate
-integration:
+## Domain features
 
-- `GET /api/bars` – list bars stored in the PostgreSQL database.
-- `POST /api/bars` – create a new bar by providing `name` and `slug`.
-- `POST /api/orders` – create an order and automatically compute VAT,
-  the 5% platform fee and the payout due to the bar.
-- `POST /api/payouts/run` – aggregate completed orders for a bar within a
-  date range and create a payout entry. Each invocation is recorded in the
-  `audit_logs` table for traceability.
-  - `GET /admin/analytics` – analytics dashboard with multi-tab layout
-    exposing KPIs for orders, revenue breakdowns, top products, client
-    metrics, payouts and refunds.
+### Global layout and localisation
+- `templates/layout.html` defines the responsive shell: header, language picker, notification badge, session flash handling, and footer. JavaScript bootstraps state via `static/js/layout.js` before `static/js/app.min.js` initialises dynamic behaviours. 【F:templates/layout.html†L1-L210】【F:static/js/layout.js†L1-L120】
+- Language resolution honours `?lang=`, session preference, and the `Accept-Language` header; translations live in `app/i18n/translations/*.json`. 【F:app/i18n/__init__.py†L50-L123】
+- Support contact cards on static marketing pages pull from `SUPPORT_EMAIL`, `SUPPORT_NUMBER`, `TERMS_VERSION`, and `TERMS_*` constants in `main.py`. 【F:main.py†L44-L71】【F:templates/about.html†L1-L160】
 
-## Environment Variables
+### Visitor and customer experience
+| Route | Template | Assets | Description |
+| ----- | -------- | ------ | ----------- |
+| `/` | `home.html` | `static/js/home.js`, `static/css/components.css` | Hero with language-aware copy, featured bars, and “Browse bars” CTA. | 
+| `/about`, `/help-center`, `/for-bars`, `/terms` | `about.html`, `help_center.html`, etc. | Shared `.static-page` styling | Marketing and legal content fed by translations and support constants. |
+| `/search` | `search.html` | `static/js/search.js` | Filtered bar directory with distance, rating, and open-status chips. |
+| `/bars` | `all_bars.html` | `static/js/view-all.js` | Admin-curated list of every active bar. |
+| `/bars/{id}` | `bar_detail.html` | `static/js/bar-detail.js` | Category tabs, product lists, stock status badges, and add-to-cart controls. |
+| `/cart` | `cart.html` | `static/js/cart.js` | Session cart overview, quantity adjustment, notes, and table selection status. |
+| `/cart/select_table` | `cart.html` | `static/js/cart.js` | Inline modal for choosing tables defined for a bar. |
+| `/cart/checkout` | Redirect to `order_success.html` | - | Validates cart, processes card/wallet payments, writes orders, clears cart. |
+| `/orders` | `order_history.html` | `static/js/order-history.js`, `static/js/orders.js` | Displays order timeline, allows reorder, exports invoice-friendly details. |
+| `/order_success` | `order_success.html` | - | Confirmation with translated summaries, totals, and wallet balance reminders. |
 
-The application reads its configuration from environment variables:
+### Account management
+- **Registration**: `/register` collects email/password, validates disposable domains, and seeds a `REGISTERING` user; `/register/details` enforces lowercase usernames, phone prefixes, and disclaimers referencing the Terms. JavaScript `static/js/register.js` normalises username input. 【F:main.py†L3644-L3864】【F:templates/register.html†L1-L200】【F:static/js/register.js†L1-L120】
+- **Login**: `/login` offers password visibility toggles, location hints via `static/js/login.js`, and redirects authenticated users away from redundant flows. 【F:main.py†L3871-L4017】【F:templates/login.html†L1-L170】【F:static/js/login.js†L1-L140】
+- **Profile**: `/profile` lets customers update username, phone, and marketing opt-ins; `/profile/password` enforces Argon2-hashed password updates peppered with `PASSWORD_PEPPER`. Client scripts `static/js/profile.js` and `static/js/password.js` handle UI interactions. 【F:main.py†L4029-L4217】【F:templates/profile.html†L1-L210】【F:static/js/profile.js†L1-L160】
+- **Session control**: `/logout` clears the session unless the user is `Blocked` or `IPBlock`. Blocked users see dedicated templates `/blocked` or `/ip-blocked`. 【F:main.py†L4217-L4247】【F:templates/blocked.html†L1-L40】
 
-- `DATABASE_URL` – SQLAlchemy connection URL. Example:
-  `postgresql://USER:PASSWORD@HOST:5432/DBNAME`. If omitted, it will be
-  built automatically from the `POSTGRES_USER`, `POSTGRES_PASSWORD`,
-  `POSTGRES_DB`, and optional `POSTGRES_HOST`/`POSTGRES_PORT` variables.
-- `ADMIN_EMAIL` – email for the SuperAdmin account (defaults to
-  `admin@example.com`).
-- `ADMIN_PASSWORD` – password for the SuperAdmin account (defaults to
-  `ChangeMe!123`).
+### Ordering, cart, and payments
+- **Cart lifecycle**: `/bars/{bar_id}/add_to_cart`, `/cart/update`, and `/cart/clear` mutate the session cart; `main.py` keeps an in-memory cache for quick lookup and persists to `UserCart` on login. 【F:main.py†L2882-L3058】【F:models.py†L46-L62】
+- **Checkout**: `/cart/checkout` routes wallet, card, and cash payments through shared helpers, records Argon2-hashed payment metadata, and triggers audit logging. 【F:main.py†L3044-L3366】
+- **Orders API**: `POST /api/orders` creates orders for POS integrations; `POST /api/orders/{order_id}/status` updates statuses and notifies via WebSockets. 【F:main.py†L2755-L3432】
+- **Realtime updates**: `/ws/bar/{bar_id}/orders` streams live order updates to bartender/admin dashboards; `/ws/user/{user_id}/orders` keeps customers in sync with status changes. 【F:main.py†L3423-L3438】
+- **Finance calculations**: `finance.py` computes VAT, platform fees, and bar payouts; `payouts.schedule_payout` aggregates completed orders. 【F:finance.py†L1-L27】【F:payouts.py†L1-L47】
 
-When running via Docker Compose with the bundled Postgres service, also set:
+### Wallet and top-ups
+- Wallet ledger surfaces on `/wallet` with transactions and current credit; `/topup` renders preset amounts and card instructions powered by `static/js/topup.js`. 【F:main.py†L3448-L3519】【F:templates/wallet.html†L1-L200】【F:static/js/topup.js†L1-L160】
+- Top-up initiation hits `POST /api/topup/init`, which creates a `WalletTopup` row, stores metadata for Wallee, and redirects to the PSP. Success/failure callbacks route to `/wallet/topup/success` and `/wallet/topup/failed`. 【F:main.py†L3514-L3636】
+- Wallee webhooks reconcile payments, credit the wallet, append `WalletTransaction` history, and update cached session data. 【F:app/webhooks/wallee.py†L1-L248】
 
-- `POSTGRES_USER` – database user name.
-- `POSTGRES_PASSWORD` – database user password.
-- `POSTGRES_DB` – database name.
-- `POSTGRES_HOST` – database host (defaults to `postgres`).
-- `POSTGRES_PORT` – database port (defaults to `5432`).
+### Notifications system
+- Admin broadcasts start at `/admin/notifications/new` with per-language subject/body inputs and optional attachments; stored in `NotificationLog` and user-specific `Notification` rows. 【F:main.py†L6403-L6708】【F:templates/admin_new_notification.html†L1-L310】
+- Welcome message editor (`/admin/notifications/welcome`) seeds onboarding copy, automatically dispatched after registration. 【F:main.py†L6427-L6569】
+- Users read messages at `/notifications`; unread cards highlight via `.notification-card.card--unread` and are marked read on `/notifications/{id}`. Attachments and inline images stream via dedicated routes. 【F:main.py†L6765-L6854】【F:templates/notifications.html†L1-L160】
+- Deleting notifications from `/admin/notifications/{log_id}/delete` purges both log and recipient rows, ensuring no stale cards remain. 【F:main.py†L6744-L6763】
 
-If `DATABASE_URL` is not provided, the application combines the variables
-above to form it. When deploying to an external provider, simply set
-`DATABASE_URL` to the provider's connection string instead.
+### Bar administration
+| Route | Template | Scripts | Function |
+| ----- | -------- | ------- | -------- |
+| `/bar/{bar_id}/categories` | `bar_manage_categories.html` | `static/js/bar-manage-categories.js` | List, sort, and toggle category visibility. |
+| `/bar/{bar_id}/categories/new` | `bar_new_category.html` | `static/js/bar-new-category.js` | Create translated category names/descriptions with photo URLs. |
+| `/bar/{bar_id}/categories/{category_id}/edit` | `bar_edit_category.html` | `static/js/bar-manage-categories.js` | Update base metadata, translations, and visibility. |
+| `/bar/{bar_id}/categories/{category_id}/products` | `bar_category_products.html` | `static/js/bar-category-products.js` | Manage products, pricing, stock, photos, translations, and variant sorting. |
+| `/bar/{bar_id}/categories/{category_id}/products/new` | `bar_new_product.html` | `static/js/bar-category-products.js` | Add items, VAT rates, SKUs, and stock flags. |
+| `/bar/{bar_id}/categories/{category_id}/products/{product_id}/edit` | `bar_edit_product.html` | `static/js/bar-category-products.js` | Edit product info, translations, and imagery via `/api/products/{product_id}/image`. |
+| `/admin/bars/edit/{bar_id}` | `admin_edit_bar.html` | `static/js/admin-edit-bar.js` | SuperAdmin edit shell linking to info, description, and assets. |
+| `/admin/bars/edit/{bar_id}/info` | `admin_edit_bar_options.html` | `static/js/admin-edit-bar.js` | Toggle ordering pause, set categories, update address, map coordinates, or manual close flags. |
+| `/admin/bars/edit/{bar_id}/description` | `admin_edit_bar_description.html` | - | Maintain multi-language descriptions via translation editor styles. |
+| `/admin/bars/{bar_id}/tables` | `admin_bar_tables.html` | `static/js/admin-bar-tables.js` | Define physical tables with QR codes and seat counts; accessible to bar admins. |
+| `/admin/bars/{bar_id}/users` | `admin_bar_users.html` | `static/js/admin-bar-users.js` | Assign staff roles (BarAdmin, Bartender, Display) with search/filter controls. |
 
-Optional variables:
+### Staff operations
+- **Dashboards**: `/dashboard` summarises assigned bars; `/dashboard/bar/{bar_id}/orders` shows live columns for “Preparing” and “Ready” orders and supports pause toggles. `static/js/bar-orders.js` fetches updates via WebSockets. 【F:main.py†L4248-L4338】【F:templates/bartender_dashboard.html†L1-L200】
+- **Historical views**: `/dashboard/bar/{bar_id}/orders/history/{year}/{month}` exports monthly records with confirmation toggles to trigger payouts. 【F:main.py†L4411-L4513】【F:templates/bar_admin_month_history.html†L1-L210】
+- **Bartender confirmation**: `/confirm_bartender` ensures staff agree to service terms before accessing orders. 【F:main.py†L5251-L5271】
+- **Display mode**: `/dashboard/bar/{bar_id}/orders/display` renders the two-column TV layout (`display_orders.html`) with `static/js/display-page.js` providing automatic refreshes. 【F:main.py†L4328-L4409】【F:templates/display_orders.html†L1-L160】
 
-- `FRONTEND_ORIGINS` – comma-separated list of allowed frontend URLs for CORS
-  (defaults to `http://localhost:5173`).
-- `WALLEE_SPACE_ID`, `WALLEE_USER_ID`, `WALLEE_API_SECRET` – credentials for
-  Wallee transactions.
-- `BASE_URL` – public base URL of the app used for payment callbacks.
-- `CURRENCY` – currency code for payments (defaults to `CHF`).
+### Super admin console
+| Route | Purpose | Assets |
+| ----- | ------- | ------ |
+| `/admin/dashboard` | Global KPIs and quick links. | `static/js/admin-dashboard.js` |
+| `/admin/analytics` | Multi-tab analytics (orders, revenue, clients, payouts, refunds) rendered with Chart.js fed by `#adminAnalyticsData`. | `static/js/admin-analytics.js`, `static/css/pages/admin-analytics.css` |
+| `/admin/payments` | Payout scheduling, manual closing tests, and finance exports. | `static/js/admin-payments.js` |
+| `/admin/audit` | Filterable audit log viewer for actions recorded via `audit.log_action`. | `static/js/admin-audit-logs.js` |
+| `/admin/users` | Searchable user management, creation, editing, deletion, password reset, and credit overview. | `static/js/admin-users.js`, `static/css/pages/admin-edit-user.css` |
+| `/admin/orders/{order_id}` | Detailed view of individual orders with line items and audit trail. | - |
+| `/admin/ip-block` | Configure IP blocks to prevent login/registration abuse. | `static/js/admin-ip-block.js` |
+| `/admin/notifications` | List, delete, and drill into notification logs. | `static/js/admin-notifications.js`, `static/js/admin-notification-view.js` |
+| `/admin/profile` | SuperAdmin profile summary and welcome message link. | - |
+| `/admin/bars` | Table of bars with filtering, deletion, and quick links to management flows. | `static/js/admin-bars.js`, `static/css/pages/admin-bars.css` |
+| `/admin/bars/new` | Guided bar creation capturing metadata, geolocation, and ordering flags. | `static/js/admin-new-bar.js`, `static/css/pages/admin-new-bar.css` |
 
-### Disposable email controls
+## Background services and utilities
+- `audit.log_action` records every sensitive change, including actor, entity, payload, IP, and geolocation, into the `audit_logs` table. 【F:audit.py†L1-L34】
+- Disposable email enforcement caches remote lists, optional local files, and PyPI datasets; stats available at `/internal/disposable-domains/stats`. 【F:app/utils/disposable_email.py†L5-L125】【F:main.py†L4017-L4027】
+- Phone validation normalises numbers, rejects extensions, and returns `(E.164, region)` pairs for persistence. 【F:app/phone.py†L1-L53】
+- Payout scheduler aggregates completed orders into `Payout` rows; invoked via `/admin/payments/{bar_id}/test_closing` utilities and background jobs. 【F:payouts.py†L1-L47】【F:main.py†L5443-L5498】
+- WebSockets broadcast order and wallet updates after payments or manual status changes. 【F:main.py†L3423-L3498】
 
-- `DISPOSABLE_EMAIL_ENFORCE` – set to `true` to block disposable email addresses.
-- `DISPOSABLE_DOMAIN_URLS` – comma-separated HTTPS URLs pointing to disposable domain lists.
-- `DISPOSABLE_CACHE_TTL_MIN` – cache TTL in minutes for the domain list (default `360`).
-- `ENV` – environment name (`dev`, `staging`, or `prod`).
+## Static assets
+- **Core styles**: `static/css/components.css` (layout, cards, notifications), `static/css/tokens.css` (colors, spacing, typography).
+- **Page-specific styles**: located under `static/css/pages/` mirroring template names (e.g. `order-history.css`, `admin-edit-bar.css`). Follow the convention when adding new templates: import CSS/JS via `<link rel="stylesheet">` and `<script src="..." defer>` in the template head block. 【F:static/css/components.css†L1-L400】【F:templates/admin_edit_bar.html†L5-L25】
+- **JavaScript modules**: each template listed above loads a dedicated script from `static/js`. Modules rely on `defer` and avoid inline handlers per project conventions. 【F:static/js/admin-edit-bar.js†L1-L180】【F:templates/admin_dashboard.html†L5-L30】
 
-## Frontend redesign
+## Data model reference
+Key tables and relationships defined in `models.py`:
+- `User`, `UserCart`, `UserBarRole` with roles `SuperAdmin`, `BarAdmin`, `Bartender`, `Customer`, `Registering`, `Display`, `Blocked`, `IPBlock`. 【F:models.py†L21-L75】
+- `Bar`, `Category`, `MenuItem`, `MenuVariant`, `ProductImage`, `Table`, `BarClosing` capturing venue metadata, menu structure, variants, imagery, and closures. 【F:models.py†L63-L227】
+- `Order`, `OrderItem`, `Payment`, `Payout`, `WalletTransaction`, `WalletTopup` supporting checkout, finance, and reconciliation. 【F:models.py†L227-L352】
+- `NotificationLog`, `Notification`, `WelcomeMessage`, `AuditLog`, `BlockedIP` underpinning communications, auditing, and IP restrictions. 【F:models.py†L352-L402】
 
-The home page and shared layout were refreshed with a mobile‑first design.
-Images now load from the `photo_url` field with lazy loading and an inline SVG
-placeholder fallback. Spacing and grid breakpoints follow an
-8px rhythm.
+## Support and constants
+- `SUPPORT_EMAIL`, `SUPPORT_NUMBER`, `TERMS_VERSION`, `TERMS_EFFECTIVE_DATE`, and `TERMS_NEXT_REVIEW_DATE` populate static page copy and must be kept up to date during regulatory reviews. 【F:main.py†L44-L71】
+- Homepage imagery is served from `/photo/homepage.png` with dimensions and positioning defined in `.home-hero .hero-art` styles; ensure replacements respect the fixed 819×819 layout to avoid overlap. 【F:photo/README.md†L1-L40】【F:static/css/components.css†L240-L320】
+- Horizontal overflow is clamped globally (`overflow-x: clip`) so new components must avoid fixed-width layouts wider than the viewport. 【F:static/css/components.css†L20-L60】
 
-Design tokens such as colors, radii and typography live in
-`static/css/tokens.css`.
-
-## New Bar fields
-
-Bars now support additional optional metadata:
-
-- `rating` – float 0–5 displayed with a star icon.
-- `is_open_now` – flag shown as an "OPEN NOW" badge.
-These fields are editable in **Admin → BarEdit Info**. Image URLs must be
-absolute HTTPS links.
+For any new feature, mirror the patterns above: add a translation namespace, define templates without inline CSS/JS, register routes in `main.py`, and extend this manual to keep documentation aligned with the implementation.
