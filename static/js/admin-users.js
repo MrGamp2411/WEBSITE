@@ -35,7 +35,14 @@
     const run = debounce(applyFilter, 120);
     input.addEventListener('input', run);
 
-    const clearButton = document.querySelector('.users-search .clear');
+    const form = document.querySelector('.users-search');
+    if(form){
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+      });
+    }
+
+    const clearButton = form ? form.querySelector('.clear') : document.querySelector('.users-search .clear');
     if(clearButton){
       clearButton.addEventListener('click', () => {
         input.value = '';

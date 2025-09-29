@@ -1,4 +1,8 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+{{ super() }}
+<link rel="stylesheet" href="/static/css/pages/admin-bars.css">
+{% endblock %}
 {% block content %}
 <section class="bars-page"> <!-- CHANGED -->
   <header class="bars-toolbar"> <!-- CHANGED -->
@@ -8,7 +12,7 @@
       <p class="subtitle">{{ _('admin_bars.subtitle', default='Create, edit and manage venues on the platform.') }}</p> <!-- CHANGED -->
     </div>
     <div class="toolbar-actions"> <!-- CHANGED -->
-      <form class="bars-search" role="search" aria-label="{{ _('admin_bars.search.aria', default='Search bars') }}" onsubmit="return false"> <!-- CHANGED -->
+      <form class="bars-search" role="search" aria-label="{{ _('admin_bars.search.aria', default='Search bars') }}"> <!-- CHANGED -->
         <i class="bi bi-search" aria-hidden="true"></i>
         <input id="barsSearch" type="search" inputmode="search" autocomplete="off"
                placeholder="{{ _('admin_bars.search.placeholder', default='Search bars by name…') }}" aria-label="{{ _('admin_bars.search.input_aria', default='Search bars by name') }}">
@@ -47,9 +51,9 @@
             </div>
             <form
               id="delete-bar-{{ bar.id }}"
+              class="admin-bars__delete-form"
               method="post"
               action="{{ request.url_for('delete_bar', bar_id=bar.id) }}"
-              style="display:none;"
             ></form>
           </td>
         </tr>

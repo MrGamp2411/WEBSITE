@@ -23,8 +23,10 @@
   - `templates/bar_manage_categories.html` imports `/static/css/pages/bar-manage-categories.css` and `/static/js/bar-manage-categories.js`.
   - `templates/admin_edit_bar_description.html` imports `/static/css/pages/admin-edit-bar-description.css`.
   - `templates/admin_analytics.html` imports `/static/css/pages/admin-analytics.css` and `/static/js/admin-analytics.js` (Chart.js stays on the CDN and page data hydrates via `#adminAnalyticsData`).
+  - `templates/admin_dashboard.html` imports `/static/js/admin-dashboard.js` to handle the delete-all-orders confirmation without inline handlers.
   - `templates/admin_notifications.html` imports `/static/js/admin-notifications.js` for delete confirmation handling.
   - `templates/admin_bars.html` imports `/static/js/admin-bars.js` for table filtering and deletion confirmation.
+  - `templates/admin_bars.html` also imports `/static/css/pages/admin-bars.css` to keep hidden delete forms out of the layout flow.
   - `templates/admin_bar_users.html` imports `/static/js/admin-bar-users.js` for staff filtering and removal confirmation dialogs.
   - `templates/admin_notification_view.html` imports `/static/js/admin-notification-view.js` for delete confirmation handling.
   - `templates/admin_notification_view.html` also imports `/static/css/pages/admin-notification-view.css` for action spacing and hidden delete form styling.
