@@ -1,5 +1,16 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+{{ super() }}
+<link rel="stylesheet" href="/static/css/pages/admin-analytics.css">
+{% endblock %}
 {% block content %}
+{% set chart_labels = {
+  'gmv': _('admin_analytics.charts.gmv', default='GMV'),
+  'orders': _('admin_analytics.charts.orders', default='# Orders'),
+  'commission': _('admin_analytics.charts.commission', default='Commission'),
+  'net': _('admin_analytics.charts.net', default='Net'),
+  'orders_per_hour': _('admin_analytics.charts.orders_per_hour', default='Orders/hour')
+} %}
 <a class="back-link" href="/dashboard"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_analytics.back', default='Back to dashboard') }}</a>
 <h1>{{ _('admin_analytics.title', default='Analytics') }}</h1>
 <div class="dashboard-info">
@@ -131,80 +142,20 @@
   <div id="exports" class="tab-content">
     <p>{{ _('admin_analytics.exports.message', default='CSV exports and scheduled reports will be available soon.') }}</p>
   </div>
-<style>
-.tab-nav a{margin-right:1rem;cursor:pointer;}
-.tab-nav a.active{font-weight:bold;}
-.tab-content{display:none;margin-top:1rem;}
-.tab-content.active{display:block;}
-</style>
+  <script type="application/json" id="adminAnalyticsData">
+    {{ {
+      'dailyLabels': stats.daily_labels,
+      'dailyGmv': stats.daily_gmv,
+      'dailyOrders': stats.daily_orders,
+      'chartLabels': chart_labels,
+      'revenueBars': stats.revenue_bars,
+      'hourlyLabels': stats.hourly_labels,
+      'hourlyOrders': stats.hourly_orders
+    }|tojson }}
+  </script>
 {% endblock %}
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% set chart_labels = {
-  'gmv': _('admin_analytics.charts.gmv', default='GMV'),
-  'orders': _('admin_analytics.charts.orders', default='# Orders'),
-  'commission': _('admin_analytics.charts.commission', default='Commission'),
-  'net': _('admin_analytics.charts.net', default='Net'),
-  'orders_per_hour': _('admin_analytics.charts.orders_per_hour', default='Orders/hour')
-} %}
-<script>
-const labels = {{ stats.daily_labels|tojson }};
-const gmv = {{ stats.daily_gmv|tojson }};
-const orders = {{ stats.daily_orders|tojson }};
-const ctx = document.getElementById('gmvChart');
-const chartLabels = {{ chart_labels|tojson }};
-new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: labels,
-    datasets: [
-      {label: chartLabels.gmv, data: gmv, borderColor: '#0d6efd', fill: false},
-        {label: chartLabels.orders, data: orders, borderColor: '#6c757d', fill: false, yAxisID: 'y1'}
-    ]
-  },
-  options: {
-    scales: {
-      y: {beginAtZero: true},
-      y1: {beginAtZero: true, position: 'right'}
-    }
-  }
-});
-
-const revData = {{ stats.revenue_bars|tojson }};
-if (revData.length) {
-  const revLabels = revData.map(r=>r.bar);
-  const revGmv = revData.map(r=>r.gmv);
-  const revComm = revData.map(r=>r.commission);
-  const revNet = revData.map(r=>r.net);
-  new Chart(document.getElementById('revenueChart'), {
-    type: 'bar',
-    data: {labels: revLabels, datasets: [
-      {label: chartLabels.gmv, data: revGmv, backgroundColor: '#0d6efd'},
-        {label: chartLabels.commission, data: revComm, backgroundColor: '#dc3545'},
-        {label: chartLabels.net, data: revNet, backgroundColor: '#198754'}
-    ]},
-    options: {scales: {y: {beginAtZero: true}}}
-  });
-}
-
-const hourLabels = {{ stats.hourly_labels|tojson }};
-const hourOrders = {{ stats.hourly_orders|tojson }};
-new Chart(document.getElementById('ordersChart'), {
-  type: 'line',
-  data: {labels: hourLabels, datasets: [
-      {label: chartLabels.orders_per_hour, data: hourOrders, borderColor: '#0d6efd', fill: false}
-  ]},
-  options: {scales: {y: {beginAtZero: true}}}
-});
-
-document.querySelectorAll('.tab-nav a').forEach(a=>{
-  a.addEventListener('click', e=>{
-    e.preventDefault();
-    document.querySelectorAll('.tab-nav a').forEach(el=>el.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
-    a.classList.add('active');
-    document.getElementById(a.dataset.tab).classList.add('active');
-  });
-});
-</script>
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+<script src="/static/js/admin-analytics.js" defer></script>
 {% endblock %}
