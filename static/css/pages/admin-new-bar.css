@@ -1,0 +1,4 @@
+.editbar .map-card #map,
+.editbar .map-card .admin-new-bar__map {
+  height: 400px;
+}

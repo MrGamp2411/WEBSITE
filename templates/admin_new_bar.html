@@ -1,13 +1,17 @@
 {% extends "layout.html" %}
-{% block content %}
+{% block page_styles %}
+{{ super() }}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="/static/css/pages/admin-new-bar.css">
+{% endblock %}
+{% block content %}
 <section class="editbar">
   <a class="back-link" href="/admin/bars"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_new_bar.back', default='Back to Bars') }}</a>
   <h1>{{ _('admin_new_bar.title', default='Create New Bar') }}</h1>
   {% if error %}<p class="error">{{ error }}</p>{% endif %}
 
   <div class="card map-card">
-    <div id="map" style="height:400px;"></div>
+    <div id="map" class="admin-new-bar__map"></div>
   </div>
 
   <form method="post" action="/admin/bars/new" enctype="multipart/form-data" class="editbar-form">
@@ -123,7 +127,10 @@
     </div>
   </form>
 </section>
+{% endblock %}
 
+{% block scripts %}
+{{ super() }}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/static/js/admin-new-bar.js" defer></script>
 {% endblock %}

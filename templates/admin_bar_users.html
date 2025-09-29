@@ -25,7 +25,7 @@
       </form>
     </details>
     <div class="toolbar-actions">
-      <form class="users-search" role="search" aria-label="{{ _('admin_bar_users.search.aria', default='Search users') }}" onsubmit="return false">
+      <form class="users-search" role="search" aria-label="{{ _('admin_bar_users.search.aria', default='Search users') }}">
         <i class="bi bi-search" aria-hidden="true"></i>
         <input id="userSearch" type="search" inputmode="search" autocomplete="off"
                placeholder="{{ _('admin_bar_users.search.placeholder', default='Search users by name or email…') }}" aria-label="{{ _('admin_bar_users.search.input_aria', default='Search users by name or email') }}">
@@ -60,7 +60,7 @@
             <div class="actions-group">
               <button type="button" class="btn-danger-soft js-remove-user" data-user-id="{{ u.id }}">{{ _('admin_bar_users.actions.remove', default='Remove') }}</button>
             </div>
-            <form id="remove_{{ u.id }}" method="post" action="/admin/bars/{{ bar.id }}/users" style="display:none">
+            <form id="remove_{{ u.id }}" method="post" action="/admin/bars/{{ bar.id }}/users" hidden>
               <input type="hidden" name="action" value="remove">
               <input type="hidden" name="user_id" value="{{ u.id }}">
             </form>
