@@ -14,3 +14,9 @@
 .description-field .description-preview:empty::before {
   content: "";
 }
+
+.editbar .bar-photo-preview {
+  max-width: 200px;
+  height: auto;
+  display: block;
+}

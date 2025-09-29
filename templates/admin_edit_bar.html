@@ -77,7 +77,11 @@
 
         {% if bar.photo_url %}
         <div class="field-group">
-          <img src="{{ bar.photo_url }}" alt="{{ _('admin_edit_bar.media.photo_alt', bar=bar.name, default='{bar} photo') }}" style="max-width:200px;"/>
+          <img
+            src="{{ bar.photo_url }}"
+            alt="{{ _('admin_edit_bar.media.photo_alt', bar=bar.name, default='{bar} photo') }}"
+            class="bar-photo-preview"
+          />
         </div>
         {% endif %}
 
