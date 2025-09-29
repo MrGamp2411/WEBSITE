@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+<link rel="stylesheet" href="/static/css/pages/display-orders.css">
+{% endblock %}
 {% block content %}
-<section class="display-page">
+<section class="display-page" data-bar-id="{{ bar.id }}">
   <div class="display-column">
     <div class="section-head"><h2>{{ _('display_orders.sections.preparing', default='Preparing') }}</h2></div>
     <div id="preparing-orders" class="display-orders"></div>
@@ -10,21 +13,9 @@
     <div id="ready-orders" class="display-orders"></div>
   </div>
 </section>
+{% endblock %}
 
-<style>
-#main{max-width:none;margin:0 10px;padding:0;}
-.display-page{display:flex;gap:20px;margin-top:10px;}
-.display-column{flex:1;}
-.display-orders{display:flex;flex-direction:column;gap:12px;}
-.display-orders .order-card{width:100%;max-width:none;min-width:100px;text-align:left;display:flex;align-items:center;justify-content:flex-start;}
-.display-orders .order-card__header{justify-content:flex-start;align-items:center;width:100%;}
-.display-orders .order-card h3{font-size:2em;}
-</style>
-
+{% block scripts %}
 <script src="/static/js/display.js" defer></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    initDisplay({{ bar.id }});
-  });
-</script>
+<script src="/static/js/display-page.js" defer></script>
 {% endblock %}
