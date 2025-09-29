@@ -37,13 +37,13 @@
 
     <section id="userSection" hidden>
       <h2>{{ _('admin_new_notification.user_section.title', default='Select User') }}</h2>
-      <div class="users-search" role="search" aria-label="{{ _('admin_new_notification.user_section.search.aria', default='Search users') }}" onsubmit="return false">
+      <form class="users-search" role="search" aria-label="{{ _('admin_new_notification.user_section.search.aria', default='Search users') }}">
         <i class="bi bi-search" aria-hidden="true"></i>
         <input id="userSearch" type="search" inputmode="search" autocomplete="off" placeholder="{{ _('admin_new_notification.user_section.search.placeholder', default='Search users…') }}" aria-label="{{ _('admin_new_notification.user_section.search.input_aria', default='Search users') }}">
         <button class="clear" type="button" aria-label="{{ _('admin_new_notification.user_section.search.clear', default='Clear search') }}">
           <i class="bi bi-x-circle" aria-hidden="true"></i>
         </button>
-      </div>
+      </form>
       <div class="table-card">
         <table class="users-table">
           <thead>
@@ -73,13 +73,13 @@
 
     <section id="barSection" hidden>
       <h2>{{ _('admin_new_notification.bar_section.title', default='Select Bar') }}</h2>
-      <div class="bars-search" role="search" aria-label="{{ _('admin_new_notification.bar_section.search.aria', default='Search bars') }}" onsubmit="return false">
+      <form class="bars-search" role="search" aria-label="{{ _('admin_new_notification.bar_section.search.aria', default='Search bars') }}">
         <i class="bi bi-search" aria-hidden="true"></i>
         <input id="barSearch" type="search" inputmode="search" autocomplete="off" placeholder="{{ _('admin_new_notification.bar_section.search.placeholder', default='Search bars…') }}" aria-label="{{ _('admin_new_notification.bar_section.search.input_aria', default='Search bars') }}">
         <button class="clear" type="button" aria-label="{{ _('admin_new_notification.bar_section.search.clear', default='Clear search') }}">
           <i class="bi bi-x-circle" aria-hidden="true"></i>
         </button>
-      </div>
+      </form>
       <div class="table-card">
         <table class="bars-table">
           <thead>

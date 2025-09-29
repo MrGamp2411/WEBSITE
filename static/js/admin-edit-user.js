@@ -69,8 +69,14 @@
       });
     };
 
+    const form = input.closest('.bars-search');
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      input.focus();
+    });
+
     input.addEventListener('input', debounce(apply, 120));
-    input.closest('.bars-search')
+    form
       ?.querySelector('.clear')
       ?.addEventListener('click', () => {
         input.value = '';

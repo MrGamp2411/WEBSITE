@@ -31,6 +31,7 @@
   - `templates/admin_notification_view.html` imports `/static/js/admin-notification-view.js` for delete confirmation handling.
   - `templates/admin_notification_view.html` also imports `/static/css/pages/admin-notification-view.css` for action spacing and hidden delete form styling.
   - `templates/admin_audit_logs.html` imports `/static/js/admin-audit-logs.js` and `/static/css/pages/admin-audit-logs.css` to keep the filter form responsive without inline styles.
+  - Admin edit user and admin new notification search toolbars now use `<form class="...-search">` wrappers; page scripts prevent submissions so inline handlers are no longer needed.
   - `templates/admin_ip_block.html` imports `/static/js/admin-ip-block.js` for delete confirmation handling.
   - `templates/admin_new_bar.html` imports `/static/css/pages/admin-new-bar.css` for map sizing alongside Leaflet assets.
   - `templates/register_step1.html` imports `/static/css/pages/register-step1.css` to handle the login prompt alignment.
