@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+{{ super() }}
+<link rel="stylesheet" href="/static/css/pages/order-history.css">
+{% endblock %}
 {% block content %}
-<section class="orders-page">
+<section class="orders-page" data-order-history data-user-id="{{ user.id if user else '' }}">
   <header class="orders-head">
     <h1 class="orders-title">{{ _('order_history.title', default='Order History') }}</h1>
     <p class="orders-subtitle">{{ _('order_history.subtitle', default='Review your past orders and find details faster.') }}</p>
@@ -152,80 +156,10 @@
   </section>
 </section>
 
-<style>
-.orders-page{
-  --surface:#fff; --bg-subtle:#f6f8fb; --border:#e5e7eb;
-  --text:#0f172a; --muted:#475569; --accent:var(--brand,#7c3aed);
-  --radius:16px; --shadow:0 6px 16px rgba(0,0,0,.06);
-}
+{% endblock %}
 
-/* Page head */
-.orders-page .orders-head{ margin:8px 0 14px; }
-.orders-page .orders-title{ margin:0 0 4px; font-size:1.6rem; font-weight:800; color:var(--text); }
-.orders-page .orders-subtitle{ margin:0; font-size:.95rem; color:var(--muted); }
-
-/* Section heads */
-.orders-page .orders-section{ margin-top:18px; }
-.orders-page .section-head{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-.orders-page .section-head h2{ margin:0; font-size:1.125rem; font-weight:800; color:var(--text); }
-.orders-page .count-badge{ display:inline-flex; align-items:center; justify-content:center; min-width:24px; height:24px; padding:0 8px; font-size:.8rem; font-weight:700; color:#111; background:#eef2ff; border:1px solid #dbeafe; border-radius:999px; }
-
-/* Grid that hosts the EXISTING order cards */
-.orders-page .orders-grid{
-  display:grid; gap:12px;
-  grid-template-columns: minmax(100px, 1fr);
-  margin:0;
-}
-.orders-page .orders-grid .card{ width:100%; max-width:none; min-width:100px; }
-
-/* Desktop: keep three columns with 100px minimum card width */
-@media (min-width: 960px){
-  .orders-page .orders-grid{ grid-template-columns: repeat(3, minmax(100px, 1fr)); }
-}
-
-/* Empty */
-.orders-page .empty{ display:none; text-align:center; border:1px dashed var(--border); border-radius:12px; padding:22px; color:var(--muted); background:#fff; }
-.orders-page .empty.show{ display:block; }
-.orders-page .empty h3{ margin:0 0 6px; font-size:1.05rem; color:var(--text); }
-
-/* Responsiveness */
-@media (max-width: 768px){
-  .orders-page .orders-title{ font-size:1.4rem; }
-}
-
-/* Focus ring */
-.orders-page :is(select,input,button,a){ outline:none; }
-.orders-page :is(select,input,button,a):focus{
-  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
-  border-radius:12px;
-}
-</style>
-
-<script>
-function initOrderHistoryCounts(){
-  const pendingGrid=document.getElementById('pending-orders');
-  const completedGrid=document.getElementById('completed-orders');
-  const pendingCount=document.getElementById('pendingCount');
-  const completedCount=document.getElementById('completedCount');
-  const pendingEmpty=document.getElementById('pendingEmpty');
-  const completedEmpty=document.getElementById('completedEmpty');
-  function update(){
-    const p=pendingGrid.children.length;
-    const c=completedGrid.children.length;
-    pendingCount.textContent=p;
-    completedCount.textContent=c;
-    pendingEmpty.classList.toggle('show',p===0);
-    completedEmpty.classList.toggle('show',c===0);
-  }
-  update();
-  const mo=new MutationObserver(update);
-  mo.observe(pendingGrid,{childList:true});
-  mo.observe(completedGrid,{childList:true});
-}
-</script>
-<script src="/static/js/orders.js"></script>
-<script>
-  initUser({{ user.id }});
-  initOrderHistoryCounts();
-</script>
+{% block scripts %}
+{{ super() }}
+<script src="/static/js/orders.js" defer></script>
+<script src="/static/js/order-history.js" defer></script>
 {% endblock %}

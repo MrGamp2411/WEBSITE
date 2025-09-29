@@ -1,0 +1,16 @@
+.editbar .map-card #map {
+  height: 400px;
+}
+
+.description-field .description-preview {
+  margin: 0 0 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-xl, 16px);
+  background: var(--surface-strong, #f3f4f6);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.description-field .description-preview:empty::before {
+  content: "";
+}
