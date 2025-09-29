@@ -62,7 +62,9 @@
 - Body uses a column flex layout with `min-height: 100dvh` and grows `<main>` so the footer always anchors to the bottom even on sparse pages.
 - Display orders page uses `/static/css/pages/display-orders.css` for layout adjustments and `/static/js/display-page.js` to bootstrap `initDisplay` via the `data-bar-id` attribute.
 - Bartender and bar admin order dashboards share `/static/css/pages/bar-orders.css` for layout and `/static/js/bar-orders.js` to bootstrap `initBartender` (reading the `data-bar-id` attribute) and handle pause toggles.
-- `templates/bar_detail.html` imports `/static/js/bar-detail.js` to sync pause state and choose the best directions link.
+- `templates/bar_detail.html` imports `/static/js/bar-detail.js` to sync pause state, choose the best directions link, and apply fallback imagery when bar assets fail to load.
+- `templates/home.html` loads `/static/js/home.js` to attach fallback handlers to hero and bar card images.
+- `templates/search.html` relies on `/static/js/search.js` for filtering, card metadata rendering, and image fallback handling instead of inline events.
 - Wallet top-up page `templates/topup.html` imports `/static/js/topup.js` for preset amounts and checkout redirects.
 - Admin payments search logic now lives in `/static/js/admin-payments.js`; templates only render markup.
 - Admin users search filtering now runs through `/static/js/admin-users.js` loaded with `defer`.
