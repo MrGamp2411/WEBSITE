@@ -39,6 +39,6 @@ def log_action(
         created_at=datetime.utcnow(),
     )
     db.add(log)
+    db.flush()
     db.commit()
-    db.refresh(log)
     return log

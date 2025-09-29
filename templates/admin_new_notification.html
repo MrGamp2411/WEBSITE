@@ -19,16 +19,16 @@
   <p class="alert-danger">{{ error }}</p>
   {% endif %}
   <form id="notificationForm"
-        class="form"
         method="post"
         action="/admin/notifications"
         enctype="multipart/form-data"
         data-select-user="{{ _('admin_new_notification.alerts.select_user', default='Please select a user.') }}"
         data-select-bar="{{ _('admin_new_notification.alerts.select_bar', default='Please select a bar.') }}"
         data-select-label="{{ _('admin_new_notification.actions.select', default='Select') }}"
-        data-selected-label="{{ _('admin_new_notification.actions.selected', default='Selected') }}">
+        data-selected-label="{{ _('admin_new_notification.actions.selected', default='Selected') }}"></form>
+  <section class="form">
     <label>{{ _('admin_new_notification.form.target.label', default='Target') }}
-      <select name="target" id="target" required>
+      <select name="target" id="target" required form="notificationForm">
         <option value="all">{{ _('admin_new_notification.form.target.options.all', default='All Users') }}</option>
         <option value="user">{{ _('admin_new_notification.form.target.options.user', default='Specific User') }}</option>
         <option value="bar">{{ _('admin_new_notification.form.target.options.bar', default='Users of Bar') }}</option>
@@ -68,7 +68,7 @@
           </tbody>
         </table>
       </div>
-      <input type="hidden" name="user_id" id="user_id">
+      <input type="hidden" name="user_id" id="user_id" form="notificationForm">
     </section>
 
     <section id="barSection" hidden>
@@ -104,7 +104,7 @@
           </tbody>
         </table>
       </div>
-      <input type="hidden" name="bar_id" id="bar_id">
+      <input type="hidden" name="bar_id" id="bar_id" form="notificationForm">
     </section>
 
     <div class="field-group">
@@ -115,7 +115,7 @@
       <p class="translation-note">{{ _('admin_new_notification.form.subject_default_language_help', language=(default_lang.name if default_lang else default_language|upper), default='Provide the {language} subject. Other languages inherit it when no translation is set.') }}</p>
       {% for lang in available_languages %}
       <label for="subject_{{ lang.code }}">{{ _('admin_new_notification.form.language_subject_label', language=lang.name, default='{language} subject') }}
-        <input id="subject_{{ lang.code }}" name="subject_{{ lang.code }}" maxlength="30" value="{{ subject_map.get(lang.code, '') }}"{% if lang.code == default_language %} required aria-required="true"{% endif %}>
+        <input id="subject_{{ lang.code }}" name="subject_{{ lang.code }}" maxlength="30" value="{{ subject_map.get(lang.code, '') }}" form="notificationForm"{% if lang.code == default_language %} required aria-required="true"{% endif %}>
       </label>
       {% endfor %}
     </div>
@@ -127,21 +127,21 @@
       <p class="translation-note">{{ _('admin_new_notification.form.message_default_language_help', language=(default_lang.name if default_lang else default_language|upper), default='Provide the {language} message. Other languages inherit it when no translation is set.') }}</p>
       {% for lang in available_languages %}
       <label for="body_{{ lang.code }}">{{ _('admin_new_notification.form.language_message_label', language=lang.name, default='{language} message') }}
-        <textarea id="body_{{ lang.code }}" name="body_{{ lang.code }}" rows="4"{% if lang.code == default_language %} required aria-required="true"{% endif %}>{{ body_map.get(lang.code, '') }}</textarea>
+        <textarea id="body_{{ lang.code }}" name="body_{{ lang.code }}" rows="4" form="notificationForm"{% if lang.code == default_language %} required aria-required="true"{% endif %}>{{ body_map.get(lang.code, '') }}</textarea>
       </label>
       {% endfor %}
     </div>
     <label>{{ _('admin_new_notification.form.link_url', default='Link URL') }}
-      <input type="url" name="link_url">
+      <input type="url" name="link_url" form="notificationForm">
     </label>
     <label>{{ _('admin_new_notification.form.image', default='Image') }}
-      <input type="file" name="image" accept="image/*">
+      <input type="file" name="image" accept="image/*" form="notificationForm">
     </label>
     <label>{{ _('admin_new_notification.form.attachment', default='Attachment') }}
-      <input type="file" name="attachment">
+      <input type="file" name="attachment" form="notificationForm">
     </label>
-    <button class="btn btn--primary" type="submit">{{ _('admin_new_notification.form.submit', default='Send') }}</button>
-  </form>
+    <button class="btn btn--primary" type="submit" form="notificationForm">{{ _('admin_new_notification.form.submit', default='Send') }}</button>
+  </section>
 </section>
 {% endblock %}
 

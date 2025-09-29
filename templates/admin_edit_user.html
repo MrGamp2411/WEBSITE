@@ -15,17 +15,18 @@
   </div>
 </div>
 {% endif %}
-<form class="form" method="post" action="/admin/users/edit/{{ user.id }}">
+<form id="editUserForm" method="post" action="/admin/users/edit/{{ user.id }}"></form>
+<section class="form">
   <label for="username">{{ _('admin_edit_user.form.username', default='Username') }}</label>
-  <input id="username" name="username" type="text" value="{{ user.username }}" required>
+  <input id="username" name="username" type="text" value="{{ user.username }}" required form="editUserForm">
 
   <a class="btn-outline" href="/admin/users/{{ user.id }}/password">{{ _('admin_edit_user.actions.edit_password', default='Edit Password') }}</a>
 
   <label for="email">{{ _('admin_edit_user.form.email', default='Email') }}</label>
-  <input id="email" name="email" type="email" value="{{ user.email }}" required>
+  <input id="email" name="email" type="email" value="{{ user.email }}" required form="editUserForm">
 
   <label for="prefix">{{ _('admin_edit_user.form.prefix', default='Prefix') }}</label>
-  <select id="prefix" name="prefix" autocomplete="tel-country-code">
+  <select id="prefix" name="prefix" autocomplete="tel-country-code" form="editUserForm">
     <option value="+41" {% if user.prefix == "+41" %}selected{% endif %}>{{ _('admin_edit_user.prefixes.ch', default='+41 (Switzerland)') }}</option>
     <option value="+39" {% if user.prefix == "+39" %}selected{% endif %}>{{ _('admin_edit_user.prefixes.it', default='+39 (Italy)') }}</option>
     <option value="+49" {% if user.prefix == "+49" %}selected{% endif %}>{{ _('admin_edit_user.prefixes.de', default='+49 (Germany)') }}</option>
@@ -33,14 +34,11 @@
   </select>
 
   <label for="phone">{{ _('admin_edit_user.form.phone', default='Phone') }}</label>
-  <input id="phone" name="phone" type="tel" value="{{ user.phone }}">
+  <input id="phone" name="phone" type="tel" value="{{ user.phone }}" form="editUserForm">
 
   <label for="role">{{ _('admin_edit_user.form.role', default='Role') }}</label>
   {% if current.is_super_admin %}
-  <div id="barAssignments"
-       data-add-label="{{ _('admin_edit_user.actions.add', default='Add') }}"
-       data-remove-label="{{ _('admin_edit_user.actions.remove', default='Remove') }}">
-    <select id="role" name="role">
+  <select id="role" name="role" form="editUserForm">
       <option value="super_admin" {% if user.role=='super_admin' %}selected{% endif %}>{{ _('admin_edit_user.roles.super_admin', default='Super Admin') }}</option>
       <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>{{ _('admin_edit_user.roles.bar_admin', default='Bar Admin') }}</option>
       <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>{{ _('admin_edit_user.roles.bartender', default='Bartender') }}</option>
@@ -48,8 +46,20 @@
       <option value="customer" {% if user.role=='customer' %}selected{% endif %}>{{ _('admin_edit_user.roles.customer', default='Customer') }}</option>
       <option value="blocked" {% if user.role=='blocked' %}selected{% endif %}>{{ _('admin_edit_user.roles.blocked', default='Blocked') }}</option>
       <option value="ip_block" {% if user.role=='ip_block' %}selected{% endif %}>{{ _('admin_edit_user.roles.ip_block', default='IP Block') }}</option>
-    </select>
+  </select>
+  {% else %}
+  <select id="role" name="role" form="editUserForm">
+    <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>{{ _('admin_edit_user.roles.bar_admin', default='Bar Admin') }}</option>
+    <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>{{ _('admin_edit_user.roles.bartender', default='Bartender') }}</option>
+  </select>
+  <input type="hidden" name="add_credit" value="0" form="editUserForm">
+  <input type="hidden" name="remove_credit" value="0" form="editUserForm">
+  {% endif %}
 
+  {% if current.is_super_admin %}
+  <div id="barAssignments"
+       data-add-label="{{ _('admin_edit_user.actions.add', default='Add') }}"
+       data-remove-label="{{ _('admin_edit_user.actions.remove', default='Remove') }}">
     <h2>{{ _('admin_edit_user.sections.assigned', default='Assigned Bars') }}</h2>
     <div class="toolbar-actions">
       <form class="bars-search" role="search" aria-label="{{ _('admin_edit_user.assigned_search.aria', default='Search assigned bars') }}">
@@ -81,7 +91,7 @@
               <div class="actions-group">
                 <button type="button" class="btn-danger-soft js-remove-bar" data-bar-id="{{ b.id }}">{{ _('admin_edit_user.actions.remove', default='Remove') }}</button>
               </div>
-              <input type="checkbox" name="bar_ids" value="{{ b.id }}" checked hidden>
+              <input type="checkbox" name="bar_ids" value="{{ b.id }}" checked hidden form="editUserForm">
             </td>
           </tr>
           {% endfor %}
@@ -120,7 +130,7 @@
               <div class="actions-group">
                 <button type="button" class="btn-outline js-add-bar" data-bar-id="{{ b.id }}">{{ _('admin_edit_user.actions.add', default='Add') }}</button>
               </div>
-              <input type="checkbox" name="bar_ids" value="{{ b.id }}" hidden>
+              <input type="checkbox" name="bar_ids" value="{{ b.id }}" hidden form="editUserForm">
             </td>
           </tr>
           {% endfor %}
@@ -129,22 +139,15 @@
     </div>
 
     <label for="add_credit">{{ _('admin_edit_user.form.add_credit', default='Add Credit') }}</label>
-    <input id="add_credit" name="add_credit" type="number" step="0.01" value="0">
+    <input id="add_credit" name="add_credit" type="number" step="0.01" value="0" form="editUserForm">
 
     <label for="remove_credit">{{ _('admin_edit_user.form.remove_credit', default='Remove Credit') }}</label>
-    <input id="remove_credit" name="remove_credit" type="number" step="0.01" value="0">
+    <input id="remove_credit" name="remove_credit" type="number" step="0.01" value="0" form="editUserForm">
   </div>
-  {% else %}
-  <select id="role" name="role">
-    <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>{{ _('admin_edit_user.roles.bar_admin', default='Bar Admin') }}</option>
-    <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>{{ _('admin_edit_user.roles.bartender', default='Bartender') }}</option>
-  </select>
-  <input type="hidden" name="add_credit" value="0">
-  <input type="hidden" name="remove_credit" value="0">
   {% endif %}
 
-  <button class="btn btn--primary" type="submit">{{ _('admin_edit_user.actions.save', default='Save') }}</button>
-</form>
+  <button class="btn btn--primary" type="submit" form="editUserForm">{{ _('admin_edit_user.actions.save', default='Save') }}</button>
+</section>
 
 {% if current.is_super_admin %}
 <div class="actions-group admin-edit-user__danger-actions">
