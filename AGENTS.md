@@ -31,6 +31,8 @@
   - `templates/admin_audit_logs.html` imports `/static/js/admin-audit-logs.js` and `/static/css/pages/admin-audit-logs.css` to keep the filter form responsive without inline styles.
   - `templates/admin_ip_block.html` imports `/static/js/admin-ip-block.js` for delete confirmation handling.
   - `templates/admin_new_bar.html` imports `/static/css/pages/admin-new-bar.css` for map sizing alongside Leaflet assets.
+  - `templates/register_step1.html` imports `/static/css/pages/register-step1.css` to handle the login prompt alignment.
+  - `templates/bar_category_products.html` imports `/static/css/pages/bar-category-products.css` and `/static/js/bar-category-products.js` for delete form handling.
 - Footer marketing pages (About, Help Center, For Bars, Terms) live in `templates/about.html`, `templates/help_center.html`, `templates/for_bars.html`, and `templates/terms.html`; they share the `.static-page` styles defined in `static/css/components.css`.
   - Support contact details for these static pages pull from Jinja globals defined in `main.py` (`SUPPORT_EMAIL`, `SUPPORT_NUMBER`, `TERMS_VERSION`, etc.); update those constants to change emails, phone numbers, or term dates sitewide.
   - The About page intro copy reads "Built and operated by Siply..." followed by "We’re building a modern ordering experience..." to highlight Siply's role and hospitality focus.

@@ -1,4 +1,8 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+{{ super() }}
+<link rel="stylesheet" href="/static/css/pages/register-step1.css">
+{% endblock %}
 {% block content %}
 <div class="auth-card">
   <h1>{{ _('register_step1.title', default='Register') }}</h1>
@@ -24,7 +28,7 @@
     <p class="auth-card__disclaimer">{{ _('register_step1.disclaimer', default="By registering you accept our <a href=\"/terms\">Terms of Service</a>.")|safe }}</p>
     <button class="btn btn--primary" type="submit">{{ _('register_step1.actions.submit', default='Next') }}</button>
   </form>
-  <p style="align-self:center">{{ _('register_step1.actions.login_prompt', default="Already registered? <a href=\"/login\">Log in</a>")|safe }}</p>
+  <p class="auth-card__login-prompt">{{ _('register_step1.actions.login_prompt', default="Already registered? <a href=\"/login\">Log in</a>")|safe }}</p>
 </div>
 {% endblock %}
 
