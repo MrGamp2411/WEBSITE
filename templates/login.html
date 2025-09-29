@@ -1,4 +1,9 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+{{ super() }}
+<link rel="stylesheet" href="/static/css/pages/login.css">
+{% endblock %}
+
 {% block content %}
 <div class="auth-card">
   <h1>{{ _('login.title', default='Login') }}</h1>
@@ -18,19 +23,12 @@
     <input type="hidden" name="longitude" id="longitude">
     <button class="btn btn--primary" type="submit">{{ _('login.actions.submit', default='Login') }}</button>
   </form>
-  <p style="align-self:center">{{ _('login.actions.register_prompt', default="Not registered yet? <a href=\"/register\">Register</a>")|safe }}</p>
+  <p class="login-register-prompt">{{ _('login.actions.register_prompt', default="Not registered yet? <a href=\"/register\">Register</a>")|safe }}</p>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script src="/static/js/password.js" defer></script>
-<script>
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(pos) {
-      document.getElementById('latitude').value = pos.coords.latitude;
-      document.getElementById('longitude').value = pos.coords.longitude;
-    });
-  }
-</script>
+<script src="/static/js/login.js" defer></script>
 {% endblock %}
 
