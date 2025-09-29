@@ -49,19 +49,9 @@
     </table>
   </div>
 </section>
-<script>
-(function(){
-  const form = document.getElementById('auditFilters');
-  if(!form) return;
-  form.querySelectorAll('input[type="search"]').forEach(inp=>{
-    inp.addEventListener('keydown', e=>{
-      if(e.key === 'Enter'){
-        e.preventDefault();
-        form.submit();
-      }
-    });
-  });
-  form.querySelector('select')?.addEventListener('change', ()=>form.submit());
-})();
-</script>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="/static/js/admin-audit-logs.js" defer></script>
 {% endblock %}
