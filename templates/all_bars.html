@@ -73,7 +73,7 @@
         <a class="bar-card{% if bar.is_open_now %} is-open{% endif %}" href="/bars/{{ bar.id }}" aria-label="{{ _('home.bar_card.open_label', bar_name=bar.name, default='Open {bar_name}') }}" data-name="{{ bar.name|lower }}" data-address="{{ bar.address|lower }}" data-city="{{ bar.city|lower }}" data-state="{{ bar.state|lower }}" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-open="{{ 'true' if bar.is_open_now else 'false' }}" data-categories="{{ bar.bar_categories|lower if bar.bar_categories else '' }}" itemscope itemtype="https://schema.org/BarOrPub">
           <div class="thumb-wrapper">
             {% if bar.photo_url %}
-            <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
+            <img class="thumb" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" data-fallback-src="{{ fallback_img }}">
             {% else %}
             <img class="thumb" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
             {% endif %}
@@ -99,5 +99,7 @@
 {% endblock %}
 
 {% block scripts %}
+{{ super() }}
+<script src="/static/js/image-fallback.js" defer></script>
 <script src="/static/js/view-all.js" defer></script>
 {% endblock %}

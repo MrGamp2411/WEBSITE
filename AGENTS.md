@@ -153,8 +153,9 @@
     - JavaScript: `static/js/app.js` (shared/carousels), `static/js/search.js`, `static/js/view-all.js`
     - Bar & product card size: 400×450 desktop, 300×400 mobile
   - Global footer: `templates/layout.html` uses `.site-footer` styled in `static/css/components.css`
+- Shared fallback image handler lives in `/static/js/image-fallback.js`; templates should add `data-fallback-src` on `<img>` tags and include the script when they need automatic swap behaviour.
 - Bars:
-  - `/bars` page uses `templates/all_bars.html` and `static/js/view-all.js`
+  - `/bars` page uses `templates/all_bars.html`, `static/js/image-fallback.js`, and `static/js/view-all.js`
   - Filters apply automatically on change; the old "Apply" button and its handler were removed
   - Public `/bars` listings show only bar names without numeric IDs, while admin listings keep each bar's `bar.id` zero-padded to three digits to match order codes
   - Admin Manage Bars page uses `templates/admin_bars.html` with `.bars-page` styles in `static/css/components.css`. The page header stacks the title above the search and Add Bar controls
@@ -165,8 +166,8 @@
 - Admin Manage Categories page uses `templates/bar_manage_categories.html` with `.menu-page` styles in `static/css/components.css`, a client-side category search via `#categorySearch`, and grouped uppercase action pills (`.btn-outline` for Products and Edit, `.btn-danger-soft` for Delete). The page header stacks the title above the search and Add Category controls
 - Category edit and create forms live in `templates/bar_edit_category.html` and `templates/bar_new_category.html`; both now expose translation panels for name and description that post `name_<lang>` and `description_<lang>` inputs alongside the base fields.
 - Category names and descriptions persist per-language in the `name_translations` and `description_translations` JSON columns on `categories`; keep these maps populated for every code in `LANGUAGES` and refresh in-memory bars after updates with `normalise_translation_map`.
-- Product edit and create forms live in `templates/bar_edit_product.html` and `templates/bar_new_product.html`; the description field uses a `<textarea>` styled by the `.form textarea` rule in `static/css/components.css`.
-- Admin Manage Menu Items page uses `templates/bar_category_products.html`; wrapped in `.menu-page` with a `.menu-toolbar` header and Add Product button, listing products in a `.table-card`-wrapped `menu-table` with text-only pill buttons (`.btn-outline`, `.btn-danger-soft`) and a prominent Delete
+- Product edit and create forms live in `templates/bar_edit_product.html` and `templates/bar_new_product.html`; the description field uses a `<textarea>` styled by the `.form textarea` rule in `static/css/components.css`. `bar_edit_product.html` now imports `/static/js/image-fallback.js` to handle preview fallbacks.
+- Admin Manage Menu Items page uses `templates/bar_category_products.html`; wrapped in `.menu-page` with a `.menu-toolbar` header and Add Product button, listing products in a `.table-card`-wrapped `menu-table` with text-only pill buttons (`.btn-outline`, `.btn-danger-soft`) and a prominent Delete. The template imports `/static/js/image-fallback.js` plus `/static/js/bar-category-products.js` for delete confirmation.
 - Admin Manage Users page uses `templates/admin_bar_users.html` with `.users-page` styles in `static/css/components.css`, a client-side username/email search via `#userSearch`, and grouped action pills. The page header stacks the title above an Add Existing User form and the search controls; new user creation has been removed
 - Manage Bar Users list now shows only a red `Remove` button to unassign staff from the current bar; user editing is handled on the main Admin Users page
 - Removing a user triggers a popup confirmation using `.cart-blocker` and `.cart-popup`

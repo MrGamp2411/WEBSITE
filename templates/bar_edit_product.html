@@ -39,7 +39,7 @@
         <div class="form-field">
           <label>{{ _('bar_products.form.photo', default='Photo') }}</label>
           <div class="photo-preview">
-            <img src="{{ product.photo_url }}" alt="{{ preview_name }} photo" loading="lazy" decoding="async" onerror="this.src='{{ fallback_img }}';this.onerror=null;" width="400" height="225" />
+            <img src="{{ product.photo_url }}" alt="{{ preview_name }} photo" loading="lazy" decoding="async" data-fallback-src="{{ fallback_img }}" width="400" height="225" />
           </div>
           <input id="photo" type="file" name="photo" accept="image/*">
         </div>
@@ -48,4 +48,9 @@
     </div>
   </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="/static/js/image-fallback.js" defer></script>
 {% endblock %}
