@@ -1,4 +1,11 @@
 (function () {
+  const searchForm = document.querySelector('.users-search');
+  if (searchForm) {
+    searchForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+    });
+  }
+
   const input = document.getElementById('userSearch');
   const tableBody = document.querySelector('.users-table tbody');
 

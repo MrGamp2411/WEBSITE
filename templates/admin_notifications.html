@@ -56,7 +56,7 @@
               <a href="/admin/notifications/{{ n.id }}" class="btn-outline">{{ _('admin_notifications.sent.actions.view', default='View') }}</a>
               <button type="button" class="btn-danger-soft js-delete-note" data-note-id="{{ n.id }}">{{ _('admin_notifications.sent.actions.delete', default='Delete') }}</button>
             </div>
-            <form id="delete-note-{{ n.id }}" method="post" action="/admin/notifications/{{ n.id }}/delete" style="display:none;"></form>
+            <form id="delete-note-{{ n.id }}" method="post" action="/admin/notifications/{{ n.id }}/delete" hidden></form>
           </td>
         </tr>
         {% endfor %}
