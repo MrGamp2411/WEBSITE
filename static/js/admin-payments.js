@@ -18,10 +18,17 @@
   }
 
   function initPaymentsFilter() {
+    const searchForm = document.querySelector('.payments-search.js-prevent-submit');
     const input = document.getElementById('paymentsSearch');
     const tableBody = document.querySelector('.payments-table tbody');
     if (!input || !tableBody) {
       return;
+    }
+
+    if (searchForm) {
+      searchForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+      });
     }
 
     const rows = Array.from(tableBody.rows);

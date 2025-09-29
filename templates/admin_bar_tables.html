@@ -1,4 +1,8 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+{{ super() }}
+<link rel="stylesheet" href="/static/css/pages/admin-bar-tables.css">
+{% endblock %}
 {% block content %}
 <section class="menu-page">
   <header class="menu-toolbar">
@@ -8,7 +12,7 @@
       <p class="subtitle">{{ _('admin_tables.manage.subtitle', default='Add, edit and organize tables for this venue.') }}</p>
     </div>
     <div class="toolbar-actions">
-      <form class="menu-search" role="search" aria-label="{{ _('admin_tables.manage.search.aria', default='Search tables') }}" onsubmit="return false">
+      <form class="menu-search js-prevent-submit" role="search" aria-label="{{ _('admin_tables.manage.search.aria', default='Search tables') }}">
         <i class="bi bi-search" aria-hidden="true"></i>
         <input id="tableSearch" type="search" inputmode="search" autocomplete="off"
                placeholder="{{ _('admin_tables.manage.search.placeholder', default='Search tables…') }}" aria-label="{{ _('admin_tables.manage.search.input_aria', default='Search tables by name or description') }}">
@@ -25,7 +29,7 @@
     <table class="menu-table">
       <thead>
         <tr>
-          <th style="width:56px">#</th>
+          <th class="index-col">#</th>
           <th>{{ _('admin_tables.manage.table.headers.name', default='Name') }}</th>
           <th>{{ _('admin_tables.manage.table.headers.description', default='Description') }}</th>
           <th class="actions">{{ _('admin_tables.manage.table.headers.actions', default='Actions') }}</th>
@@ -42,7 +46,7 @@
               <a class="btn-outline" href="/admin/bars/{{ bar.id }}/tables/{{ t.id }}/edit">{{ _('admin_tables.manage.actions.edit', default='Edit') }}</a>
               <button type="button" class="btn-danger-soft js-delete-table" data-table-id="{{ t.id }}">{{ _('admin_tables.manage.actions.delete', default='Delete') }}</button>
             </div>
-            <form id="delete_{{ t.id }}" method="post" action="/admin/bars/{{ bar.id }}/tables/{{ t.id }}/delete" style="display:none"></form>
+            <form id="delete_{{ t.id }}" method="post" action="/admin/bars/{{ bar.id }}/tables/{{ t.id }}/delete" hidden></form>
           </td>
         </tr>
         {% endfor %}
