@@ -7,6 +7,7 @@
 - Phone validation errors must use English messaging; see `app/phone.py` and `tests/test_register_phone_validation.py`.
 - Dark mode functionality has been removed; the site theme is fixed to light.
 - Product image uploads surface English errors: "No file uploaded", "Uploaded file must be an image", and "File too large (>5MB)".
+- Google Maps integrations no longer expect a `GOOGLE_MAPS_API_KEY`; map widgets should work without it.
 - Review recent commit history before starting new tasks.
 - Admin edit pages now offload inline assets:
   - `templates/admin_edit_bar_options.html` imports `/static/css/pages/admin-edit-bar-options.css`.
