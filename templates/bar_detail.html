@@ -4,7 +4,7 @@
 <section class="bar-detail" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-ordering-paused="{{ 'true' if bar.ordering_paused else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
   <div class="bar-cover-wrapper">
     {% if bar.photo_url %}
-    <img class="bar-cover" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
+    <img class="bar-cover" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" data-fallback-src="{{ fallback_img }}">
     {% else %}
     <img class="bar-cover" src="{{ fallback_img }}" alt="" loading="lazy" width="400" height="225">
     {% endif %}
@@ -92,7 +92,7 @@
       <li>
         <article class="product-card">
           <div class="thumb-wrapper">
-            <img class="thumb" src="{{ product.photo_url }}" alt="{{ display_name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ product.photo_url }} 400w, {{ product.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
+            <img class="thumb" src="{{ product.photo_url }}" alt="{{ display_name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ product.photo_url }} 400w, {{ product.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" data-fallback-src="{{ fallback_img }}">
           </div>
           <h3 class="title">{{ display_name }}</h3>
           <div class="card-body">

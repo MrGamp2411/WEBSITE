@@ -14,6 +14,30 @@ function toKm(v) {
 
 const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
+function applyImageFallback(root = document) {
+  const images = root.querySelectorAll('img[data-fallback-src]');
+  images.forEach((img) => {
+    const fallbackSrc = img.dataset.fallbackSrc;
+    if (!fallbackSrc) {
+      return;
+    }
+
+    const handleError = () => {
+      if (img.dataset.fallbackApplied === 'true') {
+        return;
+      }
+      img.dataset.fallbackApplied = 'true';
+      img.src = fallbackSrc;
+    };
+
+    img.addEventListener('error', handleError, { once: true });
+
+    if (img.complete && img.naturalWidth === 0) {
+      handleError();
+    }
+  });
+}
+
 function haversineKm(lat1, lon1, lat2, lon2) {
   const R = 6371;
   const toRad = d => d * Math.PI / 180;
@@ -93,6 +117,8 @@ function applyFilters(bars, state) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  applyImageFallback();
+
   const searchInput = document.getElementById('barSearch');
   const filterBtn = document.getElementById('filterBtn');
   const filterOverlay = document.getElementById('filterOverlay');
