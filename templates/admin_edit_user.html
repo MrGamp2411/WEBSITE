@@ -34,99 +34,103 @@
 
   <label for="role">{{ _('admin_edit_user.form.role', default='Role') }}</label>
   {% if current.is_super_admin %}
-  <select id="role" name="role">
-    <option value="super_admin" {% if user.role=='super_admin' %}selected{% endif %}>{{ _('admin_edit_user.roles.super_admin', default='Super Admin') }}</option>
-    <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>{{ _('admin_edit_user.roles.bar_admin', default='Bar Admin') }}</option>
-    <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>{{ _('admin_edit_user.roles.bartender', default='Bartender') }}</option>
-    <option value="display" {% if user.role=='display' %}selected{% endif %}>{{ _('admin_edit_user.roles.display', default='Display') }}</option>
-    <option value="customer" {% if user.role=='customer' %}selected{% endif %}>{{ _('admin_edit_user.roles.customer', default='Customer') }}</option>
-    <option value="blocked" {% if user.role=='blocked' %}selected{% endif %}>{{ _('admin_edit_user.roles.blocked', default='Blocked') }}</option>
-    <option value="ip_block" {% if user.role=='ip_block' %}selected{% endif %}>{{ _('admin_edit_user.roles.ip_block', default='IP Block') }}</option>
-  </select>
+  <div id="barAssignments"
+       data-add-label="{{ _('admin_edit_user.actions.add', default='Add') }}"
+       data-remove-label="{{ _('admin_edit_user.actions.remove', default='Remove') }}">
+    <select id="role" name="role">
+      <option value="super_admin" {% if user.role=='super_admin' %}selected{% endif %}>{{ _('admin_edit_user.roles.super_admin', default='Super Admin') }}</option>
+      <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>{{ _('admin_edit_user.roles.bar_admin', default='Bar Admin') }}</option>
+      <option value="bartender" {% if user.role=='bartender' %}selected{% endif %}>{{ _('admin_edit_user.roles.bartender', default='Bartender') }}</option>
+      <option value="display" {% if user.role=='display' %}selected{% endif %}>{{ _('admin_edit_user.roles.display', default='Display') }}</option>
+      <option value="customer" {% if user.role=='customer' %}selected{% endif %}>{{ _('admin_edit_user.roles.customer', default='Customer') }}</option>
+      <option value="blocked" {% if user.role=='blocked' %}selected{% endif %}>{{ _('admin_edit_user.roles.blocked', default='Blocked') }}</option>
+      <option value="ip_block" {% if user.role=='ip_block' %}selected{% endif %}>{{ _('admin_edit_user.roles.ip_block', default='IP Block') }}</option>
+    </select>
 
-  <h2>{{ _('admin_edit_user.sections.assigned', default='Assigned Bars') }}</h2>
-  <div class="toolbar-actions">
-    <div class="bars-search" role="search" aria-label="{{ _('admin_edit_user.assigned_search.aria', default='Search assigned bars') }}" onsubmit="return false">
-      <i class="bi bi-search" aria-hidden="true"></i>
-      <input id="assignedBarSearch" type="search" inputmode="search" autocomplete="off"
-             placeholder="{{ _('admin_edit_user.assigned_search.placeholder', default='Search bars by name…') }}" aria-label="{{ _('admin_edit_user.assigned_search.input_aria', default='Search assigned bars by name') }}">
-      <button class="clear" type="button" aria-label="{{ _('admin_edit_user.assigned_search.clear', default='Clear search') }}">
-        <i class="bi bi-x-circle" aria-hidden="true"></i>
-      </button>
+    <h2>{{ _('admin_edit_user.sections.assigned', default='Assigned Bars') }}</h2>
+    <div class="toolbar-actions">
+      <div class="bars-search" role="search" aria-label="{{ _('admin_edit_user.assigned_search.aria', default='Search assigned bars') }}" onsubmit="return false">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input id="assignedBarSearch" type="search" inputmode="search" autocomplete="off"
+               placeholder="{{ _('admin_edit_user.assigned_search.placeholder', default='Search bars by name…') }}" aria-label="{{ _('admin_edit_user.assigned_search.input_aria', default='Search assigned bars by name') }}">
+        <button class="clear" type="button" aria-label="{{ _('admin_edit_user.assigned_search.clear', default='Clear search') }}">
+          <i class="bi bi-x-circle" aria-hidden="true"></i>
+        </button>
+      </div>
     </div>
-  </div>
-  <div class="table-card">
-    <table class="bars-table">
-      <thead>
-        <tr>
-          <th>{{ _('admin_edit_user.table.headers.number', default='No.') }}</th>
-          <th>{{ _('admin_edit_user.table.headers.name', default='Name') }}</th>
-          <th>{{ _('admin_edit_user.table.headers.city', default='City') }}</th>
-          <th class="actions">{{ _('admin_edit_user.table.headers.actions', default='Actions') }}</th>
-        </tr>
-      </thead>
-      <tbody id="assignedBars">
-        {% for b in bars if b.id in user.bar_ids %}
-        <tr data-name="{{ b.name }}">
-          <td>{{ "%03d"|format(b.id) }}</td>
-          <td>{{ b.name }}</td>
-          <td>{{ b.city }}</td>
-          <td class="actions">
-            <div class="actions-group">
-              <button type="button" class="btn-danger-soft js-remove-bar" data-bar-id="{{ b.id }}">{{ _('admin_edit_user.actions.remove', default='Remove') }}</button>
-            </div>
-            <input type="checkbox" name="bar_ids" value="{{ b.id }}" checked hidden>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-  <h2>{{ _('admin_edit_user.sections.assign', default='Assign a Bar') }}</h2>
-  <div class="toolbar-actions">
-    <div class="bars-search" role="search" aria-label="{{ _('admin_edit_user.available_search.aria', default='Search available bars') }}" onsubmit="return false">
-      <i class="bi bi-search" aria-hidden="true"></i>
-      <input id="availableBarSearch" type="search" inputmode="search" autocomplete="off"
-             placeholder="{{ _('admin_edit_user.available_search.placeholder', default='Search bars by name…') }}" aria-label="{{ _('admin_edit_user.available_search.input_aria', default='Search available bars by name') }}">
-      <button class="clear" type="button" aria-label="{{ _('admin_edit_user.available_search.clear', default='Clear search') }}">
-        <i class="bi bi-x-circle" aria-hidden="true"></i>
-      </button>
+    <div class="table-card">
+      <table class="bars-table">
+        <thead>
+          <tr>
+            <th>{{ _('admin_edit_user.table.headers.number', default='No.') }}</th>
+            <th>{{ _('admin_edit_user.table.headers.name', default='Name') }}</th>
+            <th>{{ _('admin_edit_user.table.headers.city', default='City') }}</th>
+            <th class="actions">{{ _('admin_edit_user.table.headers.actions', default='Actions') }}</th>
+          </tr>
+        </thead>
+        <tbody id="assignedBars">
+          {% for b in bars if b.id in user.bar_ids %}
+          <tr data-name="{{ b.name }}">
+            <td>{{ "%03d"|format(b.id) }}</td>
+            <td>{{ b.name }}</td>
+            <td>{{ b.city }}</td>
+            <td class="actions">
+              <div class="actions-group">
+                <button type="button" class="btn-danger-soft js-remove-bar" data-bar-id="{{ b.id }}">{{ _('admin_edit_user.actions.remove', default='Remove') }}</button>
+              </div>
+              <input type="checkbox" name="bar_ids" value="{{ b.id }}" checked hidden>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-  </div>
-  <div class="table-card">
-    <table class="bars-table">
-      <thead>
-        <tr>
-          <th>{{ _('admin_edit_user.table.headers.number', default='No.') }}</th>
-          <th>{{ _('admin_edit_user.table.headers.name', default='Name') }}</th>
-          <th>{{ _('admin_edit_user.table.headers.city', default='City') }}</th>
-          <th class="actions">{{ _('admin_edit_user.table.headers.actions', default='Actions') }}</th>
-        </tr>
-      </thead>
-      <tbody id="availableBars">
-        {% for b in bars if b.id not in user.bar_ids %}
-        <tr data-name="{{ b.name }}">
-          <td>{{ "%03d"|format(b.id) }}</td>
-          <td>{{ b.name }}</td>
-          <td>{{ b.city }}</td>
-          <td class="actions">
-            <div class="actions-group">
-              <button type="button" class="btn-outline js-add-bar" data-bar-id="{{ b.id }}">{{ _('admin_edit_user.actions.add', default='Add') }}</button>
-            </div>
-            <input type="checkbox" name="bar_ids" value="{{ b.id }}" hidden>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
 
-  <label for="add_credit">{{ _('admin_edit_user.form.add_credit', default='Add Credit') }}</label>
-  <input id="add_credit" name="add_credit" type="number" step="0.01" value="0">
+    <h2>{{ _('admin_edit_user.sections.assign', default='Assign a Bar') }}</h2>
+    <div class="toolbar-actions">
+      <div class="bars-search" role="search" aria-label="{{ _('admin_edit_user.available_search.aria', default='Search available bars') }}" onsubmit="return false">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input id="availableBarSearch" type="search" inputmode="search" autocomplete="off"
+               placeholder="{{ _('admin_edit_user.available_search.placeholder', default='Search bars by name…') }}" aria-label="{{ _('admin_edit_user.available_search.input_aria', default='Search available bars by name') }}">
+        <button class="clear" type="button" aria-label="{{ _('admin_edit_user.available_search.clear', default='Clear search') }}">
+          <i class="bi bi-x-circle" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+    <div class="table-card">
+      <table class="bars-table">
+        <thead>
+          <tr>
+            <th>{{ _('admin_edit_user.table.headers.number', default='No.') }}</th>
+            <th>{{ _('admin_edit_user.table.headers.name', default='Name') }}</th>
+            <th>{{ _('admin_edit_user.table.headers.city', default='City') }}</th>
+            <th class="actions">{{ _('admin_edit_user.table.headers.actions', default='Actions') }}</th>
+          </tr>
+        </thead>
+        <tbody id="availableBars">
+          {% for b in bars if b.id not in user.bar_ids %}
+          <tr data-name="{{ b.name }}">
+            <td>{{ "%03d"|format(b.id) }}</td>
+            <td>{{ b.name }}</td>
+            <td>{{ b.city }}</td>
+            <td class="actions">
+              <div class="actions-group">
+                <button type="button" class="btn-outline js-add-bar" data-bar-id="{{ b.id }}">{{ _('admin_edit_user.actions.add', default='Add') }}</button>
+              </div>
+              <input type="checkbox" name="bar_ids" value="{{ b.id }}" hidden>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-  <label for="remove_credit">{{ _('admin_edit_user.form.remove_credit', default='Remove Credit') }}</label>
-  <input id="remove_credit" name="remove_credit" type="number" step="0.01" value="0">
+    <label for="add_credit">{{ _('admin_edit_user.form.add_credit', default='Add Credit') }}</label>
+    <input id="add_credit" name="add_credit" type="number" step="0.01" value="0">
+
+    <label for="remove_credit">{{ _('admin_edit_user.form.remove_credit', default='Remove Credit') }}</label>
+    <input id="remove_credit" name="remove_credit" type="number" step="0.01" value="0">
+  </div>
   {% else %}
   <select id="role" name="role">
     <option value="bar_admin" {% if user.role=='bar_admin' %}selected{% endif %}>{{ _('admin_edit_user.roles.bar_admin', default='Bar Admin') }}</option>
@@ -155,93 +159,8 @@
 </div>
 {% endif %}
 
-<script>
-{% set admin_edit_user_labels = {
-  'add': _('admin_edit_user.actions.add', default='Add'),
-  'remove': _('admin_edit_user.actions.remove', default='Remove')
-} %}
-(function(){
-  const assignedSearch = document.getElementById('assignedBarSearch');
-  const availableSearch = document.getElementById('availableBarSearch');
-  const assigned = document.getElementById('assignedBars');
-  const available = document.getElementById('availableBars');
-  if(!assigned || !available) return;
-  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
-  function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}}
-  function setupSearch(input, tbody){
-    if(!input) return ()=>{};
-    const apply = () => {
-      const q = norm(input.value);
-      Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
-        const name = tr.dataset.name || '';
-        tr.style.display = !q || norm(name).includes(q) ? '' : 'none';
-      });
-    };
-    input.addEventListener('input', debounce(apply,120));
-    input.closest('.bars-search')?.querySelector('.clear')?.addEventListener('click', () => {
-      input.value=''; apply(); input.focus();
-    });
-    return apply;
-  }
-
-  const applyAssigned = setupSearch(assignedSearch, assigned);
-  const applyAvailable = setupSearch(availableSearch, available);
-
-  function moveRow(tr, toAssigned){
-    const checkbox = tr.querySelector('input[name="bar_ids"]');
-    const btn = tr.querySelector('button');
-    if(toAssigned){
-      checkbox.checked = true;
-      btn.textContent = {{ admin_edit_user_labels.remove|tojson }};
-      btn.classList.remove('btn-outline');
-      btn.classList.add('btn-danger-soft','js-remove-bar');
-      btn.classList.remove('js-add-bar');
-      assigned.appendChild(tr);
-    } else {
-      checkbox.checked = false;
-      btn.textContent = {{ admin_edit_user_labels.add|tojson }};
-      btn.classList.remove('btn-danger-soft');
-      btn.classList.add('btn-outline','js-add-bar');
-      btn.classList.remove('js-remove-bar');
-      available.appendChild(tr);
-    }
-    applyAssigned();
-    applyAvailable();
-  }
-
-  assigned.addEventListener('click', e => {
-    const btn = e.target.closest('.js-remove-bar');
-    if(!btn) return;
-    e.preventDefault();
-    moveRow(btn.closest('tr'), false);
-  });
-
-  available.addEventListener('click', e => {
-    const btn = e.target.closest('.js-add-bar');
-    if(!btn) return;
-    e.preventDefault();
-    moveRow(btn.closest('tr'), true);
-  });
-
-  const deleteBtn = document.querySelector('.js-delete-user');
-  const blocker = document.getElementById('deleteBlocker');
-  const cancelBtn = document.querySelector('.js-cancel-delete');
-  const confirmBtn = document.querySelector('.js-confirm-delete');
-  const deleteForm = document.getElementById('delete-user-{{ user.id }}');
-  deleteBtn?.addEventListener('click', e => {
-    e.preventDefault();
-    if(blocker) blocker.hidden = false;
-  });
-  cancelBtn?.addEventListener('click', () => {
-    if(blocker) blocker.hidden = true;
-  });
-  confirmBtn?.addEventListener('click', () => {
-    deleteForm?.submit();
-  });
-  const errBlocker = document.getElementById('errorBlocker');
-  errBlocker?.querySelector('.js-close-error')?.addEventListener('click', () => {
-    errBlocker.hidden = true;
-  });
-})();
-</script>
+{% block scripts %}
+{{ super() }}
+<script src="/static/js/admin-edit-user.js" defer></script>
+{% endblock %}
 {% endblock %}
