@@ -1,4 +1,7 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+<link rel="stylesheet" href="/static/css/pages/wallet.css">
+{% endblock %}
 {% block content %}
 <section class="wallet-page">
   <div class="wallet-head">
@@ -12,9 +15,9 @@
       <div class="amount">CHF {{ "%.2f"|format(user.credit) }}</div>
       <div class="meta"><span class="badge success">{{ _('wallet.balance.available', default='Available') }}</span></div>
     </div>
-  <div class="balance-right wallet-actions">
+    <div class="balance-right wallet-actions">
       <a href="/topup" class="btn-primary">{{ _('wallet.actions.top_up', default='Top Up') }}</a>
-  </div>
+    </div>
   </div>
 
   <div class="card tx-feed">
@@ -81,73 +84,5 @@
   </div>
 </section>
 
-<style>
-.wallet-page{ --surface:#fff; --bg-subtle:#f6f8fb; --border:#e5e7eb; --text:#0f172a; --muted:#475569; --accent: var(--brand, #7c3aed); --radius:16px; }
 
-/* Cards & buttons */
-.wallet-page .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:0 6px 16px rgba(0,0,0,.06); max-height:none; }
-.wallet-page .btn-primary{ background:var(--accent); color:#fff; border:1px solid transparent; border-radius:12px; padding:10px 14px; font-weight:700; text-decoration:none; }
-.wallet-page .btn-primary:hover{ filter:brightness(.96); }
-
-/* Header */
-.wallet-page .wallet-head{ margin:8px 0 12px; }
-.wallet-page .wallet-title{ font-weight:800; font-size:1.6rem; margin:0 0 4px; color:var(--text); }
-.wallet-page .wallet-subtitle{ margin:0; color:var(--muted); font-size:.95rem; }
-
-/* Balance */
-.balance-card{ display:flex; align-items:center; justify-content:space-between; padding:16px; gap:16px; }
-.balance-card .label{ color:var(--muted); font-size:.85rem; }
-.balance-card .amount{ font-size:2rem; font-weight:800; letter-spacing:-0.02em; }
-.balance-card .meta{ color:var(--muted); font-size:.85rem; display:flex; align-items:center; gap:8px; }
-.balance-card .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; font-size:.75rem; border:1px solid var(--border); }
-.balance-card .badge.success{ background:#f0fdf4; border-color:#bbf7d0; color:#166534; }
-.wallet-actions{ display:flex; gap:10px; flex-wrap:wrap; }
-
-/* Transaction FEED */
-.tx-feed{ padding:0; overflow:hidden; }
-.tx-head{ padding:16px; }
-.section-title{ font-size:1.125rem; font-weight:700; margin:0; }
-
-.tx-group{ padding:0 16px 16px; }
-.tx-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
-
-.tx{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px; border:1px solid var(--border); border-radius:14px; background:#fff; }
-.tx:hover{ background:#fafafa; }
-.tx-main{ display:grid; gap:4px; min-width:0; }
-.tx-title{ font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.tx-sub{ color:var(--muted); font-size:.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.tx-time{ color:var(--muted); font-size:.8rem; }
-
-.tx-meta{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; }
-.tx-amount{ font-variant-numeric: tabular-nums; white-space:nowrap; font-weight:700; }
-.tx-amount.positive{ color:#166534; } /* green */
-.tx-amount.negative{ color:#b91c1c; } /* red */
-
-.pill{ padding:4px 10px; border-radius:999px; font-size:.75rem; border:1px solid var(--border); }
-.pill.success{ background:#f0fdf4; border-color:#bbf7d0; color:#166534; }
-.pill.pending{ background:#fff7ed; border-color:#fed7aa; color:#9a3412; }
-.pill.refunded{ background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8; }
-.pill.canceled{ background:#fef2f2; border-color:#fecaca; color:#991b1b; }
-
-/* Empty & actions */
-.empty{ display:none; text-align:center; padding:28px 18px 24px; }
-.empty h3{ margin:0 0 6px; font-size:1.05rem; }
-.empty p{ margin:0 0 12px; color:var(--muted); }
-
-/* Mobile */
-@media (max-width: 768px){
-  .balance-card{ flex-direction:column; align-items:flex-start; }
-  .wallet-actions{ width:100%; }
-  .wallet-actions .btn-primary{ flex:1; text-align:center; }
-  .tx{ align-items:flex-start; }
-  .tx-meta{ align-items:flex-end; }
-}
-
-/* Focus visibility */
-.wallet-page :is(select,input,button,a){ outline:none; }
-.wallet-page :is(select,input,button,a):focus{
-  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
-  border-radius:12px;
-}
-</style>
 {% endblock %}
