@@ -24,6 +24,7 @@
   - `templates/admin_analytics.html` imports `/static/css/pages/admin-analytics.css` and `/static/js/admin-analytics.js` (Chart.js stays on the CDN and page data hydrates via `#adminAnalyticsData`).
   - `templates/admin_notifications.html` imports `/static/js/admin-notifications.js` for delete confirmation handling.
   - `templates/admin_bars.html` imports `/static/js/admin-bars.js` for table filtering and deletion confirmation.
+  - `templates/admin_bar_users.html` imports `/static/js/admin-bar-users.js` for staff filtering and removal confirmation dialogs.
   - `templates/admin_notification_view.html` imports `/static/js/admin-notification-view.js` for delete confirmation handling.
   - `templates/admin_ip_block.html` imports `/static/js/admin-ip-block.js` for delete confirmation handling.
 - Footer marketing pages (About, Help Center, For Bars, Terms) live in `templates/about.html`, `templates/help_center.html`, `templates/for_bars.html`, and `templates/terms.html`; they share the `.static-page` styles defined in `static/css/components.css`.
@@ -53,6 +54,8 @@
 - Body uses a column flex layout with `min-height: 100dvh` and grows `<main>` so the footer always anchors to the bottom even on sparse pages.
 - Display orders page uses `/static/css/pages/display-orders.css` for layout adjustments and `/static/js/display-page.js` to bootstrap `initDisplay` via the `data-bar-id` attribute.
 - Bartender and bar admin order dashboards share `/static/css/pages/bar-orders.css` for layout and `/static/js/bar-orders.js` to bootstrap `initBartender` (reading the `data-bar-id` attribute) and handle pause toggles.
+- `templates/bar_detail.html` imports `/static/js/bar-detail.js` to sync pause state and choose the best directions link.
+- Wallet top-up page `templates/topup.html` imports `/static/js/topup.js` for preset amounts and checkout redirects.
 - Admin payments search logic now lives in `/static/js/admin-payments.js`; templates only render markup.
 - Admin users search filtering now runs through `/static/js/admin-users.js` loaded with `defer`.
 - Registration username lowercase enforcement is handled by `/static/js/register.js` loaded with `defer`.

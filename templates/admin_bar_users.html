@@ -82,57 +82,9 @@
   </div>
 </div>
 
-<script>
-(function(){
-  const input = document.getElementById('userSearch');
-  const tbody = document.querySelector('.users-table tbody');
-  if(input && tbody){
-    const rows = Array.from(tbody.rows);
-    const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+{% endblock %}
 
-    function applyFilter(){
-      const q = norm(input.value);
-      rows.forEach(tr=>{
-        const name = tr.cells && tr.cells[0] ? tr.cells[0].textContent : '';
-        const email = tr.cells && tr.cells[1] ? tr.cells[1].textContent : '';
-        const match = !q || norm(name).includes(q) || norm(email).includes(q);
-        tr.style.display = match ? '' : 'none';
-      });
-    }
-    function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}}
-    const run = debounce(applyFilter,120);
-
-    input.addEventListener('input', run);
-    document.querySelector('.users-search .clear')?.addEventListener('click',()=>{
-      input.value=''; applyFilter(); input.focus();
-    });
-
-    const qs = new URLSearchParams(location.search);
-    const q = qs.get('q'); if(q){ input.value=q; applyFilter(); }
-  }
-
-  const blocker = document.getElementById('removeBlocker');
-  const cancelBtn = document.querySelector('.js-cancel-remove');
-  const confirmBtn = document.querySelector('.js-confirm-remove');
-  let targetForm = null;
-
-  document.querySelectorAll('.js-remove-user').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.preventDefault();
-      const userId = btn.dataset.userId;
-      targetForm = document.getElementById('remove_' + userId);
-      if(blocker) blocker.hidden = false;
-    });
-  });
-
-  cancelBtn?.addEventListener('click', () => {
-    if(blocker) blocker.hidden = true;
-    targetForm = null;
-  });
-
-  confirmBtn?.addEventListener('click', () => {
-    targetForm?.submit();
-  });
-})();
-</script>
+{% block scripts %}
+{{ super() }}
+<script src="/static/js/admin-bar-users.js" defer></script>
 {% endblock %}

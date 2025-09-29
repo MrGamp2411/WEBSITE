@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 {% set fallback_img = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCA0MDAgMjIxJz48cmVjdCB3aWR0aD0nNDAwJyBoZWlnaHQ9JzIyNScgZmlsbD0nJTIzZjFmM2Y1Jy8+PC9zdmc+" %}
-<section class="bar-detail" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" itemscope itemtype="https://schema.org/BarOrPub">
+<section class="bar-detail" data-latitude="{{ bar.latitude }}" data-longitude="{{ bar.longitude }}" data-rating="{{ bar.rating or '' }}" data-distance_km="{{ bar.distance_km or '' }}" data-ordering-paused="{{ 'true' if bar.ordering_paused else 'false' }}" itemscope itemtype="https://schema.org/BarOrPub">
   <div class="bar-cover-wrapper">
     {% if bar.photo_url %}
     <img class="bar-cover" src="{{ bar.photo_url }}" alt="{{ bar.name }} photo" itemprop="image" loading="lazy" decoding="async" width="400" height="225" srcset="{{ bar.photo_url }} 400w, {{ bar.photo_url }} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='{{ fallback_img }}';this.onerror=null;">
@@ -116,27 +116,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-  window.orderingPaused = {{ 'true' if bar.ordering_paused else 'false' }};
-</script>
-<script>
-  (function() {
-    var directionsLink = document.querySelector('.bar-directions');
-    if (!directionsLink) {
-      return;
-    }
-
-    var appleUrl = directionsLink.getAttribute('data-apple-url');
-    var googleUrl = directionsLink.getAttribute('data-google-url');
-    var userAgent = window.navigator.userAgent || '';
-    var platform = window.navigator.platform || '';
-    var isAppleDevice = /iPad|iPhone|iPod/.test(userAgent) || (platform === 'MacIntel' && typeof window.navigator.standalone !== 'undefined');
-
-    if (isAppleDevice && appleUrl) {
-      directionsLink.setAttribute('href', appleUrl);
-    } else if (googleUrl) {
-      directionsLink.setAttribute('href', googleUrl);
-    }
-  })();
-</script>
+{{ super() }}
+<script src="/static/js/bar-detail.js" defer></script>
 {% endblock %}
