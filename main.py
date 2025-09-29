@@ -2305,11 +2305,6 @@ def render_template(template_name: str, **context) -> HTMLResponse:
                         recent_bars.append(bar)
                 context.setdefault("recent_bars", recent_bars)
 
-    # Ensure Google Maps API key is available to templates from environment.
-    api_key = os.getenv("GOOGLE_MAPS_API_KEY")
-    if api_key:
-        context.setdefault("GOOGLE_MAPS_API_KEY", api_key)
-
     language_code = DEFAULT_LANGUAGE
     translator = create_translator(DEFAULT_LANGUAGE)
     if request is not None:
