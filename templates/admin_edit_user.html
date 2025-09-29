@@ -52,14 +52,14 @@
 
     <h2>{{ _('admin_edit_user.sections.assigned', default='Assigned Bars') }}</h2>
     <div class="toolbar-actions">
-      <div class="bars-search" role="search" aria-label="{{ _('admin_edit_user.assigned_search.aria', default='Search assigned bars') }}" onsubmit="return false">
+      <form class="bars-search" role="search" aria-label="{{ _('admin_edit_user.assigned_search.aria', default='Search assigned bars') }}">
         <i class="bi bi-search" aria-hidden="true"></i>
         <input id="assignedBarSearch" type="search" inputmode="search" autocomplete="off"
                placeholder="{{ _('admin_edit_user.assigned_search.placeholder', default='Search bars by name…') }}" aria-label="{{ _('admin_edit_user.assigned_search.input_aria', default='Search assigned bars by name') }}">
         <button class="clear" type="button" aria-label="{{ _('admin_edit_user.assigned_search.clear', default='Clear search') }}">
           <i class="bi bi-x-circle" aria-hidden="true"></i>
         </button>
-      </div>
+      </form>
     </div>
     <div class="table-card">
       <table class="bars-table">
@@ -91,14 +91,14 @@
 
     <h2>{{ _('admin_edit_user.sections.assign', default='Assign a Bar') }}</h2>
     <div class="toolbar-actions">
-      <div class="bars-search" role="search" aria-label="{{ _('admin_edit_user.available_search.aria', default='Search available bars') }}" onsubmit="return false">
+      <form class="bars-search" role="search" aria-label="{{ _('admin_edit_user.available_search.aria', default='Search available bars') }}">
         <i class="bi bi-search" aria-hidden="true"></i>
         <input id="availableBarSearch" type="search" inputmode="search" autocomplete="off"
                placeholder="{{ _('admin_edit_user.available_search.placeholder', default='Search bars by name…') }}" aria-label="{{ _('admin_edit_user.available_search.input_aria', default='Search available bars by name') }}">
         <button class="clear" type="button" aria-label="{{ _('admin_edit_user.available_search.clear', default='Clear search') }}">
           <i class="bi bi-x-circle" aria-hidden="true"></i>
         </button>
-      </div>
+      </form>
     </div>
     <div class="table-card">
       <table class="bars-table">

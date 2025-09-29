@@ -87,8 +87,14 @@
       });
     };
 
+    const form = input.closest('.users-search, .bars-search');
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      input.focus();
+    });
+
     input.addEventListener('input', debounce(apply, 120));
-    input.closest('.users-search, .bars-search')
+    form
       ?.querySelector('.clear')
       ?.addEventListener('click', () => {
         input.value = '';
