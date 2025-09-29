@@ -49,44 +49,14 @@
             <form id="delete_test_{{ bar.id }}" method="post" action="/admin/payments/{{ bar.id }}/test_closing/delete" style="display:none"></form>
           </td>
         </tr>
-        {% endfor %}
+{% endfor %}
       </tbody>
     </table>
   </div>
 </section>
+{% endblock %}
 
-<script>
-(function(){
-  const input = document.getElementById('paymentsSearch');
-  const tbody = document.querySelector('.payments-table tbody');
-  if(!input || !tbody) return;
-
-  const rows = Array.from(tbody.rows);
-  const norm = s => (s||'').toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
-
-  function applyFilter(){
-    const q = norm(input.value);
-    rows.forEach(tr => {
-      const numberCell = tr.cells && tr.cells[0] ? tr.cells[0].textContent : '';
-      const nameCell = tr.cells && tr.cells[1] ? tr.cells[1].textContent : '';
-      const match =
-        !q ||
-        norm(nameCell).includes(q) ||
-        norm(numberCell).includes(q);
-      tr.style.display = match ? '' : 'none';
-    });
-  }
-  function debounce(fn,ms){let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms)}}
-  const run = debounce(applyFilter,120);
-  input.addEventListener('input', run);
-  document.querySelector('.payments-search .clear')?.addEventListener('click',()=>{
-    input.value=''; applyFilter(); input.focus();
-  });
-
-  const qs = new URLSearchParams(location.search);
-  const q = qs.get('q');
-  if(q){ input.value = q; applyFilter(); }
-})();
-</script>
+{% block scripts %}
+{{ super() }}
+<script src="/static/js/admin-payments.js" defer></script>
 {% endblock %}
