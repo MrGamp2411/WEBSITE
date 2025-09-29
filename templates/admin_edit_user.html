@@ -1,4 +1,7 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+<link rel="stylesheet" href="/static/css/pages/admin-edit-user.css">
+{% endblock %}
 {% block content %}
 <a class="back-link" href="/admin/users"><i class="bi bi-chevron-left" aria-hidden="true"></i> {{ _('admin_edit_user.back', default='Back to users') }}</a>
 <h1>{{ _('admin_edit_user.title', user=user.username, default='Edit User {user}') }}</h1>
@@ -144,9 +147,9 @@
 </form>
 
 {% if current.is_super_admin %}
-<div class="actions-group" style="margin-top:var(--space-3)">
+<div class="actions-group admin-edit-user__danger-actions">
   <button type="button" class="btn-danger-soft js-delete-user" data-user-id="{{ user.id }}">{{ _('admin_edit_user.actions.delete', default='Delete') }}</button>
-  <form id="delete-user-{{ user.id }}" method="post" action="{{ request.url_for('delete_user', user_id=user.id) }}" style="display:none;"></form>
+  <form id="delete-user-{{ user.id }}" method="post" action="{{ request.url_for('delete_user', user_id=user.id) }}" class="admin-edit-user__delete-form"></form>
 </div>
 <div id="deleteBlocker" class="cart-blocker" hidden>
   <div class="cart-popup">

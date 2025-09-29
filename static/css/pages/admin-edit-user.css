@@ -1,0 +1,7 @@
+.admin-edit-user__danger-actions {
+  margin-top: var(--space-3);
+}
+
+.admin-edit-user__delete-form {
+  display: none;
+}

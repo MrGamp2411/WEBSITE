@@ -1,0 +1,7 @@
+.admin-notification-view__actions {
+  margin-top: var(--space-2);
+}
+
+.admin-notification-view__delete-form {
+  display: none;
+}

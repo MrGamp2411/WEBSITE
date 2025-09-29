@@ -13,6 +13,7 @@
   - `templates/bar_edit_product.html` imports `/static/css/pages/bar-edit-product.css`.
   - `templates/admin_new_notification.html` imports `/static/css/pages/admin-new-notification.css` and `/static/js/admin-new-notification.js`.
   - `templates/admin_edit_user.html` imports `/static/js/admin-edit-user.js`.
+  - `templates/admin_edit_user.html` also imports `/static/css/pages/admin-edit-user.css` to handle delete action spacing and hide the post form.
   - `templates/admin_edit_bar.html` imports `/static/css/pages/admin-edit-bar.css` and `/static/js/admin-edit-bar.js` (Leaflet assets stay on the CDN).
   - `templates/order_history.html` imports `/static/css/pages/order-history.css` and `/static/js/order-history.js` alongside `orders.js`.
   - `templates/admin_edit_welcome.html` imports `/static/css/pages/admin-edit-welcome.css` and `/static/js/admin-edit-welcome.js`.
@@ -26,6 +27,8 @@
   - `templates/admin_bars.html` imports `/static/js/admin-bars.js` for table filtering and deletion confirmation.
   - `templates/admin_bar_users.html` imports `/static/js/admin-bar-users.js` for staff filtering and removal confirmation dialogs.
   - `templates/admin_notification_view.html` imports `/static/js/admin-notification-view.js` for delete confirmation handling.
+  - `templates/admin_notification_view.html` also imports `/static/css/pages/admin-notification-view.css` for action spacing and hidden delete form styling.
+  - `templates/admin_audit_logs.html` imports `/static/js/admin-audit-logs.js` and `/static/css/pages/admin-audit-logs.css` to keep the filter form responsive without inline styles.
   - `templates/admin_ip_block.html` imports `/static/js/admin-ip-block.js` for delete confirmation handling.
 - Footer marketing pages (About, Help Center, For Bars, Terms) live in `templates/about.html`, `templates/help_center.html`, `templates/for_bars.html`, and `templates/terms.html`; they share the `.static-page` styles defined in `static/css/components.css`.
   - Support contact details for these static pages pull from Jinja globals defined in `main.py` (`SUPPORT_EMAIL`, `SUPPORT_NUMBER`, `TERMS_VERSION`, etc.); update those constants to change emails, phone numbers, or term dates sitewide.

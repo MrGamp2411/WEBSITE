@@ -1,4 +1,7 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+<link rel="stylesheet" href="/static/css/pages/admin-audit-logs.css">
+{% endblock %}
 {% block content %}
 <section class="users-page audit-page">
   <header class="users-toolbar">
@@ -8,9 +11,9 @@
       <p class="subtitle">{{ _('admin_audit_logs.subtitle', default='Review system activity.') }}</p>
     </div>
     <form class="users-search" method="get" id="auditFilters">
-      <input name="username" type="search" placeholder="{{ _('admin_audit_logs.filters.username', default='User') }}" value="{{ filters.username or '' }}" style="min-width:0">
-      <input name="bar" type="search" placeholder="{{ _('admin_audit_logs.filters.bar', default='Bar') }}" value="{{ filters.bar or '' }}" style="min-width:0">
-      <select name="action" style="min-width:0">
+      <input name="username" type="search" placeholder="{{ _('admin_audit_logs.filters.username', default='User') }}" value="{{ filters.username or '' }}" class="audit-filters__field">
+      <input name="bar" type="search" placeholder="{{ _('admin_audit_logs.filters.bar', default='Bar') }}" value="{{ filters.bar or '' }}" class="audit-filters__field">
+      <select name="action" class="audit-filters__field">
         <option value="">{{ _('admin_audit_logs.filters.all_actions', default='All actions') }}</option>
         {% for a in actions %}
           <option value="{{ a }}" {% if filters.action == a %}selected{% endif %}>{{ a }}</option>
