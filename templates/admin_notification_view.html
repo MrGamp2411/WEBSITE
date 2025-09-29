@@ -1,4 +1,7 @@
 {% extends "layout.html" %}
+{% block page_styles %}
+<link rel="stylesheet" href="/static/css/pages/admin-notification-view.css">
+{% endblock %}
 {% block content %}
 <section class="users-page">
   <header class="users-toolbar">
@@ -55,11 +58,11 @@
     </table>
   </div>
 
-  <div class="actions-group" style="margin-top:var(--space-2);">
+  <div class="actions-group admin-notification-view__actions">
     <a href="/admin/notifications" class="btn-outline">{{ _('admin_notification_view.actions.back_to_list', default='Back to list') }}</a>
     <button type="button" class="btn-danger-soft js-delete-note" data-note-id="{{ note.id }}">{{ _('admin_notifications.sent.actions.delete', default='Delete') }}</button>
   </div>
-  <form id="delete-note-{{ note.id }}" method="post" action="/admin/notifications/{{ note.id }}/delete" style="display:none;"></form>
+  <form id="delete-note-{{ note.id }}" method="post" action="/admin/notifications/{{ note.id }}/delete" class="admin-notification-view__delete-form"></form>
 </section>
 
 <div id="deleteBlocker" class="cart-blocker" hidden>
@@ -72,6 +75,10 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
 <script src="/static/js/admin-notification-view.js" defer></script>
 {% endblock %}
 
