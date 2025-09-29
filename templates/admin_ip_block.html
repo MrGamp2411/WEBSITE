@@ -73,31 +73,5 @@
     </div>
   </div>
 </div>
-<script>
-(function(){
-  const blocker = document.getElementById('ipBlocker');
-  const cancelBtn = blocker?.querySelector('.js-cancel-ip');
-  const confirmBtn = blocker?.querySelector('.js-confirm-ip');
-  let targetForm = null;
-
-  document.querySelectorAll('.ip-block-delete').forEach(form => {
-    form.addEventListener('submit', evt => {
-      if (!targetForm) {
-        evt.preventDefault();
-        targetForm = form;
-        if (blocker) blocker.hidden = false;
-      }
-    });
-  });
-
-  cancelBtn?.addEventListener('click', () => {
-    if (blocker) blocker.hidden = true;
-    targetForm = null;
-  });
-
-  confirmBtn?.addEventListener('click', () => {
-    if (targetForm) targetForm.submit();
-  });
-})();
-</script>
+<script src="/static/js/admin-ip-block.js" defer></script>
 {% endblock %}

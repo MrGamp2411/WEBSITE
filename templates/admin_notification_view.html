@@ -72,25 +72,6 @@
   </div>
 </div>
 
-<script>
-(function(){
-  const blocker = document.getElementById('deleteBlocker');
-  const cancelBtn = document.querySelector('.js-cancel-delete');
-  const confirmBtn = document.querySelector('.js-confirm-delete');
-  let targetForm = null;
-  document.querySelector('.js-delete-note')?.addEventListener('click', e => {
-    e.preventDefault();
-    targetForm = document.getElementById('delete-note-{{ note.id }}');
-    if(blocker) blocker.hidden = false;
-  });
-  cancelBtn?.addEventListener('click', () => {
-    if(blocker) blocker.hidden = true;
-    targetForm = null;
-  });
-  confirmBtn?.addEventListener('click', () => {
-    if(targetForm) targetForm.submit();
-  });
-})();
-</script>
+<script src="/static/js/admin-notification-view.js" defer></script>
 {% endblock %}
 
