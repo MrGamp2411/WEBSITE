@@ -1395,7 +1395,12 @@
         "email": "E-mail",
         "phone": "Téléphone"
       },
-      "empty": "Aucune mise à jour du profil enregistrée."
+      "filters": {
+        "label": "Filtrer par champ",
+        "all": "Tous les champs"
+      },
+      "empty": "Aucune mise à jour du profil enregistrée.",
+      "no_results": "Aucune mise à jour ne correspond au champ sélectionné."
     },
     "orders": {
       "title": "Ordres",

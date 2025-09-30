@@ -26,6 +26,21 @@
 
   <h2>{{ _('admin_view_user.updates.title', default='Profile updates') }}</h2>
   <p class="subtitle">{{ _('admin_view_user.updates.subtitle', default='Detailed history of profile edits.') }}</p>
+  {% if profile_updates|length > 0 %}
+  <div class="users-table__filters">
+    <label for="fieldFilter">{{ _('admin_view_user.updates.filters.label', default='Filter by field') }}</label>
+    <select id="fieldFilter" class="users-table__filter-select" data-field-filter>
+      <option value="">{{ _('admin_view_user.updates.filters.all', default='All fields') }}</option>
+      {% set seen = namespace(items=[]) %}
+      {% for change in profile_updates %}
+        {% if change.field not in seen.items %}
+          <option value="{{ change.field }}">{{ _('admin_view_user.updates.fields.' ~ change.field, default=change.field|title) }}</option>
+          {% set seen.items = seen.items + [change.field] %}
+        {% endif %}
+      {% endfor %}
+    </select>
+  </div>
+  {% endif %}
   <div class="table-card table-card--scroll">
     <table class="users-table">
       <thead>
@@ -38,7 +53,7 @@
       </thead>
       <tbody>
         {% for change in profile_updates %}
-        <tr>
+        <tr data-update-row data-field="{{ change.field }}">
           <td>{{ _('admin_view_user.updates.fields.' ~ change.field, default=change.field|title) }}</td>
           <td>{{ change.previous or '-' }}</td>
           <td>{{ change.current or '-' }}</td>
@@ -47,6 +62,10 @@
         {% endfor %}
         {% if profile_updates|length == 0 %}
         <tr><td colspan="4">{{ _('admin_view_user.updates.empty', default='No profile updates recorded.') }}</td></tr>
+        {% else %}
+        <tr class="users-table__empty" data-no-results hidden>
+          <td colspan="4">{{ _('admin_view_user.updates.no_results', default='No updates match the selected field.') }}</td>
+        </tr>
         {% endif %}
       </tbody>
     </table>
@@ -140,5 +159,10 @@
     </table>
   </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="/static/js/admin-view-user.js" defer></script>
 {% endblock %}
 

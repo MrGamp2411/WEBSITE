@@ -1368,7 +1368,12 @@
         "email": "E-Mail",
         "phone": "Telefon"
       },
-      "empty": "Keine Profilaktualisierungen vorhanden."
+      "filters": {
+        "label": "Nach Feld filtern",
+        "all": "Alle Felder"
+      },
+      "empty": "Keine Profilaktualisierungen vorhanden.",
+      "no_results": "Keine Aktualisierungen entsprechen dem ausgewählten Feld."
     },
     "orders": {
       "title": "Bestellungen",
