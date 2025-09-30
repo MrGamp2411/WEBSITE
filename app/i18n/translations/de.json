@@ -1368,12 +1368,7 @@
         "email": "E-Mail",
         "phone": "Telefon"
       },
-      "filters": {
-        "label": "Nach Feld filtern",
-        "all": "Alle Felder"
-      },
-      "empty": "Keine Profilaktualisierungen vorhanden.",
-      "no_results": "Keine Aktualisierungen entsprechen dem ausgewählten Feld."
+      "empty": "Keine Profilaktualisierungen vorhanden."
     },
     "orders": {
       "title": "Bestellungen",

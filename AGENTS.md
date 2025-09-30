@@ -124,7 +124,6 @@ assets when working on admin templates under `templates/`.
 | `templates/admin_bar_users.html` | — | `static/js/admin-bar-users.js` | Handles staff filtering/removal dialogs. |
 | `templates/admin_ip_block.html` | — | `static/js/admin-ip-block.js` | Delete confirmation. |
 | `templates/admin_notifications_form` (search toolbars) | CSS via respective page | JS prevents submissions on `.form-search` wrappers. |
-| `templates/admin_view_user.html` | `static/css/pages/admin-view-user.css` | `static/js/admin-view-user.js` | Field filter dropdown narrows profile update history. |
 | `templates/admin_notification_view.html` | `static/css/pages/admin-notification-view.css` | `static/js/admin-notification-view.js` | Maintains action spacing. |
 
 ## 8. Bar Management (Admin + Bar Owner)
