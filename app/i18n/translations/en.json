@@ -1368,7 +1368,12 @@
         "email": "Email",
         "phone": "Phone"
       },
-      "empty": "No profile updates recorded."
+      "filters": {
+        "label": "Filter by field",
+        "all": "All fields"
+      },
+      "empty": "No profile updates recorded.",
+      "no_results": "No updates match the selected field."
     },
     "orders": {
       "title": "Orders",
