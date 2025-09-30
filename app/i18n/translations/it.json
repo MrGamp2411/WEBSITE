@@ -1368,12 +1368,7 @@
         "email": "Email",
         "phone": "Telefono"
       },
-      "filters": {
-        "label": "Filtra per campo",
-        "all": "Tutti i campi"
-      },
-      "empty": "Nessun aggiornamento profilo registrato.",
-      "no_results": "Nessun aggiornamento corrisponde al campo selezionato."
+      "empty": "Nessun aggiornamento profilo registrato."
     },
     "orders": {
       "title": "Ordini",
