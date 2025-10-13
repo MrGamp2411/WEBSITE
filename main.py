@@ -2373,20 +2373,34 @@ def render_template(template_name: str, **context) -> HTMLResponse:
 
 @app.post("/api/products/{product_id}/image")
 async def upload_product_image(
+    request: Request,
     product_id: int,
     image: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
     if not image.filename:
         raise HTTPException(status_code=400, detail="No file uploaded")
+
+    db_item = db.get(MenuItem, product_id)
+    if not db_item:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    user = get_current_user(request)
+    if not user or not (
+        user.is_super_admin
+        or (
+            db_item.bar_id in user.bar_ids
+            and (user.is_bar_admin or user.is_bartender)
+        )
+    ):
+        raise HTTPException(status_code=403, detail="Not authorised")
+
     data = await image.read()
     if not image.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="Uploaded file must be an image")
     if len(data) > 5 * 1024 * 1024:
         raise HTTPException(status_code=413, detail="File too large (>5MB)")
-    db_item = db.get(MenuItem, product_id)
-    if not db_item:
-        raise HTTPException(status_code=404, detail="Product not found")
+
     img = db.query(ProductImage).filter_by(product_id=product_id).first()
     if img:
         img.data = data
