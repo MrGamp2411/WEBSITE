@@ -140,6 +140,8 @@ assets when working on admin templates under `templates/`.
 | `templates/bar_edit_product.html` | `static/css/pages/bar-edit-product.css` | `static/js/bar-edit-product.js` (if added) | Loads via admin mapping above. |
 | `templates/bar_edit_product_description.html` | `static/css/pages/translation-editor.css` | — | Product description translations. |
 
+- Product image uploads (`/api/products/{product_id}/image`) now enforce staff-only access. Only super admins or bar admins/bartenders assigned to the product's bar can update imagery.
+
 - Shared order widgets pull translations from `orders.statuses`,
   `orders.payment_methods`, `bartender_orders.actions`, and
   `display_orders.card.title` inside `app/i18n/translations/*.json`.

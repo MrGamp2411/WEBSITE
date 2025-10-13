@@ -72,10 +72,11 @@ def test_upload_product_photo_updates_db_and_renders():
     client.post("/login", data={"email": admin.email, "password": admin.password})
 
     file_content = b"img"
-    client.post(
+    resp = client.post(
         f"/api/products/{item_id}/image",
         files={"image": ("beer.jpg", file_content, "image/jpeg")},
     )
+    assert resp.status_code == 204
 
     edit = client.get(
         f"/bar/{bar_id}/categories/{category_id}/products/{item_id}/edit"
@@ -138,16 +139,74 @@ def test_product_photo_persists_after_restart():
     client.post("/login", data={"email": admin.email, "password": admin.password})
 
     file_content = b"img"
-    client.post(
+    resp = client.post(
         f"/api/products/{item_id}/image",
         files={"image": ("beer.jpg", file_content, "image/jpeg")},
     )
+    assert resp.status_code == 204
 
     load_bars_from_db()
     photo_path = bars[bar_id].products[item_id].photo_url
     assert photo_path == f"/api/products/{item_id}/image"
     detail = client.get(f"/bars/{bar_id}")
     assert f"/api/products/{item_id}/image" in detail.text
+
+    users.clear()
+    users_by_email.clear()
+    users_by_username.clear()
+    bars.clear()
+
+
+def test_upload_product_photo_requires_staff_access():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+
+    db = SessionLocal()
+    bar = BarModel(name="Bar", slug="bar")
+    db.add(bar)
+    db.commit()
+    db.refresh(bar)
+    category = CategoryModel(bar_id=bar.id, name="Drinks")
+    db.add(category)
+    db.commit()
+    db.refresh(category)
+    item = MenuItem(
+        bar_id=bar.id,
+        category_id=category.id,
+        name="Beer",
+        description="desc",
+        price_chf=Decimal("5.00"),
+    )
+    db.add(item)
+    db.commit()
+    db.refresh(item)
+    item_id = item.id
+    db.close()
+
+    customer = DemoUser(
+        id=9999,
+        username="customer",
+        password="secret",
+        email="customer@example.com",
+    )
+    users[customer.id] = customer
+    users_by_email[customer.email] = customer
+    users_by_username[customer.username] = customer
+
+    client = TestClient(app)
+    client.post(
+        "/login", data={"email": customer.email, "password": customer.password}
+    )
+
+    resp = client.post(
+        f"/api/products/{item_id}/image",
+        files={"image": ("beer.jpg", b"img", "image/jpeg")},
+    )
+    assert resp.status_code == 403
+
+    db = SessionLocal()
+    assert db.query(ProductImage).filter_by(product_id=item_id).first() is None
+    db.close()
 
     users.clear()
     users_by_email.clear()
