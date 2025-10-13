@@ -1,29 +1,24 @@
 # Security Review
 
 ## Overview
-This document captures potential vulnerabilities observed during a manual review of the FastAPI application in this repository. Each issue includes an impact assessment and recommended mitigation steps.
+This document captures potential vulnerabilities observed during a manual review of the FastAPI application in this repository. Each issue includes an impact assessment and recommended mitigation steps. Previously reported high-risk flaws around product image uploads, the session secret, WebSocket authorisation, and notification attachments have been remediated; the findings below reflect the current outstanding risks.
 
 ## Findings
 
-### 1. Unauthenticated product image upload (High)
-The `/api/products/{product_id}/image` endpoint accepts uploaded files without verifying that the caller is an authenticated or authorised staff member. Any internet user can overwrite a product image for any product ID, which enables defacement, malicious content injection, or a storage-based denial of service (despite the 5 MB limit per upload).【F:main.py†L2374-L2398】
+### 1. Unauthenticated bar creation (High)
+The public REST API exposes `POST /api/bars` without any authentication or authorisation. Any internet user can create or mutate bar records, polluting production data, overriding legitimate listings, or abusing the platform to host fraudulent content.【F:main.py†L2780-L2802】
 
-**Recommendation:** Restrict the endpoint to authenticated bar staff or administrators (e.g. by requiring a valid session and authorisation check before processing the upload). Additionally, persist files via an object store or trusted CDN instead of raw database blobs to simplify validation and scanning.
+**Recommendation:** Require an authenticated super administrator session (or an equivalent admin token) before allowing bar creation. Reject anonymous requests and log failed attempts for monitoring.
 
-### 2. Hard-coded session secret (High)
-The application configures `SessionMiddleware` with the literal secret value `"dev-secret"`. Anyone who can read the source can forge session cookies and impersonate arbitrary users (including super administrators), completely bypassing authentication controls.【F:main.py†L768-L774】
+### 2. Unauthenticated payout scheduling (High)
+`POST /api/payouts/run` similarly omits permission checks. An attacker can fabricate payouts for arbitrary bars, manipulating accounting records and potentially triggering downstream payment workflows or reports that rely on payout status.【F:main.py†L2864-L2890】
 
-**Recommendation:** Load a strong, randomly generated secret from the environment (e.g. `SESSION_SECRET`) in production, rotate it periodically, and ensure deployments never fall back to a placeholder.
+**Recommendation:** Restrict this endpoint to authorised finance or super admin users and validate the actor from the current session rather than accepting an arbitrary `actor_user_id` payload. Add rate limiting and audit logging for failed attempts.
 
-### 3. Unauthenticated WebSocket subscriptions (Medium)
-WebSocket endpoints (`/ws/bar/{bar_id}/orders` and `/ws/user/{user_id}/orders`) accept the caller-provided identifiers at face value and do not confirm the user’s identity. Attackers can connect to another user’s channel to receive order updates or supply an arbitrary bar ID to monitor staff traffic.【F:main.py†L3423-L3439】【F:main.py†L780-L815】
+### 3. Anonymous order submission (High)
+`POST /api/orders` lets unauthenticated callers place orders for any bar. Although no payment is collected, the endpoint inserts fully-fledged orders into the database, generating live work for bartenders and triggering websocket notifications. Attackers can exploit this to flood venues with bogus orders and disrupt operations.【F:main.py†L2805-L2861】
 
-**Recommendation:** Require an authenticated session when upgrading to WebSockets. Validate that the connected user owns the requested channel (matching `user_id` or associated bar) before registering the socket, and immediately terminate mismatches.
-
-### 4. Unbounded notification attachments (Medium)
-`/admin/notifications` accepts optional image and attachment uploads but reads the entire file into memory without enforcing size limits or validating content type. A malicious administrator (or an attacker with a stolen admin session) could exhaust server memory or store dangerous payloads served back to end users.【F:main.py†L6603-L6705】【F:main.py†L6824-L6851】
-
-**Recommendation:** Enforce explicit size caps (e.g. `<10 MB`) before reading files, restrict accepted MIME types, and scan attachments for malware. Consider storing large files externally with signed download URLs to avoid keeping binary blobs in application memory.
+**Recommendation:** Require a logged-in customer before creating an order, associating the order with the caller’s user ID. Apply server-side validation (e.g. CAPTCHA, rate limits) to deter automated abuse and ensure payment or wallet balance is verified prior to confirming the order.
 
 ## Next Steps
-Prioritise remediation of the high-severity issues (unauthenticated file upload and hard-coded session secret), then address WebSocket authorisation gaps and attachment handling. After implementing fixes, schedule a follow-up security assessment and add automated tests to cover these regressions.
+Prioritise remediation of the three high-severity issues above. After implementing fixes, perform a regression review (including automated tests) to ensure admin-only APIs enforce authentication and that order placement validates the customer identity and payment state.
