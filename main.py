@@ -3929,8 +3929,6 @@ async def login_form(request: Request):
 async def login(request: Request, db: Session = Depends(get_db)):
     """Handle login submissions."""
     existing_user = get_current_user(request)
-    if existing_user:
-        return redirect_for_authenticated_user(existing_user)
     form = await request.form()
     email = form.get("email")
     password = form.get("password")
@@ -3938,6 +3936,8 @@ async def login(request: Request, db: Session = Depends(get_db)):
     longitude = form.get("longitude")
     lat = float(latitude) if latitude else None
     lon = float(longitude) if longitude else None
+    if existing_user and not (email and password):
+        return redirect_for_authenticated_user(existing_user)
     if email and password:
         record = login_attempts[email]
         if record["count"] >= 5:
