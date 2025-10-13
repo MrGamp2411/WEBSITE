@@ -770,7 +770,11 @@ app.add_middleware(BlockRedirectMiddleware)
 app.add_middleware(DisplayRedirectMiddleware)
 app.add_middleware(RegisterRedirectMiddleware)
 app.add_middleware(AuditLogMiddleware)
-app.add_middleware(SessionMiddleware, secret_key="dev-secret")
+SESSION_SECRET = os.getenv("SESSION_SECRET", "").strip()
+if not SESSION_SECRET:
+    SESSION_SECRET = secrets.token_urlsafe(64)
+
+app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
 
 
 # -----------------------------------------------------------------------------

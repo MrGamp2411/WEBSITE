@@ -54,6 +54,7 @@ Configure the application via environment variables. Unless noted, defaults foll
 | `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `POSTGRES_HOST`, `POSTGRES_PORT` | Compose `DATABASE_URL` automatically. | `postgres` host, `5432` port |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Seed credentials for the SuperAdmin account. | `admin@example.com`, `ChangeMe!123` |
 | `SUPPORT_EMAIL`, `SUPPORT_NUMBER` | Support contact exposed in static pages and footer. | `support@siplygo.example.com`, `+41 91 555 01 23` |
+| `SESSION_SECRET` | Secret key for signing authentication sessions. | Randomly generated at startup when unset |
 | `FRONTEND_ORIGINS` | Allowed CORS origins for API requests. | `http://localhost:5173` |
 | `BAR_TIMEZONE` / `TZ` | Timezone used when computing “open now”, schedules, and order codes. | System TZ |
 | `PASSWORD_PEPPER` | Extra hash pepper appended before Argon2 hashing. | `""` |
