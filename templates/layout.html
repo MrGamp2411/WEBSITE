@@ -167,6 +167,9 @@
         </div>
       </div>
     </div>
+    {% if cart_bar_paused|default(False) %}
+    <!-- window.orderingPaused = true -->
+    {% endif %}
     <script id="layoutState" type="application/json">
       {{ {'orderingPaused': cart_bar_paused|default(False), 'showServicePausedOnLoad': show_service_paused|default(False)}|tojson }}
     </script>
