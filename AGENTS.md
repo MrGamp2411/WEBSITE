@@ -12,6 +12,7 @@ Sections are grouped so you can jump straight to the files you need.
 | Phone validation copy | Must stay in English. | `app/phone.py`, `tests/test_register_phone_validation.py` |
 | Dark mode | Removed; site is light-only. | Global |
 | Recent work context | Always review latest commits. | `git log` |
+| Session secret | Load via `SESSION_SECRET` env var; code falls back to random runtime secret only for local dev. | `main.py` |
 
 > **Reminder:** Inspect existing CSS/JS under `static/` before writing new
 > assets. Templates under `templates/` must **not** contain inline CSS or JS.
