@@ -245,3 +245,10 @@ All static marketing pages reuse `.static-page` rules in
 If any instruction seems missing, re-check this file—everything links to the
 canonical location. For further context, inspect the file path referenced in
 each table cell or bullet.
+
+## Security Audit Notes
+
+- Security findings are documented in `SECURITY_REVIEW.md`. The most recent
+  review (April 2025) highlights missing CSRF protections on POST routes and
+  unsafe product photo upload handling. Address these before deploying changes
+  that rely on cookie-authenticated flows or staff-provided media.
