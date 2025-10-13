@@ -40,7 +40,7 @@ import random
 import re
 import secrets
 import time
-from collections import defaultdict
+from collections import defaultdict, deque
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from datetime import date, datetime, timedelta
@@ -48,6 +48,23 @@ from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
 CH_TZ = ZoneInfo("Europe/Zurich")
+
+PAYOUT_RATE_LIMIT_WINDOW_SECONDS = 60
+PAYOUT_RATE_LIMIT_MAX_ATTEMPTS = 5
+_payout_attempt_buckets: Dict[str, deque[float]] = defaultdict(deque)
+
+
+def _register_payout_attempt(ip: Optional[str]) -> bool:
+    """Track payout scheduling attempts for rudimentary rate limiting."""
+    key = ip or "unknown"
+    bucket = _payout_attempt_buckets[key]
+    now = time.monotonic()
+    while bucket and now - bucket[0] > PAYOUT_RATE_LIMIT_WINDOW_SECONDS:
+        bucket.popleft()
+    if len(bucket) >= PAYOUT_RATE_LIMIT_MAX_ATTEMPTS:
+        return False
+    bucket.append(now)
+    return True
 
 SUPPORT_EMAIL = os.getenv("SUPPORT_EMAIL", "support@siplygo.example.com")
 SUPPORT_NUMBER = os.getenv("SUPPORT_NUMBER", "+41 91 555 01 23")
@@ -514,6 +531,10 @@ class DemoUser:
     @property
     def is_blocked(self) -> bool:
         return self.role == "blocked"
+
+    @property
+    def is_finance(self) -> bool:
+        return self.role == "finance"
 
     @property
     def is_ip_blocked(self) -> bool:
@@ -999,7 +1020,7 @@ def ensure_role_enum() -> None:
                 "WHERE t.typname = 'roleenum'"
             )
         ).scalars().all()
-        for label in ["REGISTERING", "DISPLAY", "BLOCKED", "IPBLOCK"]:
+        for label in ["REGISTERING", "DISPLAY", "BLOCKED", "IPBLOCK", "Finance"]:
             if label not in existing:
                 conn.execute(
                     text(f"ALTER TYPE roleenum ADD VALUE IF NOT EXISTS '{label}'")
@@ -2913,26 +2934,113 @@ async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
 )
 def run_payout(data: PayoutRunInput, request: Request, db: Session = Depends(get_db)):
     """Aggregate completed orders for a bar within a date range and create a payout."""
+    ip = request.client.host if request.client else None
+    user_agent = request.headers.get("user-agent")
+    payload_details = {
+        "bar_id": data.bar_id,
+        "period_start": data.period_start.isoformat(),
+        "period_end": data.period_end.isoformat(),
+    }
+
+    if not _register_payout_attempt(ip):
+        log_action(
+            db,
+            actor_user_id=None,
+            action="rate_limited_payout_run_attempt",
+            entity_type="payout",
+            payload={**payload_details, "reason": "rate_limited"},
+            ip=ip,
+            user_agent=user_agent,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many payout attempts. Please wait before retrying.",
+        )
+
+    user = get_current_user(request)
+    if not user:
+        log_action(
+            db,
+            actor_user_id=None,
+            action="unauthenticated_payout_run_attempt",
+            entity_type="payout",
+            payload=payload_details,
+            ip=ip,
+            user_agent=user_agent,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+        )
+
+    if not (user.is_super_admin or user.is_finance):
+        log_action(
+            db,
+            actor_user_id=user.id,
+            action="forbidden_payout_run_attempt",
+            entity_type="payout",
+            payload={**payload_details, "role": user.role},
+            ip=ip,
+            user_agent=user_agent,
+            phone=user.phone_e164 or None,
+            credit=float(user.credit) if user.credit else None,
+        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorised")
+
+    if data.actor_user_id and data.actor_user_id != user.id:
+        log_action(
+            db,
+            actor_user_id=user.id,
+            action="payout_run_actor_mismatch_attempt",
+            entity_type="payout",
+            payload={**payload_details, "actor_user_id": data.actor_user_id},
+            ip=ip,
+            user_agent=user_agent,
+            phone=user.phone_e164 or None,
+            credit=float(user.credit) if user.credit else None,
+        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid actor")
+
     try:
         payout = schedule_payout(db, data.bar_id, data.period_start, data.period_end)
     except ValueError as exc:
+        log_action(
+            db,
+            actor_user_id=user.id,
+            action="payout_run_failed",
+            entity_type="payout",
+            payload={**payload_details, "error": str(exc)},
+            ip=ip,
+            user_agent=user_agent,
+            phone=user.phone_e164 or None,
+            credit=float(user.credit) if user.credit else None,
+        )
         raise HTTPException(status_code=400, detail=str(exc))
-    actor_user = db.get(User, data.actor_user_id) if data.actor_user_id else None
+
+    actor_user = db.get(User, user.id)
+    phone = None
+    credit = None
+    if actor_user:
+        phone = actor_user.phone_e164 or actor_user.phone or None
+        credit = float(actor_user.credit) if actor_user.credit is not None else None
+    elif user.phone_e164:
+        phone = user.phone_e164
+    elif user.phone:
+        phone = user.phone
+    if credit is None and user.credit:
+        credit = float(user.credit)
+
     log_action(
         db,
-        actor_user_id=data.actor_user_id,
+        actor_user_id=user.id,
         action="payout_run",
         entity_type="payout",
         entity_id=payout.id,
-        payload={
-            "bar_id": data.bar_id,
-            "period_start": data.period_start.isoformat(),
-            "period_end": data.period_end.isoformat(),
-        },
-        ip=request.client.host if request.client else None,
-        user_agent=request.headers.get("user-agent"),
-        phone=actor_user.phone_e164 if actor_user else None,
-        credit=float(actor_user.credit) if actor_user else None,
+        payload=payload_details,
+        ip=ip,
+        user_agent=user_agent,
+        phone=phone,
+        credit=credit,
     )
     return payout
 
@@ -5961,6 +6069,7 @@ def _load_demo_user(user_id: int, db: Session) -> DemoUser:
         RoleEnum.SUPERADMIN: "super_admin",
         RoleEnum.BARADMIN: "bar_admin",
         RoleEnum.BARTENDER: "bartender",
+        RoleEnum.FINANCE: "finance",
         RoleEnum.CUSTOMER: "customer",
         RoleEnum.REGISTERING: "registering",
         RoleEnum.DISPLAY: "display",
