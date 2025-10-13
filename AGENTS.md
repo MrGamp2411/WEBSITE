@@ -73,9 +73,12 @@ Sections are grouped so you can jump straight to the files you need.
   `.notifications-page .notification-card`.
 - Behaviour: `/static/js/admin-notifications.js`,
   `/static/js/admin-notification-view.js`, `/static/js/admin-new-notification.js`.
-- Admin form enforces subject maxlength 30, handles attachments (downloadable
-  in detail view) and optional targeting. Alerts when required recipient data
-  is missing.
+  - Admin form enforces subject maxlength 30, handles attachments (downloadable
+    in detail view) and optional targeting. Alerts when required recipient data
+    is missing.
+- Upload limits: images max 5MB (`ALLOWED_NOTIFICATION_IMAGE_TYPES`),
+  attachments max 10MB (`ALLOWED_NOTIFICATION_ATTACHMENT_TYPES`). Filenames are
+  sanitised via `sanitize_notification_filename` in `main.py`.
 - Deleting a notification removes related `NotificationLog` plus all recipient
   `Notification` rows so `/notifications` stays in sync.
 - Translations stored on both `NotificationLog` and each `Notification` via

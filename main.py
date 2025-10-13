@@ -56,6 +56,31 @@ TERMS_VERSION = "V1.0"
 TERMS_EFFECTIVE_DATE = date.today().strftime("%d.%m.%Y")
 TERMS_NEXT_REVIEW_DATE = date(2025, 9, 16).strftime("%d.%m.%Y")
 
+MAX_NOTIFICATION_IMAGE_BYTES = 5 * 1024 * 1024  # 5MB
+MAX_NOTIFICATION_ATTACHMENT_BYTES = 10 * 1024 * 1024  # 10MB
+ALLOWED_NOTIFICATION_IMAGE_TYPES = {
+    "image/png",
+    "image/jpeg",
+    "image/jpg",
+    "image/gif",
+    "image/webp",
+}
+ALLOWED_NOTIFICATION_ATTACHMENT_TYPES = ALLOWED_NOTIFICATION_IMAGE_TYPES | {
+    "application/pdf",
+    "text/plain",
+    "text/markdown",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+}
+
+
+def sanitize_notification_filename(filename: str | None) -> str | None:
+    if not filename:
+        return None
+    cleaned = Path(filename).name.strip()
+    cleaned = cleaned.replace("\r", "").replace("\n", "")
+    return cleaned or None
+
 from fastapi import (
     Depends,
     FastAPI,
@@ -6711,10 +6736,55 @@ async def admin_notifications_send(
             body_translations[code] = body_value
     subject_text = subject_translations.get(DEFAULT_LANGUAGE, english_subject)
     body_text = body_translations.get(DEFAULT_LANGUAGE, english_body)
-    image_bytes = await image.read() if image else None
-    image_mime = image.content_type if image else None
-    attachment_bytes = await attachment.read() if attachment else None
-    attachment_filename = attachment.filename if attachment else None
+    image_bytes = None
+    image_mime = None
+    if image and image.filename:
+        image_mime = (image.content_type or "").lower()
+        if image_mime not in ALLOWED_NOTIFICATION_IMAGE_TYPES:
+            return RedirectResponse(
+                url="/admin/notifications/new?error=Unsupported+image+type",
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
+        image_bytes = await image.read(MAX_NOTIFICATION_IMAGE_BYTES + 1)
+        if len(image_bytes) > MAX_NOTIFICATION_IMAGE_BYTES:
+            return RedirectResponse(
+                url="/admin/notifications/new?error=Image+too+large",
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
+        if not image_bytes:
+            return RedirectResponse(
+                url="/admin/notifications/new?error=Image+empty",
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
+        await image.close()
+    attachment_bytes = None
+    attachment_filename = None
+    if attachment and attachment.filename:
+        attachment_mime = (attachment.content_type or "").lower()
+        if attachment_mime not in ALLOWED_NOTIFICATION_ATTACHMENT_TYPES:
+            return RedirectResponse(
+                url="/admin/notifications/new?error=Unsupported+attachment+type",
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
+        attachment_bytes = await attachment.read(
+            MAX_NOTIFICATION_ATTACHMENT_BYTES + 1
+        )
+        if len(attachment_bytes) > MAX_NOTIFICATION_ATTACHMENT_BYTES:
+            return RedirectResponse(
+                url="/admin/notifications/new?error=Attachment+too+large",
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
+        if not attachment_bytes:
+            return RedirectResponse(
+                url="/admin/notifications/new?error=Attachment+empty",
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
+        attachment_filename = sanitize_notification_filename(attachment.filename)
+        await attachment.close()
+    if not image_bytes:
+        image_mime = None
+    if not attachment_bytes:
+        attachment_filename = None
     now = datetime.utcnow()
     log = NotificationLog(
         sender_id=current.id,
