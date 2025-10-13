@@ -1691,8 +1691,7 @@ def save_cart_for_user(user_id: int, cart: Cart) -> None:
 # -----------------------------------------------------------------------------
 
 
-def get_current_user(request: Request) -> Optional[DemoUser]:
-    user_id = request.session.get("user_id")
+def get_user_by_id(user_id: Optional[int]) -> Optional[DemoUser]:
     if user_id is None:
         return None
     user = users.get(user_id)
@@ -1704,6 +1703,10 @@ def get_current_user(request: Request) -> Optional[DemoUser]:
             return _load_demo_user(user_id, db)
         except HTTPException:
             return None
+
+
+def get_current_user(request: Request) -> Optional[DemoUser]:
+    return get_user_by_id(request.session.get("user_id"))
 
 
 def redirect_for_authenticated_user(user: DemoUser) -> RedirectResponse:
@@ -2268,8 +2271,11 @@ async def save_upload(file, existing_path: Optional[str] = None) -> Optional[str
 def render_template(template_name: str, **context) -> HTMLResponse:
     status_code = context.pop("status_code", 200)
     request: Optional[Request] = context.get("request")
+    user = context.get("user")
     if request is not None:
-        user = get_current_user(request)
+        session_user = get_current_user(request)
+        if user is None:
+            user = session_user
         context.setdefault("user", user)
         if user:
             cart = get_cart_for_user(user)
@@ -2293,6 +2299,7 @@ def render_template(template_name: str, **context) -> HTMLResponse:
                     .count()
                 )
                 context.setdefault("unread_notifications", unread_count)
+    if request is not None:
         bar_obj = context.get("bar")
         if bar_obj and hasattr(bar_obj, "id"):
             context.setdefault("current_bar_id", bar_obj.id)
@@ -3440,21 +3447,44 @@ async def update_order_status(
 
 @app.websocket("/ws/bar/{bar_id}/orders")
 async def ws_bar_orders(websocket: WebSocket, bar_id: int):
+    session = getattr(websocket, "session", None)
+    user = get_user_by_id(session.get("user_id")) if session else None
+    if (
+        not user
+        or (bar_id not in user.bar_ids and not user.is_super_admin)
+        or not (
+            user.is_bartender
+            or user.is_bar_admin
+            or user.is_super_admin
+            or user.is_display
+        )
+    ):
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
     await order_ws_manager.connect_bar(bar_id, websocket)
     try:
         while True:
             await websocket.receive_text()
     except WebSocketDisconnect:
+        pass
+    finally:
         order_ws_manager.disconnect_bar(bar_id, websocket)
 
 
 @app.websocket("/ws/user/{user_id}/orders")
 async def ws_user_orders(websocket: WebSocket, user_id: int):
+    session = getattr(websocket, "session", None)
+    user = get_user_by_id(session.get("user_id")) if session else None
+    if not user or user.id != user_id:
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
     await order_ws_manager.connect_user(user_id, websocket)
     try:
         while True:
             await websocket.receive_text()
     except WebSocketDisconnect:
+        pass
+    finally:
         order_ws_manager.disconnect_user(user_id, websocket)
 
 
