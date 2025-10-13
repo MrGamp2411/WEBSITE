@@ -232,6 +232,12 @@ All static marketing pages reuse `.static-page` rules in
 - `README.md` functions as the complete product manual. Update it whenever
   features, routes, or assets change so engineering and operations stay aligned.
 
+## 15. Security Pointers
+
+- Public FastAPI endpoints under `/api/bars`, `/api/orders`, and `/api/payouts/run`
+  currently lack authentication. Treat them as high-priority hardening targets
+  during security-focused work.
+
 ---
 
 If any instruction seems missing, re-check this file—everything links to the
