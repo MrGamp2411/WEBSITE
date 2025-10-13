@@ -237,6 +237,8 @@ All static marketing pages reuse `.static-page` rules in
 - Public FastAPI endpoints under `/api/bars`, `/api/orders`, and `/api/payouts/run`
   currently lack authentication. Treat them as high-priority hardening targets
   during security-focused work.
+- `/api/bars` POST now requires a super admin session; anonymous or non-admin
+  attempts are logged to `AuditLog`.
 
 ---
 

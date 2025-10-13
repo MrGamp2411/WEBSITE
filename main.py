@@ -2778,8 +2778,45 @@ def list_bars(db: Session = Depends(get_db)):
 
 
 @app.post("/api/bars", response_model=BarRead, status_code=status.HTTP_201_CREATED)
-def create_bar(data: BarCreate, db: Session = Depends(get_db)):
+def create_bar(
+    data: BarCreate, request: Request, db: Session = Depends(get_db)
+):
     """Create a new bar in the database."""
+    user = get_current_user(request)
+    ip = request.client.host if request.client else None
+    user_agent = request.headers.get("user-agent")
+    attempt_payload = {"slug": data.slug, "name": data.name}
+
+    if not user:
+        log_action(
+            db,
+            actor_user_id=None,
+            action="unauthenticated_api_bar_create",
+            entity_type="bar",
+            payload=attempt_payload,
+            ip=ip,
+            user_agent=user_agent,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+        )
+
+    if not user.is_super_admin:
+        log_action(
+            db,
+            actor_user_id=user.id,
+            action="forbidden_api_bar_create",
+            entity_type="bar",
+            payload=attempt_payload,
+            ip=ip,
+            user_agent=user_agent,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorised",
+        )
+
     payload = data.dict()
     translations = payload.get("description_translations") or {}
     description = payload.get("description")
@@ -2799,6 +2836,16 @@ def create_bar(data: BarCreate, db: Session = Depends(get_db)):
     db.add(bar)
     db.commit()
     db.refresh(bar)
+    log_action(
+        db,
+        actor_user_id=user.id,
+        action="api_create_bar",
+        entity_type="bar",
+        entity_id=bar.id,
+        payload={"slug": bar.slug},
+        ip=ip,
+        user_agent=user_agent,
+    )
     return bar
 
 
