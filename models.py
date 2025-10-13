@@ -33,6 +33,7 @@ class RoleEnum(str, PyEnum):
     SUPERADMIN = "SuperAdmin"
     BARADMIN = "BarAdmin"
     BARTENDER = "Bartender"
+    FINANCE = "Finance"
     CUSTOMER = "Customer"
     REGISTERING = "Registering"
     DISPLAY = "Display"
