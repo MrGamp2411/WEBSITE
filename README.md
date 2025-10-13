@@ -115,7 +115,7 @@ Configure the application via environment variables. Unless noted, defaults foll
 ### Ordering, cart, and payments
 - **Cart lifecycle**: `/bars/{bar_id}/add_to_cart`, `/cart/update`, and `/cart/clear` mutate the session cart; `main.py` keeps an in-memory cache for quick lookup and persists to `UserCart` on login. 【F:main.py†L2882-L3058】【F:models.py†L46-L62】
 - **Checkout**: `/cart/checkout` routes wallet, card, and cash payments through shared helpers, records Argon2-hashed payment metadata, and triggers audit logging. 【F:main.py†L3044-L3366】
-- **Orders API**: `POST /api/orders` creates orders for POS integrations; `POST /api/orders/{order_id}/status` updates statuses and notifies via WebSockets. 【F:main.py†L2755-L3432】
+- **Orders API**: `POST /api/orders` (requires an authenticated customer session) creates orders for POS integrations while binding them to the caller; `POST /api/orders/{order_id}/status` updates statuses and notifies via WebSockets. 【F:main.py†L2755-L3432】
 - **Realtime updates**: `/ws/bar/{bar_id}/orders` streams live order updates to bartender/admin dashboards; `/ws/user/{user_id}/orders` keeps customers in sync with status changes. 【F:main.py†L3423-L3438】
 - **Finance calculations**: `finance.py` computes VAT, platform fees, and bar payouts; `payouts.schedule_payout` aggregates completed orders. 【F:finance.py†L1-L27】【F:payouts.py†L1-L47】
 
