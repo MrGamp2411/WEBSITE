@@ -2,6 +2,103 @@ document.addEventListener('DOMContentLoaded', function() {
   const APP_I18N = window.APP_I18N || {};
   const noticeMap = APP_I18N.notices || {};
   const appTexts = APP_I18N.app || {};
+  const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+  const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+  function isSameOrigin(url) {
+    if (!url) return true;
+    try {
+      const parsed = new URL(url, window.location.href);
+      return parsed.origin === window.location.origin;
+    } catch (err) {
+      return true;
+    }
+  }
+  if (csrfToken) {
+    window.CSRF_TOKEN = csrfToken;
+    const ensureFormToken = (form) => {
+      if (!form || form.dataset.skipCsrf === 'true') return;
+      const method = (form.getAttribute('method') || 'GET').toUpperCase();
+      if (method === 'GET') return;
+      let input = form.querySelector('input[name="csrf_token"]');
+      if (!input) {
+        input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'csrf_token';
+        form.appendChild(input);
+      }
+      input.value = csrfToken;
+    };
+    document.querySelectorAll('form').forEach(ensureFormToken);
+    if (window.MutationObserver) {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach((node) => {
+            if (!(node instanceof HTMLElement)) return;
+            if (node.tagName === 'FORM') {
+              ensureFormToken(node);
+            }
+            node.querySelectorAll?.('form').forEach(ensureFormToken);
+          });
+        });
+      });
+      if (document.body) {
+        observer.observe(document.body, { childList: true, subtree: true });
+      }
+    }
+    if (typeof window.fetch === 'function') {
+      const originalFetch = window.fetch;
+      window.fetch = function(input, init) {
+        let request = null;
+        let url = null;
+        if (input instanceof Request) {
+          request = input;
+          url = request.url;
+        } else if (typeof input === 'string') {
+          url = input;
+        } else if (input && typeof input === 'object') {
+          url = input.url;
+        }
+        if (!isSameOrigin(url)) {
+          return originalFetch.call(this, input, init);
+        }
+        const finalInit = init ? { ...init } : {};
+        let headers;
+        if (request) {
+          headers = new Headers(request.headers || {});
+        } else if (finalInit.headers) {
+          headers = new Headers(finalInit.headers);
+        } else {
+          headers = new Headers();
+        }
+        if (!headers.has('X-CSRF-Token')) {
+          headers.set('X-CSRF-Token', csrfToken);
+        }
+        finalInit.headers = headers;
+        if (request) {
+          return originalFetch.call(this, new Request(request, finalInit));
+        }
+        return originalFetch.call(this, input, finalInit);
+      };
+    }
+    if (window.XMLHttpRequest) {
+      const open = XMLHttpRequest.prototype.open;
+      const send = XMLHttpRequest.prototype.send;
+      XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+        this.__csrfUrl = url;
+        return open.call(this, method, url, async, user, password);
+      };
+      XMLHttpRequest.prototype.send = function(body) {
+        if (isSameOrigin(this.__csrfUrl)) {
+          try {
+            this.setRequestHeader('X-CSRF-Token', csrfToken);
+          } catch (err) {
+            /* no-op */
+          }
+        }
+        return send.call(this, body);
+      };
+    }
+  }
   function formatTemplate(template, values){
     if(typeof template !== 'string') return '';
     return template.replace(/\{(\w+)\}/g, (_, key) => Object.prototype.hasOwnProperty.call(values, key) ? values[key] : '');

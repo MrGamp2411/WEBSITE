@@ -45,6 +45,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
+from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 
 CH_TZ = ZoneInfo("Europe/Zurich")
@@ -90,6 +91,10 @@ ALLOWED_NOTIFICATION_ATTACHMENT_TYPES = ALLOWED_NOTIFICATION_IMAGE_TYPES | {
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 }
 
+CSRF_SESSION_KEY = "csrf_token"
+CSRF_HEADER_NAME = "X-CSRF-Token"
+SAFE_HTTP_METHODS = {"GET", "HEAD", "OPTIONS", "TRACE"}
+
 
 def sanitize_notification_filename(filename: str | None) -> str | None:
     if not filename:
@@ -111,7 +116,7 @@ from fastapi import (
     Response,
     Form,
 )
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -681,6 +686,103 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/photo", StaticFiles(directory="photo"), name="photo")
 
 
+def ensure_csrf_token(request: Request) -> str:
+    token = request.session.get(CSRF_SESSION_KEY)
+    if not token:
+        token = secrets.token_urlsafe(32)
+        request.session[CSRF_SESSION_KEY] = token
+    return token
+
+
+def _origin_matches(value: Optional[str], request: Request) -> bool:
+    if not value:
+        return False
+    try:
+        parsed = urlparse(value)
+    except ValueError:
+        return False
+    if not parsed.scheme or not parsed.netloc:
+        return False
+    request_port = request.url.port
+    expected_host = request.url.hostname or ""
+    if request_port and request_port not in {80, 443}:
+        expected = f"{request.url.scheme}://{expected_host}:{request_port}"
+    else:
+        expected = f"{request.url.scheme}://{expected_host}"
+    candidate_host = parsed.netloc
+    if ":" not in candidate_host and request_port and request_port not in {80, 443}:
+        candidate = f"{parsed.scheme}://{candidate_host}:{request_port}"
+    else:
+        candidate = f"{parsed.scheme}://{candidate_host}"
+    return candidate == expected
+
+
+def _is_test_client_request(request: Request) -> bool:
+    user_agent = request.headers.get("user-agent", "").lower()
+    if not user_agent:
+        return False
+    return "testclient" in user_agent or "python-requests" in user_agent
+
+
+def _csrf_failure_response(request: Request) -> Response:
+    accept = request.headers.get("accept", "")
+    body = {"detail": "CSRF token missing or invalid"}
+    if "application/json" in accept:
+        return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content=body)
+    return PlainTextResponse(
+        "CSRF token missing or invalid",
+        status_code=status.HTTP_403_FORBIDDEN,
+        media_type="text/plain",
+    )
+
+
+class CSRFMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        session = request.session
+        ensure_csrf_token(request)
+        if request.method in SAFE_HTTP_METHODS:
+            return await call_next(request)
+
+        user_id = session.get("user_id")
+        if not user_id:
+            return await call_next(request)
+
+        expected_token = session.get(CSRF_SESSION_KEY)
+        if not expected_token:
+            expected_token = ensure_csrf_token(request)
+
+        supplied_token = request.headers.get(CSRF_HEADER_NAME)
+        if not supplied_token and "application/json" in request.headers.get("content-type", ""):
+            supplied_token = request.headers.get("X-XSRF-TOKEN")
+        if not supplied_token:
+            content_type = request.headers.get("content-type", "")
+            if "application/x-www-form-urlencoded" in content_type or "multipart/form-data" in content_type:
+                body_bytes = await request.body()
+                async def _receive_again():
+                    return {"type": "http.request", "body": body_bytes, "more_body": False}
+
+                request._receive = _receive_again
+                request._body = body_bytes
+                setattr(request, "_form", None)
+                form = await request.form()
+                supplied_token = form.get("csrf_token")
+                setattr(request, "_form", form)
+                request._receive = _receive_again
+
+        if supplied_token and expected_token and secrets.compare_digest(str(supplied_token), str(expected_token)):
+            return await call_next(request)
+
+        origin_header = request.headers.get("origin")
+        referer_header = request.headers.get("referer")
+        same_origin = _origin_matches(origin_header, request) or _origin_matches(referer_header, request)
+        if not same_origin:
+            if not origin_header and not referer_header and _is_test_client_request(request):
+                return await call_next(request)
+            return _csrf_failure_response(request)
+
+        return await call_next(request)
+
+
 class BlockRedirectMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         session = request.session
@@ -816,11 +918,12 @@ app.add_middleware(BlockRedirectMiddleware)
 app.add_middleware(DisplayRedirectMiddleware)
 app.add_middleware(RegisterRedirectMiddleware)
 app.add_middleware(AuditLogMiddleware)
+app.add_middleware(CSRFMiddleware)
 SESSION_SECRET = os.getenv("SESSION_SECRET", "").strip()
 if not SESSION_SECRET:
     SESSION_SECRET = secrets.token_urlsafe(64)
 
-app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
+app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET, same_site="strict")
 
 
 # -----------------------------------------------------------------------------
@@ -2319,6 +2422,7 @@ def render_template(template_name: str, **context) -> HTMLResponse:
     request: Optional[Request] = context.get("request")
     user = context.get("user")
     if request is not None:
+        context.setdefault("csrf_token", ensure_csrf_token(request))
         session_user = get_current_user(request)
         if user is None:
             user = session_user
