@@ -2871,8 +2871,59 @@ def create_bar(
 
 
 @app.post("/api/orders", response_model=OrderRead, status_code=status.HTTP_201_CREATED)
-async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
+async def create_order(
+    order: OrderCreate, request: Request, db: Session = Depends(get_db)
+):
     """Create an order and compute platform fee and payout."""
+    ip = request.client.host if request.client else None
+    user_agent = request.headers.get("user-agent")
+    menu_item_ids = [item.menu_item_id for item in order.items]
+    attempt_payload = {
+        "bar_id": order.bar_id,
+        "item_count": len(order.items),
+        "menu_item_ids": menu_item_ids,
+    }
+
+    user = get_current_user(request)
+    if not user:
+        log_action(
+            db,
+            actor_user_id=None,
+            action="unauthenticated_api_order_create",
+            entity_type="order",
+            payload=attempt_payload,
+            ip=ip,
+            user_agent=user_agent,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+        )
+
+    if user.is_blocked or user.is_ip_blocked or user.role != "customer":
+        log_action(
+            db,
+            actor_user_id=user.id,
+            action="forbidden_api_order_create",
+            entity_type="order",
+            payload={**attempt_payload, "role": user.role},
+            ip=ip,
+            user_agent=user_agent,
+            phone=user.phone_e164 or user.phone or None,
+            credit=(
+                float(user.credit)
+                if getattr(user, "credit", None) is not None
+                else None
+            ),
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorised",
+        )
+
+    if not order.items:
+        raise HTTPException(status_code=400, detail="Order must include at least one item")
+
     bar = db.get(BarModel, order.bar_id)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
@@ -2882,14 +2933,17 @@ async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
     order_items: List[OrderItem] = []
 
     for item in order.items:
+        if item.qty <= 0:
+            raise HTTPException(status_code=400, detail="Invalid quantity")
         menu_item = db.get(MenuItem, item.menu_item_id)
         if not menu_item:
             raise HTTPException(status_code=404, detail="Menu item not found")
+        if menu_item.bar_id != order.bar_id:
+            raise HTTPException(status_code=400, detail="Menu item does not belong to bar")
         price = Decimal(menu_item.price_chf)
+        vat_rate = Decimal(menu_item.vat_rate or 0)
         line_total = price * item.qty
-        line_vat = (
-            calculate_vat_from_gross(price, Decimal(menu_item.vat_rate)) * item.qty
-        )
+        line_vat = calculate_vat_from_gross(price, vat_rate) * item.qty
         vat_total += line_vat
         subtotal += line_total - line_vat
         order_items.append(
@@ -2902,6 +2956,9 @@ async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
             )
         )
 
+    if not order_items:
+        raise HTTPException(status_code=400, detail="Order must include at least one item")
+
     fee = calculate_platform_fee(subtotal)
     total_gross = subtotal + vat_total
     payout = calculate_payout(total_gross, fee)
@@ -2911,6 +2968,7 @@ async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
 
     db_order = Order(
         bar_id=order.bar_id,
+        customer_id=user.id,
         subtotal=subtotal,
         vat_total=vat_total,
         fee_platform_5pct=fee,
@@ -2921,10 +2979,43 @@ async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
         order_local_date=local_date,
         daily_seq=seq,
         public_order_code=code,
+        source_channel="api",
     )
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
+
+    db_user = db.get(User, user.id)
+    phone = None
+    credit = None
+    if db_user:
+        phone = db_user.phone_e164 or db_user.phone or None
+        if db_user.credit is not None:
+            credit = float(db_user.credit)
+    if phone is None:
+        phone = user.phone_e164 or user.phone or None
+    if credit is None and getattr(user, "credit", None) is not None:
+        credit = float(user.credit)
+
+    log_action(
+        db,
+        actor_user_id=user.id,
+        action="api_create_order",
+        entity_type="order",
+        entity_id=db_order.id,
+        payload={
+            "bar_id": order.bar_id,
+            "menu_item_ids": menu_item_ids,
+            "subtotal": float(subtotal),
+            "vat_total": float(vat_total),
+            "total_gross": float(total_gross),
+        },
+        ip=ip,
+        user_agent=user_agent,
+        phone=phone,
+        credit=credit,
+    )
+
     await send_order_update(db_order)
     return db_order
 
