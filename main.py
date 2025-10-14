@@ -1000,7 +1000,21 @@ SESSION_SECRET = os.getenv("SESSION_SECRET", "").strip()
 if not SESSION_SECRET:
     SESSION_SECRET = secrets.token_urlsafe(64)
 
-app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET, same_site="strict")
+session_cookie_secure_env = os.getenv("SESSION_COOKIE_SECURE", "").strip().lower()
+if session_cookie_secure_env in {"1", "true", "yes", "on"}:
+    session_cookie_secure = True
+elif session_cookie_secure_env in {"0", "false", "no", "off"}:
+    session_cookie_secure = False
+else:
+    base_url = os.getenv("BASE_URL", "").strip().lower()
+    session_cookie_secure = base_url.startswith("https://")
+
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=SESSION_SECRET,
+    same_site="strict",
+    https_only=session_cookie_secure,
+)
 
 
 # -----------------------------------------------------------------------------
