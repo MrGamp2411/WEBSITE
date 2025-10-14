@@ -2621,18 +2621,23 @@ async def upload_product_image(
     ):
         raise HTTPException(status_code=403, detail="Not authorised")
 
-    data = await image.read()
-    if not image.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="Uploaded file must be an image")
-    if len(data) > 5 * 1024 * 1024:
-        raise HTTPException(status_code=413, detail="File too large (>5MB)")
+    try:
+        sanitized_bytes, _, mime = await process_image_upload(image)
+    except ImageUploadError as exc:  # pragma: no cover - narrow FastAPI mapping
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     img = db.query(ProductImage).filter_by(product_id=product_id).first()
     if img:
-        img.data = data
-        img.mime = image.content_type
+        img.data = sanitized_bytes
+        img.mime = mime
     else:
-        db.add(ProductImage(product_id=product_id, data=data, mime=image.content_type))
+        db.add(
+            ProductImage(
+                product_id=product_id,
+                data=sanitized_bytes,
+                mime=mime,
+            )
+        )
     db.commit()
     refresh_bar_from_db(db_item.bar_id, db)
     return Response(status_code=204)
