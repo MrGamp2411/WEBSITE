@@ -261,3 +261,7 @@ that rely on cookie-authenticated flows or staff-provided media.
   `static/js/app.js`) so bar metadata never passes through `innerHTML`. Cart
   notices also render with text nodes only, preventing HTML injection via query
   parameters.
+- Live order dashboards (`static/js/orders.js`) still inject `order.notes`
+  directly into `innerHTML`. Until this is refactored to escape/sanitise user
+  content, treat order notes as untrusted and track remediation in
+  `SECURITY_REVIEW.md`.
