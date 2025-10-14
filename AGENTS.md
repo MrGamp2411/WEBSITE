@@ -241,6 +241,9 @@ All static marketing pages reuse `.static-page` rules in
   attempts are logged to `AuditLog`.
 - Product and bar photo uploads must route through `process_image_upload` in
   `main.py` so files are re-encoded to JPEG/PNG/WebP before storage.
+- Security review log (`SECURITY_REVIEW.md`) is kept empty unless a new finding
+  is discovered. When adding an item include impact, mitigation, and remove it
+  once the fix lands so the document always reflects the current backlog.
 
 ---
 
