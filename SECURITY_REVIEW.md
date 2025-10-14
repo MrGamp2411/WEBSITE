@@ -6,7 +6,7 @@ Each issue includes an impact assessment and recommended mitigation steps. The i
 discovered in the current codebase.
 
 Recent changes introduced CSRF middleware plus front-end helpers that populate a `csrf_token` field automatically, which
-mitigates the previously reported cross-site request forgery risk.【F:main.py†L762-L842】【F:static/js/app.js†L1-L88】
+mitigates the previously reported cross-site request forgery risk.【F:main.py†L772-L874】【F:static/js/app.js†L1-L88】
 
 ## Findings
 
@@ -65,6 +65,7 @@ probing anti-abuse controls.【F:app/utils/disposable_email.py†L118-L126】
 responds with `404` unless the `DISPOSABLE_STATS_ENABLED` feature flag is
 explicitly enabled. This keeps diagnostics off the public surface in
 production environments.【F:main.py†L54-L63】【F:main.py†L4516-L4524】
+
 
 ## Next Steps
 Continue regression-testing the hardened upload pipeline and session middleware across staging and production environments.
