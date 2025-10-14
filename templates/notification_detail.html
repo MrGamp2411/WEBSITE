@@ -11,7 +11,7 @@
   <div class="table-card">
     <p class="notification-body">{{ note.localized_body or note.body }}</p>
     {% if note.link_url %}
-    <p><a href="{{ note.link_url }}">{{ note.link_url }}</a></p>
+    <p><a href="{{ note.link_url|e }}">{{ note.link_url }}</a></p>
     {% endif %}
     {% if note.image %}
     <p><img src="/notifications/{{ note.id }}/image" alt="{{ _('notification_detail.image_alt', default='Notification image') }}"></p>

@@ -94,6 +94,8 @@ ALLOWED_NOTIFICATION_ATTACHMENT_TYPES = ALLOWED_NOTIFICATION_IMAGE_TYPES | {
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 }
 
+ALLOWED_NOTIFICATION_LINK_SCHEMES = {"https", "http", "mailto", "tel"}
+
 MAX_PRODUCT_IMAGE_BYTES = 5 * 1024 * 1024  # 5MB
 ALLOWED_PRODUCT_IMAGE_FORMATS = {
     "JPEG": ("jpg", "image/jpeg"),
@@ -130,6 +132,27 @@ def sanitize_notification_filename(filename: str | None) -> str | None:
     cleaned = Path(filename).name.strip()
     cleaned = cleaned.replace("\r", "").replace("\n", "")
     return cleaned or None
+
+
+def normalize_notification_link(url: str | None) -> Optional[str]:
+    if not url:
+        return None
+    candidate = url.strip()
+    if not candidate:
+        return None
+    if candidate.startswith("//"):
+        return None
+    parsed = urlparse(candidate)
+    if parsed.scheme:
+        scheme = parsed.scheme.lower()
+        if scheme not in ALLOWED_NOTIFICATION_LINK_SCHEMES:
+            return None
+        if scheme in {"http", "https"} and not parsed.netloc:
+            return None
+        return candidate
+    if candidate.startswith("/"):
+        return candidate
+    return None
 
 
 class ImageUploadError(Exception):
@@ -7246,6 +7269,12 @@ async def admin_notifications_send(
         image_mime = None
     if not attachment_bytes:
         attachment_filename = None
+    normalized_link_url = normalize_notification_link(link_url)
+    if (link_url or "").strip() and not normalized_link_url:
+        return RedirectResponse(
+            url="/admin/notifications/new?error=Invalid+link+URL",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
     now = datetime.utcnow()
     log = NotificationLog(
         sender_id=current.id,
@@ -7256,7 +7285,7 @@ async def admin_notifications_send(
         body=body_text,
         subject_translations=subject_translations,
         body_translations=body_translations,
-        link_url=link_url or None,
+        link_url=normalized_link_url,
         created_at=now,
     )
     db.add(log)
@@ -7270,7 +7299,7 @@ async def admin_notifications_send(
             body=body_text,
             subject_translations=subject_translations,
             body_translations=body_translations,
-            link_url=link_url or None,
+            link_url=normalized_link_url,
             image=image_bytes,
             image_mime=image_mime,
             attachment=attachment_bytes,

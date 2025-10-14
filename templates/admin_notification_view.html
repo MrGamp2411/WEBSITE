@@ -27,7 +27,7 @@
         </tr>
         <tr><th>{{ _('admin_notification_view.details.subject', default='Subject') }}</th><td>{{ note.subject }}</td></tr>
         <tr><th>{{ _('admin_notification_view.details.message', default='Message') }}</th><td>{{ note.body }}</td></tr>
-        {% if note.link_url %}<tr><th>{{ _('admin_notification_view.details.link', default='Link') }}</th><td><a href="{{ note.link_url }}">{{ note.link_url }}</a></td></tr>{% endif %}
+        {% if note.link_url %}<tr><th>{{ _('admin_notification_view.details.link', default='Link') }}</th><td><a href="{{ note.link_url|e }}">{{ note.link_url }}</a></td></tr>{% endif %}
         <tr><th>{{ _('admin_notification_view.details.sent', default='Sent') }}</th><td>{{ note.created_at|format_time }}</td></tr>
         <tr><th>{{ _('admin_notification_view.details.sender', default='Sender') }}</th><td>{{ note.sender.username }}</td></tr>
       </tbody>
