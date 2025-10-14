@@ -146,9 +146,10 @@
         <p>{{ _('layout.footer.copyright', default='SiplyGo © 2025') }} · <a href="/about">{{ _('layout.footer.about', default='About') }}</a> · <a href="/help-center">{{ _('layout.footer.help_center', default='Help Center') }}</a> · <a href="/for-bars">{{ _('layout.footer.for_bars', default='For Bars') }}</a> · <a href="/terms">{{ _('layout.footer.terms', default='Terms') }}</a></p>
       </div>
     </footer>
+    {% set safe_cart_bar_name = cart_bar_name|default('')|e %}
     <div id="cartBlocker" class="cart-blocker" {% if cart_bar_id and current_bar_id != cart_bar_id %}{% else %}hidden{% endif %}>
       <div class="cart-popup">
-        <p>{{ _('layout.cart_blocker.message', bar_name=cart_bar_name, default='You still have products in your cart at <strong>{bar_name}</strong>.')|safe }}</p>
+        <p>{{ _('layout.cart_blocker.message', bar_name=safe_cart_bar_name, default='You still have products in your cart at <strong>{bar_name}</strong>.')|safe }}</p>
         <div class="cart-popup-actions">
           <button type="button" class="btn btn--secondary js-clear-cart">{{ _('layout.cart_blocker.remove', default='Remove products') }}</button>
           <a class="btn btn--primary" href="/bars/{{ cart_bar_id }}">{{ _('layout.cart_blocker.go_to_menu', default='Go to the bar menu') }}</a>
@@ -157,7 +158,7 @@
     </div>
     <div id="servicePaused" class="cart-blocker" hidden>
       <div class="cart-popup">
-        <p>{{ _('layout.service_paused.message', bar_name=cart_bar_name, default='Ordering is paused for <strong>{bar_name}</strong>. Please contact a staff member for more information.')|safe }}</p>
+        <p>{{ _('layout.service_paused.message', bar_name=safe_cart_bar_name, default='Ordering is paused for <strong>{bar_name}</strong>. Please contact a staff member for more information.')|safe }}</p>
         <div class="cart-popup-actions">
           {% if pause_popup_close|default(False) %}
           <button type="button" class="btn btn--secondary js-close-service-paused">{{ _('layout.service_paused.close', default='Close') }}</button>
