@@ -77,6 +77,10 @@ TERMS_VERSION = "V1.0"
 TERMS_EFFECTIVE_DATE = date.today().strftime("%d.%m.%Y")
 TERMS_NEXT_REVIEW_DATE = date(2025, 9, 16).strftime("%d.%m.%Y")
 
+DISPOSABLE_STATS_ENABLED = (
+    os.getenv("DISPOSABLE_STATS_ENABLED", "false").lower() == "true"
+)
+
 MAX_NOTIFICATION_IMAGE_BYTES = 5 * 1024 * 1024  # 5MB
 MAX_NOTIFICATION_ATTACHMENT_BYTES = 10 * 1024 * 1024  # 10MB
 ALLOWED_NOTIFICATION_IMAGE_TYPES = {
@@ -4514,8 +4518,15 @@ async def login(request: Request, db: Session = Depends(get_db)):
 
 
 @app.get("/internal/disposable-domains/stats")
-async def disposable_domains_stats():
+async def disposable_domains_stats(request: Request):
     """Return disposable domain cache statistics."""
+    if not DISPOSABLE_STATS_ENABLED:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    if not user.is_super_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorised")
     return get_disposable_stats()
 
 

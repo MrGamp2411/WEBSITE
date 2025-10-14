@@ -21,13 +21,10 @@ resulting in stored cross-site scripting across bar pages and admin dashboards.�
 non-binary image types (SVG/HTML), cap file sizes, and consider serving transformed assets from a distinct host without cookies
 attached.
 
-### 2. Unauthenticated disposable-email telemetry endpoint (Low)
-The `/internal/disposable-domains/stats` route is exposed without authentication and reveals operational metadata such as the
-number of cached disposable domains and the timestamp of the last refresh. While this does not leak customer data directly, it
-provides reconnaissance value to attackers probing anti-abuse controls.【F:main.py†L4511-L4514】【F:app/utils/disposable_email.py†L118-L120】
+### 2. Unauthenticated disposable-email telemetry endpoint (Low) — Mitigated
+The `/internal/disposable-domains/stats` route was exposed without authentication and revealed operational metadata such as the number of cached disposable domains and the timestamp of the last refresh. While this did not leak customer data directly, it provided reconnaissance value to attackers probing anti-abuse controls.【F:app/utils/disposable_email.py†L118-L126】
 
-**Recommendation:** Restrict this diagnostic endpoint to authenticated admins or remove it from the public surface. At a
-minimum, guard it behind a feature flag so it cannot be reached in production.
+**Mitigation:** Access now requires a logged-in super admin, and the handler responds with `404` unless the `DISPOSABLE_STATS_ENABLED` feature flag is explicitly enabled. This keeps diagnostics off the public surface in production environments.【F:main.py†L54-L63】【F:main.py†L4516-L4524】
 
 ## Next Steps
 Prioritise remediation of the high-severity issue above. After implementing fixes, perform a regression review (including
