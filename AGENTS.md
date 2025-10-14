@@ -262,6 +262,5 @@ that rely on cookie-authenticated flows or staff-provided media.
   notices also render with text nodes only, preventing HTML injection via query
   parameters.
 - Live order dashboards (`static/js/orders.js`) still inject `order.notes`
-  directly into `innerHTML`. Until this is refactored to escape/sanitise user
-  content, treat order notes as untrusted and track remediation in
-  `SECURITY_REVIEW.md`.
+  now populate order notes via text nodes (`.order-notes__value`) so customer
+  input renders as plain text.
