@@ -10,23 +10,25 @@ mitigates the previously reported cross-site request forgery risk.【F:main.py�
 
 ## Findings
 
-### 1. Product image upload API bypasses re-encoding (High)
-The JSON API that allows staff to upload product artwork still persists the raw bytes supplied by the client and trusts the
-declared `Content-Type`. Any authenticated bar admin or bartender can therefore upload an SVG (or other active payload) that
-will be stored verbatim and later served back with the attacker-controlled MIME type.【F:main.py†L2600-L2647】 Customer-facing
-templates embed these images directly via `<img>` tags, so a malicious SVG will execute script in every visitor’s browser,
-resulting in stored cross-site scripting across bar pages and admin dashboards.【F:templates/bar_detail.html†L80-L105】
+### 1. Product image upload API bypasses re-encoding (High) — Mitigated
+Earlier revisions allowed staff uploads to bypass server-side re-encoding, enabling stored XSS via crafted SVG payloads. The
+API now routes every upload through `process_image_upload`, which verifies the binary data with Pillow, converts it into a safe
+format, and stores the sanitised bytes alongside the detected MIME type before committing them to the database.【F:main.py†L125-L214】【F:main.py†L2618-L2649】
+Product images rendered on bar detail pages therefore inherit the trusted MIME type returned by the sanitisation pipeline.【F:templates/bar_detail.html†L9-L76】
 
-**Recommendation:** Reuse the existing `process_image_upload` pipeline to verify and re-encode uploads before storage. Reject
-non-binary image types (SVG/HTML), cap file sizes, and consider serving transformed assets from a distinct host without cookies
-attached.
+### 2. Session cookie missing `Secure` attribute (Medium) — Mitigated
+The session cookie was previously issued without the `Secure` flag, so deployments reachable over HTTPS but also serving
+occasional HTTP traffic (for example via misconfigured reverse proxies) risked leaking session identifiers over unencrypted
+connections. Middleware configuration now infers the correct setting from the `SESSION_COOKIE_SECURE` toggle or the `BASE_URL`
+scheme, automatically enabling `Secure` cookies whenever the site runs on HTTPS while still supporting HTTP-only local
+development workflows.【F:main.py†L1003-L1016】
 
-### 2. Unauthenticated disposable-email telemetry endpoint (Low) — Mitigated
+### 3. Unauthenticated disposable-email telemetry endpoint (Low) — Mitigated
 The `/internal/disposable-domains/stats` route was exposed without authentication and revealed operational metadata such as the number of cached disposable domains and the timestamp of the last refresh. While this did not leak customer data directly, it provided reconnaissance value to attackers probing anti-abuse controls.【F:app/utils/disposable_email.py†L118-L126】
 
 **Mitigation:** Access now requires a logged-in super admin, and the handler responds with `404` unless the `DISPOSABLE_STATS_ENABLED` feature flag is explicitly enabled. This keeps diagnostics off the public surface in production environments.【F:main.py†L54-L63】【F:main.py†L4516-L4524】
 
 ## Next Steps
-Prioritise remediation of the high-severity issue above. After implementing fixes, perform a regression review (including
-automated tests) to ensure the hardened upload flow cannot be bypassed and that diagnostic endpoints intended for operators are
-not exposed publicly.
+Continue regression-testing the hardened upload pipeline and session middleware across staging and production environments.
+Ensure deployment manifests explicitly set `SESSION_COOKIE_SECURE=true` (or advertise an HTTPS `BASE_URL`) so the runtime picks
+up the secure-cookie behaviour, and schedule periodic reviews of newly exposed endpoints before release.
