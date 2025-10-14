@@ -687,7 +687,30 @@ document.addEventListener('DOMContentLoaded', function() {
     if(totalEl&&json.totalFormatted) totalEl.textContent=json.totalFormatted;
     const list=document.querySelector('.mini-cart-items');
     if(list&&Array.isArray(json.items)){
-      list.innerHTML=json.items.map(i=>`<li>${i.qty}× ${i.name} - ${i.lineTotal}</li>`).join('');
+      const fragment=document.createDocumentFragment();
+      json.items.forEach(item=>{
+        const li=document.createElement('li');
+        const qty=typeof item.qty==='number'?`${item.qty}\u00d7`:item.qty?
+          `${item.qty}\u00d7`:'';
+        const name=item.name??'';
+        const total=item.lineTotal??'';
+        const parts=[];
+        if(qty) parts.push(qty.trim());
+        if(name) parts.push(name);
+        const label=parts.join(' ').trim();
+        if(label){
+          li.append(document.createTextNode(label));
+        }
+        if(total){
+          if(label){
+            li.append(document.createTextNode(' - '));
+          }
+          li.append(document.createTextNode(total));
+        }
+        fragment.append(li);
+      });
+      list.innerHTML='';
+      list.append(fragment);
     }
   }
 
