@@ -6,11 +6,20 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+os.environ["WALLEE_VERIFY_SIGNATURE"] = "false"
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, engine, SessionLocal  # noqa: E402
-from models import Bar, Category, MenuItem, Table, User, Payment  # noqa: E402
+from models import (
+    Bar,
+    Category,
+    MenuItem,
+    Table,
+    User,
+    Payment,
+    Order,
+)  # noqa: E402
 from main import app, load_bars_from_db  # noqa: E402
 
 
@@ -19,7 +28,7 @@ def setup_db():
     Base.metadata.create_all(bind=engine)
 
 
-def test_checkout_saves_notes():
+def place_order_with_notes(notes_value: str) -> Order:
     setup_db()
     with TestClient(app) as client:
         db = SessionLocal()
@@ -50,7 +59,7 @@ def test_checkout_saves_notes():
             MockPage.payment_page_url.return_value = "https://pay.example/123"
             resp = client.post(
                 "/cart/checkout",
-                data={"table_id": table_id, "payment_method": "card", "notes": "No sugar"},
+                data={"table_id": table_id, "payment_method": "card", "notes": notes_value},
                 follow_redirects=False,
             )
         assert resp.status_code == 303
@@ -61,6 +70,24 @@ def test_checkout_saves_notes():
             "/webhooks/wallee",
             json={"entityId": int(payment.wallee_tx_id), "state": "COMPLETED"},
         )
-        orders = client.get("/orders")
-        assert "<dt>Notes</dt><dd>No sugar</dd>" in orders.text
+        order_session = SessionLocal()
+        try:
+            return order_session.query(Order).first()
+        finally:
+            order_session.close()
+
+
+def test_checkout_saves_notes():
+    order = place_order_with_notes("No sugar")
+    assert order is not None
+    assert order.notes == "No sugar"
+
+
+def test_order_notes_are_escaped_in_html():
+    place_order_with_notes('<img src="x" onerror="alert(1)">')
+    orders_js = pathlib.Path(__file__).resolve().parents[1] / "static" / "js" / "orders.js"
+    contents = orders_js.read_text(encoding="utf-8")
+    assert contents.count('<dd class="order-notes__value">${escapeHtml(order.notes)}</dd>') == 2
+    assert contents.count('.textContent = order.notes') == 2
+    assert '<dd>${order.notes}</dd>' not in contents
 

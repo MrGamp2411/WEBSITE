@@ -6,6 +6,18 @@ const STATUS_TEXTS = ORDERS_I18N.statuses || {};
 const PAYMENT_TEXTS = ORDERS_I18N.payment_methods || {};
 const REASON_TEXTS = CARD_TEXTS.cancellation_reasons || {};
 
+function escapeHtml(value) {
+  if (value == null) {
+    return '';
+  }
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function formatTemplate(template, values){
   if(typeof template !== 'string') return '';
   return template.replace(/\{(\w+)\}/g, (_, key) => Object.prototype.hasOwnProperty.call(values, key) ? values[key] : '');
@@ -103,7 +115,9 @@ function initBartender(barId) {
     const cancellation = order.status === 'CANCELED' && order.cancellation_reason
       ? `<div><dt class="order-kv__term--wrap">${getField('cancellation_reason', 'Cancellation reason')}</dt><dd>${formatCancellationReason(order.cancellation_reason)}</dd></div>`
       : '';
-    const notes = order.notes ? `<div><dt>${getField('notes', 'Notes')}</dt><dd>${order.notes}</dd></div>` : '';
+    const notes = order.notes
+      ? `<div class="order-notes"><dt>${getField('notes', 'Notes')}</dt><dd class="order-notes__value">${escapeHtml(order.notes)}</dd></div>`
+      : '';
     const prepMinutes = order.ready_at ? diffMinutes(order.created_at, order.ready_at) : null;
     const prep = prepMinutes != null
       ? `<div><dt>${getField('prep_time', 'Prep time')}</dt><dd class="num">${formatTemplate(CARD_TEXTS.prep_minutes, { minutes: prepMinutes }) || `${prepMinutes} min`}</dd></div>`
@@ -147,6 +161,12 @@ function initBartender(barId) {
     el.querySelectorAll('button').forEach(btn => {
       btn.addEventListener('click', () => updateStatus(order.id, btn.dataset.status, render));
     });
+    if (order.notes) {
+      const notesValue = el.querySelector('.order-notes__value');
+      if (notesValue) {
+        notesValue.textContent = order.notes;
+      }
+    }
     if (order.status === 'PLACED') {
       insertSorted(incoming, el, true);
     } else if (order.status === 'ACCEPTED') {
@@ -214,7 +234,9 @@ function initUser(userId) {
     const cancellation = order.status === 'CANCELED' && order.cancellation_reason
       ? `<div><dt class="order-kv__term--wrap">${getField('cancellation_reason', 'Cancellation reason')}</dt><dd>${formatCancellationReason(order.cancellation_reason)}</dd></div>`
       : '';
-    const notes = order.notes ? `<div><dt>${getField('notes', 'Notes')}</dt><dd>${order.notes}</dd></div>` : '';
+    const notes = order.notes
+      ? `<div><dt>${getField('notes', 'Notes')}</dt><dd class="order-notes__value">${escapeHtml(order.notes)}</dd></div>`
+      : '';
     const prepMinutes = order.ready_at ? diffMinutes(order.created_at, order.ready_at) : null;
     const prep = prepMinutes != null
       ? `<div><dt>${getField('prep_time', 'Prep time')}</dt><dd class="num">${formatTemplate(CARD_TEXTS.prep_minutes, { minutes: prepMinutes }) || `${prepMinutes} min`}</dd></div>`
@@ -256,6 +278,12 @@ function initUser(userId) {
       `</ul>` +
       actionsHtml +
       `</section>`;
+    if (order.notes) {
+      const notesValue = el.querySelector('.order-notes__value');
+      if (notesValue) {
+        notesValue.textContent = order.notes;
+      }
+    }
     return el;
   }
   const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
