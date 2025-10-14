@@ -1,3 +1,4 @@
+import io
 import os
 import sys
 import pathlib
@@ -6,6 +7,7 @@ os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from decimal import Decimal
+from PIL import Image
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, engine, SessionLocal  # noqa: E402
 from models import (
@@ -32,6 +34,13 @@ def setup_module(module):
     users_by_email.clear()
     users_by_username.clear()
     bars.clear()
+
+
+def make_image_bytes(format: str = "PNG") -> bytes:
+    buffer = io.BytesIO()
+    image = Image.new("RGB", (4, 4), color="white")
+    image.save(buffer, format=format)
+    return buffer.getvalue()
 
 
 def test_upload_product_photo_updates_db_and_renders():
@@ -71,10 +80,10 @@ def test_upload_product_photo_updates_db_and_renders():
     client = TestClient(app)
     client.post("/login", data={"email": admin.email, "password": admin.password})
 
-    file_content = b"img"
+    file_content = make_image_bytes("PNG")
     resp = client.post(
         f"/api/products/{item_id}/image",
-        files={"image": ("beer.jpg", file_content, "image/jpeg")},
+        files={"image": ("beer.png", file_content, "image/png")},
     )
     assert resp.status_code == 204
 
@@ -89,7 +98,10 @@ def test_upload_product_photo_updates_db_and_renders():
 
     db = SessionLocal()
     db_img = db.query(ProductImage).filter_by(product_id=item_id).first()
-    assert db_img and db_img.mime == "image/jpeg" and db_img.data == file_content
+    assert db_img is not None
+    assert db_img.mime == "image/png"
+    stored_img = Image.open(io.BytesIO(db_img.data))
+    assert stored_img.size == (4, 4)
     assert f"/api/products/{item_id}/image" in detail.text
     db.close()
 
@@ -138,10 +150,10 @@ def test_product_photo_persists_after_restart():
     client = TestClient(app)
     client.post("/login", data={"email": admin.email, "password": admin.password})
 
-    file_content = b"img"
+    file_content = make_image_bytes("PNG")
     resp = client.post(
         f"/api/products/{item_id}/image",
-        files={"image": ("beer.jpg", file_content, "image/jpeg")},
+        files={"image": ("beer.png", file_content, "image/png")},
     )
     assert resp.status_code == 204
 
