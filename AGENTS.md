@@ -251,6 +251,10 @@ each table cell or bullet.
 ## Security Audit Notes
 
 - Security findings are documented in `SECURITY_REVIEW.md`. The most recent
-  review (April 2025) highlights missing CSRF protections on POST routes and
-  unsafe product photo upload handling. Address these before deploying changes
-  that rely on cookie-authenticated flows or staff-provided media.
+review (April 2025) highlights missing CSRF protections on POST routes and
+unsafe product photo upload handling. Address these before deploying changes
+that rely on cookie-authenticated flows or staff-provided media.
+- Search suggestions now build DOM nodes directly (see `renderSuggestions` in
+  `static/js/app.js`) so bar metadata never passes through `innerHTML`. Cart
+  notices also render with text nodes only, preventing HTML injection via query
+  parameters.

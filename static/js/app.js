@@ -129,17 +129,33 @@ document.addEventListener('DOMContentLoaded', function() {
     const noticeConfig = noticeMap[notice] || fallbackNotice;
     const defaultTitle = 'Payment failed';
     const defaultBody = 'Payment was not successful. Please try again or contact our staff if the problem persists.';
-    const title = params.get('noticeTitle') || noticeConfig.title || fallbackNotice.title || defaultTitle;
-    const body = params.get('noticeBody') || noticeConfig.body || fallbackNotice.body || defaultBody;
-    const closeLabel = noticeConfig.close || fallbackNotice.close || 'Close';
+    const safeText = value => (typeof value === 'string' ? value : '');
+    const title = safeText(params.get('noticeTitle')) || safeText(noticeConfig.title) || safeText(fallbackNotice.title) || defaultTitle;
+    const body = safeText(params.get('noticeBody')) || safeText(noticeConfig.body) || safeText(fallbackNotice.body) || defaultBody;
+    const closeLabel = safeText(noticeConfig.close) || safeText(fallbackNotice.close) || 'Close';
     const blocker = document.createElement('div');
     blocker.className = 'cart-blocker';
     const popup = document.createElement('div');
     popup.className = 'cart-popup';
-    popup.innerHTML = `<p><strong>${title}</strong></p><p>${body}</p><div class="cart-popup-actions"><button type="button" class="btn btn--primary notice-close">${closeLabel}</button></div>`;
+    const titleParagraph = document.createElement('p');
+    const titleStrong = document.createElement('strong');
+    titleStrong.textContent = title;
+    titleParagraph.appendChild(titleStrong);
+    const bodyParagraph = document.createElement('p');
+    bodyParagraph.textContent = body;
+    const actions = document.createElement('div');
+    actions.className = 'cart-popup-actions';
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'btn btn--primary notice-close';
+    closeButton.textContent = closeLabel;
+    actions.appendChild(closeButton);
+    popup.appendChild(titleParagraph);
+    popup.appendChild(bodyParagraph);
+    popup.appendChild(actions);
     blocker.appendChild(popup);
     document.body.appendChild(blocker);
-    blocker.querySelector('.notice-close').addEventListener('click', () => blocker.remove());
+    closeButton.addEventListener('click', () => blocker.remove());
     const url = new URL(window.location.href);
     ['notice','noticeTitle','noticeBody','noticeType'].forEach(k => url.searchParams.delete(k));
     window.history.replaceState({}, document.title, url.toString());
@@ -206,30 +222,81 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function renderSuggestions(bars) {
     if (!suggestionsBox) return;
+    suggestionsBox.innerHTML = '';
+    suggestionsBox.classList.remove('show');
     if (!bars.length) {
-      suggestionsBox.innerHTML = '';
-      suggestionsBox.classList.remove('show');
       return;
     }
-    const items = bars.map(bar => `
-      <li data-bar-id="${bar.id}">
-        <a class="bar-card" href="/bars/${bar.id}" aria-label="${formatTemplate(appTexts.open_label, { bar: bar.name }) || `Open ${bar.name}`}">
-          <div class="thumb-wrapper"><img class="thumb" src="${bar.photo_url || FALLBACK_IMG}" alt="${bar.name} photo" loading="lazy" decoding="async" width="400" height="225" srcset="${bar.photo_url || FALLBACK_IMG} 400w, ${bar.photo_url || FALLBACK_IMG} 800w" sizes="(max-width: 600px) 100vw, 400px" onerror="this.src='${FALLBACK_IMG}';this.onerror=null;"></div>
-          <h3 class="title">${bar.name}</h3>
-          <div class="bar-meta">
-            <span class="bar-rating" data-has-rating="true" hidden></span>
-            <span class="bar-distance" data-has-distance="true" hidden></span>
-          </div>
-          <address>${bar.address}, ${bar.city}, ${bar.state}</address>
-          <p class="desc">${bar.description}</p>
-        </a>
-      </li>
-    `).join('');
-    suggestionsBox.innerHTML = `<ul class="bars">${items}</ul>`;
-    suggestionsBox.classList.add('show');
-    suggestionsBox.querySelectorAll('.bar-card').forEach((card, i) => {
-      renderMeta(card, bars[i] || {});
+    const list = document.createElement('ul');
+    list.className = 'bars';
+    bars.forEach(bar => {
+      const item = document.createElement('li');
+      item.dataset.barId = bar.id;
+
+      const card = document.createElement('a');
+      card.className = 'bar-card';
+      card.href = `/bars/${bar.id}`;
+      const openLabel = formatTemplate(appTexts.open_label, { bar: bar.name }) || `Open ${bar.name || ''}`;
+      card.setAttribute('aria-label', openLabel);
+
+      const thumbWrapper = document.createElement('div');
+      thumbWrapper.className = 'thumb-wrapper';
+      const thumb = document.createElement('img');
+      const resolvedSrc = bar.photo_url || FALLBACK_IMG;
+      thumb.className = 'thumb';
+      thumb.src = resolvedSrc;
+      thumb.alt = `${bar.name || ''} photo`;
+      thumb.loading = 'lazy';
+      thumb.decoding = 'async';
+      thumb.width = 400;
+      thumb.height = 225;
+      thumb.sizes = '(max-width: 600px) 100vw, 400px';
+      thumb.srcset = `${resolvedSrc} 400w, ${resolvedSrc} 800w`;
+      thumb.addEventListener('error', () => {
+        thumb.src = FALLBACK_IMG;
+        thumb.srcset = `${FALLBACK_IMG} 400w, ${FALLBACK_IMG} 800w`;
+      }, { once: true });
+      thumbWrapper.appendChild(thumb);
+
+      const title = document.createElement('h3');
+      title.className = 'title';
+      title.textContent = bar.name || '';
+
+      const meta = document.createElement('div');
+      meta.className = 'bar-meta';
+      const rating = document.createElement('span');
+      rating.className = 'bar-rating';
+      rating.dataset.hasRating = 'true';
+      rating.hidden = true;
+      const distance = document.createElement('span');
+      distance.className = 'bar-distance';
+      distance.dataset.hasDistance = 'true';
+      distance.hidden = true;
+      meta.appendChild(rating);
+      meta.appendChild(distance);
+
+      const address = document.createElement('address');
+      const locationParts = [bar.address, bar.city, bar.state].filter(Boolean);
+      address.textContent = locationParts.join(', ');
+
+      const desc = document.createElement('p');
+      desc.className = 'desc';
+      desc.textContent = bar.description || '';
+
+      card.appendChild(thumbWrapper);
+      card.appendChild(title);
+      card.appendChild(meta);
+      card.appendChild(address);
+      card.appendChild(desc);
+
+      item.appendChild(card);
+      list.appendChild(item);
+
+      renderMeta(card, bar || {});
     });
+
+    suggestionsBox.appendChild(list);
+    suggestionsBox.classList.add('show');
   }
 
   function fetchSuggestions(term) {
