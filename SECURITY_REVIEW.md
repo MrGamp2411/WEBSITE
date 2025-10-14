@@ -10,9 +10,19 @@ mitigates the previously reported cross-site request forgery risk.【F:main.py�
 
 ## Findings
 
-No outstanding findings remain. Previously identified issues have been verified
-in code and test coverage, so this section currently tracks no open
-vulnerabilities.
+### Stored XSS in live order dashboards via unchecked order notes
+- **Impact:** Customer-supplied order notes are written to the database without
+  sanitisation and later injected directly into the bartender/admin order
+  dashboards through `innerHTML`. An attacker can submit HTML/JS in the notes
+  field during checkout, which will execute for staff reviewing live orders,
+  enabling session hijacking or pivoting into privileged admin actions.
+- **Evidence:** The checkout handler persists raw `notes` from the form payload
+  into the `Order` record, while the real-time order rendering script inserts
+  `order.notes` into the DOM without escaping.【F:main.py†L3527-L3597】【F:static/js/orders.js†L94-L146】
+- **Mitigation:** Escape or sanitise order notes before rendering in
+  `orders.js` (e.g. convert text to DOM text nodes) or store an HTML-escaped
+  version server-side. Add regression tests to ensure only plain text appears
+  in the dashboard.
 
 
 ## Next Steps
