@@ -239,6 +239,8 @@ All static marketing pages reuse `.static-page` rules in
   during security-focused work.
 - `/api/bars` POST now requires a super admin session; anonymous or non-admin
   attempts are logged to `AuditLog`.
+- Product and bar photo uploads must route through `process_image_upload` in
+  `main.py` so files are re-encoded to JPEG/PNG/WebP before storage.
 
 ---
 

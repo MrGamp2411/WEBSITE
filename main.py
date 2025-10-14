@@ -31,7 +31,10 @@ Limitations:
     additional code.
 """
 
+from __future__ import annotations
+
 import os
+import io
 import asyncio
 import hashlib
 import ipaddress
@@ -91,6 +94,13 @@ ALLOWED_NOTIFICATION_ATTACHMENT_TYPES = ALLOWED_NOTIFICATION_IMAGE_TYPES | {
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 }
 
+MAX_PRODUCT_IMAGE_BYTES = 5 * 1024 * 1024  # 5MB
+ALLOWED_PRODUCT_IMAGE_FORMATS = {
+    "JPEG": ("jpg", "image/jpeg"),
+    "PNG": ("png", "image/png"),
+    "WEBP": ("webp", "image/webp"),
+}
+
 CSRF_SESSION_KEY = "csrf_token"
 CSRF_HEADER_NAME = "X-CSRF-Token"
 SAFE_HTTP_METHODS = {"GET", "HEAD", "OPTIONS", "TRACE"}
@@ -102,6 +112,68 @@ def sanitize_notification_filename(filename: str | None) -> str | None:
     cleaned = Path(filename).name.strip()
     cleaned = cleaned.replace("\r", "").replace("\n", "")
     return cleaned or None
+
+
+class ImageUploadError(Exception):
+    """Raised when an uploaded product image fails validation."""
+
+
+async def process_image_upload(
+    upload_file: UploadFile,
+) -> tuple[bytes, str, str]:
+    """Return sanitised image bytes, extension, and MIME type for an upload."""
+
+    data = await upload_file.read()
+    if not data:
+        raise ImageUploadError("Select a valid image (JPEG, PNG or WebP).")
+    if len(data) > MAX_PRODUCT_IMAGE_BYTES:
+        raise ImageUploadError("Product images must be 5MB or smaller.")
+
+    try:
+        Image.open(io.BytesIO(data)).verify()
+    except (UnidentifiedImageError, OSError):
+        raise ImageUploadError("Select a valid image (JPEG, PNG or WebP).")
+
+    try:
+        with Image.open(io.BytesIO(data)) as image:
+            image_format = (image.format or "").upper()
+            if image_format not in ALLOWED_PRODUCT_IMAGE_FORMATS:
+                raise ImageUploadError("Select a valid image (JPEG, PNG or WebP).")
+
+            if image_format == "JPEG" and image.mode not in {"RGB", "L"}:
+                image = image.convert("RGB")
+            elif image_format in {"PNG", "WEBP"} and image.mode not in {
+                "RGB",
+                "RGBA",
+                "L",
+            }:
+                image = image.convert("RGBA")
+
+            buffer = io.BytesIO()
+            image.save(buffer, format=image_format)
+            sanitised_bytes = buffer.getvalue()
+    except ImageUploadError:
+        raise
+    except OSError:
+        raise ImageUploadError("Select a valid image (JPEG, PNG or WebP).")
+    finally:
+        await upload_file.close()
+
+    extension, mime = ALLOWED_PRODUCT_IMAGE_FORMATS[image_format]
+    return sanitised_bytes, extension, mime
+
+
+async def save_product_image(upload_file: UploadFile) -> str:
+    """Validate and persist an uploaded product image, returning its URL."""
+
+    data, extension, _ = await process_image_upload(upload_file)
+    uploads_dir = os.path.join("static", "uploads")
+    os.makedirs(uploads_dir, exist_ok=True)
+    filename = f"{uuid4().hex}.{extension}"
+    file_path = os.path.join(uploads_dir, filename)
+    with open(file_path, "wb") as f:
+        f.write(data)
+    return f"/static/uploads/{filename}"
 
 from fastapi import (
     Depends,
@@ -118,6 +190,7 @@ from fastapi import (
 )
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
+from PIL import Image, UnidentifiedImageError
 from fastapi.middleware.cors import CORSMiddleware
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from sqlalchemy import inspect, text, func, extract, or_, and_
@@ -2394,27 +2467,19 @@ def make_absolute_url(url: Optional[str], request: Request) -> Optional[str]:
     return url
 
 
-async def save_upload(file, existing_path: Optional[str] = None) -> Optional[str]:
-    """Persist an uploaded file and return its relative URL.
+async def save_upload(
+    file: UploadFile | None, existing_path: Optional[str] = None
+) -> Optional[str]:
+    """Persist an uploaded image and return its relative URL.
 
     If ``file`` has no filename, ``existing_path`` is returned unchanged."""
-    filename = getattr(file, "filename", None)
-    if filename:
-        base_dir = Path(__file__).resolve().parent
-        uploads_dir = base_dir / "static" / "uploads"
-        uploads_dir.mkdir(parents=True, exist_ok=True)
-        _, ext = os.path.splitext(filename)
-        filename = f"{uuid4().hex}{ext}"
-        file_path = uploads_dir / filename
-        with open(file_path, "wb") as f:
-            while True:
-                chunk = await file.read(1024 * 1024)
-                if not chunk:
-                    break
-                f.write(chunk)
-        await file.close()
-        return f"/static/uploads/{filename}"
-    return existing_path
+
+    if not file or not getattr(file, "filename", None):
+        if file and hasattr(file, "close"):
+            await file.close()
+        return existing_path
+
+    return await save_product_image(file)
 
 
 def render_template(template_name: str, **context) -> HTMLResponse:
@@ -5059,14 +5124,16 @@ async def create_bar_post(request: Request, db: Session = Depends(get_db)):
     photo_file = form.get("photo")
     photo_url = None
     if getattr(photo_file, "filename", None):
-        uploads_dir = os.path.join("static", "uploads")
-        os.makedirs(uploads_dir, exist_ok=True)
-        _, ext = os.path.splitext(photo_file.filename)
-        filename = f"{uuid4().hex}{ext}"
-        file_path = os.path.join(uploads_dir, filename)
-        with open(file_path, "wb") as f:
-            f.write(await photo_file.read())
-        photo_url = f"/static/uploads/{filename}"
+        try:
+            photo_url = await save_product_image(photo_file)
+        except ImageUploadError as exc:
+            return render_template(
+                "admin_new_bar.html",
+                request=request,
+                bar_categories=BAR_CATEGORIES,
+                selected_categories=categories,
+                error=str(exc),
+            )
     if not all([name, address, city, state, latitude, longitude, description]):
         return render_template(
             "admin_new_bar.html",
@@ -5217,14 +5284,18 @@ async def edit_bar_post(request: Request, bar_id: int, db: Session = Depends(get
     photo_file = form.get("photo")
     photo_url = bar.photo_url
     if getattr(photo_file, "filename", None):
-        uploads_dir = os.path.join("static", "uploads")
-        os.makedirs(uploads_dir, exist_ok=True)
-        _, ext = os.path.splitext(photo_file.filename)
-        filename = f"{uuid4().hex}{ext}"
-        file_path = os.path.join(uploads_dir, filename)
-        with open(file_path, "wb") as f:
-            f.write(await photo_file.read())
-        photo_url = f"/static/uploads/{filename}"
+        try:
+            photo_url = await save_product_image(photo_file)
+        except ImageUploadError as exc:
+            return render_template(
+                "admin_edit_bar.html",
+                request=request,
+                bar=bar,
+                hours=hours,
+                bar_categories=BAR_CATEGORIES,
+                selected_categories=categories,
+                error=str(exc),
+            )
     if all([name, address, city, state, latitude, longitude]):
         try:
             lat = float(latitude)
@@ -7558,7 +7629,16 @@ async def bar_new_product(
         description = description[:190]
     display_order = form.get("display_order") or 0
     photo_file = form.get("photo")
-    photo_url = await save_upload(photo_file)
+    try:
+        photo_url = await save_upload(photo_file)
+    except ImageUploadError as exc:
+        return render_template(
+            "bar_new_product.html",
+            request=request,
+            bar=bar,
+            category=category,
+            error=str(exc),
+        )
     if not name or not description or not price:
         return render_template(
             "bar_new_product.html",
@@ -7746,6 +7826,21 @@ async def bar_edit_product(
         description = description[:190]
     display_order = form.get("display_order") or product.display_order
     photo_file = form.get("photo")
+    image_bytes: bytes | None = None
+    image_mime: str | None = None
+    if getattr(photo_file, "filename", ""):
+        try:
+            image_bytes, _, image_mime = await process_image_upload(photo_file)
+        except ImageUploadError as exc:
+            db.rollback()
+            return render_template(
+                "bar_edit_product.html",
+                request=request,
+                bar=bar,
+                category=category,
+                product=product,
+                error=str(exc),
+            )
     if name:
         name = name[:80]
         product.name = db_item.name = name
@@ -7787,17 +7882,17 @@ async def bar_edit_product(
         db_item.sort_order = order_val
     except ValueError:
         pass
-    if getattr(photo_file, "filename", ""):
-        data = await photo_file.read()
-        mime = photo_file.content_type or ""
-        if mime.startswith("image/") and len(data) <= 5 * 1024 * 1024:
-            img = db.query(ProductImage).filter_by(product_id=db_item.id).first()
-            if img:
-                img.data = data
-                img.mime = mime
-            else:
-                db.add(ProductImage(product_id=db_item.id, data=data, mime=mime))
-        await photo_file.close()
+    if image_bytes is not None and image_mime is not None:
+        img = db.query(ProductImage).filter_by(product_id=db_item.id).first()
+        if img:
+            img.data = image_bytes
+            img.mime = image_mime
+        else:
+            db.add(
+                ProductImage(
+                    product_id=db_item.id, data=image_bytes, mime=image_mime
+                )
+            )
     product.photo_url = f"/api/products/{db_item.id}/image"
     db_item.photo = None
     db.commit()

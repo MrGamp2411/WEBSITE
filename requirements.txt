@@ -5,6 +5,7 @@ itsdangerous
 starlette
 python-dotenv
 python-multipart
+Pillow>=10.0.0
 sqlalchemy
 alembic
 psycopg2-binary
