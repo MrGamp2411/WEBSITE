@@ -3521,18 +3521,20 @@ async def update_cart(
     return RedirectResponse(url="/cart", status_code=status.HTTP_303_SEE_OTHER)
 
 
-@app.get("/cart/select_table")
-async def select_table(request: Request):
+@app.post("/cart/select_table")
+async def select_table(request: Request, table_id: str = Form(...)):
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     try:
-        table_id = int(request.query_params.get("table_id", 0))
-    except ValueError:
+        parsed_table_id = int(table_id)
+    except (TypeError, ValueError):
         raise HTTPException(status_code=400, detail="Invalid table")
     cart = get_cart_for_user(user)
-    cart.table_id = table_id
+    cart.table_id = parsed_table_id
     save_cart_for_user(user.id, cart)
+    if "application/json" in request.headers.get("accept", ""):
+        return JSONResponse({"table_id": parsed_table_id})
     return RedirectResponse(url="/cart", status_code=status.HTTP_303_SEE_OTHER)
 
 

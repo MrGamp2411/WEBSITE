@@ -101,7 +101,7 @@ Configure the application via environment variables. Unless noted, defaults foll
 | `/bars` | `all_bars.html` | `static/js/view-all.js` | Admin-curated list of every active bar. |
 | `/bars/{id}` | `bar_detail.html` | `static/js/bar-detail.js` | Category tabs, product lists, stock status badges, and add-to-cart controls. |
 | `/cart` | `cart.html` | `static/js/cart.js` | Session cart overview, quantity adjustment, notes, and table selection status. |
-| `/cart/select_table` | `cart.html` | `static/js/cart.js` | Inline modal for choosing tables defined for a bar. |
+| `POST /cart/select_table` | `cart.html` | `static/js/cart.js` | CSRF-protected endpoint that persists the selected table for checkout. |
 | `/cart/checkout` | Redirect to `order_success.html` | - | Validates cart, processes card/wallet payments, writes orders, clears cart. |
 | `/orders` | `order_history.html` | `static/js/order-history.js`, `static/js/orders.js` | Displays order timeline, allows reorder, exports invoice-friendly details. |
 | `/order_success` | `order_success.html` | - | Confirmation with translated summaries, totals, and wallet balance reminders. |
