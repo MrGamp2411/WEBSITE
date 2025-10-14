@@ -168,7 +168,7 @@ Configure the application via environment variables. Unless noted, defaults foll
 
 ## Background services and utilities
 - `audit.log_action` records every sensitive change, including actor, entity, payload, IP, and geolocation, into the `audit_logs` table. 【F:audit.py†L1-L34】
-- Disposable email enforcement caches remote lists, optional local files, and PyPI datasets; stats are only exposed to super admins when `DISPOSABLE_STATS_ENABLED=true`. 【F:app/utils/disposable_email.py†L5-L125】【F:main.py†L54-L63】【F:main.py†L4516-L4524】
+- Disposable email enforcement caches remote lists, optional local files, and PyPI datasets; stats are only exposed to super admins when `DISPOSABLE_STATS_ENABLED=true`. 【F:app/utils/disposable_email.py†L5-L125】【F:main.py†L109-L124】【F:main.py†L4541-L4549】
 - Phone validation normalises numbers, rejects extensions, and returns `(E.164, region)` pairs for persistence. 【F:app/phone.py†L1-L53】
 - Payout scheduler aggregates completed orders into `Payout` rows; invoked via `/admin/payments/{bar_id}/test_closing` utilities and background jobs. 【F:payouts.py†L1-L47】【F:main.py†L5443-L5498】
 - WebSockets broadcast order and wallet updates after payments or manual status changes. 【F:main.py†L3423-L3498】

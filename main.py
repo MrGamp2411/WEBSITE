@@ -77,10 +77,6 @@ TERMS_VERSION = "V1.0"
 TERMS_EFFECTIVE_DATE = date.today().strftime("%d.%m.%Y")
 TERMS_NEXT_REVIEW_DATE = date(2025, 9, 16).strftime("%d.%m.%Y")
 
-DISPOSABLE_STATS_ENABLED = (
-    os.getenv("DISPOSABLE_STATS_ENABLED", "false").lower() == "true"
-)
-
 MAX_NOTIFICATION_IMAGE_BYTES = 5 * 1024 * 1024  # 5MB
 MAX_NOTIFICATION_ATTACHMENT_BYTES = 10 * 1024 * 1024  # 10MB
 ALLOWED_NOTIFICATION_IMAGE_TYPES = {
@@ -108,6 +104,24 @@ ALLOWED_PRODUCT_IMAGE_FORMATS = {
 CSRF_SESSION_KEY = "csrf_token"
 CSRF_HEADER_NAME = "X-CSRF-Token"
 SAFE_HTTP_METHODS = {"GET", "HEAD", "OPTIONS", "TRACE"}
+
+
+def disposable_stats_enabled() -> bool:
+    """Return ``True`` when disposable stats diagnostics should be exposed."""
+
+    return os.getenv("DISPOSABLE_STATS_ENABLED", "false").lower() == "true"
+
+
+def should_use_secure_session_cookie() -> bool:
+    """Determine whether session cookies must be marked as ``Secure``."""
+
+    flag = os.getenv("SESSION_COOKIE_SECURE", "").strip().lower()
+    if flag in {"1", "true", "yes", "on"}:
+        return True
+    if flag in {"0", "false", "no", "off"}:
+        return False
+    base_url = os.getenv("BASE_URL", "").strip().lower()
+    return base_url.startswith("https://")
 
 
 def sanitize_notification_filename(filename: str | None) -> str | None:
@@ -1000,14 +1014,7 @@ SESSION_SECRET = os.getenv("SESSION_SECRET", "").strip()
 if not SESSION_SECRET:
     SESSION_SECRET = secrets.token_urlsafe(64)
 
-session_cookie_secure_env = os.getenv("SESSION_COOKIE_SECURE", "").strip().lower()
-if session_cookie_secure_env in {"1", "true", "yes", "on"}:
-    session_cookie_secure = True
-elif session_cookie_secure_env in {"0", "false", "no", "off"}:
-    session_cookie_secure = False
-else:
-    base_url = os.getenv("BASE_URL", "").strip().lower()
-    session_cookie_secure = base_url.startswith("https://")
+session_cookie_secure = should_use_secure_session_cookie()
 
 app.add_middleware(
     SessionMiddleware,
@@ -4534,7 +4541,7 @@ async def login(request: Request, db: Session = Depends(get_db)):
 @app.get("/internal/disposable-domains/stats")
 async def disposable_domains_stats(request: Request):
     """Return disposable domain cache statistics."""
-    if not DISPOSABLE_STATS_ENABLED:
+    if not disposable_stats_enabled():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     user = get_current_user(request)
     if not user:
