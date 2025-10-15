@@ -16,16 +16,30 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
+ENVIRONMENT = os.getenv("ENV", "development").lower()
+
+
 @router.post("/webhooks/wallee")
 async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db)):
     try:
         raw = await request.body()
-        verify = os.getenv("WALLEE_VERIFY_SIGNATURE", "true").lower() == "true"
-        if verify:
+        verify_config = os.getenv("WALLEE_VERIFY_SIGNATURE", "true").lower() == "true"
+        enforce_verification = ENVIRONMENT == "production"
+        if enforce_verification and not verify_config:
+            logger.warning(
+                "Ignoring WALLEE_VERIFY_SIGNATURE=false in production; verification enforced"
+            )
+
+        if verify_config or enforce_verification:
             sig = request.headers.get("x-signature") or request.headers.get("X-Signature")
-            verify_signature_bytes(raw, sig)
+            try:
+                verify_signature_bytes(raw, sig)
+            except ValueError as exc:
+                raise HTTPException(status_code=400, detail=str(exc))
         else:
-            print("WARNING: skipping signature verification (test mode)")
+            logger.warning(
+                "Skipping Wallee webhook signature verification because it is disabled"
+            )
 
         payload = json.loads(raw.decode("utf-8"))
         tx_id_raw = payload.get("entityId") or payload.get("id")
