@@ -98,7 +98,7 @@ def create_order(client, payment_method):
             '/cart/checkout',
             data={'table_id': ids['table_id'], 'payment_method': payment_method},
         )
-    client.get('/logout')
+    client.post('/logout')
     db = SessionLocal()
     order = db.query(Order).first()
     db.close()
@@ -110,7 +110,7 @@ def create_order(client, payment_method):
 def cancel_order(client, ids):
     client.post('/login', data={'email': ids['bartender_email'], 'password': 'pass'})
     resp = client.post(f"/api/orders/{ids['order_id']}/status", json={'status': 'CANCELED'})
-    client.get('/logout')
+    client.post('/logout')
     return resp
 
 
@@ -223,7 +223,7 @@ def test_customer_cannot_cancel_after_acceptance():
         ids = create_order(client, 'card')
         client.post('/login', data={'email': ids['bartender_email'], 'password': 'pass'})
         client.post(f"/api/orders/{ids['order_id']}/status", json={'status': 'ACCEPTED'})
-        client.get('/logout')
+        client.post('/logout')
         client.post('/login', data={'email': ids['customer_email'], 'password': 'pass'})
         resp = client.post(f"/api/orders/{ids['order_id']}/status", json={'status': 'CANCELED'})
         assert resp.status_code == 404

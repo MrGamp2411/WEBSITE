@@ -19,20 +19,20 @@ def test_wallet_transaction_status_updates():
         client.post('/login', data={'email': ids['customer_email'], 'password': 'pass'})
         wallet = client.get('/wallet')
         assert 'Processing' in wallet.text
-        client.get('/logout')
+        client.post('/logout')
 
         client.post('/login', data={'email': ids['bartender_email'], 'password': 'pass'})
         client.post(f"/api/orders/{ids['order_id']}/status", json={'status': 'ACCEPTED'})
-        client.get('/logout')
+        client.post('/logout')
 
         client.post('/login', data={'email': ids['customer_email'], 'password': 'pass'})
         wallet = client.get('/wallet')
         assert 'Completed' in wallet.text
-        client.get('/logout')
+        client.post('/logout')
 
         client.post('/login', data={'email': ids['bartender_email'], 'password': 'pass'})
         client.post(f"/api/orders/{ids['order_id']}/status", json={'status': 'CANCELED'})
-        client.get('/logout')
+        client.post('/logout')
 
         client.post('/login', data={'email': ids['customer_email'], 'password': 'pass'})
         wallet = client.get('/wallet')
@@ -69,7 +69,7 @@ def test_wallet_transactions_persist_across_restart():
         client.post('/login', data={'email': ids['customer_email'], 'password': 'pass'})
         wallet = client.get('/wallet')
         assert 'Processing' in wallet.text
-        client.get('/logout')
+        client.post('/logout')
 
         users.clear()
         users_by_email.clear()

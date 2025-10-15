@@ -50,7 +50,7 @@ def test_register_username_validation():
             )
             assert resp.status_code == 200
             assert "3–24 characters" in resp.text
-            client.get("/logout")
+            client.post("/logout")
 
         _start(client, "user_valid@example.com")
         resp_ok = client.post(
@@ -60,7 +60,7 @@ def test_register_username_validation():
         )
         assert resp_ok.status_code == 303
         assert resp_ok.headers["location"] == "/"
-        client.get("/logout")
+        client.post("/logout")
         _start(client, "user_dup@example.com")
         resp_dup = client.post(
             "/register/details",

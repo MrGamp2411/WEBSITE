@@ -69,6 +69,12 @@ def test_notification_marked_read_after_view():
         assert resp.status_code == 200
 
         resp = client.get("/notifications")
+        assert "card--unread" in resp.text
+
+        resp = client.post(f"/notifications/{note_id}/mark-read")
+        assert resp.status_code == 200
+
+        resp = client.get("/notifications")
         assert "card--unread" not in resp.text
 
         db = SessionLocal()

@@ -51,7 +51,7 @@ def test_register_phone_valid_numbers():
                     {"email": f"u{i}@example.com"},
                 ).fetchone()
             assert db_user[0] == e164
-            client.get("/logout")
+            client.post("/logout")
 
 
 def test_register_phone_prefix_mismatch():
@@ -68,7 +68,7 @@ def test_register_phone_prefix_mismatch():
         )
         assert resp.status_code == 422
         assert "The number does not match the selected dial code (+41)." in resp.text
-        client.get("/logout")
+        client.post("/logout")
         _start(client, "mm2@example.com")
         resp2 = client.post(
             "/register/details",
@@ -92,7 +92,7 @@ def test_register_phone_format_errors():
         )
         assert resp_short.status_code == 422
         assert "Invalid phone number length." in resp_short.text
-        client.get("/logout")
+        client.post("/logout")
         _start(client, "ext@example.com")
         resp_ext = client.post(
             "/register/details",
@@ -117,7 +117,7 @@ def test_register_phone_duplicate():
             follow_redirects=False,
         )
         assert resp_first.status_code == 303
-        client.get("/logout")
+        client.post("/logout")
         _start(client, "second@example.com")
         resp_dup = client.post(
             "/register/details",

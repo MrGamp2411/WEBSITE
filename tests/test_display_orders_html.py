@@ -42,7 +42,7 @@ def test_display_orders_page_shows_two_columns():
         assert 'Completed' not in resp.text
         assert 'href="/"' not in resp.text
         assert 'js-open-menu' not in resp.text
-        assert 'href="/logout"' in resp.text
+        assert 'form method="post" action="/logout"' in resp.text
 
 
 def test_display_user_redirected_from_home():

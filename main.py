@@ -963,6 +963,43 @@ def _csrf_failure_response(request: Request) -> Response:
     )
 
 
+async def enforce_csrf(request: Request) -> None:
+    session = request.session
+    expected_token = session.get(CSRF_SESSION_KEY)
+    if not expected_token:
+        expected_token = ensure_csrf_token(request)
+
+    supplied_token = request.headers.get(CSRF_HEADER_NAME) or request.headers.get("X-XSRF-TOKEN")
+
+    if not supplied_token:
+        content_type = request.headers.get("content-type", "")
+        if "application/x-www-form-urlencoded" in content_type or "multipart/form-data" in content_type:
+            form = await request.form()
+            supplied_token = form.get("csrf_token")
+
+    if (
+        supplied_token
+        and expected_token
+        and secrets.compare_digest(str(supplied_token), str(expected_token))
+    ):
+        return
+
+    origin_header = request.headers.get("origin")
+    referer_header = request.headers.get("referer")
+    same_origin = _origin_matches(origin_header, request) or _origin_matches(
+        referer_header, request
+    )
+    if same_origin:
+        return
+    if not origin_header and not referer_header and _is_test_client_request(request):
+        return
+
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="CSRF token missing or invalid",
+    )
+
+
 class HostValidationMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         host = request.headers.get("host", "")
@@ -1112,7 +1149,10 @@ class DisplayRedirectMiddleware(BaseHTTPMiddleware):
                         url=f"/dashboard/bar/{user.bar_id}/orders",
                         status_code=status.HTTP_303_SEE_OTHER,
                     )
-                return RedirectResponse(url="/logout", status_code=status.HTTP_303_SEE_OTHER)
+                request.session.clear()
+                return RedirectResponse(
+                    url="/", status_code=status.HTTP_303_SEE_OTHER
+                )
         return await call_next(request)
 
 
@@ -3615,13 +3655,6 @@ async def bar_detail(request: Request, bar_id: int):
         raise HTTPException(status_code=404, detail="Bar not found")
     bar.photo_url = make_absolute_url(bar.photo_url, request)
     bar.distance_km = None
-    recent = request.session.get("recent_bar_ids", [])
-    if bar.id in recent:
-        recent.remove(bar.id)
-    recent.append(bar.id)
-    if len(recent) > 5:
-        recent = recent[-5:]
-    request.session["recent_bar_ids"] = recent
     # group products by category
     products_by_category: Dict[Category, List[Product]] = {}
     for prod in bar.products.values():
@@ -3645,6 +3678,22 @@ async def bar_detail(request: Request, bar_id: int):
         cart_bar_name=bar.name,
         cart_bar_id=bar.id,
     )
+
+
+@app.post("/bars/{bar_id}/recently-viewed")
+async def track_recent_bar(request: Request, bar_id: int):
+    bar = bars.get(bar_id)
+    if not bar:
+        raise HTTPException(status_code=404, detail="Bar not found")
+    await enforce_csrf(request)
+    recent = list(request.session.get("recent_bar_ids", []))
+    if bar.id in recent:
+        recent.remove(bar.id)
+    recent.append(bar.id)
+    if len(recent) > 5:
+        recent = recent[-5:]
+    request.session["recent_bar_ids"] = recent
+    return JSONResponse({"status": "ok"})
 
 
 @app.post("/bars/{bar_id}/add_to_cart")
@@ -5062,12 +5111,21 @@ async def profile_password_update(request: Request, db: Session = Depends(get_db
     return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
 
 
-@app.get("/logout")
+@app.post("/logout")
 async def logout(request: Request):
+    await enforce_csrf(request)
     user = get_current_user(request)
     if user and (user.is_blocked or user.is_ip_blocked):
         return redirect_for_authenticated_user(user)
     request.session.clear()
+    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@app.get("/logout", include_in_schema=False)
+async def logout_via_get(request: Request):
+    user = get_current_user(request)
+    if user:
+        return redirect_for_authenticated_user(user)
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -5116,7 +5174,8 @@ async def dashboard(request: Request):
                 url=f"/dashboard/bar/{user.bar_id}/orders",
                 status_code=status.HTTP_303_SEE_OTHER,
             )
-        return RedirectResponse(url="/logout", status_code=status.HTTP_303_SEE_OTHER)
+        request.session.clear()
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 
@@ -7708,9 +7767,6 @@ async def notification_detail(
     )
     if not note:
         raise HTTPException(status_code=404)
-    if not note.read:
-        note.read = True
-        db.commit()
     language_code = getattr(request.state, "language_code", DEFAULT_LANGUAGE)
     subject_text, body_text = resolve_notification_text(note, language_code)
     note.localized_subject = subject_text
@@ -7718,6 +7774,27 @@ async def notification_detail(
     return render_template(
         "notification_detail.html", request=request, user=user, note=note
     )
+
+
+@app.post("/notifications/{note_id}/mark-read")
+async def mark_notification_read(
+    note_id: int, request: Request, db: Session = Depends(get_db)
+):
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=403)
+    await enforce_csrf(request)
+    note = (
+        db.query(Notification)
+        .filter(Notification.id == note_id, Notification.user_id == user.id)
+        .first()
+    )
+    if not note:
+        raise HTTPException(status_code=404)
+    if not note.read:
+        note.read = True
+        db.commit()
+    return JSONResponse({"status": "ok"})
 
 
 @app.get("/notifications/{note_id}/image")

@@ -28,6 +28,7 @@ def test_search_recent_section_shows_only_visited():
 
     with TestClient(app) as client:
         client.get(f"/bars/{visited.id}")
+        client.post(f"/bars/{visited.id}/recently-viewed")
         resp = client.get("/search")
         assert resp.status_code == 200
         assert 'data-section="recent"' in resp.text
