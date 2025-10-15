@@ -1,6 +1,7 @@
 import os
 import sys
 import pathlib
+import pytest
 
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
@@ -26,7 +27,14 @@ def test_session_cookie_secure_defaults_to_https_base(monkeypatch):
     assert should_use_secure_session_cookie() is True
 
 
-def test_session_cookie_secure_defaults_to_false(monkeypatch):
+def test_session_cookie_secure_requires_explicit_decision(monkeypatch):
     monkeypatch.delenv("SESSION_COOKIE_SECURE", raising=False)
     monkeypatch.delenv("BASE_URL", raising=False)
-    assert should_use_secure_session_cookie() is False
+    with pytest.raises(RuntimeError):
+        should_use_secure_session_cookie()
+
+
+def test_session_cookie_secure_invalid_flag(monkeypatch):
+    monkeypatch.setenv("SESSION_COOKIE_SECURE", "maybe")
+    with pytest.raises(RuntimeError):
+        should_use_secure_session_cookie()

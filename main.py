@@ -117,13 +117,28 @@ def disposable_stats_enabled() -> bool:
 def should_use_secure_session_cookie() -> bool:
     """Determine whether session cookies must be marked as ``Secure``."""
 
-    flag = os.getenv("SESSION_COOKIE_SECURE", "").strip().lower()
-    if flag in {"1", "true", "yes", "on"}:
-        return True
-    if flag in {"0", "false", "no", "off"}:
-        return False
-    base_url = os.getenv("BASE_URL", "").strip().lower()
-    return base_url.startswith("https://")
+    flag_raw = os.getenv("SESSION_COOKIE_SECURE")
+    if flag_raw is not None:
+        flag = flag_raw.strip().lower()
+        if flag in {"1", "true", "yes", "on"}:
+            return True
+        if flag in {"0", "false", "no", "off"}:
+            return False
+        raise RuntimeError(
+            "SESSION_COOKIE_SECURE must be set to 'true' or 'false'."
+        )
+
+    base_url = os.getenv("BASE_URL", "").strip()
+    if base_url:
+        if base_url.lower().startswith("https://"):
+            return True
+        raise RuntimeError(
+            "BASE_URL must use HTTPS when SESSION_COOKIE_SECURE is not set."
+        )
+
+    raise RuntimeError(
+        "SESSION_COOKIE_SECURE must be explicitly set or BASE_URL must use HTTPS."
+    )
 
 
 def sanitize_notification_filename(filename: str | None) -> str | None:
@@ -265,6 +280,7 @@ from models import (
     NotificationLog,
     WelcomeMessage,
     BlockedIP,
+    LoginRateLimit,
 )
 from pydantic import BaseModel, constr, ConfigDict, ValidationError
 from decimal import Decimal
@@ -1207,13 +1223,34 @@ async def send_order_update(order: Order) -> Dict[str, Any]:
         await order_ws_manager.broadcast_user(order.customer_id, {"type": "order", "order": data})
     return data
 
+def _resolve_super_admin_credentials() -> tuple[str, str]:
+    email = (os.getenv("ADMIN_EMAIL") or "").strip()
+    password = os.getenv("ADMIN_PASSWORD") or ""
+    if not email or not password:
+        raise RuntimeError(
+            "ADMIN_EMAIL and ADMIN_PASSWORD must be provided via environment variables."
+        )
+    allow_defaults = (
+        os.getenv("ALLOW_INSECURE_ADMIN_CREDENTIALS", "").strip().lower()
+        in {"1", "true", "yes", "on"}
+    )
+    if (
+        not allow_defaults
+        and email.lower() == "admin@example.com"
+        and password == "ChangeMe!123"
+    ):
+        raise RuntimeError(
+            "Default super admin credentials are disabled. Set secure ADMIN_EMAIL and ADMIN_PASSWORD values."
+        )
+    return email, password
+
+
 def seed_super_admin():
     """Ensure a SuperAdmin user exists based on environment variables."""
-    admin_email = os.getenv("ADMIN_EMAIL", "admin@example.com")
-    admin_password = os.getenv("ADMIN_PASSWORD", "ChangeMe!123")
+    admin_email, admin_password = _resolve_super_admin_credentials()
     db = SessionLocal()
     try:
-        existing = db.query(User).filter(User.email == admin_email).first()
+        existing = db.query(User).filter(func.lower(User.email) == admin_email.lower()).first()
         if not existing:
             password_hash = hash_password(admin_password)
             user = User(
@@ -1922,8 +1959,94 @@ def get_request_ip(request: Request) -> Optional[str]:
     return request.client.host if request.client else None
 
 
-# Simple login attempt tracking
-login_attempts: Dict[str, Dict[str, float]] = defaultdict(lambda: {"count": 0, "last": 0.0})
+LOGIN_FAILURE_LOCK_THRESHOLD = 5
+LOGIN_FAILURE_LOCK_SECONDS = 15 * 60
+LOGIN_BACKOFF_THRESHOLD = 5
+
+
+def _coarsen_ip_for_throttle(ip: str) -> str:
+    try:
+        ip_obj = ipaddress.ip_address(ip)
+    except ValueError:
+        return ip
+    if isinstance(ip_obj, ipaddress.IPv4Address):
+        network = ipaddress.ip_network(f"{ip_obj}/24", strict=False)
+    else:
+        network = ipaddress.ip_network(f"{ip_obj}/64", strict=False)
+    return network.with_prefixlen
+
+
+def _load_login_rate_limits(
+    db: Session, keys: list[tuple[str, str]], now: datetime
+) -> dict[tuple[str, str], LoginRateLimit | None]:
+    records: dict[tuple[str, str], LoginRateLimit | None] = {}
+    dirty = False
+    for scope, identifier in keys:
+        record = (
+            db.query(LoginRateLimit)
+            .filter(
+                LoginRateLimit.scope == scope,
+                LoginRateLimit.identifier == identifier,
+            )
+            .first()
+        )
+        if record and record.locked_until and record.locked_until <= now:
+            record.fail_count = 0
+            record.locked_until = None
+            record.last_failure_at = now
+            dirty = True
+        records[(scope, identifier)] = record
+    if dirty:
+        db.commit()
+    return records
+
+
+def _register_login_failure(
+    db: Session,
+    keys: list[tuple[str, str]],
+    now: datetime,
+    records: dict[tuple[str, str], LoginRateLimit | None],
+) -> None:
+    dirty = False
+    for scope, identifier in keys:
+        record = records.get((scope, identifier))
+        if record is None:
+            record = LoginRateLimit(
+                scope=scope,
+                identifier=identifier,
+                fail_count=0,
+                last_failure_at=now,
+            )
+            db.add(record)
+            records[(scope, identifier)] = record
+        if record.locked_until and record.locked_until <= now:
+            record.fail_count = 0
+            record.locked_until = None
+        record.fail_count += 1
+        record.last_failure_at = now
+        if record.fail_count >= LOGIN_FAILURE_LOCK_THRESHOLD:
+            record.locked_until = now + timedelta(seconds=LOGIN_FAILURE_LOCK_SECONDS)
+        dirty = True
+    if dirty:
+        db.commit()
+
+
+def _clear_login_failures(db: Session, keys: list[tuple[str, str]]) -> None:
+    dirty = False
+    for scope, identifier in keys:
+        record = (
+            db.query(LoginRateLimit)
+            .filter(
+                LoginRateLimit.scope == scope,
+                LoginRateLimit.identifier == identifier,
+            )
+            .first()
+        )
+        if record:
+            db.delete(record)
+            dirty = True
+    if dirty:
+        db.commit()
 
 
 def load_cart_from_db(user_id: int) -> Cart:
@@ -4235,7 +4358,10 @@ async def register_step_one(request: Request, db: Session = Depends(get_db)):
         except HTTPException as exc:
             return render_form(exc.detail["message"], status_code=exc.status_code)
         if email in users_by_email or db.query(User).filter(User.email == email).first():
-            return render_form("Email already taken")
+            return render_form(
+                "We couldn't process your request. Please try again later.",
+                status_code=400,
+            )
         password_hash = hash_password(password)
         temp_username = f"pending_{uuid4().hex[:8]}"
         temp_username_lower = temp_username.lower()
@@ -4433,10 +4559,37 @@ async def login(request: Request, db: Session = Depends(get_db)):
     lon = float(longitude) if longitude else None
     if existing_user and not (email and password):
         return redirect_for_authenticated_user(existing_user)
+    canonical_ip = None
+    ip_throttle_key = None
+    client_ip_raw = get_request_ip(request)
+    if client_ip_raw:
+        try:
+            canonical_ip = ipaddress.ip_address(client_ip_raw).compressed
+        except ValueError:
+            canonical_ip = client_ip_raw
+        ip_throttle_key = _coarsen_ip_for_throttle(canonical_ip)
     if email and password:
-        record = login_attempts[email]
-        if record["count"] >= 5:
-            await asyncio.sleep(2 ** (record["count"] - 4))
+        normalized_email = (email or "").strip().lower()
+        throttle_keys: list[tuple[str, str]] = []
+        if normalized_email:
+            throttle_keys.append(("email", normalized_email))
+        if ip_throttle_key:
+            throttle_keys.append(("ip", ip_throttle_key))
+        now = datetime.utcnow()
+        rate_limits = _load_login_rate_limits(db, throttle_keys, now)
+        if any(
+            record and record.locked_until and record.locked_until > now
+            for record in rate_limits.values()
+        ):
+            return render_template(
+                "login.html",
+                request=request,
+                error="Too many login attempts. Please try again later.",
+            )
+        email_record = rate_limits.get(("email", normalized_email))
+        if email_record and email_record.fail_count >= LOGIN_BACKOFF_THRESHOLD:
+            delay = min(8, 2 ** (email_record.fail_count - LOGIN_BACKOFF_THRESHOLD + 1))
+            await asyncio.sleep(delay)
         db_user = db.query(User).filter(User.email == email).first()
         user = users_by_email.get(email)
         if not user:
@@ -4504,19 +4657,11 @@ async def login(request: Request, db: Session = Depends(get_db)):
                 users_by_email[user.email] = user
                 users_by_username[user.username.lower()] = user
         if not user or not verify_password(user.password_hash, password):
-            record["count"] += 1
-            record["last"] = time.time()
+            _register_login_failure(db, throttle_keys, now, rate_limits)
             return render_template(
                 "login.html", request=request, error="Invalid credentials"
             )
-        login_attempts.pop(email, None)
-        client_ip_raw = get_request_ip(request)
-        canonical_ip = None
-        if client_ip_raw:
-            try:
-                canonical_ip = ipaddress.ip_address(client_ip_raw).compressed
-            except ValueError:
-                canonical_ip = client_ip_raw
+        _clear_login_failures(db, throttle_keys)
         if db_user and db_user.role == RoleEnum.SUPERADMIN:
             user.role = "super_admin"
             user.base_role = "super_admin"
@@ -4758,7 +4903,8 @@ async def profile_password_update(request: Request, db: Session = Depends(get_db
         raise HTTPException(status_code=404, detail="User not found")
     user.password_hash = hash_password(password)
     db_user.password_hash = user.password_hash
-    login_attempts.pop(user.email, None)
+    if user.email:
+        _clear_login_failures(db, [("email", user.email.lower())])
     db.commit()
     request.session.clear()
     return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
@@ -6919,7 +7065,8 @@ async def admin_password_update(
         raise HTTPException(status_code=404, detail="User not found")
     user.password_hash = hash_password(password)
     db_user.password_hash = user.password_hash
-    login_attempts.pop(user.email, None)
+    if user.email:
+        _clear_login_failures(db, [("email", user.email.lower())])
     db.commit()
     return RedirectResponse(
         url=f"/admin/users/edit/{user_id}", status_code=status.HTTP_303_SEE_OTHER
