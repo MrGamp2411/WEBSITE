@@ -48,7 +48,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlsplit
 from zoneinfo import ZoneInfo
 
 CH_TZ = ZoneInfo("Europe/Zurich")
@@ -106,6 +106,103 @@ ALLOWED_PRODUCT_IMAGE_FORMATS = {
 CSRF_SESSION_KEY = "csrf_token"
 CSRF_HEADER_NAME = "X-CSRF-Token"
 SAFE_HTTP_METHODS = {"GET", "HEAD", "OPTIONS", "TRACE"}
+
+
+DEFAULT_ALLOWED_HOSTS = {"localhost", "127.0.0.1", "testserver"}
+
+
+def _parse_host_entry(value: str) -> tuple[str, Optional[int]]:
+    candidate = value.strip()
+    if not candidate:
+        raise ValueError("Host value must not be empty")
+    if "//" not in candidate and "://" not in candidate:
+        candidate = f"//{candidate}"
+    parsed = urlsplit(candidate)
+    if not parsed.hostname:
+        raise ValueError("Host value must include a hostname")
+    host = parsed.hostname.lower()
+    return host, parsed.port
+
+
+def _load_public_origin() -> Optional[str]:
+    raw = os.getenv("BASE_URL", "").strip()
+    if not raw:
+        return None
+    parsed = urlparse(raw)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise RuntimeError("BASE_URL must include an http or https scheme and host")
+    return f"{parsed.scheme}://{parsed.netloc}".rstrip("/")
+
+
+def _load_allowed_hosts(public_origin: Optional[str]) -> set[str]:
+    hosts: set[str] = set(DEFAULT_ALLOWED_HOSTS)
+    if public_origin:
+        host, port = _parse_host_entry(public_origin)
+        hosts.add(host)
+        if port is not None:
+            hosts.add(f"{host}:{port}")
+    raw_hosts = os.getenv("ALLOWED_HOSTS", "")
+    for entry in raw_hosts.split(","):
+        candidate = entry.strip()
+        if not candidate:
+            continue
+        try:
+            host, port = _parse_host_entry(candidate)
+        except ValueError as exc:  # pragma: no cover - configuration error
+            raise RuntimeError(
+                f"Invalid ALLOWED_HOSTS entry: {candidate!r}"
+            ) from exc
+        hosts.add(host)
+        if port is not None:
+            hosts.add(f"{host}:{port}")
+    return hosts
+
+
+def _load_trusted_proxies() -> tuple[ipaddress._BaseNetwork, ...]:
+    raw = os.getenv("TRUSTED_PROXY_IPS", "").strip()
+    if not raw:
+        return ()
+    networks: list[ipaddress._BaseNetwork] = []
+    for entry in raw.split(","):
+        candidate = entry.strip()
+        if not candidate:
+            continue
+        try:
+            network = ipaddress.ip_network(candidate, strict=False)
+        except ValueError as exc:  # pragma: no cover - configuration error
+            raise RuntimeError(
+                f"Invalid TRUSTED_PROXY_IPS entry: {candidate!r}"
+            ) from exc
+        networks.append(network)
+    return tuple(networks)
+
+
+PUBLIC_ORIGIN = _load_public_origin()
+TRUSTED_HOSTS = _load_allowed_hosts(PUBLIC_ORIGIN)
+TRUSTED_PROXY_NETWORKS = _load_trusted_proxies()
+
+
+def _is_allowed_host(value: str) -> bool:
+    try:
+        host, port = _parse_host_entry(value)
+    except ValueError:
+        return False
+    if port is not None and f"{host}:{port}" in TRUSTED_HOSTS:
+        return True
+    return host in TRUSTED_HOSTS
+
+
+def get_public_base_url(request: Request) -> str:
+    if PUBLIC_ORIGIN:
+        return PUBLIC_ORIGIN
+    host_header = request.headers.get("host", "")
+    if host_header and _is_allowed_host(host_header):
+        scheme = request.url.scheme or "http"
+        host, port = _parse_host_entry(host_header)
+        if port and not ((scheme == "http" and port == 80) or (scheme == "https" and port == 443)):
+            return f"{scheme}://{host}:{port}"
+        return f"{scheme}://{host}"
+    return str(request.base_url).rstrip("/")
 
 
 def disposable_stats_enabled() -> bool:
@@ -866,6 +963,18 @@ def _csrf_failure_response(request: Request) -> Response:
     )
 
 
+class HostValidationMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        host = request.headers.get("host", "")
+        if not host or not _is_allowed_host(host):
+            return PlainTextResponse(
+                "Invalid Host header",
+                status_code=status.HTTP_400_BAD_REQUEST,
+                media_type="text/plain",
+            )
+        return await call_next(request)
+
+
 class CSRFMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         session = request.session
@@ -1061,6 +1170,7 @@ app.add_middleware(
     same_site="strict",
     https_only=session_cookie_secure,
 )
+app.add_middleware(HostValidationMiddleware)
 
 
 # -----------------------------------------------------------------------------
@@ -1949,14 +2059,30 @@ def verify_password(stored: str, password: str) -> bool:
     return stored == expected
 
 
+def _client_from_trusted_proxy(client_host: Optional[str]) -> bool:
+    if not client_host or not TRUSTED_PROXY_NETWORKS:
+        return False
+    try:
+        client_ip = ipaddress.ip_address(client_host)
+    except ValueError:
+        return False
+    return any(client_ip in network for network in TRUSTED_PROXY_NETWORKS)
+
+
 def get_request_ip(request: Request) -> Optional[str]:
     forwarded = request.headers.get("x-forwarded-for")
-    if forwarded:
+    client_host = request.client.host if request.client else None
+    if forwarded and _client_from_trusted_proxy(client_host):
         for part in forwarded.split(","):
             candidate = part.strip()
-            if candidate:
-                return candidate
-    return request.client.host if request.client else None
+            if not candidate:
+                continue
+            try:
+                ipaddress.ip_address(candidate)
+            except ValueError:
+                continue
+            return candidate
+    return client_host
 
 
 LOGIN_FAILURE_LOCK_THRESHOLD = 5
@@ -2634,7 +2760,8 @@ def make_absolute_url(url: Optional[str], request: Request) -> Optional[str]:
     if url.startswith("http://"):
         url = "https://" + url[len("http://") :]
     elif not url.startswith("https://"):
-        url = urljoin(str(request.base_url), url.lstrip("/"))
+        base = get_public_base_url(request).rstrip("/")
+        url = urljoin(f"{base}/", url.lstrip("/"))
     return url
 
 
@@ -3667,6 +3794,14 @@ async def update_cart(
     return RedirectResponse(url="/cart", status_code=status.HTTP_303_SEE_OTHER)
 
 
+def _ensure_table_for_cart(cart: Cart, table_id: int) -> None:
+    if cart.bar_id is None:
+        raise HTTPException(status_code=400, detail="Invalid table selection")
+    bar = bars.get(cart.bar_id)
+    if not bar or table_id not in bar.tables:
+        raise HTTPException(status_code=400, detail="Invalid table selection")
+
+
 @app.post("/cart/select_table")
 async def select_table(request: Request, table_id: str = Form(...)):
     user = get_current_user(request)
@@ -3677,6 +3812,7 @@ async def select_table(request: Request, table_id: str = Form(...)):
     except (TypeError, ValueError):
         raise HTTPException(status_code=400, detail="Invalid table")
     cart = get_cart_for_user(user)
+    _ensure_table_for_cart(cart, parsed_table_id)
     cart.table_id = parsed_table_id
     save_cart_for_user(user.id, cart)
     if "application/json" in request.headers.get("accept", ""):
@@ -3698,11 +3834,13 @@ async def checkout(
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     cart = get_cart_for_user(user)
     if table_id is not None:
+        _ensure_table_for_cart(cart, table_id)
         cart.table_id = table_id
     if cart.table_id is None:
         raise HTTPException(
             status_code=400, detail="Please select a table before checking out"
         )
+    _ensure_table_for_cart(cart, cart.table_id)
     order_total = cart.total_with_fee()
     if payment_method == "wallet":
         if user.credit < order_total:
@@ -3739,7 +3877,7 @@ async def checkout(
         for item in cart.items.values()
     ]
     if payment_method == "card":
-        base_url = str(request.base_url).rstrip("/")
+        base_url = get_public_base_url(request)
         failed_params = {
             "notice": "payment_failed",
             "noticeTitle": translator(

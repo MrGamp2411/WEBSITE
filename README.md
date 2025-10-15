@@ -56,6 +56,7 @@ Configure the application via environment variables. Unless noted, defaults foll
 | `SUPPORT_EMAIL`, `SUPPORT_NUMBER` | Support contact exposed in static pages and footer. | `support@siplygo.example.com`, `+41 91 555 01 23` |
 | `SESSION_SECRET` | Secret key for signing authentication sessions. | Randomly generated at startup when unset |
 | `FRONTEND_ORIGINS` | Allowed CORS origins for API requests. | `http://localhost:5173` |
+| `ALLOWED_HOSTS` | Comma-separated hostnames permitted in HTTP `Host` headers. `BASE_URL` and local dev hosts are allowed automatically. | `localhost,127.0.0.1,testserver` |
 | `BAR_TIMEZONE` / `TZ` | Timezone used when computing “open now”, schedules, and order codes. | System TZ |
 | `PASSWORD_PEPPER` | Extra hash pepper appended before Argon2 hashing. | `""` |
 | `CURRENCY` | ISO currency code displayed in wallet, checkout, and reporting. | `CHF` |
@@ -63,6 +64,7 @@ Configure the application via environment variables. Unless noted, defaults foll
 | `DISPOSABLE_EMAIL_ENFORCE`, `DISPOSABLE_DOMAIN_URLS`, `DISPOSABLE_CACHE_TTL_MIN`, `DISPOSABLE_LOCAL_PATH` | Disposable-email guard configuration. | Enforced, 360-minute cache |
 | `ENV` | Environment label (dev/staging/prod). | `dev` |
 | `BASE_URL` | Public base URL used in payment callbacks. | unset |
+| `TRUSTED_PROXY_IPS` | Comma-separated IP addresses or CIDR blocks that are allowed to forward client IPs via `X-Forwarded-For`. When unset the header is ignored. | unset |
 
 ### Local Python workflow
 1. Install Python 3.11+ and create a virtual environment.
