@@ -7,7 +7,19 @@ This document captures outstanding security issues discovered during manual revi
 
 ## Outstanding Findings
 
-- None. All interactive forms now require a session CSRF token, with
-  `enforce_csrf` invoked across authentication, account management, cart, and
-  administrative POST routes, and templates embedding the token in each form
-  submission. 【F:main.py†L3877-L3996】【F:main.py†L4579-L5192】【F:main.py†L5568-L7816】【F:templates/login.html†L11-L25】【F:templates/profile.html†L12-L63】
+- **Wallet top-up API leaks upstream error details (medium).** The
+  `POST /api/topup/init` handler reflects raw exception strings from the Wallee
+  SDK back to the caller (for example `"Wallee create error: {e}"` and
+  `"Wallee payment page error: {e}"`). An attacker can deliberately trigger
+  failures and harvest gateway responses that may expose identifiers, request
+  metadata, or other sensitive information that helps with further abuse. Replace
+  these responses with generic error messages and log the detailed exception on
+  the server instead.【F:main.py†L4441-L4563】
+- **Malformed Wallee webhooks acknowledged as successful (medium).** When the
+  webhook payload is missing an `entityId`/`id` or cannot be parsed, the handler
+  returns `{"ok": true}` with HTTP 200. In environments where signature
+  verification is disabled (e.g. `WALLEE_VERIFY_SIGNATURE=false`), an unauthenticated
+  actor can repeatedly post junk payloads to exhaust webhook retries and prevent
+  legitimate completion events from crediting wallets. The endpoint should return
+  an error for invalid payloads and keep verification permanently enabled in
+  production.【F:app/webhooks/wallee.py†L22-L54】
