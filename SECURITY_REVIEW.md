@@ -7,4 +7,20 @@ This document captures outstanding security issues discovered during manual revi
 
 ## Outstanding Findings
 
-_None – all known findings have been remediated._
+- **Critical – Authentication forms lack CSRF protection.** The primary login
+  handler and both registration steps accept cross-site form submissions or
+  scripted requests without ever calling `enforce_csrf`, so an attacker can
+  silently sign a victim up or attempt logins while their browser forwards
+  authentication cookies. 【F:main.py†L4801-L4869】【F:main.py†L4578-L4660】【F:main.py†L4677-L4759】
+- **High – Account management flows are CSRF-exposed.** Profile edits and
+  password changes process POST bodies directly with no CSRF validation,
+  letting a malicious site update a signed-in user’s account details or reset
+  their password. 【F:main.py†L4996-L5054】【F:main.py†L5136-L5163】
+- **High – Cart and checkout endpoints miss CSRF enforcement.** Actions such as
+  `POST /cart/update`, `POST /cart/select_table`, and `POST /cart/checkout`
+  mutate the active order purely on session cookies, enabling forced orders or
+  table selections via cross-site requests. 【F:main.py†L3877-L3931】【F:main.py†L3934-L3996】
+- **Critical – Admin management POST routes omit CSRF checks.** Administrative
+  submissions (for example `POST /admin/bars/new` and `POST /admin/users/{id}/delete`)
+  never verify a CSRF token, so compromising a super admin’s browser lets an
+  attacker create or delete records through a single lure page. 【F:main.py†L5567-L5594】【F:main.py†L7213-L7237】
