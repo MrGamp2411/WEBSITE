@@ -287,3 +287,6 @@ that rely on cookie-authenticated flows or staff-provided media.
   - `/bar/{bar_id}/categories/{category_id}/products/{product_id}/edit`
     performs lookups and raises 404s prior to checking permissions, allowing
     unauthorized users to enumerate valid bar/category/product IDs.
+- **June 2025 CSRF audit:** Login, registration, account management, cart, and
+  admin POST forms still lack `enforce_csrf` checks. See the refreshed
+  findings in `SECURITY_REVIEW.md` when hardening form submissions.
