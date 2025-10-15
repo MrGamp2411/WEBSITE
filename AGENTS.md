@@ -275,3 +275,12 @@ that rely on cookie-authenticated flows or staff-provided media.
   `get_request_ip` only trusts proxy headers from `TRUSTED_PROXY_IPS`, and
   table selections are now verified against the active cart bar before being
   persisted. Review `main.py` for implementation details.
+- **May 2025 audit addendum:** New findings logged in `SECURITY_REVIEW.md`
+  require attention:
+  - `/login` casts optional latitude/longitude values with `float()` without
+    validation, so malformed coordinates raise `ValueError` and return a 500.
+  - `/api/orders/{order_id}/status` reveals whether an order exists because it
+    returns 404 before authorization checks and 403 after them.
+  - `/bar/{bar_id}/categories/{category_id}/products/{product_id}/edit`
+    performs lookups and raises 404s prior to checking permissions, allowing
+    unauthorized users to enumerate valid bar/category/product IDs.
