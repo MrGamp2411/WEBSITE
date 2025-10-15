@@ -268,3 +268,8 @@ that rely on cookie-authenticated flows or staff-provided media.
 - Live order dashboards (`static/js/orders.js`) still inject `order.notes`
   now populate order notes via text nodes (`.order-notes__value`) so customer
   input renders as plain text.
+- May 2025 follow-up flagged new gaps: host header poisoning via
+  `request.base_url`, spoofable client IP detection because `X-Forwarded-For`
+  is trusted directly, and cart table selection that fails to verify a table
+  belongs to the active bar. See `SECURITY_REVIEW.md` for details and
+  mitigations before shipping related changes.
