@@ -21,6 +21,7 @@ from main import (  # noqa: E402
     blocked_ips,
     blocked_ip_lookup,
 )
+from tests.helpers import trust_testclient_proxy  # noqa: E402
 
 
 def setup_db():
@@ -98,25 +99,26 @@ def test_login_from_blocked_ip_redirects_user():
     load_bars_from_db()
     load_blocked_ips_from_db()
 
-    with TestClient(app) as client:
-        resp = client.post(
-            '/login',
-            data={'email': 'customer@example.com', 'password': 'pass'},
-            headers={'x-forwarded-for': '203.0.113.5'},
-            follow_redirects=False,
-        )
-        assert resp.status_code == 303
-        assert resp.headers['location'] == '/ip-blocked'
+    with trust_testclient_proxy():
+        with TestClient(app) as client:
+            resp = client.post(
+                '/login',
+                data={'email': 'customer@example.com', 'password': 'pass'},
+                headers={'x-forwarded-for': '203.0.113.5'},
+                follow_redirects=False,
+            )
+            assert resp.status_code == 303
+            assert resp.headers['location'] == '/ip-blocked'
 
-        page = client.get('/ip-blocked')
-        assert page.status_code == 200
+            page = client.get('/ip-blocked')
+            assert page.status_code == 200
 
-        redirect_home = client.get('/', follow_redirects=False)
-        assert redirect_home.status_code == 303
-        assert redirect_home.headers['location'] == '/ip-blocked'
+            redirect_home = client.get('/', follow_redirects=False)
+            assert redirect_home.status_code == 303
+            assert redirect_home.headers['location'] == '/ip-blocked'
 
-        notes = client.get('/notifications')
-        assert notes.status_code == 200
+            notes = client.get('/notifications')
+            assert notes.status_code == 200
 
     demo_user = users[user_id]
     assert demo_user.role == 'ip_block'
@@ -150,21 +152,22 @@ def test_super_admin_login_ignores_ip_block():
     load_bars_from_db()
     load_blocked_ips_from_db()
 
-    with TestClient(app) as client:
-        resp = client.post(
-            '/login',
-            data={'email': 'admin@example.com', 'password': 'pass'},
-            headers={'x-forwarded-for': '203.0.113.5'},
-            follow_redirects=False,
-        )
-        assert resp.status_code == 303
-        assert resp.headers['location'] == '/dashboard'
+    with trust_testclient_proxy():
+        with TestClient(app) as client:
+            resp = client.post(
+                '/login',
+                data={'email': 'admin@example.com', 'password': 'pass'},
+                headers={'x-forwarded-for': '203.0.113.5'},
+                follow_redirects=False,
+            )
+            assert resp.status_code == 303
+            assert resp.headers['location'] == '/dashboard'
 
-        dashboard = client.get(
-            '/admin/dashboard',
-            headers={'x-forwarded-for': '203.0.113.5'},
-        )
-        assert dashboard.status_code == 200
+            dashboard = client.get(
+                '/admin/dashboard',
+                headers={'x-forwarded-for': '203.0.113.5'},
+            )
+            assert dashboard.status_code == 200
 
     demo_user = users[admin_id]
     assert demo_user.role == 'super_admin'
@@ -187,26 +190,27 @@ def test_register_from_blocked_ip_sets_role():
     load_bars_from_db()
     load_blocked_ips_from_db()
 
-    with TestClient(app) as client:
-        resp = client.post(
-            '/register',
-            data={
-                'email': 'blocked@example.com',
-                'password': 'pass12345',
-                'confirm_password': 'pass12345',
-            },
-            headers={'x-forwarded-for': '203.0.113.5'},
-            follow_redirects=False,
-        )
-        assert resp.status_code == 303
-        assert resp.headers['location'] == '/ip-blocked'
+    with trust_testclient_proxy():
+        with TestClient(app) as client:
+            resp = client.post(
+                '/register',
+                data={
+                    'email': 'blocked@example.com',
+                    'password': 'pass12345',
+                    'confirm_password': 'pass12345',
+                },
+                headers={'x-forwarded-for': '203.0.113.5'},
+                follow_redirects=False,
+            )
+            assert resp.status_code == 303
+            assert resp.headers['location'] == '/ip-blocked'
 
-        page = client.get('/ip-blocked')
-        assert page.status_code == 200
+            page = client.get('/ip-blocked')
+            assert page.status_code == 200
 
-        details_redirect = client.get('/register/details', follow_redirects=False)
-        assert details_redirect.status_code == 303
-        assert details_redirect.headers['location'] == '/ip-blocked'
+            details_redirect = client.get('/register/details', follow_redirects=False)
+            assert details_redirect.status_code == 303
+            assert details_redirect.headers['location'] == '/ip-blocked'
 
     db = SessionLocal()
     stored_user = db.query(User).filter(User.email == 'blocked@example.com').first()
@@ -239,50 +243,51 @@ def test_existing_session_is_ip_blocked_after_block_added():
     load_bars_from_db()
     load_blocked_ips_from_db()
 
-    with TestClient(app) as client:
-        resp = client.post(
-            '/login',
-            data={'email': 'customer@example.com', 'password': 'pass'},
-            headers={'x-forwarded-for': '198.51.100.10'},
-            follow_redirects=False,
-        )
-        assert resp.status_code == 303
-        assert resp.headers['location'] == '/dashboard'
+    with trust_testclient_proxy():
+        with TestClient(app) as client:
+            resp = client.post(
+                '/login',
+                data={'email': 'customer@example.com', 'password': 'pass'},
+                headers={'x-forwarded-for': '198.51.100.10'},
+                follow_redirects=False,
+            )
+            assert resp.status_code == 303
+            assert resp.headers['location'] == '/dashboard'
 
-        profile = client.get(
-            '/profile',
-            headers={'x-forwarded-for': '198.51.100.10'},
-        )
-        assert profile.status_code == 200
+            profile = client.get(
+                '/profile',
+                headers={'x-forwarded-for': '198.51.100.10'},
+            )
+            assert profile.status_code == 200
 
-        db = SessionLocal()
-        entry = BlockedIP(address='198.51.100.10')
-        db.add(entry)
-        db.commit()
-        db.refresh(entry)
-        record = BlockedIPEntry(
-            entry.id,
-            entry.address,
-            entry.note or '',
-            entry.created_at or datetime.utcnow(),
-        )
-        blocked_ips[record.id] = record
-        blocked_ip_lookup[record.address] = record
-        db.close()
+            db = SessionLocal()
+            entry = BlockedIP(address='198.51.100.10')
+            db.add(entry)
+            db.commit()
+            db.refresh(entry)
+            record = BlockedIPEntry(
+                entry.id,
+                entry.address,
+                entry.note or '',
+                entry.created_at or datetime.utcnow(),
+            )
+            blocked_ips[record.id] = record
+            blocked_ip_lookup[record.address] = record
+            db.close()
 
-        redirected = client.get(
-            '/profile',
-            headers={'x-forwarded-for': '198.51.100.10'},
-            follow_redirects=False,
-        )
-        assert redirected.status_code == 303
-        assert redirected.headers['location'] == '/ip-blocked'
+            redirected = client.get(
+                '/profile',
+                headers={'x-forwarded-for': '198.51.100.10'},
+                follow_redirects=False,
+            )
+            assert redirected.status_code == 303
+            assert redirected.headers['location'] == '/ip-blocked'
 
-        blocked_page = client.get(
-            '/ip-blocked',
-            headers={'x-forwarded-for': '198.51.100.10'},
-        )
-        assert blocked_page.status_code == 200
+            blocked_page = client.get(
+                '/ip-blocked',
+                headers={'x-forwarded-for': '198.51.100.10'},
+            )
+            assert blocked_page.status_code == 200
 
     demo_user = users[user_id]
     assert demo_user.role == 'ip_block'

@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, engine, SessionLocal  # noqa: E402
 from models import AuditLog, User  # noqa: E402
 from main import app  # noqa: E402
+from tests.helpers import trust_testclient_proxy  # noqa: E402
 from tests.test_cancel_order import setup_db, create_order  # noqa: E402
 
 
@@ -50,22 +51,23 @@ def test_login_creates_audit_log():
 
 def test_register_creates_audit_log():
     setup_db()
-    with TestClient(app) as client:
-        resp = client.post(
-            "/register",
-            data={
-                "email": "newuser@example.com",
-                "password": "Str0ngPass!",
-                "confirm_password": "Str0ngPass!",
-            },
-            follow_redirects=False,
-            headers={
-                "User-Agent": "test-agent",
-                "X-Forwarded-For": "2001:db8::1",
-            },
-        )
-        assert resp.status_code == 303
-        assert resp.headers["location"] == "/register/details"
+    with trust_testclient_proxy():
+        with TestClient(app) as client:
+            resp = client.post(
+                "/register",
+                data={
+                    "email": "newuser@example.com",
+                    "password": "Str0ngPass!",
+                    "confirm_password": "Str0ngPass!",
+                },
+                follow_redirects=False,
+                headers={
+                    "User-Agent": "test-agent",
+                    "X-Forwarded-For": "2001:db8::1",
+                },
+            )
+            assert resp.status_code == 303
+            assert resp.headers["location"] == "/register/details"
     db = SessionLocal()
     user = db.query(User).filter(User.email == "newuser@example.com").one()
     logs = db.query(AuditLog).filter(AuditLog.action == "register").all()
