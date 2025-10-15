@@ -198,6 +198,21 @@ class BlockedIP(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
 
+class LoginRateLimit(Base):
+    __tablename__ = "login_rate_limits"
+
+    id = Column(Integer, primary_key=True)
+    scope = Column(String(20), nullable=False)
+    identifier = Column(String(191), nullable=False)
+    fail_count = Column(Integer, nullable=False, default=0)
+    locked_until = Column(DateTime, nullable=True)
+    last_failure_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("scope", "identifier", name="uq_login_rate_limits_scope_identifier"),
+    )
+
+
 class BarClosing(Base):
     __tablename__ = "bar_closings"
 
