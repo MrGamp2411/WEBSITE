@@ -38,6 +38,7 @@ import io
 import asyncio
 import hashlib
 import ipaddress
+import logging
 import json
 import random
 import re
@@ -52,6 +53,8 @@ from urllib.parse import urlparse, urlsplit
 from zoneinfo import ZoneInfo
 
 CH_TZ = ZoneInfo("Europe/Zurich")
+
+logger = logging.getLogger(__name__)
 
 PAYOUT_RATE_LIMIT_WINDOW_SECONDS = 60
 PAYOUT_RATE_LIMIT_MAX_ATTEMPTS = 5
@@ -4542,10 +4545,14 @@ async def init_topup(
         tx = wallee_client.tx_service.create(
             space_id=wallee_client.space_id, transaction=tx_create
         )
-    except Exception as e:
+    except Exception:
         topup.status = "FAILED"
         db.commit()
-        raise HTTPException(status_code=502, detail=f"Wallee create error: {e}")
+        logger.exception("Failed to create Wallee transaction for topup %s", topup.id)
+        raise HTTPException(
+            status_code=502,
+            detail="Payment provider error. Please try again later.",
+        )
 
     topup.wallee_tx_id = int(tx.id)
     db.add(topup)
@@ -4555,10 +4562,16 @@ async def init_topup(
         page_url = wallee_client.pp_service.payment_page_url(
             space_id=wallee_client.space_id, id=int(tx.id)
         )
-    except Exception as e:
+    except Exception:
         topup.status = "FAILED"
         db.commit()
-        raise HTTPException(status_code=502, detail=f"Wallee payment page error: {e}")
+        logger.exception(
+            "Failed to create Wallee payment page for transaction %s", tx.id
+        )
+        raise HTTPException(
+            status_code=502,
+            detail="Payment provider error. Please try again later.",
+        )
 
     return {"paymentPageUrl": page_url}
 

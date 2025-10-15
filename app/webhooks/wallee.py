@@ -41,17 +41,26 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
                 "Skipping Wallee webhook signature verification because it is disabled"
             )
 
-        payload = json.loads(raw.decode("utf-8"))
+        try:
+            payload = json.loads(raw.decode("utf-8"))
+        except json.JSONDecodeError:
+            logger.warning("Received non-JSON Wallee webhook payload")
+            raise HTTPException(status_code=400, detail="Invalid webhook payload")
+
         tx_id_raw = payload.get("entityId") or payload.get("id")
+        if tx_id_raw is None:
+            logger.warning("Wallee webhook missing transaction identifier")
+            raise HTTPException(status_code=400, detail="Missing transaction identifier")
         try:
             tx_id = int(tx_id_raw)
-        except Exception:
-            return {"ok": True}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        except (TypeError, ValueError):
+            logger.warning("Invalid Wallee transaction identifier: %r", tx_id_raw)
+            raise HTTPException(status_code=400, detail="Invalid transaction identifier")
+    except HTTPException:
+        raise
     except Exception:
-        logger.warning("Malformed Wallee webhook payload")
-        return {"ok": True}
+        logger.exception("Malformed Wallee webhook payload")
+        raise HTTPException(status_code=400, detail="Invalid webhook payload")
 
     payment = (
         db.query(Payment)
