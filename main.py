@@ -1000,6 +1000,43 @@ async def enforce_csrf(request: Request) -> None:
     )
 
 
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Set strict browser security headers for every response."""
+
+    def __init__(self, app: FastAPI):
+        super().__init__(app)
+        self._static_headers = {
+            "Content-Security-Policy": (
+                "default-src 'self'; "
+                "script-src 'self' https://cdn.jsdelivr.net https://unpkg.com; "
+                "style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; "
+                "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; "
+                "img-src 'self' data: https://*.tile.openstreetmap.org; "
+                "connect-src 'self' https://nominatim.openstreetmap.org; "
+                "object-src 'none'; "
+                "base-uri 'self'; "
+                "form-action 'self'; "
+                "frame-ancestors 'none'; "
+                "worker-src 'none'"
+            ),
+            "Referrer-Policy": "strict-origin-when-cross-origin",
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "DENY",
+            "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+        }
+
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        for header, value in self._static_headers.items():
+            response.headers.setdefault(header, value)
+        if request.url.scheme == "https":
+            response.headers.setdefault(
+                "Strict-Transport-Security",
+                "max-age=63072000; includeSubDomains; preload",
+            )
+        return response
+
+
 class HostValidationMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         host = request.headers.get("host", "")
@@ -1211,6 +1248,7 @@ app.add_middleware(
     https_only=session_cookie_secure,
 )
 app.add_middleware(HostValidationMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
 
 
 # -----------------------------------------------------------------------------
@@ -2982,7 +3020,31 @@ async def upload_product_image(
 
 
 @app.get("/api/products/{product_id}/image")
-def get_product_image(product_id: int, db: Session = Depends(get_db)):
+def get_product_image(
+    request: Request,
+    product_id: int,
+    db: Session = Depends(get_db),
+):
+    product = db.get(MenuItem, product_id)
+    if not product:
+        raise HTTPException(status_code=404)
+
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+        )
+
+    if not (
+        user.is_super_admin
+        or (
+            product.bar_id in user.bar_ids
+            and (user.is_bar_admin or user.is_bartender)
+        )
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorised")
+
     img = db.query(ProductImage).filter_by(product_id=product_id).first()
     if not img:
         raise HTTPException(status_code=404)
