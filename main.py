@@ -4149,6 +4149,9 @@ async def update_order_status(
     db: Session = Depends(get_db),
 ):
     user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=404, detail="Order not found")
+
     order = db.get(Order, order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
@@ -4174,7 +4177,7 @@ async def update_order_status(
     )
 
     if not is_staff and not is_customer_cancel:
-        raise HTTPException(status_code=403, detail="Not authorised")
+        raise HTTPException(status_code=404, detail="Order not found")
 
     if new_status not in allowed:
         raise HTTPException(
@@ -4693,8 +4696,19 @@ async def login(request: Request, db: Session = Depends(get_db)):
     password = form.get("password")
     latitude = form.get("latitude")
     longitude = form.get("longitude")
-    lat = float(latitude) if latitude else None
-    lon = float(longitude) if longitude else None
+    lat = None
+    lon = None
+    try:
+        if latitude:
+            lat = float(latitude)
+        if longitude:
+            lon = float(longitude)
+    except (TypeError, ValueError):
+        return render_template(
+            "login.html",
+            request=request,
+            error="Invalid location data provided",
+        )
     if existing_user and not (email and password):
         return redirect_for_authenticated_user(existing_user)
     canonical_ip = None
@@ -8049,17 +8063,22 @@ async def bar_delete_product(
     db: Session = Depends(get_db),
 ):
     user = get_current_user(request)
+    has_access = bool(
+        user
+        and (
+            user.is_super_admin
+            or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+        )
+    )
+    if not has_access:
+        raise HTTPException(status_code=404, detail="Product not found")
+
     bar = refresh_bar_from_db(bar_id, db)
     if not bar:
-        raise HTTPException(status_code=404, detail="Bar not found")
+        raise HTTPException(status_code=404, detail="Product not found")
     product = bar.products.get(product_id)
     if not product or product.category_id != category_id:
         raise HTTPException(status_code=404, detail="Product not found")
-    if not user or not (
-        user.is_super_admin
-        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
-    ):
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     db.query(MenuItem).filter(MenuItem.id == product_id).delete()
     db.commit()
     bar.products.pop(product_id, None)
@@ -8081,9 +8100,19 @@ async def bar_edit_product_form(
     db: Session = Depends(get_db),
 ):
     user = get_current_user(request)
+    has_access = bool(
+        user
+        and (
+            user.is_super_admin
+            or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+        )
+    )
+    if not has_access:
+        raise HTTPException(status_code=404, detail="Product not found")
+
     bar = refresh_bar_from_db(bar_id, db)
     if not bar:
-        raise HTTPException(status_code=404, detail="Bar not found")
+        raise HTTPException(status_code=404, detail="Product not found")
     category = bar.categories.get(category_id)
     db_item = db.get(MenuItem, product_id)
     if not category or not db_item or db_item.category_id != category_id:
@@ -8111,11 +8140,6 @@ async def bar_edit_product_form(
         name_translations=name_translations,
         description_translations=description_translations,
     )
-    if not user or not (
-        user.is_super_admin
-        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
-    ):
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(
         "bar_edit_product.html",
         request=request,
