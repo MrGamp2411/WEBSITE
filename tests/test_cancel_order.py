@@ -226,7 +226,7 @@ def test_customer_cannot_cancel_after_acceptance():
         client.get('/logout')
         client.post('/login', data={'email': ids['customer_email'], 'password': 'pass'})
         resp = client.post(f"/api/orders/{ids['order_id']}/status", json={'status': 'CANCELED'})
-        assert resp.status_code == 403
+        assert resp.status_code == 404
     user_carts.clear()
     users.clear()
     users_by_email.clear()

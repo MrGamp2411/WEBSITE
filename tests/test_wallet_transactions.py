@@ -8,7 +8,7 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 from fastapi.testclient import TestClient  # noqa: E402
 
 from main import app, user_carts, users, users_by_email, users_by_username  # noqa: E402
-from test_cancel_order import setup_db, create_order  # noqa: E402
+from tests.test_cancel_order import setup_db, create_order  # noqa: E402
 
 
 def test_wallet_transaction_status_updates():
