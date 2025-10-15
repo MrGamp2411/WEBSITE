@@ -9,6 +9,7 @@
     {% if success %}<p class="alert alert-success">{{ _('profile.alerts.success', default='Profile updated successfully.') }}</p>{% endif %}
     {% if error %}<p class="alert alert-danger">{{ error }}</p>{% endif %}
     <form method="post" action="/profile" id="profile-form" class="profile-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <div class="form-grid">
         <div class="field" data-name="username">
           <label for="username" class="block-label">{{ _('profile.fields.username.label', default='Username') }}</label>
