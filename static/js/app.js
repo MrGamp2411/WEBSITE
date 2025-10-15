@@ -79,8 +79,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return originalFetch.call(this, input, finalInit);
       };
-    }
-    if (window.XMLHttpRequest) {
+  }
+  if (window.XMLHttpRequest) {
       const open = XMLHttpRequest.prototype.open;
       const send = XMLHttpRequest.prototype.send;
       XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
@@ -97,6 +97,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return send.call(this, body);
       };
+    }
+  }
+  const notificationDetail = document.querySelector('[data-mark-read-url]');
+  if (notificationDetail) {
+    const alreadyRead = notificationDetail.getAttribute('data-notification-read') === 'true';
+    const markUrl = notificationDetail.getAttribute('data-mark-read-url');
+    if (!alreadyRead && markUrl && typeof window.fetch === 'function') {
+      notificationDetail.dataset.notificationRead = 'pending';
+      window.fetch(markUrl, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
+      }).then(() => {
+        notificationDetail.dataset.notificationRead = 'true';
+      }).catch(() => {
+        notificationDetail.dataset.notificationRead = 'false';
+      });
     }
   }
   function formatTemplate(template, values){

@@ -68,4 +68,10 @@ def test_notification_badge():
         assert resp.status_code == 200
 
         resp = client.get("/notifications")
+        assert "notif-badge" in resp.text
+
+        resp = client.post(f"/notifications/{note_id}/mark-read")
+        assert resp.status_code == 200
+
+        resp = client.get("/notifications")
         assert "notif-badge" not in resp.text

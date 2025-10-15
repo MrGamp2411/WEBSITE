@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<section class="users-page">
+<section class="users-page" data-notification-id="{{ note.id }}" data-mark-read-url="/notifications/{{ note.id }}/mark-read" data-notification-read="{{ 'true' if note.read else 'false' }}">
   <header class="users-toolbar">
     <div class="title-wrap">
       <h1>{{ note.localized_subject or note.subject }}</h1>

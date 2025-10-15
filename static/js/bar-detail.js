@@ -8,6 +8,18 @@
   if (typeof pausedValue !== 'undefined') {
     window.orderingPaused = pausedValue === 'true';
   }
+
+  const trackUrl = barDetail.getAttribute('data-track-url');
+  if (trackUrl && typeof window.fetch === 'function' && barDetail.dataset.recentlyTracked !== 'true') {
+    barDetail.dataset.recentlyTracked = 'true';
+    window.fetch(trackUrl, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      credentials: 'same-origin'
+    }).catch(() => {
+      barDetail.dataset.recentlyTracked = 'false';
+    });
+  }
 })();
 
 (function () {
