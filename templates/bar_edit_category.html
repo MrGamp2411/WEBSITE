@@ -15,6 +15,7 @@
   <div class="card">
     <div class="card__body">
       <form class="form" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <div class="form-field locked-field">
           <label for="name">{{ _('bar_categories.form.name', default='Name') }}</label>
           <p class="description-preview">{{ category.name }}</p>

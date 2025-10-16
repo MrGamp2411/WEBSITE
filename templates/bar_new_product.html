@@ -8,6 +8,7 @@
 <h1>{{ _('bar_products.new.title', category=category_title, default='Add Product to {category}') }}</h1>
 {% if error %}<p class="error">{{ error }}</p>{% endif %}
 <form class="form" method="post" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
   <label for="name">{{ _('bar_products.form.name', default='Name') }}
     <input id="name" name="name" required>
   </label>

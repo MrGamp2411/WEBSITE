@@ -7997,6 +7997,7 @@ async def bar_new_category(
         or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    await enforce_csrf(request)
     form = await request.form()
     base_name = (form.get("name") or "").strip()
     base_description = (form.get("description") or "").strip()
@@ -8086,6 +8087,7 @@ async def bar_delete_category(
         or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    await enforce_csrf(request)
     db.query(MenuItem).filter(MenuItem.category_id == category_id).delete(
         synchronize_session=False
     )
@@ -8173,6 +8175,7 @@ async def bar_new_product(
         or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    await enforce_csrf(request)
     form = await request.form()
     name = (form.get("name") or "").strip()
     price = form.get("price")
@@ -8266,6 +8269,7 @@ async def bar_delete_product(
     product = bar.products.get(product_id)
     if not product or product.category_id != category_id:
         raise HTTPException(status_code=404, detail="Product not found")
+    await enforce_csrf(request)
     db.query(MenuItem).filter(MenuItem.id == product_id).delete()
     db.commit()
     bar.products.pop(product_id, None)
@@ -8382,6 +8386,7 @@ async def bar_edit_product(
         or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    await enforce_csrf(request)
     form = await request.form()
     name = form.get("name")
     price = form.get("price")
@@ -8559,6 +8564,7 @@ async def bar_edit_product_name(
         or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    await enforce_csrf(request)
     form = await request.form()
     translations: Dict[str, str] = {}
     error_code: Optional[str] = None
@@ -8723,6 +8729,7 @@ async def bar_edit_product_description(
         or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    await enforce_csrf(request)
     form = await request.form()
     translations: Dict[str, str] = {}
     error_code: Optional[str] = None
@@ -8824,6 +8831,7 @@ async def bar_edit_category(
         or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    await enforce_csrf(request)
     form = await request.form()
     name_translations = getattr(category, "name_translations", None)
     base_name = (
@@ -8935,6 +8943,7 @@ async def bar_edit_category_name(
         or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    await enforce_csrf(request)
     form = await request.form()
     translations: Dict[str, str] = {}
     error_code: Optional[str] = None
@@ -9025,6 +9034,7 @@ async def bar_edit_category_description(
         or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
     ):
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+    await enforce_csrf(request)
     form = await request.form()
     translations: Dict[str, str] = {}
     error_code: Optional[str] = None
