@@ -339,9 +339,13 @@ function initUser(userId) {
       const originalText = btn.textContent;
       btn.disabled = true;
       btn.textContent = 'Reordering…';
+      const headers = { Accept: 'application/json' };
+      if (window.CSRF_TOKEN) {
+        headers['X-CSRF-Token'] = window.CSRF_TOKEN;
+      }
       fetch(`/orders/${btn.dataset.orderId}/reorder`, {
         method: 'POST',
-        headers: { Accept: 'application/json' }
+        headers
       })
         .then(res => {
           if (!res.ok) {
