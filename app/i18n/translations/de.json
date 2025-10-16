@@ -1456,7 +1456,9 @@
   },
   "bartender_confirm": {
     "title": "Bartender-Registrierung",
+    "intro": "Bestätigen Sie, dass Sie {bar} als Barkeeper beitreten möchten, um Ihren Zugang abzuschließen.",
     "body": "Sie sind jetzt als Barkeeper für {bar} registriert.",
+    "submit": "Einladung annehmen",
     "cta": "Gehen Sie zum Dashboard"
   },
   "display_orders": {

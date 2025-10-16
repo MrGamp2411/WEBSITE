@@ -1483,7 +1483,9 @@
   },
   "bartender_confirm": {
     "title": "Enregistrement du barman",
+    "intro": "Confirmez que vous souhaitez rejoindre {bar} en tant que barman pour terminer la configuration de votre accès.",
     "body": "Vous êtes maintenant enregistré en tant que barman pour {bar}.",
+    "submit": "Accepter l'invitation",
     "cta": "Aller au tableau de bord"
   },
   "display_orders": {

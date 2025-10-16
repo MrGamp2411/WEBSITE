@@ -1456,7 +1456,9 @@
   },
   "bartender_confirm": {
     "title": "Bartender Registration",
+    "intro": "Confirm you want to join {bar} as a bartender to finish setting up your access.",
     "body": "You are now registered as a bartender for {bar}.",
+    "submit": "Accept invite",
     "cta": "Go to Dashboard"
   },
   "display_orders": {

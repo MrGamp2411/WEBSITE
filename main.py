@@ -4196,6 +4196,7 @@ async def reorder_order(
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    await enforce_csrf(request)
     order = db.get(Order, order_id)
     if not order or order.customer_id != user.id:
         raise HTTPException(status_code=404, detail="Order not found")
@@ -5307,6 +5308,7 @@ async def toggle_ordering_pause(
         or not (user.is_bartender or user.is_bar_admin or user.is_super_admin)
     ):
         raise HTTPException(status_code=403)
+    await enforce_csrf(request)
     data = await request.json()
     paused = bool(data.get("paused"))
     bar_model = db.get(BarModel, bar_id)
@@ -6259,14 +6261,40 @@ async def delete_bar_table(
 
 
 @app.get("/confirm_bartender", response_class=HTMLResponse)
-async def confirm_bartender(request: Request):
+async def confirm_bartender_page(request: Request):
     user = get_current_user(request)
     try:
         bar_id = int(request.query_params.get("bar_id", 0))
-    except ValueError:
+    except (TypeError, ValueError):
         raise HTTPException(status_code=400, detail="Invalid bar")
     bar = bars.get(bar_id)
-    if not user or not bar or user.pending_bar_id != bar_id:
+    if not user or not bar:
+        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    pending_invite = user.pending_bar_id == bar_id
+    already_confirmed = user.id in bar.bartender_ids and user.pending_bar_id is None
+    if not pending_invite and not already_confirmed:
+        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    return render_template(
+        "bartender_confirm.html",
+        request=request,
+        bar=bar,
+        confirmed=already_confirmed,
+    )
+
+
+@app.post("/confirm_bartender", response_class=HTMLResponse)
+async def confirm_bartender(request: Request):
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    await enforce_csrf(request)
+    form = await request.form()
+    try:
+        bar_id = int(form.get("bar_id", 0))
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=400, detail="Invalid bar")
+    bar = bars.get(bar_id)
+    if not bar or user.pending_bar_id != bar_id:
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     user.role = "bartender"
     user.base_role = "bartender"
@@ -6277,7 +6305,12 @@ async def confirm_bartender(request: Request):
         bar.bartender_ids.append(user.id)
     if user.id in bar.pending_bartender_ids:
         bar.pending_bartender_ids.remove(user.id)
-    return render_template("bartender_confirm.html", request=request, bar=bar)
+    return render_template(
+        "bartender_confirm.html",
+        request=request,
+        bar=bar,
+        confirmed=True,
+    )
 
 
 @app.get("/admin/dashboard", response_class=HTMLResponse)

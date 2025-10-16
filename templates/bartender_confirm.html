@@ -1,6 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>{{ _('bartender_confirm.title', default='Bartender Registration') }}</h1>
-<p>{{ _('bartender_confirm.body', bar=bar.name, default='You are now registered as a bartender for {bar}.') }}</p>
-<a class="btn btn--primary" href="/dashboard">{{ _('bartender_confirm.cta', default='Go to Dashboard') }}</a>
+{% if confirmed %}
+  <p>{{ _('bartender_confirm.body', bar=bar.name, default='You are now registered as a bartender for {bar}.') }}</p>
+  <a class="btn btn--primary" href="/dashboard">{{ _('bartender_confirm.cta', default='Go to Dashboard') }}</a>
+{% else %}
+  <p>{{ _('bartender_confirm.intro', bar=bar.name, default='Confirm you want to join {bar} as a bartender to finish setting up your access.') }}</p>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="bar_id" value="{{ bar.id }}">
+    <button class="btn btn--primary" type="submit">{{ _('bartender_confirm.submit', default='Accept invite') }}</button>
+  </form>
+  <a class="btn" href="/dashboard">{{ _('bartender_confirm.cta', default='Go to Dashboard') }}</a>
+{% endif %}
 {% endblock %}
