@@ -7,4 +7,21 @@ This document captures outstanding security issues discovered during manual revi
 
 ## Outstanding Findings
 
-None.
+- **GET invite confirmation lacks CSRF** – `/confirm_bartender` updates the logged-in
+  user’s role and removes their pending invite purely through a GET request with a
+  `bar_id` query parameter, so a crafted image tag or link can auto-accept a
+  bartender invite without the user’s consent. Mitigation: switch the route to a
+  POST that requires `await enforce_csrf` and include the CSRF token in the
+  confirmation UI.【F:main.py†L6261-L6280】
+- **Reorder endpoint skips explicit CSRF validation** –
+  `/orders/{order_id}/reorder` mutates the session cart but never calls
+  `await enforce_csrf`, relying only on the middleware’s origin heuristics.
+  Attackers who can trigger same-origin requests (e.g., via compromised static
+  assets) can silently repopulate a victim’s cart. Mitigation: add
+  `await enforce_csrf(request)` before reading the request body and ensure the
+  reorder button includes the CSRF token.【F:main.py†L4192-L4223】
+- **Bar pause toggle missing CSRF token enforcement** – the admin/bartender API at
+  `/dashboard/bar/{bar_id}/toggle_pause` updates bar availability based on JSON
+  input but never enforces a CSRF token, so the service state can be flipped with a
+  forged same-origin request. Mitigation: require `await enforce_csrf` and send the
+  token from `bar-orders.js` when toggling the pause switch.【F:main.py†L5299-L5319】
