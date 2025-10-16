@@ -12,6 +12,7 @@
   <div class="alert alert-danger">{{ _('bar_products.edit_description.errors.' + error_code, default='All fields are required.') }}</div>
   {% endif %}
   <form method="post" action="/bar/{{ bar.id }}/categories/{{ category.id }}/products/{{ product.id }}/edit/description" class="translation-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     {% for lang in languages %}
     <div class="field-group">
       <label for="description_{{ lang.code }}">{{ _('bar_products.edit_description.fields.language', language=lang.name, default='{language} description') }}</label>
