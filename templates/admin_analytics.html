@@ -156,6 +156,6 @@
 {% endblock %}
 {% block scripts %}
 {{ super() }}
-<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+<script src="{{ url_for('static', path='js/vendor/chart.4.4.3.umd.min.js') }}" defer></script>
 <script src="/static/js/admin-analytics.js" defer></script>
 {% endblock %}
