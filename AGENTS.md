@@ -250,6 +250,10 @@ All static marketing pages reuse `.static-page` rules in
 - Bootstrap Icons now live under `static/css/vendor/bootstrap-icons.css`; add the
   upstream `bootstrap-icons.woff2` and `.woff` binaries to `static/fonts/` when
   assembling deployment builds so navigation glyphs render correctly.
+- Inter font weights 400/600/700 are self-hosted via
+  `static/css/vendor/inter.css`. Keep matching `inter-latin-*-normal.woff2/.woff`
+  binaries in `static/fonts/` (see the README there for download commands) so the
+  base layout loads without reaching Google Fonts.
 
 ---
 
