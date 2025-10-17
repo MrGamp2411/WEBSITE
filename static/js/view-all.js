@@ -270,7 +270,16 @@ document.addEventListener('DOMContentLoaded', () => {
     chip.className = 'filter-chip';
     chip.dataset.filter = type;
     if (val) chip.dataset.value = val;
-    chip.innerHTML = label + (value ? ': ' + value : '') + ' <i class="bi bi-x" aria-hidden="true"></i>';
+    chip.append(label);
+    if (value) {
+      chip.append(': ');
+      chip.append(value);
+    }
+    const icon = document.createElement('i');
+    icon.className = 'bi bi-x';
+    icon.setAttribute('aria-hidden', 'true');
+    chip.append(' ');
+    chip.append(icon);
     activeChips.appendChild(chip);
   }
 
