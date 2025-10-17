@@ -80,3 +80,34 @@ def test_fallback_priority(monkeypatch):
     _mock_loaders(monkeypatch, remote=set(), local=set(), pypi={"pypi.com"})
     de._cache.clear()
     assert de.is_disposable_domain("pypi.com")
+
+
+def test_http_urls_upgraded_and_invalid_skipped(monkeypatch):
+    urls = [
+        "http://example.com/list.txt",
+        "https://valid.com/list.txt",
+        "ftp://ignored.com/list.txt",
+        "https://valid.com/list.txt",
+        "http://",
+    ]
+    normalized = de._normalize_remote_urls(urls)
+    assert normalized == [
+        "https://example.com/list.txt",
+        "https://valid.com/list.txt",
+    ]
+
+
+def test_remote_urls_reloaded_with_https(monkeypatch):
+    monkeypatch.setenv(
+        "DISPOSABLE_DOMAIN_URLS",
+        "http://blocked.example.com/list.txt,https://ok.example.com/list.txt",
+    )
+    importlib.reload(de)
+    try:
+        assert de.REMOTE_URLS == [
+            "https://blocked.example.com/list.txt",
+            "https://ok.example.com/list.txt",
+        ]
+    finally:
+        monkeypatch.delenv("DISPOSABLE_DOMAIN_URLS", raising=False)
+        importlib.reload(de)

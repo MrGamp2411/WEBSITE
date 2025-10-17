@@ -1,7 +1,8 @@
 import os
 import logging
 from datetime import datetime, timezone
-from typing import Set, Iterable
+from typing import Iterable, List, Set
+from urllib.parse import urlparse, urlunparse
 from cachetools import TTLCache
 import httpx
 from importlib import resources
@@ -12,7 +13,7 @@ from .email_normalize import normalize_email
 _LOG = logging.getLogger(__name__)
 
 ENFORCE = os.getenv("DISPOSABLE_EMAIL_ENFORCE", "true").lower() == "true"
-URLS = [u.strip() for u in os.getenv("DISPOSABLE_DOMAIN_URLS", "").split(",") if u.strip()]
+RAW_URLS = [u.strip() for u in os.getenv("DISPOSABLE_DOMAIN_URLS", "").split(",") if u.strip()]
 TTL_MIN = int(os.getenv("DISPOSABLE_CACHE_TTL_MIN", "360"))
 LOCAL_PATH = os.getenv("DISPOSABLE_LOCAL_PATH", "app/data/disposable_domains.txt")
 
@@ -22,6 +23,36 @@ _meta = {"last_refreshed": None}
 
 def _is_domain_or_subdomain_of(target: str, base: str) -> bool:
     return target == base or target.endswith("." + base)
+
+
+def _normalize_remote_urls(urls: Iterable[str]) -> List[str]:
+    normalized: List[str] = []
+    seen = set()
+    for raw in urls:
+        if not raw:
+            continue
+        parsed = urlparse(raw)
+        scheme = parsed.scheme.lower()
+        if scheme not in {"http", "https"}:
+            _LOG.warning("Skipping disposable list URL with unsupported scheme: %s", raw)
+            continue
+        if not parsed.netloc:
+            _LOG.warning("Skipping disposable list URL without host: %s", raw)
+            continue
+        if scheme == "http":
+            parsed = parsed._replace(scheme="https")
+            upgraded = urlunparse(parsed)
+            _LOG.warning("Upgrading disposable list URL to HTTPS: %s -> %s", raw, upgraded)
+        else:
+            upgraded = urlunparse(parsed)
+        if upgraded in seen:
+            continue
+        seen.add(upgraded)
+        normalized.append(upgraded)
+    return normalized
+
+
+REMOTE_URLS = _normalize_remote_urls(RAW_URLS)
 
 
 def _load_local() -> Set[str]:
@@ -88,7 +119,7 @@ def _merge_sets(*sets: Iterable[str]) -> Set[str]:
 def _build_domains_set(force: bool = False) -> Set[str]:
     if "domains_set" in _cache and not force:
         return _cache["domains_set"]
-    remote = _load_remote(URLS)
+    remote = _load_remote(REMOTE_URLS)
     local = _load_local()
     pypi = _load_from_pypi_pkg()
     domains = _merge_sets(remote, local, pypi)
