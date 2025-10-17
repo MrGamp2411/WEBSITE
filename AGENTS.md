@@ -290,3 +290,11 @@ that rely on cookie-authenticated flows or staff-provided media.
 - **June 2025 CSRF audit:** Login, registration, account management, cart, and
   admin POST forms still lack `enforce_csrf` checks. See the refreshed
   findings in `SECURITY_REVIEW.md` when hardening form submissions.
+- **June 2025 vulnerability sweep:**
+  - The `/bars` "All bars" filter chips still concatenate raw input into
+    `chip.innerHTML`. Treat it as a DOM XSS sink until the component is rebuilt
+    with `textContent` nodes (`static/js/view-all.js`).
+  - `POST /api/bars` accepts arbitrary `photo_url` strings; anything not
+    starting with `http(s)` is passed through by `make_absolute_url`, letting
+    `data:image/svg+xml` payloads execute inside `<img>` tags. Force uploads
+    through `save_product_image` when touching this API.
