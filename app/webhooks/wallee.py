@@ -15,8 +15,13 @@ from .wallee_verify import verify_signature_bytes
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-
-ENVIRONMENT = os.getenv("ENV", "development").lower()
+TRUSTED_WEBHOOK_IPS = {
+    ip.strip()
+    for ip in os.getenv(
+        "WALLEE_TRUSTED_IPS", "127.0.0.1,::1,localhost,testclient"
+    ).split(",")
+    if ip.strip()
+}
 
 
 @router.post("/webhooks/wallee")
@@ -24,22 +29,30 @@ async def handle_wallee_webhook(request: Request, db: Session = Depends(get_db))
     try:
         raw = await request.body()
         verify_config = os.getenv("WALLEE_VERIFY_SIGNATURE", "true").lower() == "true"
-        enforce_verification = ENVIRONMENT == "production"
-        if enforce_verification and not verify_config:
-            logger.warning(
-                "Ignoring WALLEE_VERIFY_SIGNATURE=false in production; verification enforced"
-            )
-
-        if verify_config or enforce_verification:
-            sig = request.headers.get("x-signature") or request.headers.get("X-Signature")
+        sig = request.headers.get("x-signature") or request.headers.get("X-Signature")
+        client_host = request.client.host if request.client else None
+        if verify_config:
+            if not sig:
+                raise HTTPException(status_code=400, detail="Missing signature header")
             try:
                 verify_signature_bytes(raw, sig)
             except ValueError as exc:
                 raise HTTPException(status_code=400, detail=str(exc))
         else:
-            logger.warning(
-                "Skipping Wallee webhook signature verification because it is disabled"
-            )
+            if not client_host or client_host not in TRUSTED_WEBHOOK_IPS:
+                logger.warning(
+                    "Rejected unsigned Wallee webhook from untrusted source %s", client_host
+                )
+                raise HTTPException(status_code=400, detail="Signature verification required")
+            if sig:
+                try:
+                    verify_signature_bytes(raw, sig)
+                except ValueError as exc:
+                    raise HTTPException(status_code=400, detail=str(exc))
+            else:
+                logger.warning(
+                    "Accepting unsigned Wallee webhook from trusted source %s", client_host
+                )
 
         try:
             payload = json.loads(raw.decode("utf-8"))

@@ -7,6 +7,7 @@ from unittest.mock import patch
 from sqlalchemy import text, inspect
 
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+os.environ["WALLEE_VERIFY_SIGNATURE"] = "false"
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from fastapi.testclient import TestClient  # noqa: E402
