@@ -3032,16 +3032,16 @@ def get_product_image(
     product_id: int,
     db: Session = Depends(get_db),
 ):
-    product = db.get(MenuItem, product_id)
-    if not product:
-        raise HTTPException(status_code=404)
-
     user = get_current_user(request)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication required",
         )
+
+    product = db.get(MenuItem, product_id)
+    if not product:
+        raise HTTPException(status_code=404)
 
     if not (
         user.is_super_admin
@@ -6024,6 +6024,7 @@ async def manage_bar_users_post(
         "bartender": RoleEnum.BARTENDER,
         "display": RoleEnum.DISPLAY,
     }
+    protected_roles = {RoleEnum.SUPERADMIN, RoleEnum.FINANCE}
     error = None
     message = None
     if action == "existing":
@@ -6034,8 +6035,9 @@ async def manage_bar_users_post(
             db_user = db.query(User).filter(User.email == email).first()
             if not db_user:
                 error = "User not found"
+            elif db_user.role in protected_roles:
+                error = "Cannot modify this user"
             else:
-                db_user.role = role_map[role]
                 rel = (
                     db.query(UserBarRole)
                     .filter(
@@ -6044,29 +6046,34 @@ async def manage_bar_users_post(
                     )
                     .first()
                 )
-                if not rel:
-                    rel = UserBarRole(
-                        user_id=db_user.id, bar_id=bar_id, role=role_map[role]
-                    )
-                    db.add(rel)
+                if not current.is_super_admin and not rel:
+                    error = "User not assigned to this bar"
                 else:
-                    rel.role = role_map[role]
-                db.commit()
-                demo = _load_demo_user(db_user.id, db)
-                demo.role = role
-                if bar_id not in demo.bar_ids:
-                    demo.bar_ids.append(bar_id)
-                if role == "bar_admin":
-                    if demo.id not in bar.bar_admin_ids:
-                        bar.bar_admin_ids.append(demo.id)
-                    if demo.id in bar.bartender_ids:
-                        bar.bartender_ids.remove(demo.id)
-                else:
-                    if demo.id not in bar.bartender_ids:
-                        bar.bartender_ids.append(demo.id)
-                    if demo.id in bar.bar_admin_ids:
-                        bar.bar_admin_ids.remove(demo.id)
-                message = "User assigned"
+                    if not rel:
+                        rel = UserBarRole(
+                            user_id=db_user.id, bar_id=bar_id, role=role_map[role]
+                        )
+                        db.add(rel)
+                    else:
+                        rel.role = role_map[role]
+                    if current.is_super_admin:
+                        db_user.role = role_map[role]
+                    db.commit()
+                    demo = _load_demo_user(db_user.id, db)
+                    demo.role = role
+                    if bar_id not in demo.bar_ids:
+                        demo.bar_ids.append(bar_id)
+                    if role == "bar_admin":
+                        if demo.id not in bar.bar_admin_ids:
+                            bar.bar_admin_ids.append(demo.id)
+                        if demo.id in bar.bartender_ids:
+                            bar.bartender_ids.remove(demo.id)
+                    else:
+                        if demo.id not in bar.bartender_ids:
+                            bar.bartender_ids.append(demo.id)
+                        if demo.id in bar.bar_admin_ids:
+                            bar.bar_admin_ids.remove(demo.id)
+                    message = "User assigned"
     elif action == "remove":
         uid = form.get("user_id")
         try:
@@ -6084,7 +6091,10 @@ async def manage_bar_users_post(
                 )
                 .first()
             )
-            if not rel:
+            db_user = db.get(User, uid_int)
+            if db_user and db_user.role in protected_roles:
+                error = "Cannot modify this user"
+            elif not rel:
                 error = "User not assigned"
             else:
                 db.delete(rel)
@@ -8109,17 +8119,17 @@ async def bar_delete_category(
     request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     category = bar.categories.get(category_id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    if not user or not (
-        user.is_super_admin
-        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
-    ):
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     await enforce_csrf(request)
     db.query(MenuItem).filter(MenuItem.category_id == category_id).delete(
         synchronize_session=False
@@ -8142,17 +8152,17 @@ async def bar_category_products(
     request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     category = bar.categories.get(category_id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    if not user or not (
-        user.is_super_admin
-        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
-    ):
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     products = sorted(
         [p for p in bar.products.values() if p.category_id == category_id],
         key=lambda p: p.display_order,
@@ -8176,17 +8186,17 @@ async def bar_new_product_form(
     request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     category = bar.categories.get(category_id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    if not user or not (
-        user.is_super_admin
-        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
-    ):
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(
         "bar_new_product.html", request=request, bar=bar, category=category
     )
@@ -8197,17 +8207,17 @@ async def bar_new_product(
     request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     category = bar.categories.get(category_id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    if not user or not (
-        user.is_super_admin
-        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
-    ):
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     await enforce_csrf(request)
     form = await request.form()
     name = (form.get("name") or "").strip()
@@ -8382,6 +8392,11 @@ async def bar_edit_product(
     db: Session = Depends(get_db),
 ):
     user = get_current_user(request)
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
@@ -8414,11 +8429,6 @@ async def bar_edit_product(
             name_translations=name_translations,
             description_translations=description_translations,
         )
-    if not user or not (
-        user.is_super_admin
-        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
-    ):
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     await enforce_csrf(request)
     form = await request.form()
     name = form.get("name")
@@ -8832,17 +8842,17 @@ async def bar_edit_category_form(
     request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     category = bar.categories.get(category_id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    if not user or not (
-        user.is_super_admin
-        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
-    ):
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     return render_template(
         "bar_edit_category.html", request=request, bar=bar, category=category
     )
@@ -8853,17 +8863,17 @@ async def bar_edit_category(
     request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     category = bar.categories.get(category_id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    if not user or not (
-        user.is_super_admin
-        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
-    ):
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     await enforce_csrf(request)
     form = await request.form()
     name_translations = getattr(category, "name_translations", None)
@@ -8935,17 +8945,17 @@ async def bar_edit_category_name_form(
     request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     category = bar.categories.get(category_id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    if not user or not (
-        user.is_super_admin
-        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
-    ):
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     translations = dict(getattr(category, "name_translations", {}) or {})
     base_name = translations.get(DEFAULT_LANGUAGE) or category.name or ""
     for code in LANGUAGES:
@@ -8965,17 +8975,17 @@ async def bar_edit_category_name(
     request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     category = bar.categories.get(category_id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    if not user or not (
-        user.is_super_admin
-        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
-    ):
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     await enforce_csrf(request)
     form = await request.form()
     translations: Dict[str, str] = {}
@@ -9022,17 +9032,17 @@ async def bar_edit_category_description_form(
     request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     category = bar.categories.get(category_id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    if not user or not (
-        user.is_super_admin
-        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
-    ):
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     translations = dict(getattr(category, "description_translations", {}) or {})
     base_description = (
         translations.get(DEFAULT_LANGUAGE)
@@ -9056,17 +9066,17 @@ async def bar_edit_category_description(
     request: Request, bar_id: int, category_id: int, db: Session = Depends(get_db)
 ):
     user = get_current_user(request)
+    if not user or not (
+        user.is_super_admin
+        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
+    ):
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     bar = refresh_bar_from_db(bar_id, db)
     if not bar:
         raise HTTPException(status_code=404, detail="Bar not found")
     category = bar.categories.get(category_id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    if not user or not (
-        user.is_super_admin
-        or (bar_id in user.bar_ids and (user.is_bar_admin or user.is_bartender))
-    ):
-        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     await enforce_csrf(request)
     form = await request.form()
     translations: Dict[str, str] = {}
