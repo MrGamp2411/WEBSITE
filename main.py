@@ -98,6 +98,7 @@ ALLOWED_NOTIFICATION_ATTACHMENT_TYPES = ALLOWED_NOTIFICATION_IMAGE_TYPES | {
 }
 
 ALLOWED_NOTIFICATION_LINK_SCHEMES = {"https", "http", "mailto", "tel"}
+ALLOWED_BAR_PHOTO_SCHEMES = {"https"}
 
 MAX_PRODUCT_IMAGE_BYTES = 5 * 1024 * 1024  # 5MB
 ALLOWED_PRODUCT_IMAGE_FORMATS = {
@@ -268,6 +269,26 @@ def normalize_notification_link(url: str | None) -> Optional[str]:
     if candidate.startswith("/"):
         return candidate
     return None
+
+
+def normalise_bar_photo_url(url: Optional[str]) -> Optional[str]:
+    if not url:
+        return None
+    candidate = url.strip()
+    if not candidate:
+        return None
+    if candidate.startswith("//"):
+        raise ValueError("Disallowed photo URL scheme")
+    if candidate.startswith("/"):
+        return candidate
+    parsed = urlparse(candidate)
+    scheme = (parsed.scheme or "").lower()
+    if scheme == "http":
+        parsed = parsed._replace(scheme="https")
+        scheme = "https"
+    if scheme not in ALLOWED_BAR_PHOTO_SCHEMES or not parsed.netloc:
+        raise ValueError("Disallowed photo URL scheme")
+    return parsed.geturl()
 
 
 class ImageUploadError(Exception):
@@ -3434,6 +3455,13 @@ def create_bar(
             normalised[code] = value
         payload["description_translations"] = normalised
         payload["description"] = normalised.get(DEFAULT_LANGUAGE) or base
+    try:
+        payload["photo_url"] = normalise_bar_photo_url(payload.get("photo_url"))
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Photo URL must use HTTPS or be a site-relative path",
+        )
     bar = BarModel(**payload)
     db.add(bar)
     db.commit()
