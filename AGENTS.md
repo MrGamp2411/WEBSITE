@@ -247,6 +247,9 @@ All static marketing pages reuse `.static-page` rules in
 - Security review log (`SECURITY_REVIEW.md`) is kept empty unless a new finding
   is discovered. When adding an item include impact, mitigation, and remove it
   once the fix lands so the document always reflects the current backlog.
+- Bootstrap Icons now live under `static/css/vendor/bootstrap-icons.css`; add the
+  upstream `bootstrap-icons.woff2` and `.woff` binaries to `static/fonts/` when
+  assembling deployment builds so navigation glyphs render correctly.
 
 ---
 
