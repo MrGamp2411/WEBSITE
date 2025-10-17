@@ -1,8 +1,9 @@
 # Font Assets
 
-This directory stores binary font files that are required by the stylesheets under
-`static/css/vendor/`. The binaries themselves are not tracked in git, so remember to
-download them before building production bundles.
+This directory stores the binary font files required by the stylesheets under
+`static/css/vendor/`. The binaries are tracked in git so local development and
+deployments pick them up automatically, but if a file goes missing you can
+redownload the expected versions with the commands below.
 
 ## Bootstrap Icons
 
