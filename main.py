@@ -369,7 +369,12 @@ from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, Plai
 from fastapi.staticfiles import StaticFiles
 from PIL import Image, UnidentifiedImageError
 from fastapi.middleware.cors import CORSMiddleware
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from jinja2 import (
+    Environment,
+    FileSystemLoader,
+    select_autoescape,
+    pass_context,
+)
 from sqlalchemy import inspect, text, func, extract, or_, and_
 from sqlalchemy.orm import Session, joinedload
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -2098,6 +2103,17 @@ templates_env = Environment(
     autoescape=select_autoescape(["html", "xml"]),
 )
 
+
+@pass_context
+def _url_for(context: Dict[str, Any], name: str, /, **path_params: Any) -> str:
+    request: Optional[Request] = context.get("request")
+    if request is None:
+        raise RuntimeError("url_for requires a request in the template context")
+    return request.url_for(name, **path_params)
+
+
+templates_env.globals.setdefault("url_for", _url_for)
+
 # -----------------------------------------------------------------------------
 # In-memory store with sample data
 # -----------------------------------------------------------------------------
@@ -2891,6 +2907,7 @@ def render_template(template_name: str, **context) -> HTMLResponse:
     request: Optional[Request] = context.get("request")
     user = context.get("user")
     if request is not None:
+        context.setdefault("request", request)
         context.setdefault("csrf_token", ensure_csrf_token(request))
         session_user = get_current_user(request)
         if user is None:
