@@ -11,3 +11,13 @@ This document captures outstanding security issues discovered during manual revi
 - **Location:** `templates/layout.html`【F:templates/layout.html†L22-L30】
 - **Impact:** The base layout links the Bootstrap Icons CSS from jsDelivr without integrity metadata. Malicious CSS delivered from the CDN can exfiltrate session data via `url()` beacons or visually spoof UI controls across every page.
 - **Mitigation:** Ship the Bootstrap Icons assets from `static/` (or add an SRI hash) and tighten the CSP to only allow self-hosted stylesheets.
+
+### Google Fonts stylesheet loaded without integrity guarantees
+- **Location:** `templates/layout.html`【F:templates/layout.html†L22-L24】
+- **Impact:** The layout page fetches the Inter font family from `fonts.googleapis.com` without any subresource integrity metadata. If that CDN or its DNS responses are compromised, an attacker-controlled stylesheet can run cross-origin requests (e.g. via `@font-face`/`url()` beacons) to leak session identifiers and page content from every view that inherits the base layout.
+- **Mitigation:** Bundle the Inter font files under `static/` and update the layout to reference the self-hosted assets so the CSP can be narrowed to `'self'`.
+
+### Leaflet assets served from unpkg without integrity protection
+- **Location:** `templates/admin_edit_bar.html`, `templates/admin_new_bar.html`【F:templates/admin_edit_bar.html†L1-L7】【F:templates/admin_new_bar.html†L1-L5】【F:templates/admin_edit_bar.html†L149-L156】【F:templates/admin_new_bar.html†L128-L135】
+- **Impact:** Both admin bar-management templates pull Leaflet’s CSS and JavaScript from `unpkg.com` with no SRI hashes. A malicious update or CDN compromise would let attackers execute arbitrary JavaScript in privileged admin sessions (bar owners and super admins) or inject hostile CSS that captures form inputs such as address and contact data.
+- **Mitigation:** Vendor the Leaflet assets within `static/` and adjust the CSP to remove the `unpkg.com` allowance so only self-hosted resources are permitted.
