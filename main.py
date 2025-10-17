@@ -1036,8 +1036,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         self._static_headers = {
             "Content-Security-Policy": (
                 "default-src 'self'; "
-                "script-src 'self' https://cdn.jsdelivr.net https://unpkg.com; "
-                "style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; "
+                "script-src 'self' https://cdn.jsdelivr.net; "
+                "style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; "
                 "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; "
                 "img-src 'self' data: https://*.tile.openstreetmap.org; "
                 "connect-src 'self' https://nominatim.openstreetmap.org; "
