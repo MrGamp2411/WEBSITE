@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block page_styles %}
 {{ super() }}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="{{ url_for('static', path='css/vendor/leaflet/leaflet.css') }}">
 <link rel="stylesheet" href="/static/css/pages/admin-edit-bar.css">
 {% endblock %}
 {% block content %}
@@ -152,6 +152,6 @@
 
 {% block scripts %}
 {{ super() }}
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('static', path='js/vendor/leaflet/leaflet.js') }}"></script>
 <script src="/static/js/admin-edit-bar.js" defer></script>
 {% endblock %}
