@@ -306,3 +306,6 @@ that rely on cookie-authenticated flows or staff-provided media.
     starting with `http(s)` is passed through by `make_absolute_url`, letting
     `data:image/svg+xml` payloads execute inside `<img>` tags. Force uploads
     through `save_product_image` when touching this API.
+- **July 2025 follow-up:** See `SECURITY_REVIEW.md` for the latest backlog on
+  the Node top-up service, host header validation defaults, CSP tightening, and
+  Wallee webhook signature enforcement.
